@@ -81,10 +81,14 @@ export function gather(state, resourceId, amount = 1) {
 }
 
 // Get effective cap for a resource
+// Caps scale with era distance — earlier resources get bigger caps in later eras
 export function getEffectiveCap(state, resourceId) {
   const r = state.resources[resourceId];
   if (!r) return 0;
   const def = resourceDefs[resourceId];
   if (!def) return 0;
-  return def.baseCap * r.capMult;
+  // Era scaling: resources from earlier eras get cap boost in later eras
+  const eraDiff = Math.max(0, (state.era || 1) - def.era);
+  const eraCapScale = 1 + eraDiff * 0.5; // +50% cap per era beyond origin
+  return def.baseCap * r.capMult * eraCapScale;
 }
