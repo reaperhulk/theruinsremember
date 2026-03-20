@@ -28,6 +28,11 @@ export function OfflineReport({ report, onDismiss }) {
             </div>
           </>
         )}
+        {gains.length > 0 && (
+          <p className="offline-time" style={{ color: '#88cc88' }}>
+            Total: +{formatNumber(gains.reduce((s, [, v]) => s + v, 0))} resources earned
+          </p>
+        )}
         <button className="mine-btn" onClick={onDismiss}>Continue</button>
       </div>
     </div>
