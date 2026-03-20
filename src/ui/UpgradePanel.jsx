@@ -57,6 +57,7 @@ function getAffordProgress(state, cost) {
 export function UpgradePanel({ state, onUpdate }) {
   const [showPurchased, setShowPurchased] = useState(false);
   const [sortBy, setSortBy] = useState('affordable');
+  const [filterType, setFilterType] = useState('all');
   const [flashId, setFlashId] = useState(null);
 
   const handlePurchase = useCallback((upgradeId) => {
@@ -84,10 +85,21 @@ export function UpgradePanel({ state, onUpdate }) {
     return 0;
   });
 
+  // Apply effect type filter
+  const filteredAvailable = filterType === 'all' ? sortedAvailable : sortedAvailable.filter(u =>
+    u.effects.some(e => {
+      if (filterType === 'mult') return e.type === 'production_mult' || e.type === 'production_mult_all';
+      if (filterType === 'add') return e.type === 'production_add';
+      if (filterType === 'cap') return e.type === 'cap_mult';
+      if (filterType === 'unlock') return e.type === 'unlock_resource';
+      return true;
+    })
+  );
+
   return (
     <div className="panel upgrade-panel">
       <h2>
-        Upgrades{sortedAvailable.length > 0 ? ` (${sortedAvailable.length})` : ''}{upcoming.length > 0 ? ` — ${upcoming.length} soon` : ''}
+        Upgrades{filteredAvailable.length > 0 ? ` (${filteredAvailable.length})` : ''}{upcoming.length > 0 ? ` — ${upcoming.length} soon` : ''}
         {purchased.length > 0 && (
           <span
             className="toggle-purchased"
@@ -115,16 +127,21 @@ export function UpgradePanel({ state, onUpdate }) {
           <button className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>All</button>
           <button className={sortBy === 'affordable' ? 'active' : ''} onClick={() => setSortBy('affordable')}>Can Buy</button>
           <button className={sortBy === 'cheapest' ? 'active' : ''} onClick={() => setSortBy('cheapest')}>Cheap</button>
+          <span style={{ borderLeft: '1px solid #333', margin: '0 4px' }} />
+          <button className={filterType === 'all' ? 'active' : ''} onClick={() => setFilterType('all')}>Any</button>
+          <button className={filterType === 'mult' ? 'active' : ''} onClick={() => setFilterType('mult')}>xN</button>
+          <button className={filterType === 'add' ? 'active' : ''} onClick={() => setFilterType('add')}>+N</button>
+          <button className={filterType === 'cap' ? 'active' : ''} onClick={() => setFilterType('cap')}>Cap</button>
         </div>
       )}
       <div className="upgrade-list">
-        {sortedAvailable.length === 0 && upcoming.length === 0 && (
+        {filteredAvailable.length === 0 && upcoming.length === 0 && (
           <p className="empty-message">No upgrades available — buy prerequisite upgrades to unlock more</p>
         )}
-        {sortedAvailable.length === 0 && upcoming.length > 0 && (
+        {filteredAvailable.length === 0 && upcoming.length > 0 && (
           <p className="empty-message">Buy prerequisites to unlock {upcoming.length} upcoming upgrade{upcoming.length > 1 ? 's' : ''}</p>
         )}
-        {sortedAvailable.map(upgrade => {
+        {filteredAvailable.map(upgrade => {
           const cost = getUpgradeCost(state, upgrade.id);
           const affordable = canAfford(state, cost);
           const count = typeof state.upgrades[upgrade.id] === 'number' ? state.upgrades[upgrade.id] : 0;
