@@ -126,7 +126,7 @@ export function App() {
   };
 
   return (
-    <div className={`game-container ${shakeClass}`}>
+    <div className={`game-container era-${state.era} ${shakeClass}`}>
       <header className="game-header">
         <h1>Planet to Multiverse</h1>
         <div className="header-controls">

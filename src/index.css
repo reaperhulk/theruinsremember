@@ -33,7 +33,21 @@ body {
   max-width: 900px;
   margin: 0 auto;
   padding: 12px;
+  border-top: 2px solid transparent;
+  transition: border-color 1s ease;
 }
+
+/* Era-themed top border */
+.game-container.era-1 { border-top-color: #4a8a4a; }
+.game-container.era-2 { border-top-color: #8a6a3a; }
+.game-container.era-3 { border-top-color: #3a6a8a; }
+.game-container.era-4 { border-top-color: #6a6a8a; }
+.game-container.era-5 { border-top-color: #8a8a3a; }
+.game-container.era-6 { border-top-color: #3a5a8a; }
+.game-container.era-7 { border-top-color: #8a4a3a; }
+.game-container.era-8 { border-top-color: #6a3a8a; }
+.game-container.era-9 { border-top-color: #3a8a7a; }
+.game-container.era-10 { border-top-color: #8a3a8a; }
 
 .game-header {
   display: flex;
