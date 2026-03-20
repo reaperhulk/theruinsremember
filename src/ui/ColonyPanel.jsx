@@ -86,7 +86,7 @@ export function ColonyPanel({ state, onUpdate }) {
           Strategy: {strategy.type} (x{strategy.mult})
         </div>
       )}
-      <p className="mining-hint">Specialize (all one type, 3+) for x2, or diversify (all three) for x1.25</p>
+      <p className="mining-hint">Specialize x2 | Diversify x1.25 | Era bonus scales output</p>
     </div>
   );
 }
