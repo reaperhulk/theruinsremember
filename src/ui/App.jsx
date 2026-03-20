@@ -143,9 +143,9 @@ export function App() {
       </header>
 
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
-      {state.totalTime < 10 && (
-        <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.7em', color: '#555', padding: '2px 0', opacity: Math.max(0, 1 - state.totalTime / 10) }}>
-          Keyboard: 1-6 switch tabs | Space to mine
+      {state.totalTime < 30 && Object.keys(state.upgrades).length === 0 && (
+        <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '4px 0', opacity: Math.max(0, 1 - state.totalTime / 30) }}>
+          Click resources to gather | Buy upgrades to boost production | Space to mine
         </div>
       )}
       <EraTransition era={state.era} />
