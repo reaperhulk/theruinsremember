@@ -29,7 +29,7 @@ export function MiningPanel({ state, onUpdate }) {
       <div className="mining-info">
         <span>Chance: {chance.toFixed(0)}%</span>
         <span>Streak: {streak}</span>
-        <span>Gems: {gems}</span>
+        <span>Gems: {gems}{gems >= 25 && <span style={{ color: '#ffdd44' }}> (x{(1 + Math.floor(gems / 25) * 0.5).toFixed(1)} quality)</span>}</span>
       </div>
       <div className="mining-chance-bar">
         <div className="mining-chance-fill" style={{ width: `${chance}%` }} />
