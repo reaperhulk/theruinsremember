@@ -23,7 +23,9 @@ export function EraProgress({ state }) {
         </p>
       )}
       {isMaxEra && (
-        <p className="era-hint">You have reached the Multiverse — the final frontier</p>
+        <p className="era-hint" style={{ color: '#bb88ff' }}>
+          You have reached the Multiverse — Prestige available for permanent bonuses!
+        </p>
       )}
       <div className="era-stats">
         <span>Time played: {formatTime(state.totalTime)}</span>
