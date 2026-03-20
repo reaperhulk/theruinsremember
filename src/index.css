@@ -1070,6 +1070,20 @@ canvas:hover {
   color: #ccc;
 }
 
+.achievement-progress-bar {
+  height: 6px;
+  background: #1a1a2e;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.achievement-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4a8a4a, #88dd88);
+  transition: width 0.5s ease;
+}
+
 .achievement-list {
   display: flex;
   flex-direction: column;
@@ -1154,6 +1168,12 @@ canvas:hover {
   border-radius: 7px;
   margin-left: 3px;
   vertical-align: middle;
+  animation: badge-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 .tab-content {

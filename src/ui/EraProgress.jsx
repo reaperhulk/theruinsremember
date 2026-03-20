@@ -1,6 +1,14 @@
 import { eraNames, ERA_COUNT } from '../engine/eras.js';
 import { calculateProduction } from '../engine/resources.js';
 
+function formatNumber(n) {
+  if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toFixed(1);
+}
+
 function formatTime(seconds) {
   if (seconds < 60) return `${Math.floor(seconds)}s`;
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`;
@@ -40,7 +48,7 @@ export function EraProgress({ state }) {
           <span> | Prestige: x{state.prestigeMultiplier.toFixed(1)}</span>
         )}
         {totalRate > 0 && (
-          <span> | Total: {totalRate.toFixed(1)}/s</span>
+          <span> | Total: {formatNumber(totalRate)}/s</span>
         )}
       </div>
     </div>

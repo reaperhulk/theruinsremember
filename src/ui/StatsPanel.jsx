@@ -82,6 +82,9 @@ export function StatsPanel({ state }) {
       </div>
 
       <h3>Achievements ({earnedCount}/{achievementList.length})</h3>
+      <div className="achievement-progress-bar">
+        <div className="achievement-progress-fill" style={{ width: `${Math.floor(earnedCount / achievementList.length * 100)}%` }} />
+      </div>
       <div className="achievement-list">
         {achievementList.map(a => (
           <div key={a.id} className={`achievement ${a.earned ? 'earned' : 'locked'}`}>

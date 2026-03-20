@@ -30,7 +30,7 @@ export function PrestigePanel({ state, onUpdate }) {
         )}
       </div>
 
-      <h3>Upgrades</h3>
+      <h3>Upgrades ({shop.filter(u => u.owned).length}/{shop.length})</h3>
       <div className="prestige-shop">
         {shop.map(u => (
           <button
