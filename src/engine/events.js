@@ -46,13 +46,17 @@ function applyInstantEvent(state, event) {
   const r = state.resources[resourceId];
   if (!r) return state;
 
+  // Scale instant rewards by era and prestige so events stay relevant
+  const eraScale = 1 + (state.era - 1) * 0.5;
+  const scaledAmount = amount * eraScale * state.prestigeMultiplier;
+
   return {
     ...state,
     resources: {
       ...state.resources,
       [resourceId]: {
         ...r,
-        amount: r.amount + amount,
+        amount: r.amount + scaledAmount,
       },
     },
   };

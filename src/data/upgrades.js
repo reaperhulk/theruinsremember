@@ -363,7 +363,7 @@ export const upgrades = {
   // Era 5: Solar System
   asteroidMining: {
     id: 'asteroidMining', name: 'Asteroid Mining', era: 5,
-    cost: { orbitalInfra: 30, rocketFuel: 50, exoticMaterials: 10, materials: 200 },
+    cost: { orbitalInfra: 60, rocketFuel: 100, exoticMaterials: 20, materials: 400 },
     effects: [
       { type: 'production_add', target: 'exoticMaterials', value: 1 },
       { type: 'production_mult', target: 'materials', value: 5 },
@@ -383,7 +383,7 @@ export const upgrades = {
   },
   terraforming: {
     id: 'terraforming', name: 'Terraforming', era: 5,
-    cost: { exoticMaterials: 30, research: 60, energy: 80, food: 100 },
+    cost: { exoticMaterials: 60, research: 150, energy: 200, food: 250 },
     effects: [{ type: 'production_add', target: 'colonies', value: 0.2 }],
     description: 'Make other worlds habitable',
     prerequisites: ['asteroidMining'],
@@ -465,7 +465,7 @@ export const upgrades = {
   },
   dysonSwarms: {
     id: 'dysonSwarms', name: 'Dyson Swarms', era: 6,
-    cost: { starSystems: 5, exoticMaterials: 80, energy: 200, labor: 200 },
+    cost: { starSystems: 15, exoticMaterials: 200, energy: 500, labor: 500 },
     effects: [{ type: 'production_mult', target: 'energy', value: 50 }],
     description: 'Harvest stellar energy',
     prerequisites: ['warpDrive'],
@@ -552,7 +552,7 @@ export const upgrades = {
   },
   matrioshkaBrain: {
     id: 'matrioshkaBrain', name: 'Matrioshka Brain', era: 7,
-    cost: { stellarForge: 15, megastructures: 8, research: 120 },
+    cost: { stellarForge: 40, megastructures: 25, research: 400 },
     effects: [
       { type: 'production_mult', target: 'research', value: 20 },
       { type: 'unlock_resource', target: 'galacticInfluence', value: 1 },
@@ -605,7 +605,7 @@ export const upgrades = {
   },
   darkMatterHarvest: {
     id: 'darkMatterHarvest', name: 'Dark Matter Harvest', era: 8,
-    cost: { exoticMatter: 15, darkEnergy: 50, starSystems: 20 },
+    cost: { exoticMatter: 80, darkEnergy: 200, starSystems: 80 },
     effects: [
       { type: 'production_mult', target: 'exoticMatter', value: 3 },
       { type: 'production_mult', target: 'darkEnergy', value: 5 },
@@ -622,7 +622,7 @@ export const upgrades = {
   },
   culturalAssimilation: {
     id: 'culturalAssimilation', name: 'Cultural Assimilation', era: 8,
-    cost: { galacticInfluence: 80, food: 400, colonies: 20 },
+    cost: { galacticInfluence: 400, food: 2000, colonies: 60 },
     effects: [
       { type: 'production_mult', target: 'galacticInfluence', value: 3 },
       { type: 'production_mult', target: 'colonies', value: 5 },
@@ -673,7 +673,7 @@ export const upgrades = {
   // Era 9: Intergalactic
   galaxySeeding: {
     id: 'galaxySeeding', name: 'Galaxy Seeding', era: 9,
-    cost: { cosmicPower: 100, exoticMatter: 80, galacticInfluence: 200, steel: 2000 },
+    cost: { cosmicPower: 300, exoticMatter: 250, galacticInfluence: 600, steel: 5000 },
     effects: [{ type: 'production_mult', target: 'cosmicPower', value: 5 }],
     description: 'Seed new galaxies with life',
     prerequisites: ['matterReplicators'],
@@ -690,7 +690,7 @@ export const upgrades = {
   },
   voidBridges: {
     id: 'voidBridges', name: 'Void Bridges', era: 9,
-    cost: { cosmicPower: 200, darkEnergy: 150, exoticMatter: 100, labor: 1000 },
+    cost: { cosmicPower: 600, darkEnergy: 400, exoticMatter: 300, labor: 3000 },
     effects: [{ type: 'production_add', target: 'universalConstants', value: 0.1 }],
     description: 'Bridge the void between galaxy clusters',
     prerequisites: ['galaxySeeding'],
@@ -725,7 +725,7 @@ export const upgrades = {
   },
   entropyReversal: {
     id: 'entropyReversal', name: 'Entropy Reversal', era: 9,
-    cost: { universalConstants: 8, cosmicPower: 200, research: 300 },
+    cost: { universalConstants: 20, cosmicPower: 600, research: 800 },
     effects: [
       { type: 'production_mult', target: 'universalConstants', value: 5 },
       { type: 'unlock_resource', target: 'realityFragments', value: 1 },

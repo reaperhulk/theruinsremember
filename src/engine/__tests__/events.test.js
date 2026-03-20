@@ -71,19 +71,21 @@ describe('events', () => {
   });
 
   describe('applyEvent - instant', () => {
-    it('adds resources for alienSignal', () => {
+    it('adds resources for alienSignal scaled by era and prestige', () => {
       const state = makeState();
       // Unlock research so it exists and can be granted
       state.resources.research = { ...state.resources.research, unlocked: true, amount: 0 };
       const newState = applyEvent(state, events.alienSignal);
-      expect(newState.resources.research.amount).toBe(100);
+      // Era 3 scale = 1 + (3-1)*0.5 = 2, prestige = 1, so amount = 100 * 2 * 1 = 200
+      expect(newState.resources.research.amount).toBe(200);
     });
 
-    it('adds exotic materials for asteroidDiscovery', () => {
+    it('adds exotic materials for asteroidDiscovery scaled by era and prestige', () => {
       const state = makeState();
       state.resources.exoticMaterials = { ...state.resources.exoticMaterials, unlocked: true, amount: 10 };
       const newState = applyEvent(state, events.asteroidDiscovery);
-      expect(newState.resources.exoticMaterials.amount).toBe(60);
+      // Era 3 scale = 2, prestige = 1, event amount = 50, so 10 + 50*2 = 110
+      expect(newState.resources.exoticMaterials.amount).toBe(110);
     });
   });
 

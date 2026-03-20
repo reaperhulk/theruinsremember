@@ -166,7 +166,7 @@ export const techTree = {
   },
   massProduction: {
     id: 'massProduction', name: 'Mass Production', era: 2,
-    cost: { steel: 25, electronics: 15, labor: 20 },
+    cost: { steel: 50, electronics: 30, labor: 40 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
     description: 'Assembly line mastery — triple steel and labor output',
@@ -174,7 +174,7 @@ export const techTree = {
   },
   electricalGrid: {
     id: 'electricalGrid', name: 'Electrical Grid', era: 2,
-    cost: { electronics: 20, steel: 15, energy: 20 },
+    cost: { electronics: 40, steel: 30, energy: 40 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
     description: 'Nationwide electrical distribution',
