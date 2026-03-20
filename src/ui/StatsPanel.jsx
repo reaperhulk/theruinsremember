@@ -10,7 +10,7 @@ export function StatsPanel({ state }) {
 
   return (
     <div className="panel stats-panel">
-      <h2>Statistics ({earnedCount} achievements)</h2>
+      <h2>Statistics (Era {state.era}, {earnedCount} achievements)</h2>
       <div className="stats-grid">
         <div className="stat-row">
           <span>Current Era</span>
