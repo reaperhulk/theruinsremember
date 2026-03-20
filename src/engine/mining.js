@@ -30,7 +30,9 @@ export function mine(state, roll = Math.random()) {
 
   // Era scaling: mining stays relevant as eras increase
   const eraScale = 1 + (state.era - 1) * 0.5; // x1 at era 1, x5.5 at era 10
-  const baseGather = 1 * r.rateMult * state.prestigeMultiplier * eraScale;
+  const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
+  const savantMult = hasSavant ? 1.5 : 1;
+  const baseGather = 1 * r.rateMult * state.prestigeMultiplier * eraScale * savantMult;
   const gathered = foundGem ? baseGather * GEM_MULTIPLIER * gemQuality : baseGather;
 
   const newState = {
