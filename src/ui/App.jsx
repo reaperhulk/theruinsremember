@@ -68,7 +68,7 @@ export function App() {
 
   const handlePrestige = () => {
     if (state.era < ERA_COUNT) return;
-    if (!confirm(`Prestige for x${prestigeBonus.toFixed(1)} bonus?\nAll progress will reset but you keep prestige upgrades and achievements.`)) return;
+    if (!confirm(`Prestige for x${prestigeBonus.toFixed(1)} multiplier?\n\nYou keep: prestige upgrades, achievements\nYou lose: all resources, upgrades, tech, era progress\n\nNew multiplier: x${(state.prestigeMultiplier * prestigeBonus).toFixed(1)}`)) return;
     updateState(s => performPrestige(s));
   };
 
