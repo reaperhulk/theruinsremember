@@ -68,6 +68,7 @@ export function App() {
 
   const handlePrestige = () => {
     if (state.era < ERA_COUNT) return;
+    if (!confirm(`Prestige for x${prestigeBonus.toFixed(1)} bonus?\nAll progress will reset but you keep prestige upgrades and achievements.`)) return;
     updateState(s => performPrestige(s));
   };
 
@@ -134,7 +135,7 @@ export function App() {
               Prestige (x{prestigeBonus.toFixed(1)} bonus)
             </button>
           )}
-          <button className="reset-btn" onClick={resetSave}>
+          <button className="reset-btn" onClick={() => { if (confirm('Hard reset? This erases ALL progress including prestige!')) resetSave(); }}>
             Hard Reset
           </button>
         </div>

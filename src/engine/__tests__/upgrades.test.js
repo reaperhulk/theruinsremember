@@ -114,7 +114,7 @@ describe('upgrades', () => {
     it('returns base cost for non-repeatable upgrades via getUpgradeCost', () => {
       const state = makeEra3State();
       const cost = getUpgradeCost(state, 'internet');
-      expect(cost).toEqual({ electronics: 40, research: 30 });
+      expect(cost).toEqual({ electronics: 80, research: 60 });
     });
 
     it('still blocks non-repeatable upgrades from being bought twice', () => {

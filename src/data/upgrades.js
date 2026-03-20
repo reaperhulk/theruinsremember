@@ -56,7 +56,7 @@ export const upgrades = {
   },
   foundry: {
     id: 'foundry', name: 'Foundry', era: 1,
-    cost: { materials: 50, energy: 40, food: 20 },
+    cost: { materials: 60, energy: 50, food: 30 },
     effects: [
       { type: 'unlock_resource', target: 'steel', value: 1 },
       { type: 'production_add', target: 'steel', value: 0.3 },
@@ -130,7 +130,7 @@ export const upgrades = {
   },
   computingLab: {
     id: 'computingLab', name: 'Computing Lab', era: 2,
-    cost: { electronics: 15, energy: 25, food: 30 },
+    cost: { electronics: 30, energy: 40, food: 50 },
     effects: [{ type: 'production_add', target: 'research', value: 0.5 }],
     description: 'Begin scientific research',
     prerequisites: ['assemblyLines'],
@@ -177,7 +177,7 @@ export const upgrades = {
   // Era 3: Digital Age
   internet: {
     id: 'internet', name: 'Internet', era: 3,
-    cost: { electronics: 40, research: 30 },
+    cost: { electronics: 80, research: 60 },
     effects: [{ type: 'production_add', target: 'software', value: 0.5 }],
     description: 'Global communication network enables software development',
     prerequisites: ['computingLab'],
@@ -207,7 +207,7 @@ export const upgrades = {
   },
   aiResearch: {
     id: 'aiResearch', name: 'AI Research', era: 3,
-    cost: { software: 20, research: 40, electronics: 25 },
+    cost: { software: 40, research: 80, electronics: 50 },
     effects: [
       { type: 'production_mult', target: 'research', value: 3 },
       { type: 'production_add', target: 'data', value: 0.3 },
@@ -217,7 +217,7 @@ export const upgrades = {
   },
   quantumComputing: {
     id: 'quantumComputing', name: 'Quantum Computing', era: 3,
-    cost: { data: 15, software: 30, research: 50 },
+    cost: { data: 40, software: 80, research: 120 },
     effects: [
       { type: 'production_mult', target: 'electronics', value: 5 },
       { type: 'unlock_resource', target: 'rocketFuel', value: 1 },
@@ -263,7 +263,7 @@ export const upgrades = {
   },
   spaceStation: {
     id: 'spaceStation', name: 'Space Station', era: 4,
-    cost: { rocketFuel: 30, steel: 40, electronics: 20, food: 60 },
+    cost: { rocketFuel: 60, steel: 80, electronics: 40, food: 120 },
     effects: [{ type: 'production_add', target: 'orbitalInfra', value: 0.5 }],
     description: 'Permanent orbital habitat',
     prerequisites: ['reusableRockets'],
@@ -289,7 +289,7 @@ export const upgrades = {
   },
   zeroGManufacturing: {
     id: 'zeroGManufacturing', name: 'Zero-G Manufacturing', era: 4,
-    cost: { orbitalInfra: 15, electronics: 30, research: 25 },
+    cost: { orbitalInfra: 30, electronics: 60, research: 50 },
     effects: [
       { type: 'production_mult', target: 'electronics', value: 3 },
       { type: 'unlock_resource', target: 'exoticMaterials', value: 1 },
@@ -399,7 +399,7 @@ export const upgrades = {
   },
   fusionPower: {
     id: 'fusionPower', name: 'Fusion Power', era: 5,
-    cost: { research: 60, exoticMaterials: 25, colonies: 3 },
+    cost: { research: 200, exoticMaterials: 60, colonies: 8 },
     effects: [
       { type: 'production_mult', target: 'energy', value: 10 },
       { type: 'unlock_resource', target: 'darkEnergy', value: 1 },
@@ -451,7 +451,7 @@ export const upgrades = {
   // Era 6: Interstellar
   warpDrive: {
     id: 'warpDrive', name: 'Warp Drive', era: 6,
-    cost: { darkEnergy: 30, research: 100, exoticMaterials: 60, steel: 500 },
+    cost: { darkEnergy: 60, research: 250, exoticMaterials: 120, steel: 1000 },
     effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }],
     description: 'Travel between stars',
     prerequisites: ['fusionPower'],
@@ -481,7 +481,7 @@ export const upgrades = {
   },
   aiGovernance: {
     id: 'aiGovernance', name: 'AI Governance', era: 6,
-    cost: { research: 100, starSystems: 8, electronics: 60 },
+    cost: { research: 300, starSystems: 20, electronics: 150 },
     effects: [
       { type: 'production_mult', target: 'research', value: 10 },
       { type: 'unlock_resource', target: 'galacticInfluence', value: 1 },
@@ -513,7 +513,7 @@ export const upgrades = {
   // Era 7: Dyson Era
   dysonSphere: {
     id: 'dysonSphere', name: 'Dyson Sphere', era: 7,
-    cost: { starSystems: 8, exoticMaterials: 60, energy: 300 },
+    cost: { starSystems: 25, exoticMaterials: 150, energy: 800 },
     effects: [
       { type: 'production_add', target: 'megastructures', value: 0.1 },
       { type: 'production_mult', target: 'energy', value: 20 },
@@ -523,7 +523,7 @@ export const upgrades = {
   },
   starLifting: {
     id: 'starLifting', name: 'Star Lifting', era: 7,
-    cost: { megastructures: 5, darkEnergy: 40, research: 80 },
+    cost: { megastructures: 12, darkEnergy: 100, research: 250 },
     effects: [
       { type: 'production_add', target: 'stellarForge', value: 0.3 },
       { type: 'production_mult', target: 'materials', value: 10 },
@@ -595,7 +595,7 @@ export const upgrades = {
   // Era 8: Galactic
   wormholeNetwork: {
     id: 'wormholeNetwork', name: 'Wormhole Network', era: 8,
-    cost: { galacticInfluence: 50, darkEnergy: 80, exoticMaterials: 100, food: 500 },
+    cost: { galacticInfluence: 200, darkEnergy: 300, exoticMaterials: 300, food: 2000 },
     effects: [
       { type: 'production_mult', target: 'starSystems', value: 10 },
       { type: 'production_add', target: 'exoticMatter', value: 0.5 },
@@ -615,7 +615,7 @@ export const upgrades = {
   },
   galacticSenate: {
     id: 'galacticSenate', name: 'Galactic Senate', era: 8,
-    cost: { galacticInfluence: 100, starSystems: 30, research: 200, materials: 1000 },
+    cost: { galacticInfluence: 500, starSystems: 100, research: 800, materials: 5000 },
     effects: [{ type: 'production_mult', target: 'galacticInfluence', value: 5 }],
     description: 'Unite civilizations under one government',
     prerequisites: ['wormholeNetwork'],
@@ -660,7 +660,7 @@ export const upgrades = {
   },
   matterReplicators: {
     id: 'matterReplicators', name: 'Matter Replicators', era: 8,
-    cost: { exoticMatter: 20, energy: 300, research: 200 },
+    cost: { exoticMatter: 100, energy: 1000, research: 600 },
     effects: [
       { type: 'production_mult', target: 'exoticMatter', value: 5 },
       { type: 'unlock_resource', target: 'cosmicPower', value: 1 },

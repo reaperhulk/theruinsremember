@@ -125,7 +125,7 @@ export const techTree = {
   },
   intergalacticBeacon: {
     id: 'intergalacticBeacon', name: 'Intergalactic Beacon', era: 8,
-    cost: { exoticMatter: 400, galacticInfluence: 800, cosmicPower: 100 },
+    cost: { exoticMatter: 400, galacticInfluence: 800, research: 1500 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: 9,
     description: 'Signal reaching beyond the galaxy',
@@ -141,7 +141,7 @@ export const techTree = {
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
-    cost: { universalConstants: 80, cosmicPower: 1500, realityFragments: 40 },
+    cost: { universalConstants: 80, cosmicPower: 1500, research: 2000 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
     description: 'Detect parallel universe signatures',
