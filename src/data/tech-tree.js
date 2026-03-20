@@ -440,6 +440,14 @@ export const techTree = {
     effects: [{ type: 'production_mult', target: 'materials', value: 3 }, { type: 'production_mult', target: 'food', value: 2 }],
     excludes: 'automationTheory',
   },
+
+  // --- Worktree Agent: 6 new optional tech nodes ---
+  advancedIrrigation: { id: 'advancedIrrigation', name: 'Advanced Irrigation', era: 1, cost: { food: 25, materials: 20, labor: 10 }, prerequisites: ['metallurgy'], grantsEra: null, description: 'Aqueducts and canals triple food output', effects: [{ type: 'production_mult', target: 'food', value: 3 }] },
+  precisionEngineering: { id: 'precisionEngineering', name: 'Precision Engineering', era: 2, cost: { steel: 30, electronics: 20, research: 15 }, prerequisites: ['advancedComputing'], grantsEra: null, description: 'Precise machining doubles steel and triples electronics', effects: [{ type: 'production_mult', target: 'steel', value: 2 }, { type: 'production_mult', target: 'electronics', value: 3 }] },
+  distributedAI: { id: 'distributedAI', name: 'Distributed AI', era: 3, cost: { software: 25, data: 15, research: 35 }, prerequisites: ['globalNetwork'], grantsEra: null, description: 'AI distributed across the network triples data and doubles software', effects: [{ type: 'production_mult', target: 'data', value: 3 }, { type: 'production_mult', target: 'software', value: 2 }] },
+  antimatterContainment: { id: 'antimatterContainment', name: 'Antimatter Containment', era: 4, cost: { research: 40, rocketFuel: 25, orbitalInfra: 10 }, prerequisites: ['interplanetaryNav'], grantsEra: null, description: 'Safe antimatter storage triples fuel and doubles exotic materials', effects: [{ type: 'production_mult', target: 'rocketFuel', value: 3 }, { type: 'production_mult', target: 'exoticMaterials', value: 2 }] },
+  cosmicHarvester: { id: 'cosmicHarvester', name: 'Cosmic Harvester', era: 9, cost: { cosmicPower: 120, universalConstants: 10, exoticMatter: 40 }, prerequisites: ['realityScience'], grantsEra: null, description: 'Harvest cosmic energy at intergalactic scale', effects: [{ type: 'production_mult', target: 'cosmicPower', value: 3 }, { type: 'production_mult', target: 'exoticMatter', value: 2 }] },
+  realityCompression: { id: 'realityCompression', name: 'Reality Compression', era: 10, cost: { quantumEchoes: 25, realityFragments: 70, universalConstants: 15 }, prerequisites: ['multiverseDetection'], grantsEra: null, description: 'Compress reality for efficiency — x5 fragments and x3 constants', effects: [{ type: 'production_mult', target: 'realityFragments', value: 5 }, { type: 'production_mult', target: 'universalConstants', value: 3 }] },
 };
 
 export function getTechForEra(era) {
