@@ -104,18 +104,18 @@ describe('progression integration', () => {
     // Buy Digital Age upgrades following chains (need at least 14)
     state = giveAndBuy(state, 'upgrade', 'internet');
     state = giveAndBuy(state, 'upgrade', 'cloudComputing');
+    state = giveAndBuy(state, 'upgrade', 'cloudStorage');
+    state = giveAndBuy(state, 'upgrade', 'cyberSecurity');
+    state = giveAndBuy(state, 'upgrade', 'encryptionProtocol');
     state = giveAndBuy(state, 'upgrade', 'openSource');
+    state = giveAndBuy(state, 'upgrade', 'socialMedia');
+    state = giveAndBuy(state, 'upgrade', 'digitalSensors');
     state = giveAndBuy(state, 'upgrade', 'patternAnalysis');
     state = giveAndBuy(state, 'upgrade', 'aiResearch');
     state = giveAndBuy(state, 'upgrade', 'quantumComputing');
-    state = giveAndBuy(state, 'upgrade', 'digitalSensors');
-    state = giveAndBuy(state, 'upgrade', 'cloudStorage');
-    state = giveAndBuy(state, 'upgrade', 'cyberSecurity');
     state = giveAndBuy(state, 'upgrade', 'virtualReality');
-    state = giveAndBuy(state, 'upgrade', 'socialMedia');
-    state = giveAndBuy(state, 'upgrade', 'blockchain');
-    state = giveAndBuy(state, 'upgrade', 'energyMatrix');
-    state = giveAndBuy(state, 'upgrade', 'encryptionProtocol');
+    state = giveAndBuy(state, 'upgrade', 'dataCenter');
+    state = giveAndBuy(state, 'upgrade', 'suborbitalFlight');
     expect(state.resources.rocketFuel.unlocked).toBe(true);
 
     // Buy tech to transition
