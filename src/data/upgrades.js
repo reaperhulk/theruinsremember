@@ -2254,6 +2254,32 @@ export const upgrades = {
   },
 };
 
+// Balance scaling: multiply upgrade costs by era-dependent factors
+// This accounts for exponential production growth from multiplicative upgrades
+const ERA_COST_SCALE = {
+  1: 1,       // Era 1: base costs are fine (clicking-gated)
+  2: 2,       // Era 2: double costs
+  3: 3,       // Era 3: 3x costs
+  4: 5,       // Era 4: 5x costs
+  5: 8,       // Era 5: 8x costs
+  6: 8,       // Era 6: 8x costs (new resources are scarce, don't over-scale)
+  7: 10,      // Era 7: 10x costs
+  8: 15,      // Era 8: 15x costs
+  9: 20,      // Era 9: 20x costs
+  10: 30,     // Era 10: 30x costs (endgame)
+};
+
+// Apply scaling to all upgrade costs
+for (const upgrade of Object.values(upgrades)) {
+  const scale = ERA_COST_SCALE[upgrade.era] || 1;
+  if (scale === 1) continue;
+  const scaledCost = {};
+  for (const [resource, amount] of Object.entries(upgrade.cost)) {
+    scaledCost[resource] = Math.ceil(amount * scale);
+  }
+  upgrade.cost = scaledCost;
+}
+
 export function getUpgradesForEra(era) {
   return Object.values(upgrades).filter(u => u.era <= era);
 }

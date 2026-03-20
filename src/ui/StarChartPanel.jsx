@@ -31,6 +31,7 @@ export function StarChartPanel({ state, onUpdate }) {
         <span>Routes: {routes.length}/10</span>
         <span>Systems: {systems.length}</span>
         {stats.hubSystems > 0 && <span style={{ color: '#88ccff' }}>Hubs: {stats.hubSystems}</span>}
+        {stats.allConnected && <span style={{ color: '#ffdd44' }}>All Connected!</span>}
       </div>
       <div className="star-chart">
         <svg viewBox="0 0 100 100" className="star-svg">

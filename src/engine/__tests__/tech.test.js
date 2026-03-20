@@ -11,8 +11,9 @@ describe('tech', () => {
       const after = unlockTech(state, 'metallurgy');
       expect(after).not.toBeNull();
       expect(after.tech.metallurgy).toBe(true);
-      expect(after.resources.materials.amount).toBe(60);
-      expect(after.resources.energy.amount).toBe(70);
+      // metallurgy costs materials: 50, energy: 40
+      expect(after.resources.materials.amount).toBe(50);
+      expect(after.resources.energy.amount).toBe(60);
     });
 
     it('returns null if prerequisites not met', () => {

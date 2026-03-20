@@ -6,14 +6,14 @@ export const techTree = {
   // Era 1 → 2
   metallurgy: {
     id: 'metallurgy', name: 'Metallurgy', era: 1,
-    cost: { materials: 40, energy: 30 },
+    cost: { materials: 50, energy: 40 },
     prerequisites: [],
     grantsEra: null,
     description: 'Understanding of metal properties',
   },
   industrialRevolution: {
     id: 'industrialRevolution', name: 'Industrial Revolution', era: 1,
-    cost: { materials: 60, energy: 50, labor: 30 },
+    cost: { materials: 80, energy: 60, labor: 40 },
     prerequisites: ['metallurgy'],
     grantsEra: 2,
     description: 'Transition to machine-based manufacturing',
@@ -22,14 +22,14 @@ export const techTree = {
   // Era 2 → 3 (Digital Age)
   advancedComputing: {
     id: 'advancedComputing', name: 'Advanced Computing', era: 2,
-    cost: { research: 60, electronics: 40 },
+    cost: { research: 80, electronics: 60 },
     prerequisites: [],
     grantsEra: null,
     description: 'Powerful computational systems',
   },
   digitalRevolution: {
     id: 'digitalRevolution', name: 'Digital Revolution', era: 2,
-    cost: { research: 100, electronics: 80, steel: 60 },
+    cost: { research: 200, electronics: 150, steel: 200 },
     prerequisites: ['advancedComputing'],
     grantsEra: 3,
     description: 'The world goes digital — software and data become key resources',
@@ -38,14 +38,14 @@ export const techTree = {
   // Era 3 → 4 (Digital Age → Space Age)
   globalNetwork: {
     id: 'globalNetwork', name: 'Global Network', era: 3,
-    cost: { software: 60, data: 30 },
+    cost: { software: 100, data: 60 },
     prerequisites: [],
     grantsEra: null,
     description: 'A planet-spanning digital network — prerequisite for space era tech',
   },
   spaceProgram: {
     id: 'spaceProgram', name: 'Space Program', era: 3,
-    cost: { software: 120, data: 60, research: 150 },
+    cost: { software: 200, data: 120, research: 500 },
     prerequisites: ['globalNetwork'],
     grantsEra: 4,
     description: 'An organized program to reach space',
@@ -54,14 +54,14 @@ export const techTree = {
   // Era 4 → 5 (Space Age → Solar System)
   interplanetaryNav: {
     id: 'interplanetaryNav', name: 'Interplanetary Navigation', era: 4,
-    cost: { research: 150, rocketFuel: 100, orbitalInfra: 40 },
+    cost: { research: 800, rocketFuel: 300, orbitalInfra: 100 },
     prerequisites: [],
     grantsEra: null,
     description: 'Navigate between planets',
   },
   interplanetaryShip: {
     id: 'interplanetaryShip', name: 'Interplanetary Ship', era: 4,
-    cost: { orbitalInfra: 80, rocketFuel: 200, steel: 300, research: 200 },
+    cost: { orbitalInfra: 200, rocketFuel: 600, steel: 800, research: 1200 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: 5,
     description: 'A ship capable of reaching other planets',
@@ -70,14 +70,14 @@ export const techTree = {
   // Era 5 → 6 (Solar System → Interstellar)
   advancedPropulsion: {
     id: 'advancedPropulsion', name: 'Advanced Propulsion', era: 5,
-    cost: { research: 250, exoticMaterials: 80, energy: 300 },
+    cost: { research: 5000, exoticMaterials: 200, energy: 50000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Beyond chemical rockets',
   },
   ftlResearch: {
     id: 'ftlResearch', name: 'FTL Research', era: 5,
-    cost: { research: 400, exoticMaterials: 150, colonies: 20 },
+    cost: { research: 10000, exoticMaterials: 500, colonies: 40 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: 6,
     description: 'Faster-than-light travel theory',
@@ -86,14 +86,14 @@ export const techTree = {
   // Era 6 → 7 (Interstellar → Dyson Era)
   galacticCartography: {
     id: 'galacticCartography', name: 'Galactic Cartography', era: 6,
-    cost: { starSystems: 30, research: 300, darkEnergy: 100 },
+    cost: { starSystems: 50, research: 5000, darkEnergy: 500 },
     prerequisites: [],
     grantsEra: null,
     description: 'Map the galaxy',
   },
   megaEngineering: {
     id: 'megaEngineering', name: 'Mega Engineering', era: 6,
-    cost: { starSystems: 50, darkEnergy: 150, research: 400 },
+    cost: { starSystems: 100, darkEnergy: 1500, research: 15000 },
     prerequisites: ['galacticCartography'],
     grantsEra: 7,
     description: 'Engineering on a stellar scale — gateway to the Dyson Era',
@@ -102,14 +102,14 @@ export const techTree = {
   // Era 7 → 8 (Dyson Era → Galactic)
   galacticAscendancy: {
     id: 'galacticAscendancy', name: 'Galactic Ascendancy', era: 7,
-    cost: { megastructures: 30, stellarForge: 60, research: 500 },
+    cost: { megastructures: 15, stellarForge: 50, research: 500000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Prepare for galactic-scale civilization',
   },
   galacticNetwork: {
     id: 'galacticNetwork', name: 'Galactic Network', era: 7,
-    cost: { megastructures: 50, stellarForge: 100, research: 800 },
+    cost: { megastructures: 40, stellarForge: 120, research: 2000000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: 8,
     description: 'Galaxy-spanning communication and travel network',
@@ -118,14 +118,14 @@ export const techTree = {
   // Era 8 → 9 (Galactic → Intergalactic)
   cosmicEngineering: {
     id: 'cosmicEngineering', name: 'Cosmic Engineering', era: 8,
-    cost: { exoticMatter: 200, galacticInfluence: 400, research: 1000 },
+    cost: { exoticMatter: 2000, galacticInfluence: 100000, research: 100000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Engineer on a cosmic scale',
   },
   intergalacticBeacon: {
     id: 'intergalacticBeacon', name: 'Intergalactic Beacon', era: 8,
-    cost: { exoticMatter: 400, galacticInfluence: 800, research: 1500 },
+    cost: { exoticMatter: 5000, galacticInfluence: 300000, cosmicPower: 100 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: 9,
     description: 'Signal reaching beyond the galaxy',
@@ -134,14 +134,14 @@ export const techTree = {
   // Era 9 → 10 (Intergalactic → Multiverse)
   realityScience: {
     id: 'realityScience', name: 'Reality Science', era: 9,
-    cost: { universalConstants: 50, cosmicPower: 800, research: 1500 },
+    cost: { universalConstants: 50, cosmicPower: 50000, research: 1000000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Study the fabric of reality',
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
-    cost: { universalConstants: 80, cosmicPower: 1500, research: 2000 },
+    cost: { universalConstants: 150, cosmicPower: 150000, realityFragments: 50 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
     description: 'Detect parallel universe signatures',
@@ -166,7 +166,7 @@ export const techTree = {
   },
   massProduction: {
     id: 'massProduction', name: 'Mass Production', era: 2,
-    cost: { steel: 50, electronics: 30, labor: 40 },
+    cost: { steel: 80, electronics: 50, labor: 60 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
     description: 'Assembly line mastery — triple steel and labor output',
@@ -174,7 +174,7 @@ export const techTree = {
   },
   electricalGrid: {
     id: 'electricalGrid', name: 'Electrical Grid', era: 2,
-    cost: { electronics: 40, steel: 30, energy: 40 },
+    cost: { electronics: 60, steel: 50, energy: 60 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
     description: 'Nationwide electrical distribution',
@@ -182,7 +182,7 @@ export const techTree = {
   },
   neuralInterfaces: {
     id: 'neuralInterfaces', name: 'Neural Interfaces', era: 3,
-    cost: { data: 15, software: 20, research: 30 },
+    cost: { data: 40, software: 60, research: 100 },
     prerequisites: ['globalNetwork'],
     grantsEra: null,
     description: 'Direct brain-computer links accelerate all digital work',
@@ -190,7 +190,7 @@ export const techTree = {
   },
   orbitalDefense: {
     id: 'orbitalDefense', name: 'Orbital Defense', era: 4,
-    cost: { orbitalInfra: 10, rocketFuel: 25, steel: 40 },
+    cost: { orbitalInfra: 30, rocketFuel: 80, steel: 120 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: null,
     description: 'Protect orbital assets — double orbital infrastructure output',
@@ -198,7 +198,7 @@ export const techTree = {
   },
   gravitonTheory: {
     id: 'gravitonTheory', name: 'Graviton Theory', era: 5,
-    cost: { research: 70, exoticMaterials: 20 },
+    cost: { research: 2000, exoticMaterials: 100 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: null,
     description: 'Understanding gravity — double exotic materials production',
@@ -206,7 +206,7 @@ export const techTree = {
   },
   xenolinguistics: {
     id: 'xenolinguistics', name: 'Xenolinguistics', era: 6,
-    cost: { galacticInfluence: 30, research: 80 },
+    cost: { galacticInfluence: 200, research: 20000 },
     prerequisites: ['galacticCartography'],
     grantsEra: null,
     description: 'Communicate with alien civilizations — triple influence output',
@@ -214,7 +214,7 @@ export const techTree = {
   },
   temporalMechanics: {
     id: 'temporalMechanics', name: 'Temporal Mechanics', era: 7,
-    cost: { stellarForge: 15, research: 120, megastructures: 5 },
+    cost: { stellarForge: 30, research: 300000, megastructures: 10 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: null,
     description: 'Manipulate time itself — massive research boost',
@@ -222,7 +222,7 @@ export const techTree = {
   },
   darkMatterPhysics: {
     id: 'darkMatterPhysics', name: 'Dark Matter Physics', era: 8,
-    cost: { exoticMatter: 30, darkEnergy: 60 },
+    cost: { exoticMatter: 1000, darkEnergy: 10000 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
     description: 'Master dark matter — double exotic matter output',
@@ -231,7 +231,7 @@ export const techTree = {
   // Era 7 branching: stellarControl vs stellarHarmony
   stellarControl: {
     id: 'stellarControl', name: 'Stellar Control', era: 7,
-    cost: { stellarForge: 18, megastructures: 8, research: 130 },
+    cost: { stellarForge: 40, megastructures: 12, research: 400000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: null,
     description: 'Dominate stars — x5 stellar forge output',
@@ -240,7 +240,7 @@ export const techTree = {
   },
   stellarHarmony: {
     id: 'stellarHarmony', name: 'Stellar Harmony', era: 7,
-    cost: { stellarForge: 18, megastructures: 8, research: 130 },
+    cost: { stellarForge: 40, megastructures: 12, research: 400000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: null,
     description: 'Harmonize with stars — x5 megastructure and energy output',
@@ -249,7 +249,7 @@ export const techTree = {
   },
   multidimensionalMath: {
     id: 'multidimensionalMath', name: 'Multidimensional Mathematics', era: 9,
-    cost: { universalConstants: 10, cosmicPower: 100, research: 300 },
+    cost: { universalConstants: 30, cosmicPower: 30000, research: 500000000 },
     prerequisites: ['realityScience'],
     grantsEra: null,
     description: 'Understand higher dimensions — triple universal constants output',
@@ -261,7 +261,7 @@ export const techTree = {
   // Era 4 optional
   orbitalMechanics: {
     id: 'orbitalMechanics', name: 'Orbital Mechanics', era: 4,
-    cost: { research: 40, orbitalInfra: 12 },
+    cost: { research: 300, orbitalInfra: 50 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: null,
     description: 'Perfect orbital trajectories — triple orbital infrastructure output',
@@ -270,7 +270,7 @@ export const techTree = {
   // Era 6 optional
   subspaceTheory: {
     id: 'subspaceTheory', name: 'Subspace Theory', era: 6,
-    cost: { research: 90, darkEnergy: 35, starSystems: 10 },
+    cost: { research: 30000, darkEnergy: 3000, starSystems: 100 },
     prerequisites: ['galacticCartography'],
     grantsEra: null,
     description: 'Understand subspace — double star system and dark energy output',
@@ -279,7 +279,7 @@ export const techTree = {
   // Era 8 branching: expansion vs consolidation
   galacticExpansion: {
     id: 'galacticExpansion', name: 'Galactic Expansion', era: 8,
-    cost: { starSystems: 25, exoticMatter: 40, galacticInfluence: 60 },
+    cost: { starSystems: 20000, exoticMatter: 2000, galacticInfluence: 50000 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
     description: 'Expand rapidly — x5 star systems and colonies',
@@ -288,7 +288,7 @@ export const techTree = {
   },
   galacticConsolidation: {
     id: 'galacticConsolidation', name: 'Galactic Consolidation', era: 8,
-    cost: { galacticInfluence: 100, research: 180, megastructures: 10 },
+    cost: { galacticInfluence: 80000, research: 50000000, megastructures: 30 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
     description: 'Consolidate power — x5 galactic influence and research',
@@ -297,7 +297,7 @@ export const techTree = {
   },
   galacticEngineering: {
     id: 'galacticEngineering', name: 'Galactic Engineering', era: 8,
-    cost: { galacticInfluence: 100, exoticMatter: 50, megastructures: 12 },
+    cost: { galacticInfluence: 60000, exoticMatter: 3000, megastructures: 35 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
     description: 'Engineer on a galactic scale — triple galactic influence',
@@ -305,7 +305,7 @@ export const techTree = {
   },
   voidMastery: {
     id: 'voidMastery', name: 'Void Mastery', era: 9,
-    cost: { cosmicPower: 150, universalConstants: 12, darkEnergy: 100 },
+    cost: { cosmicPower: 80000, universalConstants: 80, darkEnergy: 200000 },
     prerequisites: ['multidimensionalMath'],
     grantsEra: null,
     description: 'Master the void — x5 cosmic power and dark energy',
@@ -314,7 +314,7 @@ export const techTree = {
   },
   realityMastery: {
     id: 'realityMastery', name: 'Reality Mastery', era: 9,
-    cost: { cosmicPower: 150, universalConstants: 12, realityFragments: 15 },
+    cost: { cosmicPower: 80000, universalConstants: 80, realityFragments: 30 },
     prerequisites: ['multidimensionalMath'],
     grantsEra: null,
     description: 'Master reality — x5 universal constants and reality fragments',
@@ -323,7 +323,7 @@ export const techTree = {
   },
   infiniteEnergy: {
     id: 'infiniteEnergy', name: 'Infinite Energy', era: 10,
-    cost: { quantumEchoes: 20, realityFragments: 80, cosmicPower: 500 },
+    cost: { quantumEchoes: 500, realityFragments: 2000, cosmicPower: 10000000 },
     prerequisites: ['omniversalAwareness'],
     grantsEra: null,
     description: 'Tap infinite multiversal energy — x10 all energy and cosmic power',
@@ -332,7 +332,7 @@ export const techTree = {
   },
   infiniteKnowledge: {
     id: 'infiniteKnowledge', name: 'Infinite Knowledge', era: 10,
-    cost: { quantumEchoes: 20, realityFragments: 80, research: 1000 },
+    cost: { quantumEchoes: 500, realityFragments: 2000, research: 100000000000000 },
     prerequisites: ['omniversalAwareness'],
     grantsEra: null,
     description: 'Tap infinite multiversal knowledge — x10 all research and data',
@@ -341,7 +341,7 @@ export const techTree = {
   },
   omniversalAwareness: {
     id: 'omniversalAwareness', name: 'Omniversal Awareness', era: 10,
-    cost: { quantumEchoes: 30, realityFragments: 100, universalConstants: 20 },
+    cost: { quantumEchoes: 100, realityFragments: 500, universalConstants: 200 },
     prerequisites: ['multiverseDetection'],
     grantsEra: null,
     description: 'Perceive all realities — quintuple reality fragment output',
@@ -351,7 +351,7 @@ export const techTree = {
   // Branching choice: Era 3 — pick offense or defense
   offensiveAI: {
     id: 'offensiveAI', name: 'Offensive AI', era: 3,
-    cost: { software: 30, data: 15, research: 40 },
+    cost: { software: 80, data: 50, research: 150 },
     prerequisites: ['globalNetwork'],
     grantsEra: null,
     description: 'Aggressive AI doubles data output but not software',
@@ -360,7 +360,7 @@ export const techTree = {
   },
   defensiveAI: {
     id: 'defensiveAI', name: 'Defensive AI', era: 3,
-    cost: { software: 30, data: 15, research: 40 },
+    cost: { software: 80, data: 50, research: 150 },
     prerequisites: ['globalNetwork'],
     grantsEra: null,
     description: 'Protective AI doubles software output but not data',
@@ -371,7 +371,7 @@ export const techTree = {
   // Branching choice: Era 5 — pick biological or mechanical
   bioEngineering: {
     id: 'bioEngineering', name: 'Biological Engineering', era: 5,
-    cost: { research: 60, colonies: 5, food: 80 },
+    cost: { research: 3000, colonies: 15, food: 5000 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: null,
     description: 'Bio-enhanced colonists — massive food and labor boost',
@@ -380,7 +380,7 @@ export const techTree = {
   },
   mechEngineering: {
     id: 'mechEngineering', name: 'Mechanical Engineering', era: 5,
-    cost: { research: 60, exoticMaterials: 20, energy: 80 },
+    cost: { research: 3000, exoticMaterials: 100, energy: 30000 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: null,
     description: 'Robotic workers — massive energy and materials boost',
@@ -391,7 +391,7 @@ export const techTree = {
   // New optional tech nodes
   quantumGravity: {
     id: 'quantumGravity', name: 'Quantum Gravity', era: 5,
-    cost: { research: 90, exoticMaterials: 25, energy: 70 },
+    cost: { research: 4000, exoticMaterials: 150, energy: 20000 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: null,
     description: 'Unify quantum mechanics and gravity — double colonies and triple orbital infra',
@@ -399,7 +399,7 @@ export const techTree = {
   },
   darkEnergyManipulation: {
     id: 'darkEnergyManipulation', name: 'Dark Energy Manipulation', era: 6,
-    cost: { darkEnergy: 40, research: 85, starSystems: 8 },
+    cost: { darkEnergy: 3000, research: 30000, starSystems: 100 },
     prerequisites: ['galacticCartography'],
     grantsEra: null,
     description: 'Directly manipulate dark energy — triple dark energy and double star systems',
@@ -407,7 +407,7 @@ export const techTree = {
   },
   antimatterTheory: {
     id: 'antimatterTheory', name: 'Antimatter Theory', era: 4,
-    cost: { research: 45, rocketFuel: 20, energy: 30 },
+    cost: { research: 400, rocketFuel: 150, energy: 500 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: null,
     description: 'Theoretical antimatter physics — double fuel and triple research',
@@ -415,7 +415,7 @@ export const techTree = {
   },
   cosmicWeaving: {
     id: 'cosmicWeaving', name: 'Cosmic Weaving', era: 10,
-    cost: { quantumEchoes: 25, realityFragments: 60, universalConstants: 15 },
+    cost: { quantumEchoes: 250, realityFragments: 600, universalConstants: 1500 },
     prerequisites: ['omniversalAwareness'],
     grantsEra: null,
     description: 'Weave the fabric of the cosmos — x5 reality fragments and x3 quantum echoes',
@@ -424,7 +424,7 @@ export const techTree = {
   // Era 2 branching: automation vs craftsmanship
   automationTheory: {
     id: 'automationTheory', name: 'Automation Theory', era: 2,
-    cost: { research: 25, electronics: 15, steel: 20 },
+    cost: { research: 50, electronics: 40, steel: 50 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
     description: 'Full automation — triple labor and double electronics',
@@ -433,7 +433,7 @@ export const techTree = {
   },
   artisanCrafts: {
     id: 'artisanCrafts', name: 'Artisan Crafts', era: 2,
-    cost: { research: 25, materials: 20, food: 25 },
+    cost: { research: 50, materials: 50, food: 60 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
     description: 'Master craftsmanship — triple materials and double food',

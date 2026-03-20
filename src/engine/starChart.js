@@ -147,5 +147,8 @@ export function getRouteStats(state) {
     connections[route.to] = (connections[route.to] || 0) + 1;
   }
   const hubSystems = Object.values(connections).filter(c => c >= 2).length;
-  return { routes: routes.length, hubSystems };
+  const connectedSystems = Object.keys(connections).length;
+  const totalSystems = getUnlockedSystems(state).length;
+  const allConnected = connectedSystems >= totalSystems && totalSystems >= 4;
+  return { routes: routes.length, hubSystems, connectedSystems, totalSystems, allConnected };
 }
