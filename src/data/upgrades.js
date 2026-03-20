@@ -121,24 +121,24 @@ export const upgrades = {
     description: 'Mass production of steel and basic electronics',
     prerequisites: ['foundry'],
   },
-  printingPress: {
-    id: 'printingPress', name: 'Printing Press', era: 2,
+  steelForge: {
+    id: 'steelForge', name: 'Steel Forge', era: 2,
     cost: { steel: 12, materials: 20, labor: 15 },
     effects: [
-      { type: 'production_add', target: 'research', value: 0.3 },
-      { type: 'cap_mult', target: 'research', value: 2 },
+      { type: 'production_add', target: 'electronics', value: 0.1 },
+      { type: 'production_mult', target: 'steel', value: 2 },
     ],
-    description: 'Mass printed books expand research capacity',
+    description: 'A dedicated steel forge doubles steel output and produces basic electronics',
     prerequisites: ['foundry'],
   },
-  railroad: {
-    id: 'railroad', name: 'Railroad', era: 2,
-    cost: { steel: 25, materials: 20, labor: 25 },
+  ironWorks: {
+    id: 'ironWorks', name: 'Iron Works', era: 2,
+    cost: { steel: 18, energy: 15, labor: 20 },
     effects: [
-      { type: 'production_mult', target: 'materials', value: 3 },
-      { type: 'production_add', target: 'steel', value: 0.5 },
+      { type: 'production_mult', target: 'materials', value: 2 },
+      { type: 'production_add', target: 'steel', value: 0.3 },
     ],
-    description: 'Rail transport triples materials and boosts steel production',
+    description: 'Heavy industry doubles materials and boosts steel production',
     prerequisites: ['foundry'],
   },
   powerGrid: {
@@ -200,6 +200,26 @@ export const upgrades = {
     cost: { electronics: 80, research: 60 },
     effects: [{ type: 'production_add', target: 'software', value: 0.5 }],
     description: 'Global communication network enables software development',
+    prerequisites: ['computingLab'],
+  },
+  digitalSensors: {
+    id: 'digitalSensors', name: 'Digital Sensors', era: 3,
+    cost: { electronics: 40, research: 30, energy: 25 },
+    effects: [
+      { type: 'production_add', target: 'data', value: 0.5 },
+      { type: 'cap_mult', target: 'data', value: 2 },
+    ],
+    description: 'Distributed sensors collect environmental data worldwide',
+    prerequisites: ['computingLab'],
+  },
+  patternAnalysis: {
+    id: 'patternAnalysis', name: 'Pattern Analysis', era: 3,
+    cost: { research: 50, electronics: 35, steel: 15 },
+    effects: [
+      { type: 'production_mult', target: 'research', value: 2 },
+      { type: 'production_mult', target: 'data', value: 2 },
+    ],
+    description: 'Statistical algorithms double research and data analysis',
     prerequisites: ['computingLab'],
   },
   cloudComputing: {
@@ -265,6 +285,26 @@ export const upgrades = {
       { type: 'production_add', target: 'rocketFuel', value: 0.3 },
     ],
     description: 'Advanced rocket technology boosts fuel production',
+    prerequisites: ['quantumComputing'],
+  },
+  advancedMaterials: {
+    id: 'advancedMaterials', name: 'Advanced Materials', era: 4,
+    cost: { research: 40, steel: 35, data: 15 },
+    effects: [
+      { type: 'production_mult', target: 'steel', value: 3 },
+      { type: 'production_mult', target: 'materials', value: 2 },
+    ],
+    description: 'Carbon nanotubes and metamaterials revolutionize construction',
+    prerequisites: ['quantumComputing'],
+  },
+  missionControl: {
+    id: 'missionControl', name: 'Mission Control', era: 4,
+    cost: { software: 30, electronics: 25, research: 20 },
+    effects: [
+      { type: 'production_add', target: 'rocketFuel', value: 0.2 },
+      { type: 'production_add', target: 'data', value: 0.3 },
+    ],
+    description: 'Coordinate space missions — steady fuel production and telemetry data',
     prerequisites: ['quantumComputing'],
   },
   reusableRockets: {
@@ -389,6 +429,26 @@ export const upgrades = {
       { type: 'production_mult', target: 'materials', value: 5 },
     ],
     description: 'Mine the asteroid belt for resources',
+    prerequisites: ['zeroGManufacturing'],
+  },
+  lunarBase: {
+    id: 'lunarBase', name: 'Lunar Base', era: 5,
+    cost: { orbitalInfra: 40, rocketFuel: 60, steel: 80 },
+    effects: [
+      { type: 'production_add', target: 'colonies', value: 0.1 },
+      { type: 'production_add', target: 'exoticMaterials', value: 0.3 },
+    ],
+    description: 'Establish a permanent lunar settlement — first step to colonization',
+    prerequisites: ['zeroGManufacturing'],
+  },
+  helium3Extraction: {
+    id: 'helium3Extraction', name: 'Helium-3 Extraction', era: 5,
+    cost: { rocketFuel: 50, research: 60, orbitalInfra: 25 },
+    effects: [
+      { type: 'production_mult', target: 'energy', value: 5 },
+      { type: 'production_add', target: 'rocketFuel', value: 0.5 },
+    ],
+    description: 'Mine lunar helium-3 for fusion fuel — massive energy and fuel boost',
     prerequisites: ['zeroGManufacturing'],
   },
   geneticEngineering: {
