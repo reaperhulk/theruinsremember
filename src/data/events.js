@@ -1141,6 +1141,40 @@ export const events = {
   realityBloom: { id: 'realityBloom', name: 'Reality Bloom', description: 'A spontaneous blooming of new realities scatters fragments everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 600 } },
   quantumSymphony: { id: 'quantumSymphony', name: 'Quantum Symphony', description: 'All quantum states harmonize — echoes multiply exponentially!', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
   omniversalConvergence: { id: 'omniversalConvergence', name: 'Omniversal Convergence', description: 'All realities converge momentarily — every resource surges!', minEra: 10, type: 'timed', duration: 40, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
+
+  // --- 16 new events ---
+  // Era 2
+  steelRush: { id: 'steelRush', name: 'Steel Rush', description: 'A steel boom sweeps the nation — production surges!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 5 } },
+  inventorsFair: { id: 'inventorsFair', name: 'Inventors Fair', description: 'Brilliant minds gather — electronics output spikes!', minEra: 2, type: 'instant', effect: { resourceId: 'electronics', amount: 25 } },
+
+  // Era 3
+  aiAwakening: { id: 'aiAwakening', name: 'AI Awakening', description: 'An AI system achieves a breakthrough — research soars!', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'research', rateMultBonus: 4 } },
+  cloudBurst: { id: 'cloudBurst', name: 'Cloud Burst', description: 'Cloud infrastructure overperforms — data flood!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 45 } },
+
+  // Era 4
+  gravityLensing: { id: 'gravityLensing', name: 'Gravity Lensing Event', description: 'A gravitational lens reveals hidden orbital paths!', minEra: 4, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 20 } },
+
+  // Era 5
+  fusionIgnition: { id: 'fusionIgnition', name: 'Fusion Ignition', description: 'Sustained fusion reaction achieved — energy output explodes!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'energy', rateMultBonus: 6 } },
+  exoplanetDiscovery: { id: 'exoplanetDiscovery', name: 'Exoplanet Discovery', description: 'A habitable exoplanet discovered — colony rush!', minEra: 5, type: 'instant', effect: { resourceId: 'colonies', amount: 8 } },
+
+  // Era 6
+  interstellarWindfall: { id: 'interstellarWindfall', name: 'Interstellar Windfall', description: 'An interstellar trade convoy arrives with exotic goods!', minEra: 6, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 80 } },
+  galacticTide: { id: 'galacticTide', name: 'Galactic Tide', description: 'Gravitational tides push new star systems into range!', minEra: 6, type: 'timed', duration: 35, effect: { resourceId: 'starSystems', rateMultBonus: 5 } },
+
+  // Era 7
+  stellarCollapse: { id: 'stellarCollapse', name: 'Stellar Collapse', description: 'A collapsing star feeds the forge — output skyrockets!', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'stellarForge', rateMultBonus: 6 } },
+
+  // Era 8
+  diplomaticSummit: { id: 'diplomaticSummit', name: 'Diplomatic Summit', description: 'A galactic summit boosts your standing dramatically!', minEra: 8, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 150 } },
+  darkMatterTide: { id: 'darkMatterTide', name: 'Dark Matter Tide', description: 'A tide of dark matter washes through your sector!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
+
+  // Era 9
+  voidWhisper: { id: 'voidWhisper', name: 'Void Whisper', description: 'Whispers from the void reveal hidden constants!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 20 } },
+
+  // Era 10
+  paradoxWave: { id: 'paradoxWave', name: 'Paradox Wave', description: 'A wave of paradoxes resolves into pure quantum echoes!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 80 } },
+  realityFracture: { id: 'realityFracture', name: 'Reality Fracture', description: 'Reality fractures and reforms — fragments rain down!', minEra: 10, type: 'timed', duration: 45, effect: { resourceId: 'realityFragments', rateMultBonus: 12 } },
 };
 
 // Get events eligible for the current era

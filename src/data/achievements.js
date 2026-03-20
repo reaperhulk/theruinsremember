@@ -192,4 +192,16 @@ export const achievements = [
   { id: 'prestigeOmnipotent', name: 'Prestige Omnipotent', description: 'Prestige 500 times', check: s => (s.prestigeCount || 0) >= 500, reward: 200 },
   { id: 'repeatAddict500', name: 'Infinite Assembly', description: 'Buy any repeatable upgrade 500 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 500), reward: 25 },
   { id: 'colonyEmpire', name: 'Colony Empire', description: 'Assign 200+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 200; }, reward: 20 },
+
+  // --- 10 new achievements ---
+  { id: 'decillion', name: 'Decillionaire', description: 'Have 1 decillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e33), reward: 40 },
+  { id: 'speedrunEra4', name: 'Orbital Speedrun', description: 'Reach Era 4 in under 7 minutes', check: s => s.era >= 4 && (s.bestEraTimes?.[4] || Infinity) < 420, reward: 5 },
+  { id: 'speedrunEra9', name: 'Cosmic Speedrun', description: 'Reach Era 9 in under 25 minutes', check: s => s.era >= 9 && (s.bestEraTimes?.[9] || Infinity) < 1500, reward: 9 },
+  { id: 'upgrade450', name: 'Upgrade Singularity', description: 'Purchase 450 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 450, reward: 70 },
+  { id: 'techEnlightened', name: 'Tech Enlightened', description: 'Unlock 80 technologies', check: s => Object.keys(s.tech || {}).length >= 80, reward: 40 },
+  { id: 'hack500long', name: 'Phantom Hacker', description: 'Complete 500 hacks', check: s => (s.hackSuccesses || 0) >= 500, reward: 25 },
+  { id: 'docking500long', name: 'Void Pilot', description: 'Land 500 perfect docks', check: s => (s.dockingPerfects || 0) >= 500, reward: 25 },
+  { id: 'weave500long', name: 'Fabric Weaver', description: 'Complete 500 weaves', check: s => (s.totalWeaves || 0) >= 500, reward: 25 },
+  { id: 'gem50000', name: 'Gem Singularity', description: 'Find 50000 gems', check: s => (s.totalGems || 0) >= 50000, reward: 30 },
+  { id: 'repeatAddict1000', name: 'Eternal Assembly', description: 'Buy any repeatable upgrade 1000 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 1000), reward: 30 },
 ];
