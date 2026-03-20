@@ -234,6 +234,9 @@ export function App() {
           </div>
         </div>
       </div>
+      <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#333', padding: '8px 0' }}>
+        Planet to Multiverse v1.0 — {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.tech || {}).length} tech | {Object.keys(state.achievements || {}).length} achievements
+      </footer>
     </div>
   );
 }
