@@ -61,16 +61,29 @@ function getScaledCost(baseCost, costScale, count) {
   return scaled;
 }
 
-// Get the current cost for an upgrade (handles repeatable scaling)
+// Get the current cost for an upgrade (handles repeatable scaling and prestige discounts)
 export function getUpgradeCost(state, upgradeId) {
   const def = upgradeDefs[upgradeId];
   if (!def) return null;
-  if (!def.repeatable) return def.cost;
+
+  let baseCost = def.cost;
+
+  // Chain Master prestige upgrade: 30% discount on cross-chain upgrades (2+ prereqs)
+  const hasChainMaster = state.prestigeUpgrades && state.prestigeUpgrades.chainMaster;
+  if (hasChainMaster && def.prerequisites.length >= 2) {
+    const discounted = {};
+    for (const [resource, amount] of Object.entries(baseCost)) {
+      discounted[resource] = Math.ceil(amount * 0.7);
+    }
+    baseCost = discounted;
+  }
+
+  if (!def.repeatable) return baseCost;
   const count = typeof state.upgrades[upgradeId] === 'number' ? state.upgrades[upgradeId] : 0;
   // Universal Optimizer prestige upgrade: reduce cost scaling by 20%
   const hasOptimizer = state.prestigeUpgrades && state.prestigeUpgrades.universalOptimizer;
   const scale = hasOptimizer ? (def.costScale || 1.5) * 0.8 : (def.costScale || 1.5);
-  return getScaledCost(def.cost, scale, count);
+  return getScaledCost(baseCost, scale, count);
 }
 
 // Purchase an upgrade. Returns new state or null if can't purchase.
