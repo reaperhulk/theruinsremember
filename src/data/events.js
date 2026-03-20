@@ -1103,6 +1103,44 @@ export const events = {
   // Era 10
   realityFracture: { id: 'realityFracture', name: 'Reality Fracture', description: 'A fracture in reality spills quantum echoes everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 150 } },
   omniversalHarvest: { id: 'omniversalHarvest', name: 'Omniversal Harvest', description: 'All realities contribute to a massive harvest of fragments!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'realityFragments', rateMultBonus: 15 } },
+
+  // --- 18 new events ---
+
+  // Era 2
+  guildMasterwork: { id: 'guildMasterwork', name: 'Guild Masterwork', description: 'Master artisans produce a legendary work — steel output surges!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 6 } },
+  granaryOverflow: { id: 'granaryOverflow', name: 'Granary Overflow', description: 'An overflowing granary feeds the masses — food floods in!', minEra: 2, type: 'instant', effect: { resourceId: 'food', amount: 80 } },
+
+  // Era 3
+  quantumLeak: { id: 'quantumLeak', name: 'Quantum Leak', description: 'A quantum computing leak yields free research data!', minEra: 3, type: 'instant', effect: { resourceId: 'research', amount: 60 } },
+  cyberHeist: { id: 'cyberHeist', name: 'Cyber Heist', description: 'A white-hat heist recovers stolen software assets!', minEra: 3, type: 'timed', duration: 30, effect: { resourceId: 'software', rateMultBonus: 5 } },
+
+  // Era 4
+  asteroidRedirect: { id: 'asteroidRedirect', name: 'Asteroid Redirect', description: 'An asteroid is redirected into orbit — exotic materials harvested!', minEra: 4, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 30 } },
+  solarSailBoost: { id: 'solarSailBoost', name: 'Solar Sail Boost', description: 'Solar sails catch a perfect wind — energy production spikes!', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'energy', rateMultBonus: 5 } },
+
+  // Era 5
+  magnetarPulse: { id: 'magnetarPulse', name: 'Magnetar Pulse', description: 'A magnetar pulse energizes exotic materials extraction!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'exoticMaterials', rateMultBonus: 5 } },
+
+  // Era 6
+  alienLibrary: { id: 'alienLibrary', name: 'Alien Library', description: 'An ancient alien library is discovered — research accelerates!', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 6 } },
+  wormholeCollapse: { id: 'wormholeCollapse', name: 'Wormhole Collapse', description: 'A collapsing wormhole showers the area with dark energy!', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 80 } },
+
+  // Era 7
+  stellarFusion: { id: 'stellarFusion', name: 'Stellar Fusion Event', description: 'Two stars merge — stellar forge output goes critical!', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'stellarForge', rateMultBonus: 9 } },
+  megastructureCache: { id: 'megastructureCache', name: 'Megastructure Cache', description: 'Ancient megastructure blueprints accelerate construction!', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 12 } },
+
+  // Era 8
+  darkMatterResonance: { id: 'darkMatterResonance', name: 'Dark Matter Resonance', description: 'Dark matter resonates across the galaxy — exotic matter surges!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 8 } },
+  galacticUnification: { id: 'galacticUnification', name: 'Galactic Unification', description: 'A unification event grants massive galactic influence!', minEra: 8, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 200 } },
+
+  // Era 9
+  cosmicEpiphany: { id: 'cosmicEpiphany', name: 'Cosmic Epiphany', description: 'A moment of cosmic clarity reveals universal constants!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 25 } },
+  voidResonanceCascade: { id: 'voidResonanceCascade', name: 'Void Resonance Cascade', description: 'A cascade through the void amplifies cosmic power!', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'cosmicPower', rateMultBonus: 9 } },
+
+  // Era 10
+  realityBloom: { id: 'realityBloom', name: 'Reality Bloom', description: 'A spontaneous blooming of new realities scatters fragments everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 600 } },
+  quantumSymphony: { id: 'quantumSymphony', name: 'Quantum Symphony', description: 'All quantum states harmonize — echoes multiply exponentially!', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
+  omniversalConvergence: { id: 'omniversalConvergence', name: 'Omniversal Convergence', description: 'All realities converge momentarily — every resource surges!', minEra: 10, type: 'timed', duration: 40, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
 };
 
 // Get events eligible for the current era

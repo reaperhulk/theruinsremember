@@ -405,6 +405,11 @@ body {
   text-align: center;
 }
 
+.era-panel h2 {
+  font-size: 1.1em;
+  letter-spacing: 1px;
+}
+
 .era-hint {
   font-size: 0.85em;
   color: #888;
