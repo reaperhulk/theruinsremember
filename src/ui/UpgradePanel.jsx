@@ -129,7 +129,7 @@ export function UpgradePanel({ state, onUpdate }) {
               {!affordable && (
                 <div className="upgrade-progress-bar">
                   <div
-                    className="upgrade-progress-fill"
+                    className={`upgrade-progress-fill ${progress > 0.8 ? 'almost' : ''}`}
                     style={{ width: `${Math.floor(progress * 100)}%` }}
                   />
                 </div>

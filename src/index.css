@@ -1313,8 +1313,18 @@ canvas:hover {
 .upgrade-progress-fill {
   height: 100%;
   background: linear-gradient(90deg, #335588, #5588bb);
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, background 0.3s ease;
   border-radius: 1px;
+}
+
+.upgrade-progress-fill.almost {
+  background: linear-gradient(90deg, #448844, #88dd88);
+  animation: almost-pulse 1s ease-in-out infinite;
+}
+
+@keyframes almost-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 /* Era transition fanfare */
