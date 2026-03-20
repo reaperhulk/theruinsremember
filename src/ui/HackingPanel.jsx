@@ -66,7 +66,7 @@ export function HackingPanel({ state, onUpdate }) {
 
   return (
     <div className="panel hacking-panel">
-      <h2>Hacking</h2>
+      <h2>Hacking {successes > 0 && `(${successes} completed)`}</h2>
       <div className="hack-info">
         <span>Hacks: {successes}</span>
         <span>Difficulty: {difficulty}</span>
