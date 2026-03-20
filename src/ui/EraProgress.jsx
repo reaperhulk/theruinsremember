@@ -20,8 +20,13 @@ export function EraProgress({ state }) {
   return (
     <div className="panel era-panel">
       <h2>Era {state.era}: {currentEra}</h2>
-      {!isMaxEra && (
+      {!isMaxEra && !upgradesMet && (
         <p className="era-hint">
+          Buy {minUpgrades - eraUpgradeCount} more upgrades, then research ★ tech to advance
+        </p>
+      )}
+      {!isMaxEra && upgradesMet && (
+        <p className="era-hint" style={{ color: '#88ff88' }}>
           Research starred (★) technologies to advance to the next era
         </p>
       )}
