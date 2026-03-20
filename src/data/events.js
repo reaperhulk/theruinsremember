@@ -1254,11 +1254,11 @@ export const events = {
 
   // --- 16 new events ---
   // Era 2
-  ironRush: { id: 'ironRush', name: 'Iron Rush', description: 'Prospectors discover a massive iron deposit — steel production surges!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 5 } },
-  inventorsFair: { id: 'inventorsFair', name: 'Inventors Fair', description: 'Brilliant minds gather and share ideas — electronics windfall!', minEra: 2, type: 'instant', effect: { resourceId: 'electronics', amount: 30 } },
+  oreStrike: { id: 'oreStrike', name: 'Ore Strike', description: 'Miners strike a massive ore deposit — steel production surges!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 5 } },
+  tinkerersFair: { id: 'tinkerersFair', name: 'Tinkerers Fair', description: 'Brilliant tinkerers gather and share inventions — electronics windfall!', minEra: 2, type: 'instant', effect: { resourceId: 'electronics', amount: 30 } },
 
   // Era 3
-  aiAwakening: { id: 'aiAwakening', name: 'AI Awakening', description: 'An AI system achieves a new level of insight — research triples!', minEra: 3, type: 'timed', duration: 25, effect: { resourceId: 'research', rateMultBonus: 5 } },
+  sentientAlgorithm: { id: 'sentientAlgorithm', name: 'Sentient Algorithm', description: 'An algorithm achieves a new level of insight — research triples!', minEra: 3, type: 'timed', duration: 25, effect: { resourceId: 'research', rateMultBonus: 5 } },
   dataLake: { id: 'dataLake', name: 'Data Lake Overflow', description: 'Archived data lakes release stored information!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 40 } },
 
   // Era 4
@@ -1273,7 +1273,7 @@ export const events = {
 
   // Era 7
   stellarRenaissance: { id: 'stellarRenaissance', name: 'Stellar Renaissance', description: 'A cultural renaissance in stellar engineering inspires breakthroughs!', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
-  forgeHarmonic: { id: 'forgeHarmonic', name: 'Forge Harmonic', description: 'All stellar forges achieve harmonic resonance!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 25 } },
+  forgeChorus: { id: 'forgeChorus', name: 'Forge Chorus', description: 'All stellar forges sing in chorus — output surges!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 25 } },
 
   // Era 8
   influenceTide: { id: 'influenceTide', name: 'Influence Tide', description: 'A tide of political goodwill sweeps the galaxy!', minEra: 8, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 200 } },
@@ -1284,7 +1284,7 @@ export const events = {
   voidRipple: { id: 'voidRipple', name: 'Void Ripple', description: 'A ripple through the void yields a burst of cosmic power!', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 300 } },
 
   // Era 10
-  realityBloom: { id: 'realityBloom', name: 'Reality Bloom', description: 'Realities bloom like flowers — fragments rain from everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
+  realityBlossom: { id: 'realityBlossom', name: 'Reality Blossom', description: 'Realities blossom like flowers — fragments rain from everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
   echoSymphony: { id: 'echoSymphony', name: 'Echo Symphony', description: 'Infinite echoes sing in harmony — quantum echoes amplified beyond measure!', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
 };
 

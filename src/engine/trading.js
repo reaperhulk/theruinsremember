@@ -30,7 +30,7 @@ export function getTradeRatio(fromResourceId, toResourceId) {
 // Execute a trade. Returns new state or null if invalid/unaffordable.
 // `amount` is how many units of `toResource` you want to receive.
 export function executeTrade(state, fromResource, toResource, amount) {
-  if (state.era < 6) return null;
+  if (state.era < 4) return null;
   if (fromResource === toResource) return null;
   if (amount <= 0) return null;
 

@@ -36,7 +36,7 @@ function getAvailableTabs(era) {
     { id: 'tech', label: 'Tech', key: '2' },
     { id: 'mini', label: 'Mini-Game', key: '3' },
   ];
-  if (era >= 6) tabs.push({ id: 'trading', label: 'Trading', key: '4' });
+  if (era >= 4) tabs.push({ id: 'trading', label: 'Trading', key: '4' });
   tabs.push({ id: 'prestige', label: 'Prestige', key: '5' });
   tabs.push({ id: 'stats', label: 'Stats', key: '6' });
   return tabs;
@@ -187,7 +187,7 @@ export function App() {
               <TechTree state={state} onUpdate={updateState} />
             )}
             {activeTab === 'mini' && getMiniGamePanel()}
-            {activeTab === 'trading' && state.era >= 6 && (
+            {activeTab === 'trading' && state.era >= 4 && (
               <TradingPanel state={state} onUpdate={updateState} />
             )}
             {activeTab === 'prestige' && (
