@@ -1,6 +1,7 @@
 import { createInitialState } from './state.js';
 import { prestigeUpgrades } from '../data/prestige-upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
+import { techTree } from '../data/tech-tree.js';
 
 // Calculate prestige multiplier based on current progress
 export function calculatePrestigeBonus(state) {
@@ -181,6 +182,51 @@ export function performPrestige(state) {
     for (const id of era2Resources) {
       if (newState.resources[id]) {
         newState.resources[id] = { ...newState.resources[id], unlocked: true };
+      }
+    }
+  }
+
+  // Era Momentum: keep 5% of previous era's production rates
+  if (hasPrestigeUpgrade(state, 'eraMomentum')) {
+    for (const [id, r] of Object.entries(state.resources)) {
+      if (r.unlocked && newState.resources[id]) {
+        const prevRate = r.baseRate * r.rateMult + r.rateAdd;
+        const bonus = prevRate * 0.05;
+        if (bonus > 0) {
+          newState.resources[id] = {
+            ...newState.resources[id],
+            rateAdd: newState.resources[id].rateAdd + bonus,
+          };
+        }
+      }
+    }
+  }
+
+  // Instant Knowledge: start with all era 1 tech researched
+  if (hasPrestigeUpgrade(state, 'instantKnowledge')) {
+    const era1Tech = Object.values(techTree).filter(t => t.era === 1);
+    for (const t of era1Tech) {
+      newState.tech[t.id] = true;
+      // Apply tech effects if present
+      if (t.effects) {
+        for (const effect of t.effects) {
+          const target = newState.resources[effect.target];
+          if (!target) continue;
+          switch (effect.type) {
+            case 'production_mult':
+              newState.resources[effect.target] = { ...target, rateMult: target.rateMult * effect.value };
+              break;
+            case 'production_add':
+              newState.resources[effect.target] = { ...target, rateAdd: target.rateAdd + effect.value };
+              break;
+            case 'unlock_resource':
+              newState.resources[effect.target] = { ...target, unlocked: true };
+              break;
+            case 'cap_mult':
+              newState.resources[effect.target] = { ...target, capMult: target.capMult * effect.value };
+              break;
+          }
+        }
       }
     }
   }

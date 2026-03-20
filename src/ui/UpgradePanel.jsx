@@ -181,8 +181,9 @@ export function UpgradePanel({ state, onUpdate }) {
             <div key={u.id} className="upcoming-upgrade">
               <span className="upcoming-name">{u.name}</span>
               <span className="upcoming-desc">
-                {u.missingPrereq && <span style={{ color: '#ffcc44' }}>Needs: {u.missingPrereq}</span>}
-                {u.missingPrereq && ' — '}{u.description}
+                {u.missingPrereq ? (
+                  <span style={{ color: '#ffcc44', fontWeight: 'bold' }}>Buy {u.missingPrereq} first</span>
+                ) : u.description}
               </span>
             </div>
           ))}
