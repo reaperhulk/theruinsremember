@@ -1620,4 +1620,18 @@ canvas:hover {
   .offline-report {
     padding: 12px;
   }
+
+  .header-controls {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .header-controls button {
+    font-size: 0.75em;
+    padding: 3px 6px;
+  }
+
+  .era-stats {
+    font-size: 0.7em;
+  }
 }
