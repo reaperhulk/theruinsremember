@@ -1029,8 +1029,10 @@ canvas:hover {
   font-size: 0.8em;
   color: #cc99ff;
   text-align: center;
-  padding: 4px;
+  padding: 6px;
   background: rgba(100, 50, 150, 0.15);
+  border-radius: 3px;
+  border: 1px solid rgba(100, 50, 150, 0.2);
 }
 
 .trade-ratio {

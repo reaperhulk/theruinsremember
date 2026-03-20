@@ -1175,6 +1175,44 @@ export const events = {
   // Era 10
   paradoxWave: { id: 'paradoxWave', name: 'Paradox Wave', description: 'A wave of paradoxes resolves into pure quantum echoes!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 80 } },
   realityFracture: { id: 'realityFracture', name: 'Reality Fracture', description: 'Reality fractures and reforms — fragments rain down!', minEra: 10, type: 'timed', duration: 45, effect: { resourceId: 'realityFragments', rateMultBonus: 12 } },
+
+  // --- 18 new events ---
+
+  // Era 2
+  steamExplosion: { id: 'steamExplosion', name: 'Steam Explosion', description: 'A controlled steam explosion yields tremendous energy!', minEra: 2, type: 'instant', effect: { resourceId: 'energy', amount: 55 } },
+  copperVein: { id: 'copperVein', name: 'Copper Vein', description: 'Miners strike a massive copper vein — materials flood in!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'materials', rateMultBonus: 5 } },
+
+  // Era 3
+  openSourceRally: { id: 'openSourceRally', name: 'Open Source Rally', description: 'The community rallies around a key project — software output surges!', minEra: 3, type: 'timed', duration: 30, effect: { resourceId: 'software', rateMultBonus: 6 } },
+  cyberDefense: { id: 'cyberDefense', name: 'Cyber Defense Victory', description: 'Repelling a cyber attack yields new security data!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 50 } },
+
+  // Era 4
+  solarEclipse: { id: 'solarEclipse', name: 'Solar Eclipse', description: 'An eclipse reveals new orbital mechanics insights!', minEra: 4, type: 'instant', effect: { resourceId: 'research', amount: 150 } },
+  debrisRecycling: { id: 'debrisRecycling', name: 'Debris Recycling', description: 'Space debris is recycled into usable steel and components!', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'steel', rateMultBonus: 5 } },
+
+  // Era 5
+  terraformSuccess: { id: 'terraformSuccess', name: 'Terraforming Success', description: 'A planet is successfully terraformed — colonies boom!', minEra: 5, type: 'instant', effect: { resourceId: 'colonies', amount: 10 } },
+  antimatterCache: { id: 'antimatterCache', name: 'Antimatter Cache', description: 'A natural antimatter cache provides enormous fuel reserves!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'rocketFuel', rateMultBonus: 6 } },
+
+  // Era 6
+  firstContact: { id: 'firstContact', name: 'First Contact', description: 'Peaceful alien contact boosts galactic influence!', minEra: 6, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 30 } },
+  hyperlaneDiscovery: { id: 'hyperlaneDiscovery', name: 'Hyperlane Discovery', description: 'A natural hyperlane is mapped — star system access surges!', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
+
+  // Era 7
+  dysonFlare: { id: 'dysonFlare', name: 'Dyson Flare', description: 'A Dyson sphere captures a solar flare — massive energy!', minEra: 7, type: 'instant', effect: { resourceId: 'energy', amount: 500 } },
+  forgeHarmonic: { id: 'forgeHarmonic', name: 'Forge Harmonic', description: 'Stellar forges enter harmonic resonance — output triples!', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
+
+  // Era 8
+  galacticRenaissance: { id: 'galacticRenaissance', name: 'Galactic Renaissance', description: 'A renaissance of science sweeps the galaxy!', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 6 } },
+  exoticMatterRift: { id: 'exoticMatterRift', name: 'Exotic Matter Rift', description: 'A rift opens, pouring exotic matter into normal space!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 100 } },
+
+  // Era 9
+  cosmicHarmonics: { id: 'cosmicHarmonics', name: 'Cosmic Harmonics', description: 'The cosmos vibrates in harmony — universal constants stabilize!', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'universalConstants', rateMultBonus: 8 } },
+  voidBloom: { id: 'voidBloom', name: 'Void Bloom', description: 'The void blooms with cosmic energy — power erupts!', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 300 } },
+
+  // Era 10
+  omniversalEcho: { id: 'omniversalEcho', name: 'Omniversal Echo', description: 'An echo reverberates across all realities — quantum echoes multiply!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
+  realityMerge: { id: 'realityMerge', name: 'Reality Merge', description: 'Two parallel realities merge briefly — fragments explode!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
 };
 
 // Get events eligible for the current era
