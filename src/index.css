@@ -1006,6 +1006,12 @@ canvas:hover {
 .event-entry {
   font-size: 0.75em;
   padding: 1px 4px;
+  animation: event-slide-in 0.3s ease-out;
+}
+
+@keyframes event-slide-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .event-time {
