@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { getAvailableTech, unlockTech } from '../engine/tech.js';
 import { canAfford } from '../engine/resources.js';
 import { techTree } from '../data/tech-tree.js';
@@ -40,8 +41,15 @@ function getAffordProgress(state, cost) {
 }
 
 export function TechTree({ state, onUpdate }) {
+  const [flashId, setFlashId] = useState(null);
   const available = getAvailableTech(state);
   const unlocked = Object.keys(state.tech || {});
+
+  const handleUnlock = useCallback((techId) => {
+    setFlashId(techId);
+    onUpdate(s => unlockTech(s, techId));
+    setTimeout(() => setFlashId(null), 400);
+  }, [onUpdate]);
 
   // Show unlocked techs count
   const unlockedCount = unlocked.length;
@@ -69,9 +77,9 @@ export function TechTree({ state, onUpdate }) {
           return (
             <button
               key={tech.id}
-              className={`tech-btn ${affordable ? 'affordable' : 'too-expensive'}`}
+              className={`tech-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === tech.id ? 'purchase-flash' : ''}`}
               disabled={!affordable}
-              onClick={() => onUpdate(s => unlockTech(s, tech.id))}
+              onClick={() => handleUnlock(tech.id)}
               title={tech.description}
             >
               <div className="tech-name">

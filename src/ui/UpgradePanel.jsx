@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades } from '../engine/upgrades.js';
 import { canAfford } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -57,6 +57,13 @@ function getAffordProgress(state, cost) {
 export function UpgradePanel({ state, onUpdate }) {
   const [showPurchased, setShowPurchased] = useState(false);
   const [sortBy, setSortBy] = useState('affordable');
+  const [flashId, setFlashId] = useState(null);
+
+  const handlePurchase = useCallback((upgradeId) => {
+    setFlashId(upgradeId);
+    onUpdate(s => purchaseUpgrade(s, upgradeId));
+    setTimeout(() => setFlashId(null), 400);
+  }, [onUpdate]);
   const available = getAvailableUpgrades(state);
   const purchased = getPurchasedUpgrades(state);
 
@@ -125,9 +132,9 @@ export function UpgradePanel({ state, onUpdate }) {
           return (
             <div key={upgrade.id} className="upgrade-row">
             <button
-              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'}`}
+              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''}`}
               disabled={!affordable}
-              onClick={() => onUpdate(s => purchaseUpgrade(s, upgrade.id))}
+              onClick={() => handlePurchase(upgrade.id)}
               title={`${upgrade.description}\nEffects: ${formatEffects(upgrade.effects)}`}
             >
               <div className="upgrade-name">

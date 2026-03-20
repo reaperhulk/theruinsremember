@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
 import { getEffectiveRate, getEffectiveCap, getNetRate, gather } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
@@ -10,6 +10,14 @@ import { formatNumber } from './format.js';
 export function ResourcePanel({ state, onUpdate }) {
   const [collapsed, setCollapsed] = useState({});
   const [autoCollapse, setAutoCollapse] = useState(true);
+  const [floats, setFloats] = useState([]);
+
+  const handleGather = useCallback((resourceId, amount) => {
+    onUpdate(s => gather(s, resourceId));
+    const id = Date.now() + Math.random();
+    setFloats(f => [...f, { id, text: `+${amount > 1 ? formatNumber(amount) : '1'}`, resourceId }]);
+    setTimeout(() => setFloats(f => f.filter(fl => fl.id !== id)), 800);
+  }, [onUpdate]);
 
   const unlockedResources = Object.entries(state.resources)
     .filter(([, r]) => r.unlocked)
@@ -101,13 +109,16 @@ export function ResourcePanel({ state, onUpdate }) {
                           return `+${formatNumber(r.rate)}/s`;
                         })() : ''}
                       </span>
-                      <span className="resource-gather">
+                      <span className="resource-gather" style={{ position: 'relative' }}>
                         <button
                           className="gather-btn"
-                          onClick={() => onUpdate(s => gather(s, r.id))}
+                          onClick={() => handleGather(r.id, r.rateMult > 1 ? r.rateMult : 1)}
                         >
                           +{r.rateMult > 1 ? formatNumber(r.rateMult) : '1'}
                         </button>
+                        {floats.filter(f => f.resourceId === r.id).map(f => (
+                          <span key={f.id} className="gather-float">{f.text}</span>
+                        ))}
                       </span>
                     </div>
                   );
