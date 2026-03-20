@@ -45,7 +45,7 @@ export function TradingPanel({ state, onUpdate }) {
             <option value="">Select...</option>
             {unlocked.map(r => (
               <option key={r.id} value={r.id}>
-                {r.def.name} ({formatNumber(state.resources[r.id].amount)})
+                {r.def.name} [Era {r.def.era}] ({formatNumber(state.resources[r.id].amount)})
               </option>
             ))}
           </select>
@@ -65,7 +65,7 @@ export function TradingPanel({ state, onUpdate }) {
             <option value="">Select...</option>
             {unlocked.filter(r => r.id !== fromId).map(r => (
               <option key={r.id} value={r.id}>
-                {r.def.name} ({formatNumber(state.resources[r.id].amount)})
+                {r.def.name} [Era {r.def.era}] ({formatNumber(state.resources[r.id].amount)})
               </option>
             ))}
           </select>
