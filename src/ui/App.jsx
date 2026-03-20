@@ -142,9 +142,9 @@ export function App() {
       </header>
 
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
-      {state.totalTime < 5 && (
-        <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.7em', color: '#555', padding: '2px 0' }}>
-          Keys: 1-6 tabs | Space mine
+      {state.totalTime < 10 && (
+        <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.7em', color: '#555', padding: '2px 0', opacity: Math.max(0, 1 - state.totalTime / 10) }}>
+          Keyboard: 1-6 switch tabs | Space to mine
         </div>
       )}
       <EraTransition era={state.era} />
