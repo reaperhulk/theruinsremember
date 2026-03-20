@@ -35,9 +35,57 @@ export function TradingPanel({ state, onUpdate }) {
     });
   };
 
+  // Quick trade suggestions — resources you have plenty of → resources you need
+  const quickTrades = [];
+  const sortedByAmount = unlocked
+    .map(r => ({ ...r, amount: state.resources[r.id]?.amount || 0, cap: state.resources[r.id]?.capMult || 1 }))
+    .filter(r => r.amount > 100)
+    .sort((a, b) => b.amount - a.amount);
+
+  if (sortedByAmount.length >= 2) {
+    const richest = sortedByAmount[0];
+    const neediest = unlocked
+      .filter(r => r.id !== richest.id && (state.resources[r.id]?.amount || 0) < 50)
+      .slice(0, 2);
+    for (const need of neediest) {
+      const r = getTradeRatio(richest.id, need.id);
+      if (r) quickTrades.push({ from: richest, to: need, ratio: r });
+    }
+  }
+
   return (
     <div className="panel trading-panel">
       <h2>Trading{(state.totalTrades || 0) > 0 ? ` (${state.totalTrades} trades)` : ''}</h2>
+      {quickTrades.length > 0 && (
+        <div className="trade-quick" style={{ marginBottom: '8px' }}>
+          <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '4px' }}>Quick trades:</div>
+          {quickTrades.map((qt, i) => {
+            const tradeAmount = Math.min(100, Math.floor(state.resources[qt.from.id]?.amount * 0.1));
+            const getCost = tradeAmount * (qt.ratio.input / qt.ratio.output);
+            return (
+              <button
+                key={i}
+                className="gather-btn"
+                style={{ display: 'block', width: '100%', marginBottom: '2px', textAlign: 'left', fontSize: '0.8em' }}
+                onClick={() => onUpdate(s => {
+                  const result = executeTrade(s, qt.from.id, qt.to.id, tradeAmount);
+                  if (!result) return null;
+                  return {
+                    ...result,
+                    totalTrades: (result.totalTrades || 0) + 1,
+                    eventLog: [...(result.eventLog || []), {
+                      message: `Quick traded ${Math.floor(getCost)} ${qt.from.def.name} → ${tradeAmount} ${qt.to.def.name}`,
+                      time: result.totalTime,
+                    }].slice(-10),
+                  };
+                })}
+              >
+                {qt.from.def.name} → {qt.to.def.name} ({tradeAmount} units)
+              </button>
+            );
+          })}
+        </div>
+      )}
       <div className="trade-controls">
         <div className="trade-row">
           <label>Give:</label>
