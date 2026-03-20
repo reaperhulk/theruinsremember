@@ -1364,6 +1364,36 @@ export const events = {
   infiniteMirrorHall: { id: 'infiniteMirrorHall', name: 'Infinite Mirror Hall', description: 'Realities reflect infinitely inward — quantum echoes compound beyond measure!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 250 } },
   realitySeedPlanting: { id: 'realitySeedPlanting', name: 'Reality Seed Planting', description: 'Seeds of new realities are planted and bloom instantly — fragments scatter!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 800 } },
   quantumEntanglementStorm: { id: 'quantumEntanglementStorm', name: 'Quantum Entanglement Storm', description: 'A storm of entangled particles synchronizes across realities — echoes multiply!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 22 } },
+
+  // --- 10 new cross-chain events ---
+
+  // Era 2
+  forgeBreakthrough: { id: 'forgeBreakthrough', name: 'Forge Breakthrough', description: 'A revolutionary forging technique doubles steel throughput!', minEra: 2, type: 'timed', duration: 35, effect: { resourceId: 'steel', rateMultBonus: 6 } },
+
+  // Era 3
+  neuralNetworkSurge: { id: 'neuralNetworkSurge', name: 'Neural Network Surge', description: 'Neural networks achieve emergent intelligence — research breakthroughs cascade!', minEra: 3, type: 'timed', duration: 40, effect: { resourceId: 'research', rateMultBonus: 6 } },
+
+  // Era 4
+  orbitalManeuverBonus: { id: 'orbitalManeuverBonus', name: 'Orbital Maneuver', description: 'A perfect orbital insertion saves enormous fuel — reserves flood in!', minEra: 4, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 180 } },
+
+  // Era 5
+  colonyFederationPact: { id: 'colonyFederationPact', name: 'Colony Federation Pact', description: 'Colonies form a federation — expansion accelerates dramatically!', minEra: 5, type: 'timed', duration: 45, effect: { resourceId: 'colonies', rateMultBonus: 6 } },
+
+  // Era 6
+  darkEnergyWell: { id: 'darkEnergyWell', name: 'Dark Energy Well', description: 'A natural dark energy well is tapped — production surges!', minEra: 6, type: 'timed', duration: 50, effect: { resourceId: 'darkEnergy', rateMultBonus: 8 } },
+  starSystemCascade: { id: 'starSystemCascade', name: 'Star System Cascade', description: 'A cascade of gravitational interactions reveals hidden star systems!', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 20 } },
+
+  // Era 7
+  forgeQuantumLock: { id: 'forgeQuantumLock', name: 'Forge Quantum Lock', description: 'Quantum-locked stellar forges achieve perfect efficiency!', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'stellarForge', rateMultBonus: 10 } },
+
+  // Era 8
+  galacticTradeWindfall: { id: 'galacticTradeWindfall', name: 'Galactic Trade Windfall', description: 'A galactic trade route opens — exotic matter and influence pour in!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 130 } },
+
+  // Era 9
+  cosmicPowerWave: { id: 'cosmicPowerWave', name: 'Cosmic Power Wave', description: 'A wave of pure cosmic energy sweeps through the intergalactic void!', minEra: 9, type: 'timed', duration: 55, effect: { resourceId: 'cosmicPower', rateMultBonus: 10 } },
+
+  // Era 10
+  realityEchoStorm: { id: 'realityEchoStorm', name: 'Reality Echo Storm', description: 'A storm of echoing realities creates a torrent of fragments and echoes!', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'realityFragments', rateMultBonus: 18 } },
 };
 
 // Get events eligible for the current era
