@@ -63,11 +63,22 @@ export function WeavingPanel({ state, onUpdate }) {
       </div>
       {grid.length > 0 && (
         <div className="weave-counts" style={{ display: 'flex', gap: '8px', fontSize: '0.75em', marginBottom: '4px' }}>
-          {['temporal','spatial','causal','quantum'].map(t => (
-            <span key={t} style={{ color: TYPE_COLORS[t], opacity: (counts[t]||0) > 0 ? 1 : 0.3 }}>
-              {t.charAt(0).toUpperCase()}: {(counts[t]||0)}{chaosCount > 0 ? `+${chaosCount}*` : ''}
-            </span>
-          ))}
+          {['temporal','spatial','causal','quantum'].map(t => {
+            const total = (counts[t]||0) + chaosCount;
+            const isClose = total >= 2 && total < 3;
+            const isReady = total >= 3;
+            return (
+              <span key={t} style={{
+                color: TYPE_COLORS[t],
+                opacity: (counts[t]||0) > 0 || isClose ? 1 : 0.3,
+                fontWeight: isReady ? 'bold' : isClose ? 'bold' : 'normal',
+                textDecoration: isReady ? 'underline' : 'none',
+              }}>
+                {t.charAt(0).toUpperCase()}: {(counts[t]||0)}{chaosCount > 0 ? `+${chaosCount}*` : ''}
+                {isReady ? ' ✓' : isClose ? ' ·' : ''}
+              </span>
+            );
+          })}
         </div>
       )}
       {lastMatch && (
