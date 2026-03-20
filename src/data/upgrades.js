@@ -163,7 +163,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
     ],
     description: 'Machines replace manual labor — automated resource gathering',
-    prerequisites: ['computingLab'],
+    prerequisites: ['printingPress'],
   },
   steamTurbine: {
     id: 'steamTurbine', name: 'Steam Turbine', era: 2,
@@ -173,7 +173,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 0.2 },
     ],
     description: 'Steam power boosts energy and steel production',
-    prerequisites: ['powerGrid'],
+    prerequisites: ['coalMine'],
   },
   factoryFloor: {
     id: 'factoryFloor', name: 'Factory Floor', era: 2,
@@ -220,7 +220,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.4 },
     ],
     description: 'Statistical algorithms double research and data analysis',
-    prerequisites: ['computingLab'],
+    prerequisites: ['digitalSensors'],
   },
   cloudComputing: {
     id: 'cloudComputing', name: 'Cloud Computing', era: 3,
@@ -319,7 +319,7 @@ export const upgrades = {
     cost: { electronics: 25, steel: 20, energy: 15 },
     effects: [{ type: 'production_mult', target: 'energy', value: 5 }],
     description: 'Orbital solar panels multiply energy output',
-    prerequisites: ['reusableRockets'],
+    prerequisites: ['nuclearReactor'],
   },
   spaceStation: {
     id: 'spaceStation', name: 'Space Station', era: 4,
@@ -397,7 +397,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 0.3 },
     ],
     description: 'Nuclear fission triples energy and generates research data',
-    prerequisites: ['rocketScience'],
+    prerequisites: ['deepSpaceProbe'],
   },
   satelliteNetwork: {
     id: 'satelliteNetwork', name: 'Satellite Network', era: 4,
@@ -901,7 +901,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'research', value: 2 },
     ],
     description: 'Industrial storage expands capacity for steel, electronics, and research',
-    prerequisites: ['assemblyLines'],
+    prerequisites: ['microchipFab'],
   },
   supplyChain: {
     id: 'supplyChain', name: 'Supply Chain', era: 2,
@@ -911,7 +911,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.3 },
     ],
     description: 'Efficient logistics double steel and materials output',
-    prerequisites: ['powerGrid', 'automation'],
+    prerequisites: ['steelRefinery'],
   },
   asteroidDefense: {
     id: 'asteroidDefense', name: 'Asteroid Defense', era: 4,
@@ -931,7 +931,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
     ],
     description: 'A permanent base on the Moon — research and materials',
-    prerequisites: ['spaceStation'],
+    prerequisites: ['marsColony'],
   },
   gravitySling: {
     id: 'gravitySling', name: 'Gravity Sling', era: 4,
@@ -951,7 +951,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'rocketFuel', value: 3 },
     ],
     description: 'Next-gen rockets triple fuel production and capacity',
-    prerequisites: ['reusableRockets'],
+    prerequisites: ['gravitySling'],
   },
   quantumNetwork: {
     id: 'quantumNetwork', name: 'Quantum Network', era: 4,
@@ -961,7 +961,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 0.6 },
     ],
     description: 'Entangled communication triples data and doubles electronics',
-    prerequisites: ['orbitalTelescope'],
+    prerequisites: ['satelliteNetwork'],
   },
   voidHarvester: {
     id: 'voidHarvester', name: 'Void Harvester', era: 8,
@@ -1403,7 +1403,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'labor', value: 2 },
     ],
     description: 'Brick production boosts materials and doubles labor capacity',
-    prerequisites: ['basicPower'],
+    prerequisites: ['quarry'],
   },
   marketplace: {
     id: 'marketplace', name: 'Marketplace', era: 1,
@@ -1413,7 +1413,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.2 },
     ],
     description: 'A bustling marketplace doubles food and material trade',
-    prerequisites: ['housing'],
+    prerequisites: ['brickworks'],
   },
   granary: {
     id: 'granary', name: 'Granary', era: 1,
@@ -1423,7 +1423,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 0.3 },
     ],
     description: 'Store food for lean times — triple capacity and steady supply',
-    prerequisites: ['irrigation'],
+    prerequisites: ['communalKitchen'],
   },
   quarry: {
     id: 'quarry', name: 'Quarry', era: 1,
@@ -1433,7 +1433,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'materials', value: 3 },
     ],
     description: 'A stone quarry boosts materials and triples storage',
-    prerequisites: ['tools'],
+    prerequisites: ['storehouse'],
   },
   animalHusbandry: {
     id: 'animalHusbandry', name: 'Animal Husbandry', era: 1,
@@ -1463,7 +1463,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.3 },
     ],
     description: 'A trading post generates food and materials from passing travelers',
-    prerequisites: ['storehouse'],
+    prerequisites: ['marketplace'],
   },
   electricMotor: {
     id: 'electricMotor', name: 'Electric Motor', era: 2,
@@ -1473,7 +1473,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.3 },
     ],
     description: 'Electric motors double labor efficiency',
-    prerequisites: ['powerGrid'],
+    prerequisites: ['steamTurbine'],
   },
   steelRefinery: {
     id: 'steelRefinery', name: 'Steel Refinery', era: 2,
@@ -1483,7 +1483,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'steel', value: 3 },
     ],
     description: 'Refined smelting doubles steel and triples storage',
-    prerequisites: ['assemblyLines'],
+    prerequisites: ['steelForge'],
   },
   chemicalPlant: {
     id: 'chemicalPlant', name: 'Chemical Plant', era: 2,
@@ -1493,7 +1493,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.3 },
     ],
     description: 'Chemical processing doubles materials and generates energy',
-    prerequisites: ['powerGrid'],
+    prerequisites: ['electricMotor'],
   },
   telephoneNetwork: {
     id: 'telephoneNetwork', name: 'Telephone Network', era: 2,
@@ -1513,7 +1513,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 0.3 },
     ],
     description: 'Textile manufacturing attracts workers and boosts food supply chains',
-    prerequisites: ['assemblyLines'],
+    prerequisites: ['textileMill'],
   },
   coalMine: {
     id: 'coalMine', name: 'Coal Mine', era: 2,
@@ -1523,7 +1523,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.3 },
     ],
     description: 'Deep coal mining doubles energy and produces materials',
-    prerequisites: ['powerGrid'],
+    prerequisites: ['steelRefinery'],
   },
   communalKitchen: {
     id: 'communalKitchen', name: 'Communal Kitchen', era: 1,
@@ -1533,7 +1533,7 @@ export const upgrades = {
       { type: 'production_add', target: 'labor', value: 0.5 },
     ],
     description: 'Shared meals triple food output and provide extra labor',
-    prerequisites: ['irrigation'],
+    prerequisites: ['animalHusbandry'],
   },
   deepMining: {
     id: 'deepMining', name: 'Deep Mining', era: 1,
@@ -1543,7 +1543,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.2 },
     ],
     description: 'Dig deeper for rare ores — more materials and energy',
-    prerequisites: ['foundry'],
+    prerequisites: ['copperSmelter'],
   },
   socialMedia: {
     id: 'socialMedia', name: 'Social Media', era: 3,
@@ -1553,7 +1553,7 @@ export const upgrades = {
       { type: 'production_add', target: 'software', value: 0.3 },
     ],
     description: 'Social networks double data generation',
-    prerequisites: ['internet'],
+    prerequisites: ['openSource'],
   },
   cloudStorage: {
     id: 'cloudStorage', name: 'Cloud Storage', era: 3,
@@ -1574,7 +1574,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'data', value: 5 },
     ],
     description: 'Decentralized ledger doubles electronics and expands data capacity',
-    prerequisites: ['openSource'],
+    prerequisites: ['quantumEncryption'],
   },
   robotics: {
     id: 'robotics', name: 'Robotics', era: 3,
@@ -1614,7 +1614,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'research', value: 2 },
     ],
     description: 'Suborbital experiments boost research output and capacity',
-    prerequisites: ['quantumComputing'],
+    prerequisites: ['patternAnalysis','quantumComputing'],
   },
   solarWindCollector: {
     id: 'solarWindCollector', name: 'Solar Wind Collector', era: 5,
@@ -1624,7 +1624,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 0.2 },
     ],
     description: 'Harvest solar wind for energy and trace exotic materials',
-    prerequisites: ['fusionPower'],
+    prerequisites: ['fuelRefinery','fusionPower'],
   },
   oortCloudMining: {
     id: 'oortCloudMining', name: 'Oort Cloud Mining', era: 5,
@@ -1664,7 +1664,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 1 },
     ],
     description: 'Missions to outer planets yield research and data breakthroughs',
-    prerequisites: ['geneticEngineering'],
+    prerequisites: ['outerColony','bioReactor'],
   },
   dysonBubble: {
     id: 'dysonBubble', name: 'Dyson Bubble', era: 5,
@@ -1674,7 +1674,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'energy', value: 5 },
     ],
     description: 'A proto-Dyson structure — x5 energy production and capacity',
-    prerequisites: ['fusionPower'],
+    prerequisites: ['heliumMiner'],
   },
   titanMining: {
     id: 'titanMining', name: 'Titan Mining', era: 5,
@@ -1694,7 +1694,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 1 },
     ],
     description: 'Survey distant planets — discover new colonies and materials',
-    prerequisites: ['terraforming'],
+    prerequisites: ['spaceHabitat'],
   },
   wormholeGenerator: {
     id: 'wormholeGenerator', name: 'Wormhole Generator', era: 8,
@@ -1806,7 +1806,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'energy', value: 3 },
     ],
     description: 'Digital energy management doubles output and triples capacity',
-    prerequisites: ['cloudComputing'],
+    prerequisites: ['iotNetwork'],
   },
   cosmicFarming: {
     id: 'cosmicFarming', name: 'Cosmic Farming', era: 9,
@@ -1841,7 +1841,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'data', value: 5 },
     ],
     description: 'Echoes from past timelines accelerate digital progress (prestige-only)',
-    prerequisites: ['internet'],
+    prerequisites: ['cloudStorage'],
     requirePrestige: 1,
   },
   industrialMemory: {
@@ -1863,7 +1863,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'orbitalInfra', value: 3 },
     ],
     description: 'Remember spacefaring techniques — triple fuel and orbital output (prestige-only)',
-    prerequisites: ['rocketScience'],
+    prerequisites: ['quantumNetwork'],
     requirePrestige: 1,
   },
   cosmicRecollection: {
@@ -1922,7 +1922,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 0.3 },
     ],
     description: 'Long-distance communication accelerates research and electronics',
-    prerequisites: ['computingLab'],
+    prerequisites: ['telephoneNetwork'],
   },
 
   // Era 3
@@ -1936,7 +1936,7 @@ export const upgrades = {
       { type: 'production_add', target: 'orbitalInfra', value: 0.3 },
     ],
     description: 'Manufacturing in zero-g triples steel and builds orbital infrastructure',
-    prerequisites: ['spaceStation'],
+    prerequisites: ['refueling'],
   },
   marsRover: {
     id: 'marsRover', name: 'Mars Rover', era: 4,
@@ -1958,7 +1958,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'exoticMaterials', value: 3 },
     ],
     description: 'Cryo-tanks massively expand fuel and exotic material storage',
-    prerequisites: ['fusionPower'],
+    prerequisites: ['quantumReactor'],
   },
 
   // Era 6
@@ -2042,17 +2042,17 @@ export const upgrades = {
   },
 
   // --- Worktree Agent: 30 new upgrades (3 per era) ---
-  oxCart: { id: 'oxCart', name: 'Ox Cart', era: 1, cost: { food: 15, materials: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'labor', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'Beast-drawn carts double labor and haul extra materials', prerequisites: ['animalHusbandry'] },
-  oilRefinery: { id: 'oilRefinery', name: 'Oil Refinery', era: 2, cost: { steel: 25, energy: 20, materials: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.5 }], description: 'Refine petroleum — triple energy and generate steel byproducts', prerequisites: ['powerGrid'] },
+  oxCart: { id: 'oxCart', name: 'Ox Cart', era: 1, cost: { food: 15, materials: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'labor', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'Beast-drawn carts double labor and haul extra materials', prerequisites: ['huntingParty'] },
+  oilRefinery: { id: 'oilRefinery', name: 'Oil Refinery', era: 2, cost: { steel: 25, energy: 20, materials: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.5 }], description: 'Refine petroleum — triple energy and generate steel byproducts', prerequisites: ['steamTurbine'] },
   laboratoryComplex: { id: 'laboratoryComplex', name: 'Laboratory Complex', era: 2, cost: { electronics: 20, steel: 15, research: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'cap_mult', target: 'research', value: 3 }], description: 'Dedicated labs double research and triple capacity', prerequisites: ['computingLab'] },
-  conveyor: { id: 'conveyor', name: 'Conveyor System', era: 2, cost: { steel: 20, electronics: 10, energy: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.3 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Automated conveyors double steel and electronics', prerequisites: ['automation'] },
+  conveyor: { id: 'conveyor', name: 'Conveyor System', era: 2, cost: { steel: 20, electronics: 10, energy: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.3 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Automated conveyors double steel and electronics', prerequisites: ['railroad'] },
   fiberOptic: { id: 'fiberOptic', name: 'Fiber Optic Network', era: 3, cost: { electronics: 30, energy: 20, materials: 25 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 0.4 }], description: 'High-speed fiber triples data and doubles electronics', prerequisites: ['internet'] },
-  autonomousDrone: { id: 'autonomousDrone', name: 'Autonomous Drone', era: 3, cost: { software: 20, electronics: 25, research: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 1 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'Drones add labor and double material gathering', prerequisites: ['aiResearch'] },
-  cryoFuelTank: { id: 'cryoFuelTank', name: 'Cryo Fuel Tank', era: 4, cost: { rocketFuel: 20, steel: 30, energy: 15 }, effects: [{ type: 'cap_mult', target: 'rocketFuel', value: 5 }, { type: 'production_add', target: 'rocketFuel', value: 0.3 }], description: 'Cryogenic storage expands fuel capacity x5', prerequisites: ['rocketScience'] },
+  autonomousDrone: { id: 'autonomousDrone', name: 'Autonomous Drone', era: 3, cost: { software: 20, electronics: 25, research: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 1 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'Drones add labor and double material gathering', prerequisites: ['robotics'] },
+  cryoFuelTank: { id: 'cryoFuelTank', name: 'Cryo Fuel Tank', era: 4, cost: { rocketFuel: 20, steel: 30, energy: 15 }, effects: [{ type: 'cap_mult', target: 'rocketFuel', value: 5 }, { type: 'production_add', target: 'rocketFuel', value: 0.3 }], description: 'Cryogenic storage expands fuel capacity x5', prerequisites: ['advancedRocketry'] },
   magneticShield: { id: 'magneticShield', name: 'Magnetic Shield', era: 4, cost: { electronics: 20, energy: 25, steel: 20 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 0.6 }, { type: 'cap_mult', target: 'orbitalInfra', value: 3 }], description: 'Magnetic shielding protects orbital assets — double output', prerequisites: ['spaceStation'] },
-  nanofabricator: { id: 'nanofabricator', name: 'Nanofabricator', era: 5, cost: { exoticMaterials: 20, research: 40, electronics: 30 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 2 }, { type: 'production_add', target: 'electronics', value: 4 }], description: 'Nanoscale fabrication triples exotic materials and x5 electronics', prerequisites: ['asteroidMining'] },
-  gravitySiphon: { id: 'gravitySiphon', name: 'Gravity Siphon', era: 5, cost: { rocketFuel: 40, energy: 50, research: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 4 }, { type: 'production_add', target: 'darkEnergy', value: 0.1 }], description: 'Siphon energy from gravity wells', prerequisites: ['fusionPower'] },
-  cometHarvester: { id: 'cometHarvester', name: 'Comet Harvester', era: 5, cost: { orbitalInfra: 20, rocketFuel: 30, materials: 100 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 0.5 }, { type: 'production_add', target: 'food', value: 2 }], description: 'Harvest comets for exotic ice and organic compounds', prerequisites: ['antimatterDrive'] },
+  nanofabricator: { id: 'nanofabricator', name: 'Nanofabricator', era: 5, cost: { exoticMaterials: 20, research: 40, electronics: 30 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 2 }, { type: 'production_add', target: 'electronics', value: 4 }], description: 'Nanoscale fabrication triples exotic materials and x5 electronics', prerequisites: ['massDriver'] },
+  gravitySiphon: { id: 'gravitySiphon', name: 'Gravity Siphon', era: 5, cost: { rocketFuel: 40, energy: 50, research: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 4 }, { type: 'production_add', target: 'darkEnergy', value: 0.1 }], description: 'Siphon energy from gravity wells', prerequisites: ['dysonBubble'] },
+  cometHarvester: { id: 'cometHarvester', name: 'Comet Harvester', era: 5, cost: { orbitalInfra: 20, rocketFuel: 30, materials: 100 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 0.5 }, { type: 'production_add', target: 'food', value: 2 }], description: 'Harvest comets for exotic ice and organic compounds', prerequisites: ['oortCloudMining'] },
   graviticLoom: { id: 'graviticLoom', name: 'Gravitic Loom', era: 6, cost: { darkEnergy: 30, exoticMaterials: 40, starSystems: 5 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 3.2 }, { type: 'production_add', target: 'darkEnergy', value: 0.5 }], description: 'Weave exotic materials using gravity — triples output', prerequisites: ['warpDrive'] },
   stellarAcademy: { id: 'stellarAcademy', name: 'Stellar Academy', era: 6, cost: { research: 80, galacticInfluence: 20, starSystems: 4 }, effects: [{ type: 'production_add', target: 'research', value: 6.4 }, { type: 'production_add', target: 'galacticInfluence', value: 0.3 }], description: 'Train across star systems — x5 research', prerequisites: ['aiGovernance'] },
   voidProbe: { id: 'voidProbe', name: 'Void Probe', era: 6, cost: { darkEnergy: 25, starSystems: 3, electronics: 40 }, effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }, { type: 'production_add', target: 'data', value: 1 }], description: 'Probes into the void discover systems and transmit data', prerequisites: ['stellarCartography'] },
@@ -2070,27 +2070,27 @@ export const upgrades = {
   // --- 30 new upgrades (3 per era) ---
 
   // Era 1
-  charcoalPit: { id: 'charcoalPit', name: 'Charcoal Pit', era: 1, cost: { materials: 20, energy: 8, labor: 12 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'Burn wood into charcoal — doubles energy and boosts materials', prerequisites: ['basicPower'] },
+  charcoalPit: { id: 'charcoalPit', name: 'Charcoal Pit', era: 1, cost: { materials: 20, energy: 8, labor: 12 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'Burn wood into charcoal — doubles energy and boosts materials', prerequisites: ['waterMill'] },
   fishingWharf: { id: 'fishingWharf', name: 'Fishing Wharf', era: 1, cost: { food: 18, materials: 14, labor: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'labor', value: 0.2 }], description: 'Coastal fishing yields food and doubles labor from dockworkers', prerequisites: ['irrigation'] },
 
   // Era 2
-  cementFactory: { id: 'cementFactory', name: 'Cement Factory', era: 2, cost: { steel: 18, materials: 22, energy: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.3 }], description: 'Cement production triples materials and generates steel', prerequisites: ['steamTurbine'] },
-  wirelessTelegraph: { id: 'wirelessTelegraph', name: 'Wireless Telegraph', era: 2, cost: { electronics: 15, research: 12, steel: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Wireless communication doubles research output', prerequisites: ['computingLab'] },
+  cementFactory: { id: 'cementFactory', name: 'Cement Factory', era: 2, cost: { steel: 18, materials: 22, energy: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.3 }], description: 'Cement production triples materials and generates steel', prerequisites: ['hydraulicPress'] },
+  wirelessTelegraph: { id: 'wirelessTelegraph', name: 'Wireless Telegraph', era: 2, cost: { electronics: 15, research: 12, steel: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Wireless communication doubles research output', prerequisites: ['telegraphLine'] },
   canningFactory: { id: 'canningFactory', name: 'Canning Factory', era: 2, cost: { steel: 15, food: 20, labor: 15 }, effects: [{ type: 'cap_mult', target: 'food', value: 5 }, { type: 'production_add', target: 'food', value: 0.3 }], description: 'Preserved food doubles output and expands storage x5', prerequisites: ['industrialFarming'] },
 
   // Era 3
-  deepLearning: { id: 'deepLearning', name: 'Deep Learning', era: 3, cost: { data: 20, software: 20, research: 25 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.5 }], description: 'Deep learning triples research and generates software', prerequisites: ['machinelearning'] },
+  deepLearning: { id: 'deepLearning', name: 'Deep Learning', era: 3, cost: { data: 20, software: 20, research: 25 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.5 }], description: 'Deep learning triples research and generates software', prerequisites: ['bigData'] },
   iotNetwork: { id: 'iotNetwork', name: 'IoT Network', era: 3, cost: { electronics: 25, data: 15, software: 12 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Connected devices double electronics and data output', prerequisites: ['cloudComputing'] },
-  quantumEncryption: { id: 'quantumEncryption', name: 'Quantum Encryption', era: 3, cost: { research: 30, software: 25, data: 15 }, effects: [{ type: 'cap_mult', target: 'data', value: 5 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Unbreakable encryption expands data capacity x5 and doubles software', prerequisites: ['cyberSecurity'] },
+  quantumEncryption: { id: 'quantumEncryption', name: 'Quantum Encryption', era: 3, cost: { research: 30, software: 25, data: 15 }, effects: [{ type: 'cap_mult', target: 'data', value: 5 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Unbreakable encryption expands data capacity x5 and doubles software', prerequisites: ['encryptionProtocol'] },
 
   // Era 4
   plasmaEngine: { id: 'plasmaEngine', name: 'Plasma Engine', era: 4, cost: { rocketFuel: 20, research: 30, energy: 25 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 1.2 }, { type: 'production_add', target: 'energy', value: 0.6 }], description: 'Plasma propulsion triples fuel efficiency and doubles energy', prerequisites: ['reusableRockets'] },
   astrometryLab: { id: 'astrometryLab', name: 'Astrometry Lab', era: 4, cost: { research: 30, data: 20, orbitalInfra: 8 }, effects: [{ type: 'production_add', target: 'data', value: 1.2 }, { type: 'production_add', target: 'research', value: 0.6 }], description: 'Precision astrometry triples data and doubles research', prerequisites: ['orbitalTelescope'] },
 
   // Era 5
-  quantumReactor: { id: 'quantumReactor', name: 'Quantum Reactor', era: 5, cost: { exoticMaterials: 25, research: 50, energy: 60 }, effects: [{ type: 'production_add', target: 'energy', value: 4 }, { type: 'production_add', target: 'exoticMaterials', value: 0.5 }], description: 'Quantum energy reactions yield x5 energy and exotic byproducts', prerequisites: ['fusionPower'] },
+  quantumReactor: { id: 'quantumReactor', name: 'Quantum Reactor', era: 5, cost: { exoticMaterials: 25, research: 50, energy: 60 }, effects: [{ type: 'production_add', target: 'energy', value: 4 }, { type: 'production_add', target: 'exoticMaterials', value: 0.5 }], description: 'Quantum energy reactions yield x5 energy and exotic byproducts', prerequisites: ['gravitySiphon'] },
   venusDome: { id: 'venusDome', name: 'Venus Dome', era: 5, cost: { colonies: 3, exoticMaterials: 18, rocketFuel: 35 }, effects: [{ type: 'production_add', target: 'colonies', value: 0.2 }, { type: 'production_add', target: 'food', value: 2 }], description: 'Floating domes on Venus grow exotic crops and expand colonies', prerequisites: ['terraforming'] },
-  kuiperStation: { id: 'kuiperStation', name: 'Kuiper Station', era: 5, cost: { orbitalInfra: 18, rocketFuel: 30, research: 35 }, effects: [{ type: 'production_add', target: 'research', value: 1 }, { type: 'production_add', target: 'exoticMaterials', value: 0.3 }], description: 'Research station in the Kuiper belt yields discoveries and materials', prerequisites: ['antimatterDrive'] },
+  kuiperStation: { id: 'kuiperStation', name: 'Kuiper Station', era: 5, cost: { orbitalInfra: 18, rocketFuel: 30, research: 35 }, effects: [{ type: 'production_add', target: 'research', value: 1 }, { type: 'production_add', target: 'exoticMaterials', value: 0.3 }], description: 'Research station in the Kuiper belt yields discoveries and materials', prerequisites: ['cometHarvester'] },
 
   // Era 6
   darkMatterProbe: { id: 'darkMatterProbe', name: 'Dark Matter Probe', era: 6, cost: { darkEnergy: 30, research: 70, starSystems: 4 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 0.8 }, { type: 'production_add', target: 'research', value: 3.2 }], description: 'Probes detect dark matter — boosts dark energy and triples research', prerequisites: ['warpDrive'] },
@@ -2118,23 +2118,23 @@ export const upgrades = {
   // --- 33 new upgrades (3+ per era) ---
 
   // Era 1
-  apprenticeSmith: { id: 'apprenticeSmith', name: 'Apprentice Smith', era: 1, cost: { materials: 22, labor: 12, energy: 8 }, effects: [{ type: 'production_add', target: 'steel', value: 0.2 }, { type: 'production_add', target: 'labor', value: 0.2 }], description: 'Train apprentice smiths — early steel trickle and double labor', prerequisites: ['foundry'] },
-  huntingParty: { id: 'huntingParty', name: 'Hunting Party', era: 1, cost: { food: 20, labor: 15, materials: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.4 }, { type: 'production_add', target: 'materials', value: 0.2 }], description: 'Organized hunting triples food and yields hides for materials', prerequisites: ['irrigation'] },
-  stoneQuarry: { id: 'stoneQuarry', name: 'Stone Quarry', era: 1, cost: { labor: 18, materials: 15, energy: 10 }, effects: [{ type: 'production_add', target: 'materials', value: 0.2 }, { type: 'cap_mult', target: 'materials', value: 3 }], description: 'Stone quarry doubles material output and triples capacity', prerequisites: ['tools'] },
-  potteryKiln: { id: 'potteryKiln', name: 'Pottery Kiln', era: 1, cost: { materials: 14, energy: 12, labor: 8 }, effects: [{ type: 'cap_mult', target: 'food', value: 2 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'Pottery stores food and provides trade goods', prerequisites: ['basicPower'] },
+  apprenticeSmith: { id: 'apprenticeSmith', name: 'Apprentice Smith', era: 1, cost: { materials: 22, labor: 12, energy: 8 }, effects: [{ type: 'production_add', target: 'steel', value: 0.2 }, { type: 'production_add', target: 'labor', value: 0.2 }], description: 'Train apprentice smiths — early steel trickle and double labor', prerequisites: ['copperMine'] },
+  huntingParty: { id: 'huntingParty', name: 'Hunting Party', era: 1, cost: { food: 20, labor: 15, materials: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.4 }, { type: 'production_add', target: 'materials', value: 0.2 }], description: 'Organized hunting triples food and yields hides for materials', prerequisites: ['animalHusbandry'] },
+  stoneQuarry: { id: 'stoneQuarry', name: 'Stone Quarry', era: 1, cost: { labor: 18, materials: 15, energy: 10 }, effects: [{ type: 'production_add', target: 'materials', value: 0.2 }, { type: 'cap_mult', target: 'materials', value: 3 }], description: 'Stone quarry doubles material output and triples capacity', prerequisites: ['ropeAndPulley'] },
+  potteryKiln: { id: 'potteryKiln', name: 'Pottery Kiln', era: 1, cost: { materials: 14, energy: 12, labor: 8 }, effects: [{ type: 'cap_mult', target: 'food', value: 2 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'Pottery stores food and provides trade goods', prerequisites: ['charcoalPit'] },
 
   // Era 2
-  chemicalWorks: { id: 'chemicalWorks', name: 'Chemical Works', era: 2, cost: { steel: 22, energy: 18, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.3 }], description: 'Chemical processing doubles energy and enables early research', prerequisites: ['powerGrid'] },
-  textileMill: { id: 'textileMill', name: 'Textile Mill', era: 2, cost: { steel: 12, food: 18, labor: 15 }, effects: [{ type: 'production_add', target: 'food', value: 0.3 }, { type: 'production_add', target: 'labor', value: 0.3 }], description: 'Textile manufacturing doubles food trade value and labor efficiency', prerequisites: ['assemblyLines'] },
+  chemicalWorks: { id: 'chemicalWorks', name: 'Chemical Works', era: 2, cost: { steel: 22, energy: 18, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.3 }], description: 'Chemical processing doubles energy and enables early research', prerequisites: ['chemicalPlant'] },
+  textileMill: { id: 'textileMill', name: 'Textile Mill', era: 2, cost: { steel: 12, food: 18, labor: 15 }, effects: [{ type: 'production_add', target: 'food', value: 0.3 }, { type: 'production_add', target: 'labor', value: 0.3 }], description: 'Textile manufacturing doubles food trade value and labor efficiency', prerequisites: ['canningFactory'] },
 
   // Era 3
-  roboticsLab: { id: 'roboticsLab', name: 'Robotics Lab', era: 3, cost: { research: 25, electronics: 18, software: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 1.6 }, { type: 'production_add', target: 'electronics', value: 0.5 }], description: 'Advanced robotics multiplies labor x5 and generates electronics', prerequisites: ['aiResearch'] },
-  edgeDrones: { id: 'edgeDrones', name: 'Edge Drones', era: 3, cost: { electronics: 20, software: 14, data: 12 }, effects: [{ type: 'production_add', target: 'data', value: 0.4 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Edge computing drones double data and generate electronics', prerequisites: ['cloudComputing'] },
+  roboticsLab: { id: 'roboticsLab', name: 'Robotics Lab', era: 3, cost: { research: 25, electronics: 18, software: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 1.6 }, { type: 'production_add', target: 'electronics', value: 0.5 }], description: 'Advanced robotics multiplies labor x5 and generates electronics', prerequisites: ['autonomousDrone'] },
+  edgeDrones: { id: 'edgeDrones', name: 'Edge Drones', era: 3, cost: { electronics: 20, software: 14, data: 12 }, effects: [{ type: 'production_add', target: 'data', value: 0.4 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Edge computing drones double data and generate electronics', prerequisites: ['energyMatrix'] },
 
   // Era 4
-  marsOutpost: { id: 'marsOutpost', name: 'Mars Outpost', era: 4, cost: { rocketFuel: 25, steel: 35, food: 30 }, effects: [{ type: 'production_add', target: 'research', value: 0.5 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'A Martian outpost yields research and trace exotic materials', prerequisites: ['spaceStation'] },
-  orbitalRefinery: { id: 'orbitalRefinery', name: 'Orbital Refinery', era: 4, cost: { orbitalInfra: 12, steel: 28, energy: 20 }, effects: [{ type: 'production_add', target: 'steel', value: 1.2 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'Refine ores in orbit — triple steel and produce exotic byproducts', prerequisites: ['zeroGManufacturing'] },
-  lightSail: { id: 'lightSail', name: 'Light Sail', era: 4, cost: { electronics: 18, rocketFuel: 12, research: 20 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Light sails double energy and fuel efficiency', prerequisites: ['solarArrays'] },
+  marsOutpost: { id: 'marsOutpost', name: 'Mars Outpost', era: 4, cost: { rocketFuel: 25, steel: 35, food: 30 }, effects: [{ type: 'production_add', target: 'research', value: 0.5 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'A Martian outpost yields research and trace exotic materials', prerequisites: ['marsRover'] },
+  orbitalRefinery: { id: 'orbitalRefinery', name: 'Orbital Refinery', era: 4, cost: { orbitalInfra: 12, steel: 28, energy: 20 }, effects: [{ type: 'production_add', target: 'steel', value: 1.2 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'Refine ores in orbit — triple steel and produce exotic byproducts', prerequisites: ['spaceDebrisCollector','zeroGManufacturing'] },
+  lightSail: { id: 'lightSail', name: 'Light Sail', era: 4, cost: { electronics: 18, rocketFuel: 12, research: 20 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Light sails double energy and fuel efficiency', prerequisites: ['solarArrays','solarSail'] },
 
   // Era 5
   heliumMiner: { id: 'heliumMiner', name: 'Helium-3 Miner', era: 5, cost: { rocketFuel: 30, exoticMaterials: 12, energy: 25 }, effects: [{ type: 'production_add', target: 'energy', value: 2 }, { type: 'production_add', target: 'rocketFuel', value: 0.5 }], description: 'Mine helium-3 from gas giants — triple energy and bonus fuel', prerequisites: ['fusionPower'] },
@@ -2164,22 +2164,22 @@ export const upgrades = {
   // --- 30 new upgrades (3 per era) ---
 
   // Era 1
-  clayPit: { id: 'clayPit', name: 'Clay Pit', era: 1, cost: { labor: 12, materials: 8 }, effects: [{ type: 'production_add', target: 'materials', value: 0.4 }, { type: 'cap_mult', target: 'materials', value: 2 }], description: 'Dig clay for building — steady materials and expanded storage', prerequisites: ['tools'] },
-  charcoalKiln: { id: 'charcoalKiln', name: 'Charcoal Kiln', era: 1, cost: { materials: 18, labor: 14, food: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.2 }], description: 'Burn wood into charcoal — double energy and extra materials', prerequisites: ['basicPower'] },
+  clayPit: { id: 'clayPit', name: 'Clay Pit', era: 1, cost: { labor: 12, materials: 8 }, effects: [{ type: 'production_add', target: 'materials', value: 0.4 }, { type: 'cap_mult', target: 'materials', value: 2 }], description: 'Dig clay for building — steady materials and expanded storage', prerequisites: ['stoneMason'] },
+  charcoalKiln: { id: 'charcoalKiln', name: 'Charcoal Kiln', era: 1, cost: { materials: 18, labor: 14, food: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.2 }], description: 'Burn wood into charcoal — double energy and extra materials', prerequisites: ['charcoalOven'] },
 
   // Era 2
 
   // Era 3
-  blockchainLedger: { id: 'blockchainLedger', name: 'Blockchain Ledger', era: 3, cost: { software: 20, data: 15, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'cap_mult', target: 'software', value: 3 }], description: 'Distributed ledger triples data output and expands software capacity', prerequisites: ['cloudComputing'] },
+  blockchainLedger: { id: 'blockchainLedger', name: 'Blockchain Ledger', era: 3, cost: { software: 20, data: 15, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'cap_mult', target: 'software', value: 3 }], description: 'Distributed ledger triples data output and expands software capacity', prerequisites: ['blockchain'] },
 
   // Era 4
-  marsColony: { id: 'marsColony', name: 'Mars Colony', era: 4, cost: { rocketFuel: 25, steel: 35, food: 50, orbitalInfra: 8 }, effects: [{ type: 'production_add', target: 'research', value: 0.4 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'A Martian outpost provides steady research and materials', prerequisites: ['spaceStation'] },
-  orbitalShipyard: { id: 'orbitalShipyard', name: 'Orbital Shipyard', era: 4, cost: { orbitalInfra: 15, steel: 40, electronics: 20 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.3 }], description: 'Build ships in orbit — double infrastructure and steady steel', prerequisites: ['spaceStation'] },
+  marsColony: { id: 'marsColony', name: 'Mars Colony', era: 4, cost: { rocketFuel: 25, steel: 35, food: 50, orbitalInfra: 8 }, effects: [{ type: 'production_add', target: 'research', value: 0.4 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'A Martian outpost provides steady research and materials', prerequisites: ['marsOutpost'] },
+  orbitalShipyard: { id: 'orbitalShipyard', name: 'Orbital Shipyard', era: 4, cost: { orbitalInfra: 15, steel: 40, electronics: 20 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.3 }], description: 'Build ships in orbit — double infrastructure and steady steel', prerequisites: ['orbitalFactory'] },
 
   // Era 5
-  jupiterStation: { id: 'jupiterStation', name: 'Jupiter Station', era: 5, cost: { rocketFuel: 80, exoticMaterials: 25, energy: 100 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 2 }, { type: 'production_add', target: 'exoticMaterials', value: 0.5 }], description: 'A station in Jupiter orbit — triple fuel and exotic material harvesting', prerequisites: ['asteroidMining'] },
-  cryogenicVaults: { id: 'cryogenicVaults', name: 'Cryogenic Vaults', era: 5, cost: { exoticMaterials: 18, research: 50, energy: 60 }, effects: [{ type: 'cap_mult', target: 'exoticMaterials', value: 3 }, { type: 'cap_mult', target: 'colonies', value: 2 }], description: 'Preserve resources and colonists — triple exotic material and double colony capacity', prerequisites: ['terraforming'] },
-  gravityTractor: { id: 'gravityTractor', name: 'Gravity Tractor', era: 5, cost: { orbitalInfra: 30, research: 60, exoticMaterials: 15 }, effects: [{ type: 'production_add', target: 'colonies', value: 2 }, { type: 'production_add', target: 'orbitalInfra', value: 0.3 }], description: 'Redirect asteroids into orbit — triple colony growth and boost infrastructure', prerequisites: ['terraforming'] },
+  jupiterStation: { id: 'jupiterStation', name: 'Jupiter Station', era: 5, cost: { rocketFuel: 80, exoticMaterials: 25, energy: 100 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 2 }, { type: 'production_add', target: 'exoticMaterials', value: 0.5 }], description: 'A station in Jupiter orbit — triple fuel and exotic material harvesting', prerequisites: ['ringStation'] },
+  cryogenicVaults: { id: 'cryogenicVaults', name: 'Cryogenic Vaults', era: 5, cost: { exoticMaterials: 18, research: 50, energy: 60 }, effects: [{ type: 'cap_mult', target: 'exoticMaterials', value: 3 }, { type: 'cap_mult', target: 'colonies', value: 2 }], description: 'Preserve resources and colonists — triple exotic material and double colony capacity', prerequisites: ['cryogenicVault'] },
+  gravityTractor: { id: 'gravityTractor', name: 'Gravity Tractor', era: 5, cost: { orbitalInfra: 30, research: 60, exoticMaterials: 15 }, effects: [{ type: 'production_add', target: 'colonies', value: 2 }, { type: 'production_add', target: 'orbitalInfra', value: 0.3 }], description: 'Redirect asteroids into orbit — triple colony growth and boost infrastructure', prerequisites: ['exoplanetSurvey'] },
 
   // Era 6
   hyperspaceLane: { id: 'hyperspaceLane', name: 'Hyperspace Lane', era: 6, cost: { darkEnergy: 30, starSystems: 8, research: 70 }, effects: [{ type: 'production_add', target: 'starSystems', value: 1.6 }, { type: 'production_add', target: 'darkEnergy', value: 1.6 }], description: 'Established hyperspace lanes double star system and dark energy output', prerequisites: ['stellarCartography'] },
@@ -2207,26 +2207,26 @@ export const upgrades = {
   // --- 33 new upgrades (3+ per era) ---
 
   // Era 1
-  beeKeeping: { id: 'beeKeeping', name: 'Bee Keeping', era: 1, cost: { food: 18, materials: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.2 }, { type: 'production_add', target: 'energy', value: 0.2 }], description: 'Domesticated bees pollinate crops and produce wax for candles', prerequisites: ['irrigation'] },
-  copperSmelter: { id: 'copperSmelter', name: 'Copper Smelter', era: 1, cost: { materials: 28, energy: 18, labor: 14 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'steel', value: 0.15 }], description: 'Smelt copper ore for early metalwork and improved energy conductors', prerequisites: ['foundry'] },
+  beeKeeping: { id: 'beeKeeping', name: 'Bee Keeping', era: 1, cost: { food: 18, materials: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.2 }, { type: 'production_add', target: 'energy', value: 0.2 }], description: 'Domesticated bees pollinate crops and produce wax for candles', prerequisites: ['fishTrap'] },
+  copperSmelter: { id: 'copperSmelter', name: 'Copper Smelter', era: 1, cost: { materials: 28, energy: 18, labor: 14 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'steel', value: 0.15 }], description: 'Smelt copper ore for early metalwork and improved energy conductors', prerequisites: ['advancedTools'] },
 
   // Era 2
-  blastFurnace: { id: 'blastFurnace', name: 'Blast Furnace', era: 2, cost: { steel: 20, energy: 22, materials: 18 }, effects: [{ type: 'production_add', target: 'steel', value: 0.6 }, { type: 'production_add', target: 'energy', value: 0.5 }], description: 'Industrial blast furnaces triple steel output with waste heat recovery', prerequisites: ['powerGrid'] },
-  railroadExpansion: { id: 'railroadExpansion', name: 'Railroad Expansion', era: 2, cost: { steel: 18, labor: 22, materials: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'food', value: 0.3 }], description: 'Extended rail lines triple material transport and double food distribution', prerequisites: ['automation'] },
-  clockwork: { id: 'clockwork', name: 'Clockwork Automation', era: 2, cost: { electronics: 12, steel: 15, research: 8 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.3 }, { type: 'production_add', target: 'labor', value: 0.3 }], description: 'Precision clockwork mechanisms automate delicate tasks', prerequisites: ['computingLab'] },
+  blastFurnace: { id: 'blastFurnace', name: 'Blast Furnace', era: 2, cost: { steel: 20, energy: 22, materials: 18 }, effects: [{ type: 'production_add', target: 'steel', value: 0.6 }, { type: 'production_add', target: 'energy', value: 0.5 }], description: 'Industrial blast furnaces triple steel output with waste heat recovery', prerequisites: ['oilRefinery'] },
+  railroadExpansion: { id: 'railroadExpansion', name: 'Railroad Expansion', era: 2, cost: { steel: 18, labor: 22, materials: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'food', value: 0.3 }], description: 'Extended rail lines triple material transport and double food distribution', prerequisites: ['laborUnion'] },
+  clockwork: { id: 'clockwork', name: 'Clockwork Automation', era: 2, cost: { electronics: 12, steel: 15, research: 8 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.3 }, { type: 'production_add', target: 'labor', value: 0.3 }], description: 'Precision clockwork mechanisms automate delicate tasks', prerequisites: ['wirelessTelegraph'] },
 
   // Era 3
-  neuralChip: { id: 'neuralChip', name: 'Neural Chip', era: 3, cost: { electronics: 25, software: 20, research: 30 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.8 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Brain-computer interface chips triple electronics and double data output', prerequisites: ['aiResearch'] },
-  meshNetwork: { id: 'meshNetwork', name: 'Mesh Network', era: 3, cost: { software: 18, electronics: 22, data: 14 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.8 }], description: 'Decentralized mesh networks double software and generate steady data', prerequisites: ['internet'] },
+  neuralChip: { id: 'neuralChip', name: 'Neural Chip', era: 3, cost: { electronics: 25, software: 20, research: 30 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.8 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Brain-computer interface chips triple electronics and double data output', prerequisites: ['roboticsLab'] },
+  meshNetwork: { id: 'meshNetwork', name: 'Mesh Network', era: 3, cost: { software: 18, electronics: 22, data: 14 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.8 }], description: 'Decentralized mesh networks double software and generate steady data', prerequisites: ['fiberOptic'] },
 
   // Era 4
-  plasmaThrusters: { id: 'plasmaThrusters', name: 'Plasma Thrusters', era: 4, cost: { rocketFuel: 22, research: 28, electronics: 18 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }, { type: 'production_add', target: 'orbitalInfra', value: 0.3 }], description: 'Efficient plasma propulsion doubles fuel economy and builds infrastructure', prerequisites: ['reusableRockets'] },
-  moonMiningFacility: { id: 'moonMiningFacility', name: 'Moon Mining Facility', era: 4, cost: { orbitalInfra: 10, steel: 30, rocketFuel: 18 }, effects: [{ type: 'production_add', target: 'materials', value: 0.8 }, { type: 'production_add', target: 'exoticMaterials', value: 0.15 }], description: 'Extract regolith and rare minerals from the lunar surface', prerequisites: ['spaceStation'] },
+  plasmaThrusters: { id: 'plasmaThrusters', name: 'Plasma Thrusters', era: 4, cost: { rocketFuel: 22, research: 28, electronics: 18 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }, { type: 'production_add', target: 'orbitalInfra', value: 0.3 }], description: 'Efficient plasma propulsion doubles fuel economy and builds infrastructure', prerequisites: ['plasmaEngine'] },
+  moonMiningFacility: { id: 'moonMiningFacility', name: 'Moon Mining Facility', era: 4, cost: { orbitalInfra: 10, steel: 30, rocketFuel: 18 }, effects: [{ type: 'production_add', target: 'materials', value: 0.8 }, { type: 'production_add', target: 'exoticMaterials', value: 0.15 }], description: 'Extract regolith and rare minerals from the lunar surface', prerequisites: ['lunarBase'] },
   orbitalLab: { id: 'orbitalLab', name: 'Orbital Laboratory', era: 4, cost: { research: 25, orbitalInfra: 8, electronics: 20 }, effects: [{ type: 'production_add', target: 'research', value: 0.6 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Zero-gravity experiments double research output and generate data', prerequisites: ['orbitalTelescope'] },
 
   // Era 5
-  oortCloudProbe: { id: 'oortCloudProbe', name: 'Oort Cloud Probe', era: 5, cost: { rocketFuel: 50, research: 45, exoticMaterials: 15 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 0.6 }, { type: 'production_add', target: 'research', value: 1 }], description: 'Probes in the Oort Cloud discover exotic matter and new physics', prerequisites: ['asteroidMining'] },
-  planetaryShield: { id: 'planetaryShield', name: 'Planetary Shield', era: 5, cost: { colonies: 5, exoticMaterials: 20, energy: 50 }, effects: [{ type: 'production_add', target: 'colonies', value: 2 }, { type: 'cap_mult', target: 'colonies', value: 3 }], description: 'Shield colonies from cosmic hazards — x3 colony growth and capacity', prerequisites: ['terraforming'] },
+  oortCloudProbe: { id: 'oortCloudProbe', name: 'Oort Cloud Probe', era: 5, cost: { rocketFuel: 50, research: 45, exoticMaterials: 15 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 0.6 }, { type: 'production_add', target: 'research', value: 1 }], description: 'Probes in the Oort Cloud discover exotic matter and new physics', prerequisites: ['jupiterStation'] },
+  planetaryShield: { id: 'planetaryShield', name: 'Planetary Shield', era: 5, cost: { colonies: 5, exoticMaterials: 20, energy: 50 }, effects: [{ type: 'production_add', target: 'colonies', value: 2 }, { type: 'cap_mult', target: 'colonies', value: 3 }], description: 'Shield colonies from cosmic hazards — x3 colony growth and capacity', prerequisites: ['atmosphericProcessor'] },
 
   // Era 6
   subspaceRelay: { id: 'subspaceRelay', name: 'Subspace Relay', era: 6, cost: { darkEnergy: 22, starSystems: 4, research: 50 }, effects: [{ type: 'production_add', target: 'starSystems', value: 1.6 }, { type: 'production_add', target: 'darkEnergy', value: 0.5 }], description: 'Relay through subspace doubles star system discovery and adds dark energy', prerequisites: ['warpDrive'] },
@@ -2254,25 +2254,25 @@ export const upgrades = {
   // --- 30 new upgrades (3 per era) ---
 
   // Era 1
-  stoneMason: { id: 'stoneMason', name: 'Stone Mason', era: 1, cost: { materials: 25, labor: 18 }, effects: [{ type: 'production_add', target: 'materials', value: 0.2 }, { type: 'cap_mult', target: 'materials', value: 2 }], description: 'Skilled masons double material output and storage', prerequisites: ['tools'] },
-  peatBog: { id: 'peatBog', name: 'Peat Bog Harvest', era: 1, cost: { energy: 15, materials: 18, labor: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'Harvest peat for fuel and building material', prerequisites: ['basicPower'] },
+  stoneMason: { id: 'stoneMason', name: 'Stone Mason', era: 1, cost: { materials: 25, labor: 18 }, effects: [{ type: 'production_add', target: 'materials', value: 0.2 }, { type: 'cap_mult', target: 'materials', value: 2 }], description: 'Skilled masons double material output and storage', prerequisites: ['stoneQuarry'] },
+  peatBog: { id: 'peatBog', name: 'Peat Bog Harvest', era: 1, cost: { energy: 15, materials: 18, labor: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'Harvest peat for fuel and building material', prerequisites: ['charcoalKiln'] },
 
   // Era 2
-  telegraphNetwork: { id: 'telegraphNetwork', name: 'Telegraph Network', era: 2, cost: { electronics: 14, steel: 18, labor: 20 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.3 }], description: 'Long-distance communication doubles electronics and aids research', prerequisites: ['assemblyLines'] },
+  telegraphNetwork: { id: 'telegraphNetwork', name: 'Telegraph Network', era: 2, cost: { electronics: 14, steel: 18, labor: 20 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.3 }], description: 'Long-distance communication doubles electronics and aids research', prerequisites: ['industrialMemory'] },
 
   // Era 3
-  virtualReality: { id: 'virtualReality', name: 'Virtual Reality', era: 3, cost: { software: 22, electronics: 28, data: 16 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Immersive VR doubles software development and data collection', prerequisites: ['internet'] },
-  quantumComputer: { id: 'quantumComputer', name: 'Quantum Computer', era: 3, cost: { research: 45, electronics: 35, data: 20 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'data', value: 0.8 }], description: 'Quantum computation triples research speed', prerequisites: ['aiResearch'] },
-  socialNetwork: { id: 'socialNetwork', name: 'Social Network', era: 3, cost: { software: 15, data: 12, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Social platforms triple data generation', prerequisites: ['cloudComputing'] },
+  virtualReality: { id: 'virtualReality', name: 'Virtual Reality', era: 3, cost: { software: 22, electronics: 28, data: 16 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Immersive VR doubles software development and data collection', prerequisites: ['socialMedia'] },
+  quantumComputer: { id: 'quantumComputer', name: 'Quantum Computer', era: 3, cost: { research: 45, electronics: 35, data: 20 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'data', value: 0.8 }], description: 'Quantum computation triples research speed', prerequisites: ['generativeAI'] },
+  socialNetwork: { id: 'socialNetwork', name: 'Social Network', era: 3, cost: { software: 15, data: 12, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Social platforms triple data generation', prerequisites: ['temporalEcho','meshNetwork'] },
 
   // Era 4
-  ionDrive: { id: 'ionDrive', name: 'Ion Drive', era: 4, cost: { rocketFuel: 20, research: 30, electronics: 22 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'Efficient ion propulsion doubles fuel economy', prerequisites: ['reusableRockets'] },
-  spaceElevator: { id: 'spaceElevator', name: 'Space Elevator', era: 4, cost: { orbitalInfra: 12, steel: 35, energy: 28 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.2 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'A tether to orbit triples infrastructure buildup', prerequisites: ['spaceStation'] },
-  gravityAssist: { id: 'gravityAssist', name: 'Gravity Assist Lab', era: 4, cost: { research: 32, orbitalInfra: 8, rocketFuel: 15 }, effects: [{ type: 'production_add', target: 'research', value: 0.6 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Master gravity slingshots for efficient travel', prerequisites: ['orbitalTelescope'] },
+  ionDrive: { id: 'ionDrive', name: 'Ion Drive', era: 4, cost: { rocketFuel: 20, research: 30, electronics: 22 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'Efficient ion propulsion doubles fuel economy', prerequisites: ['plasmaThrusters'] },
+  spaceElevator: { id: 'spaceElevator', name: 'Space Elevator', era: 4, cost: { orbitalInfra: 12, steel: 35, energy: 28 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.2 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'A tether to orbit triples infrastructure buildup', prerequisites: ['orbitalShipyard'] },
+  gravityAssist: { id: 'gravityAssist', name: 'Gravity Assist Lab', era: 4, cost: { research: 32, orbitalInfra: 8, rocketFuel: 15 }, effects: [{ type: 'production_add', target: 'research', value: 0.6 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Master gravity slingshots for efficient travel', prerequisites: ['deepSpaceRelay'] },
 
   // Era 5
-  cryoHabitat: { id: 'cryoHabitat', name: 'Cryo-Habitat', era: 5, cost: { colonies: 4, exoticMaterials: 18, energy: 40 }, effects: [{ type: 'production_add', target: 'colonies', value: 1 }, { type: 'cap_mult', target: 'colonies', value: 2 }], description: 'Cryogenic habitats double colony growth and capacity', prerequisites: ['terraforming'] },
-  xenoArchaeology: { id: 'xenoArchaeology', name: 'Xeno-Archaeology', era: 5, cost: { research: 50, exoticMaterials: 16, colonies: 3 }, effects: [{ type: 'production_add', target: 'research', value: 2 }, { type: 'production_add', target: 'darkEnergy', value: 0.08 }], description: 'Study alien ruins for advanced knowledge', prerequisites: ['asteroidMining'] },
+  cryoHabitat: { id: 'cryoHabitat', name: 'Cryo-Habitat', era: 5, cost: { colonies: 4, exoticMaterials: 18, energy: 40 }, effects: [{ type: 'production_add', target: 'colonies', value: 1 }, { type: 'cap_mult', target: 'colonies', value: 2 }], description: 'Cryogenic habitats double colony growth and capacity', prerequisites: ['venusDome'] },
+  xenoArchaeology: { id: 'xenoArchaeology', name: 'Xeno-Archaeology', era: 5, cost: { research: 50, exoticMaterials: 16, colonies: 3 }, effects: [{ type: 'production_add', target: 'research', value: 2 }, { type: 'production_add', target: 'darkEnergy', value: 0.08 }], description: 'Study alien ruins for advanced knowledge', prerequisites: ['helium3Mining','nanofabricator'] },
 
   // Era 6
   warpBeacon: { id: 'warpBeacon', name: 'Warp Beacon', era: 6, cost: { darkEnergy: 28, starSystems: 5, energy: 80 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 1.6 }, { type: 'production_add', target: 'starSystems', value: 1.6 }], description: 'Beacons guide ships through warp — double dark energy and star systems', prerequisites: ['warpDrive'] },
@@ -2300,26 +2300,26 @@ export const upgrades = {
   // --- 30 new upgrades (3 per era) — agent batch ---
 
   // Era 1
-  charcoalOven: { id: 'charcoalOven', name: 'Charcoal Oven', era: 1, cost: { materials: 22, energy: 12, labor: 14 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'Burn wood into charcoal for efficient fuel', prerequisites: ['basicPower'] },
-  grainBarn: { id: 'grainBarn', name: 'Grain Barn', era: 1, cost: { food: 28, materials: 20, labor: 10 }, effects: [{ type: 'cap_mult', target: 'food', value: 3 }, { type: 'production_add', target: 'food', value: 0.4 }], description: 'Store surplus grain for lean seasons', prerequisites: ['irrigation'] },
-  copperMine: { id: 'copperMine', name: 'Copper Mine', era: 1, cost: { labor: 20, materials: 30, energy: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.2 }, { type: 'production_add', target: 'labor', value: 0.2 }], description: 'Copper mining doubles material and labor output', prerequisites: ['foundry'] },
+  charcoalOven: { id: 'charcoalOven', name: 'Charcoal Oven', era: 1, cost: { materials: 22, energy: 12, labor: 14 }, effects: [{ type: 'production_add', target: 'energy', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'Burn wood into charcoal for efficient fuel', prerequisites: ['potteryKiln'] },
+  grainBarn: { id: 'grainBarn', name: 'Grain Barn', era: 1, cost: { food: 28, materials: 20, labor: 10 }, effects: [{ type: 'cap_mult', target: 'food', value: 3 }, { type: 'production_add', target: 'food', value: 0.4 }], description: 'Store surplus grain for lean seasons', prerequisites: ['beeKeeping'] },
+  copperMine: { id: 'copperMine', name: 'Copper Mine', era: 1, cost: { labor: 20, materials: 30, energy: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.2 }, { type: 'production_add', target: 'labor', value: 0.2 }], description: 'Copper mining doubles material and labor output', prerequisites: ['deepMining'] },
 
   // Era 2
   railroadNetwork: { id: 'railroadNetwork', name: 'Railroad Network', era: 2, cost: { steel: 24, materials: 20, labor: 22 }, effects: [{ type: 'production_add', target: 'materials', value: 0.3 }, { type: 'production_add', target: 'steel', value: 0.3 }], description: 'Rail transport doubles materials and steel throughput', prerequisites: ['ironWorks'] },
-  reagentPlant: { id: 'reagentPlant', name: 'Reagent Plant', era: 2, cost: { steel: 18, energy: 22, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Chemical processes double energy and boost research', prerequisites: ['powerGrid'] },
+  reagentPlant: { id: 'reagentPlant', name: 'Reagent Plant', era: 2, cost: { steel: 18, energy: 22, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Chemical processes double energy and boost research', prerequisites: ['chemicalWorks'] },
 
   // Era 3
-  generativeAI: { id: 'generativeAI', name: 'Generative AI', era: 3, cost: { software: 28, data: 22, research: 30 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.6 }], description: 'Generative models triple data processing', prerequisites: ['aiResearch'] },
-  fogComputing: { id: 'fogComputing', name: 'Fog Computing', era: 3, cost: { electronics: 30, software: 18, data: 14 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.4 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Distributed fog nodes double electronics and software', prerequisites: ['cloudComputing'] },
-  distributedLedger: { id: 'distributedLedger', name: 'Distributed Ledger', era: 3, cost: { data: 25, software: 20, energy: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.4 }, { type: 'cap_mult', target: 'data', value: 2 }], description: 'Immutable ledger doubles data output and capacity', prerequisites: ['internet'] },
+  generativeAI: { id: 'generativeAI', name: 'Generative AI', era: 3, cost: { software: 28, data: 22, research: 30 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.6 }], description: 'Generative models triple data processing', prerequisites: ['deepLearning'] },
+  fogComputing: { id: 'fogComputing', name: 'Fog Computing', era: 3, cost: { electronics: 30, software: 18, data: 14 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.4 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Distributed fog nodes double electronics and software', prerequisites: ['edgeDrones'] },
+  distributedLedger: { id: 'distributedLedger', name: 'Distributed Ledger', era: 3, cost: { data: 25, software: 20, energy: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.4 }, { type: 'cap_mult', target: 'data', value: 2 }], description: 'Immutable ledger doubles data output and capacity', prerequisites: ['blockchainLedger'] },
 
   // Era 4
-  plasmaShield: { id: 'plasmaShield', name: 'Plasma Shield', era: 4, cost: { energy: 35, orbitalInfra: 10, research: 25 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'cap_mult', target: 'orbitalInfra', value: 2 }], description: 'Plasma shielding doubles energy and orbital capacity', prerequisites: ['spaceStation'] },
+  plasmaShield: { id: 'plasmaShield', name: 'Plasma Shield', era: 4, cost: { energy: 35, orbitalInfra: 10, research: 25 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'cap_mult', target: 'orbitalInfra', value: 2 }], description: 'Plasma shielding doubles energy and orbital capacity', prerequisites: ['magneticShield'] },
   asteroidTug: { id: 'asteroidTug', name: 'Asteroid Tug', era: 4, cost: { rocketFuel: 22, steel: 28, orbitalInfra: 8 }, effects: [{ type: 'production_add', target: 'materials', value: 1.2 }, { type: 'production_add', target: 'exoticMaterials', value: 0.15 }], description: 'Redirect asteroids for raw materials', prerequisites: ['advancedMaterials'] },
-  deepSpaceRelay: { id: 'deepSpaceRelay', name: 'Deep Space Relay', era: 4, cost: { electronics: 25, orbitalInfra: 12, research: 28 }, effects: [{ type: 'production_add', target: 'research', value: 0.6 }, { type: 'production_add', target: 'electronics', value: 0.6 }], description: 'Relay stations accelerate deep space research', prerequisites: ['orbitalTelescope'] },
+  deepSpaceRelay: { id: 'deepSpaceRelay', name: 'Deep Space Relay', era: 4, cost: { electronics: 25, orbitalInfra: 12, research: 28 }, effects: [{ type: 'production_add', target: 'research', value: 0.6 }, { type: 'production_add', target: 'electronics', value: 0.6 }], description: 'Relay stations accelerate deep space research', prerequisites: ['xenobiology'] },
 
   // Era 5
-  gravitySmelter: { id: 'gravitySmelter', name: 'Gravity Smelter', era: 5, cost: { exoticMaterials: 20, energy: 45, research: 35 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 2 }, { type: 'production_add', target: 'steel', value: 1.5 }], description: 'Smelt materials in zero-g for exotic alloys', prerequisites: ['asteroidMining'] },
+  gravitySmelter: { id: 'gravitySmelter', name: 'Gravity Smelter', era: 5, cost: { exoticMaterials: 20, energy: 45, research: 35 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 2 }, { type: 'production_add', target: 'steel', value: 1.5 }], description: 'Smelt materials in zero-g for exotic alloys', prerequisites: ['titanMining'] },
   bioReactor: { id: 'bioReactor', name: 'Bio-Reactor', era: 5, cost: { colonies: 5, food: 40, energy: 30 }, effects: [{ type: 'production_add', target: 'food', value: 2 }, { type: 'production_add', target: 'colonies', value: 1 }], description: 'Biological reactors sustain colonies and triple food', prerequisites: ['geneticEngineering'] },
   antimatterCollider: { id: 'antimatterCollider', name: 'Antimatter Collider', era: 5, cost: { rocketFuel: 30, research: 50, energy: 55 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 2 }, { type: 'production_add', target: 'research', value: 1 }], description: 'Collide antimatter for fuel and scientific discovery', prerequisites: ['antimatterDrive'] },
 
@@ -2349,24 +2349,24 @@ export const upgrades = {
   // --- 33 new upgrades (3+ per era) + balance fix parallel paths ---
 
   // Era 1
-  herbGarden: { id: 'herbGarden', name: 'Herb Garden', era: 1, cost: { food: 12, labor: 8 }, effects: [{ type: 'production_add', target: 'food', value: 0.4 }, { type: 'production_add', target: 'energy', value: 0.2 }], description: 'Medicinal herbs improve health and boost food and energy', prerequisites: ['irrigation'] },
-  watchTower: { id: 'watchTower', name: 'Watch Tower', era: 1, cost: { materials: 25, labor: 12, energy: 8 }, effects: [{ type: 'production_add', target: 'labor', value: 0.2 }, { type: 'cap_mult', target: 'energy', value: 2 }], description: 'Watch towers coordinate workers and protect energy stores', prerequisites: ['housing'] },
+  herbGarden: { id: 'herbGarden', name: 'Herb Garden', era: 1, cost: { food: 12, labor: 8 }, effects: [{ type: 'production_add', target: 'food', value: 0.4 }, { type: 'production_add', target: 'energy', value: 0.2 }], description: 'Medicinal herbs improve health and boost food and energy', prerequisites: ['granary'] },
+  watchTower: { id: 'watchTower', name: 'Watch Tower', era: 1, cost: { materials: 25, labor: 12, energy: 8 }, effects: [{ type: 'production_add', target: 'labor', value: 0.2 }, { type: 'cap_mult', target: 'energy', value: 2 }], description: 'Watch towers coordinate workers and protect energy stores', prerequisites: ['oxCart'] },
 
   // Era 2
-  canalSystem: { id: 'canalSystem', name: 'Canal System', era: 2, cost: { steel: 18, materials: 25, labor: 20 }, effects: [{ type: 'production_add', target: 'food', value: 0.3 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'Canals transport goods and irrigate distant fields', prerequisites: ['assemblyLines'] },
-  dynamoGenerator: { id: 'dynamoGenerator', name: 'Dynamo Generator', era: 2, cost: { steel: 22, electronics: 8, energy: 15 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'electronics', value: 0.2 }], description: 'Electromagnetic generators triple energy and produce electronics', prerequisites: ['powerGrid'] },
-  laborUnion: { id: 'laborUnion', name: 'Labor Union', era: 2, cost: { food: 25, labor: 20, materials: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 0.6 }, { type: 'cap_mult', target: 'labor', value: 2 }], description: 'Organized labor triples output and doubles capacity', prerequisites: ['automation'] },
+  canalSystem: { id: 'canalSystem', name: 'Canal System', era: 2, cost: { steel: 18, materials: 25, labor: 20 }, effects: [{ type: 'production_add', target: 'food', value: 0.3 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'Canals transport goods and irrigate distant fields', prerequisites: ['textileFactory'] },
+  dynamoGenerator: { id: 'dynamoGenerator', name: 'Dynamo Generator', era: 2, cost: { steel: 22, electronics: 8, energy: 15 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'electronics', value: 0.2 }], description: 'Electromagnetic generators triple energy and produce electronics', prerequisites: ['blastFurnace'] },
+  laborUnion: { id: 'laborUnion', name: 'Labor Union', era: 2, cost: { food: 25, labor: 20, materials: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 0.6 }, { type: 'cap_mult', target: 'labor', value: 2 }], description: 'Organized labor triples output and doubles capacity', prerequisites: ['conveyor'] },
 
   // Era 3
-  neuralNetwork: { id: 'neuralNetwork', name: 'Neural Network', era: 3, cost: { software: 22, data: 18, research: 30 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'research', value: 0.4 }], description: 'Deep neural networks double software and research output', prerequisites: ['aiResearch'] },
-  digitalTwin: { id: 'digitalTwin', name: 'Digital Twin', era: 3, cost: { software: 20, research: 25, data: 15 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Digital twins of physical systems triple data collection', prerequisites: ['internet'] },
+  neuralNetwork: { id: 'neuralNetwork', name: 'Neural Network', era: 3, cost: { software: 22, data: 18, research: 30 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'research', value: 0.4 }], description: 'Deep neural networks double software and research output', prerequisites: ['neuralChip'] },
+  digitalTwin: { id: 'digitalTwin', name: 'Digital Twin', era: 3, cost: { software: 20, research: 25, data: 15 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Digital twins of physical systems triple data collection', prerequisites: ['virtualReality'] },
 
   // Era 4
-  solarSail: { id: 'solarSail', name: 'Solar Sail', era: 4, cost: { research: 25, electronics: 20, rocketFuel: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 1 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Solar sails harvest light pressure for energy and fuel savings', prerequisites: ['reusableRockets'] },
-  xenobiology: { id: 'xenobiology', name: 'Xenobiology', era: 4, cost: { research: 30, data: 15, food: 40 }, effects: [{ type: 'production_add', target: 'food', value: 1.2 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Study alien biology to improve food production and research', prerequisites: ['orbitalTelescope'] },
+  solarSail: { id: 'solarSail', name: 'Solar Sail', era: 4, cost: { research: 25, electronics: 20, rocketFuel: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 1 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Solar sails harvest light pressure for energy and fuel savings', prerequisites: ['ionDrive'] },
+  xenobiology: { id: 'xenobiology', name: 'Xenobiology', era: 4, cost: { research: 30, data: 15, food: 40 }, effects: [{ type: 'production_add', target: 'food', value: 1.2 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Study alien biology to improve food production and research', prerequisites: ['astrometryLab'] },
 
   // Era 5
-  cryogenicVault: { id: 'cryogenicVault', name: 'Cryogenic Vault', era: 5, cost: { colonies: 5, research: 40, steel: 60 }, effects: [{ type: 'cap_mult', target: 'colonies', value: 5 }, { type: 'production_add', target: 'colonies', value: 0.1 }], description: 'Preserve colonists in cryo — expand colony capacity and growth', prerequisites: ['terraforming'] },
+  cryogenicVault: { id: 'cryogenicVault', name: 'Cryogenic Vault', era: 5, cost: { colonies: 5, research: 40, steel: 60 }, effects: [{ type: 'cap_mult', target: 'colonies', value: 5 }, { type: 'production_add', target: 'colonies', value: 0.1 }], description: 'Preserve colonists in cryo — expand colony capacity and growth', prerequisites: ['gravityTractor'] },
   helium3Mining: { id: 'helium3Mining', name: 'Helium-3 Mining', era: 5, cost: { rocketFuel: 40, exoticMaterials: 15, orbitalInfra: 25 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 2 }, { type: 'production_add', target: 'energy', value: 2 }], description: 'Mine helium-3 from gas giants for fuel and energy', prerequisites: ['asteroidMining'] },
 
   // Era 6 (3 regular + already has parallel paths via warpDrive)
@@ -2397,14 +2397,14 @@ export const upgrades = {
   // --- 33 new upgrades (3+ per era) ---
 
   // Era 1
-  fishTrap: { id: 'fishTrap', name: 'Fish Trap', era: 1, cost: { food: 8, materials: 10, labor: 6 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'food', value: 0.2 }], description: 'Woven fish traps provide reliable protein — double food output', prerequisites: ['irrigation'] },
+  fishTrap: { id: 'fishTrap', name: 'Fish Trap', era: 1, cost: { food: 8, materials: 10, labor: 6 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'food', value: 0.2 }], description: 'Woven fish traps provide reliable protein — double food output', prerequisites: ['fishingWharf'] },
 
   // Era 2
-  pneumaticPress: { id: 'pneumaticPress', name: 'Pneumatic Press', era: 2, cost: { steel: 30, energy: 25, labor: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.3 }, { type: 'production_add', target: 'materials', value: 0.6 }], description: 'Compressed air presses shape metal efficiently — double steel', prerequisites: ['assemblyLines'] },
-  printingPress: { id: 'printingPress', name: 'Printing Press', era: 2, cost: { materials: 30, steel: 18, research: 15 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'cap_mult', target: 'research', value: 2 }], description: 'Mass-produced knowledge doubles research output and capacity', prerequisites: ['computingLab'] },
+  pneumaticPress: { id: 'pneumaticPress', name: 'Pneumatic Press', era: 2, cost: { steel: 30, energy: 25, labor: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.3 }, { type: 'production_add', target: 'materials', value: 0.6 }], description: 'Compressed air presses shape metal efficiently — double steel', prerequisites: ['cementFactory'] },
+  printingPress: { id: 'printingPress', name: 'Printing Press', era: 2, cost: { materials: 30, steel: 18, research: 15 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'cap_mult', target: 'research', value: 2 }], description: 'Mass-produced knowledge doubles research output and capacity', prerequisites: ['telephoneNetwork'] },
 
   // Era 3
-  firewallMatrix: { id: 'firewallMatrix', name: 'Firewall Matrix', era: 3, cost: { software: 25, research: 20, data: 15 }, effects: [{ type: 'cap_mult', target: 'data', value: 3 }, { type: 'production_add', target: 'software', value: 0.5 }], description: 'Advanced firewalls protect data assets — triple data capacity', prerequisites: ['internet'] },
+  firewallMatrix: { id: 'firewallMatrix', name: 'Firewall Matrix', era: 3, cost: { software: 25, research: 20, data: 15 }, effects: [{ type: 'cap_mult', target: 'data', value: 3 }, { type: 'production_add', target: 'software', value: 0.5 }], description: 'Advanced firewalls protect data assets — triple data capacity', prerequisites: ['digitalTwin'] },
 
   // Era 4
   orbitalMirror: { id: 'orbitalMirror', name: 'Orbital Mirror', era: 4, cost: { energy: 100, orbitalInfra: 15, electronics: 50 }, effects: [{ type: 'production_add', target: 'energy', value: 2.4 }, { type: 'production_add', target: 'research', value: 1 }], description: 'Massive orbital mirrors redirect sunlight — x5 energy', prerequisites: ['asteroidTug'] },
@@ -2438,7 +2438,7 @@ export const upgrades = {
   infinityWellspring: { id: 'infinityWellspring', name: 'Infinity Wellspring', era: 10, cost: { universalConstants: 30, cosmicPower: 500, realityFragments: 90 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 20 }, { type: 'production_add', target: 'cosmicPower', value: 20 }], description: 'Tap into an infinite wellspring of universal energy', prerequisites: ['dimensionalGateway'] },
 
   // --- 5 additional upgrades ---
-  ropeAndPulley: { id: 'ropeAndPulley', name: 'Rope and Pulley', era: 1, cost: { materials: 12, labor: 8, food: 6 }, effects: [{ type: 'production_add', target: 'labor', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'Simple machines double labor efficiency', prerequisites: ['tools'] },
+  ropeAndPulley: { id: 'ropeAndPulley', name: 'Rope and Pulley', era: 1, cost: { materials: 12, labor: 8, food: 6 }, effects: [{ type: 'production_add', target: 'labor', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'Simple machines double labor efficiency', prerequisites: ['lumberMill'] },
   edgeComputing: { id: 'edgeComputing', name: 'Edge Computing', era: 3, cost: { software: 28, data: 18, electronics: 22 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 0.4 }], description: 'Distributed edge nodes triple data processing', prerequisites: ['fogComputing'] },
   orbitalTether: { id: 'orbitalTether', name: 'Orbital Tether', era: 4, cost: { orbitalInfra: 18, steel: 70, rocketFuel: 40 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.2 }, { type: 'production_add', target: 'rocketFuel', value: 1 }], description: 'Space elevator tethers triple orbital infrastructure', prerequisites: ['plasmaShield'] },
   voidAnchor: { id: 'voidAnchor', name: 'Void Anchor', era: 9, cost: { cosmicPower: 200, universalConstants: 15, darkEnergy: 250 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 12 }, { type: 'production_add', target: 'cosmicPower', value: 2 }], description: 'Anchor points in the void stabilize cosmic power', prerequisites: ['voidCartographer'] },

@@ -104,7 +104,8 @@ describe('progression integration', () => {
     state = giveAndBuy(state, 'upgrade', 'aiResearch');
     state = giveAndBuy(state, 'upgrade', 'cyberSecurity');
     state = giveAndBuy(state, 'upgrade', 'quantumComputing');
-    state = giveAndBuy(state, 'upgrade', 'energyMatrix');
+    state = giveAndBuy(state, 'upgrade', 'digitalSensors');
+    state = giveAndBuy(state, 'upgrade', 'patternAnalysis');
     state = giveAndBuy(state, 'upgrade', 'suborbitalFlight');
     expect(state.resources.rocketFuel.unlocked).toBe(true);
 
