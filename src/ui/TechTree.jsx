@@ -59,7 +59,7 @@ export function TechTree({ state, onUpdate }) {
     <div className="panel tech-panel">
       <h2>Technology ({available.length} available{unlockedCount > 0 ? `, ${unlockedCount} done` : ''})</h2>
       <div className="tech-list">
-        {available.map(tech => {
+        {available.sort((a, b) => (b.grantsEra ? 1 : 0) - (a.grantsEra ? 1 : 0)).map(tech => {
           const affordable = canAfford(state, tech.cost);
           const progress = affordable ? 1 : getAffordProgress(state, tech.cost);
           // Show prerequisite chain info
