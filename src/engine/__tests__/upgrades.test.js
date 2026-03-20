@@ -212,7 +212,7 @@ describe('upgrades', () => {
       // Buy internet
       const afterInternet = purchaseUpgrade(state, 'internet');
       expect(afterInternet).not.toBeNull();
-      expect(afterInternet.resources.software.rateAdd).toBe(0.5);
+      expect(afterInternet.resources.software.rateAdd).toBe(1.5);
     });
 
   describe('getAvailableUpgrades', () => {

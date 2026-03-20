@@ -72,10 +72,10 @@ describe('resources', () => {
 
     it('caps gathering at resource cap', () => {
       const state = createInitialState();
-      state.resources.labor.amount = 500; // over cap
+      state.resources.labor.amount = 2500; // over cap of 2000
       const after = gather(state, 'labor');
-      // Cap enforcement: already over, stays at current
-      expect(after.resources.labor.amount).toBe(500);
+      // Cap enforcement: already over, stays at current (doesn't reduce)
+      expect(after.resources.labor.amount).toBe(2500);
     });
 
     it('applies prestige multiplier', () => {
