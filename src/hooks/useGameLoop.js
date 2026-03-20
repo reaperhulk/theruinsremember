@@ -100,6 +100,15 @@ export function useGameLoop(initialState) {
   const updateState = useCallback((fn) => {
     setState(prev => {
       const result = fn(prev);
+      if (result && result !== prev) {
+        // Save immediately on meaningful state changes (upgrades, era transitions)
+        const upgradesBefore = Object.keys(prev.upgrades || {}).length;
+        const upgradesAfter = Object.keys(result.upgrades || {}).length;
+        if (upgradesAfter > upgradesBefore || result.era !== prev.era) {
+          const toSave = { ...result, lastSaved: Date.now() };
+          localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+        }
+      }
       return result || prev;
     });
   }, []);
