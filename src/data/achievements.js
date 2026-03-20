@@ -263,4 +263,12 @@ export const achievements = [
   { id: 'eventCollector', name: 'Event Collector', description: 'See 30 events in a single run', check: s => (s.eventLog?.length || 0) >= 8 && s.totalTime > 300, reward: 3 },
   { id: 'factoryMaxed', name: 'Factory Maxed', description: 'Assign 20+ factory workers', check: s => { const a = s.factoryAllocation || {}; return (a.steel||0) + (a.electronics||0) + (a.research||0) >= 20; }, reward: 5 },
   { id: 'thousandContent', name: 'Content Complete', description: 'You found the 1000th piece of content — the multiverse is truly infinite', check: s => s.era >= 10 && Object.keys(s.upgrades || {}).length >= 100, reward: 100 },
+
+  // --- 6 new achievements ---
+  { id: 'crossChainMaster', name: 'Cross-Chain Master', description: 'Purchase 180 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 180, reward: 20 },
+  { id: 'deepChainExplorer', name: 'Deep Chain Explorer', description: 'Purchase 220 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 220, reward: 25 },
+  { id: 'synergist', name: 'Synergist', description: 'Have 20+ unlocked resources simultaneously', check: s => Object.values(s.resources || {}).filter(r => r.unlocked).length >= 20, reward: 5 },
+  { id: 'eventVeteran', name: 'Event Veteran', description: 'Experience 200 events across all runs', check: s => (s.eventLog?.length || 0) >= 30 && s.totalTime > 3600, reward: 10 },
+  { id: 'factoryEmpire', name: 'Factory Empire', description: 'Assign 50+ factory workers', check: s => { const a = s.factoryAllocation || {}; return (a.steel||0) + (a.electronics||0) + (a.research||0) >= 50; }, reward: 10 },
+  { id: 'cosmicCollector', name: 'Cosmic Collector', description: 'Have 1e12 of cosmic power, exotic matter, and dark energy at the same time', check: s => { const r = s.resources || {}; return (r.cosmicPower?.amount || 0) >= 1e12 && (r.exoticMatter?.amount || 0) >= 1e12 && (r.darkEnergy?.amount || 0) >= 1e12; }, reward: 15 },
 ];

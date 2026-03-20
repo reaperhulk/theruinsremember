@@ -37,7 +37,7 @@ export function TradingPanel({ state, onUpdate }) {
 
   return (
     <div className="panel trading-panel">
-      <h2>Trading Post</h2>
+      <h2>Trading ({state.totalTrades || 0} trades)</h2>
       <div className="trade-controls">
         <div className="trade-row">
           <label>Give:</label>
