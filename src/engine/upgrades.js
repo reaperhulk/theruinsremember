@@ -146,6 +146,21 @@ export function getAvailableUpgrades(state) {
   });
 }
 
+// Get list of "coming soon" upgrades — prerequisites almost met (need 1 more)
+export function getUpcomingUpgrades(state) {
+  return Object.values(upgradeDefs).filter(def => {
+    if (def.era > state.era) return false;
+    if (def.repeatable && state.upgrades[def.id]) return false;
+    if (!def.repeatable && state.upgrades[def.id]) return false;
+    if (def.prerequisites.length === 0) return false;
+
+    // Count unmet prerequisites
+    const unmet = def.prerequisites.filter(p => !state.upgrades[p]).length;
+    // Show if exactly 1 prerequisite is missing
+    return unmet === 1;
+  }).slice(0, 3); // Show max 3 upcoming
+}
+
 // Get list of purchased upgrades
 export function getPurchasedUpgrades(state) {
   return Object.keys(state.upgrades).map(id => {

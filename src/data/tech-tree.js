@@ -54,14 +54,14 @@ export const techTree = {
   // Era 4 → 5 (Space Age → Solar System)
   interplanetaryNav: {
     id: 'interplanetaryNav', name: 'Interplanetary Navigation', era: 4,
-    cost: { research: 2500, rocketFuel: 800, orbitalInfra: 250 },
+    cost: { research: 3500, rocketFuel: 1200, orbitalInfra: 350 },
     prerequisites: [],
     grantsEra: null,
     description: 'Navigate between planets',
   },
   interplanetaryShip: {
     id: 'interplanetaryShip', name: 'Interplanetary Ship', era: 4,
-    cost: { orbitalInfra: 600, rocketFuel: 2000, steel: 2500, research: 4000 },
+    cost: { orbitalInfra: 800, rocketFuel: 3000, steel: 3500, research: 6000 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: 5,
     description: 'A ship capable of reaching other planets',
@@ -102,14 +102,14 @@ export const techTree = {
   // Era 7 → 8 (Dyson Era → Galactic)
   galacticAscendancy: {
     id: 'galacticAscendancy', name: 'Galactic Ascendancy', era: 7,
-    cost: { megastructures: 100, stellarForge: 350, research: 10000000 },
+    cost: { megastructures: 120, stellarForge: 400, research: 15000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Prepare for galactic-scale civilization',
   },
   galacticNetwork: {
     id: 'galacticNetwork', name: 'Galactic Network', era: 7,
-    cost: { megastructures: 250, stellarForge: 800, research: 50000000 },
+    cost: { megastructures: 300, stellarForge: 1000, research: 80000000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: 8,
     description: 'Galaxy-spanning communication and travel network',
@@ -118,14 +118,14 @@ export const techTree = {
   // Era 8 → 9 (Galactic → Intergalactic)
   cosmicEngineering: {
     id: 'cosmicEngineering', name: 'Cosmic Engineering', era: 8,
-    cost: { exoticMatter: 2000, galacticInfluence: 100000, research: 100000000 },
+    cost: { exoticMatter: 1500, galacticInfluence: 80000, research: 80000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Engineer on a cosmic scale',
   },
   intergalacticBeacon: {
     id: 'intergalacticBeacon', name: 'Intergalactic Beacon', era: 8,
-    cost: { exoticMatter: 5000, galacticInfluence: 300000, cosmicPower: 100 },
+    cost: { exoticMatter: 4000, galacticInfluence: 200000, cosmicPower: 80 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: 9,
     description: 'Signal reaching beyond the galaxy',

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable } from '../engine/upgrades.js';
+import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades } from '../engine/upgrades.js';
 import { canAfford } from '../engine/resources.js';
 
 import { formatNumber } from './format.js';
@@ -54,6 +54,8 @@ export function UpgradePanel({ state, onUpdate }) {
   const [sortBy, setSortBy] = useState('default'); // 'default' | 'affordable' | 'cheapest'
   const available = getAvailableUpgrades(state);
   const purchased = getPurchasedUpgrades(state);
+
+  const upcoming = getUpcomingUpgrades(state);
 
   // Sort upgrades
   const sortedAvailable = [...available].sort((a, b) => {
@@ -163,6 +165,17 @@ export function UpgradePanel({ state, onUpdate }) {
           );
         })}
       </div>
+      {upcoming.length > 0 && (
+        <div className="upcoming-section">
+          <div className="upcoming-header">Coming Soon</div>
+          {upcoming.map(u => (
+            <div key={u.id} className="upcoming-upgrade">
+              <span className="upcoming-name">{u.name}</span>
+              <span className="upcoming-desc">{u.description}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

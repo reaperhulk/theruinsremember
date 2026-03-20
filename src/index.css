@@ -246,6 +246,38 @@ body {
   color: #555;
 }
 
+.upcoming-section {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed #2a2a4a;
+}
+
+.upcoming-header {
+  font-size: 0.75em;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.upcoming-upgrade {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 4px;
+  opacity: 0.4;
+  font-size: 0.8em;
+}
+
+.upcoming-name {
+  color: #8899aa;
+  font-weight: bold;
+}
+
+.upcoming-desc {
+  color: #555;
+  font-size: 0.9em;
+}
+
 .upgrade-sort {
   display: flex;
   gap: 4px;
