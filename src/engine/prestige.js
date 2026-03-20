@@ -27,6 +27,10 @@ export function calculatePrestigePoints(state) {
   if (state.era >= 10) points += 2;
   // Bonus for upgrades owned (1 point per 10 upgrades)
   points += Math.floor(Object.keys(state.upgrades).length / 10);
+  // Bonus for mini-game activity
+  points += Math.floor((state.hackSuccesses || 0) / 20);
+  points += Math.floor((state.dockingPerfects || 0) / 15);
+  points += Math.floor((state.totalWeaves || 0) / 10);
   return points;
 }
 

@@ -431,24 +431,24 @@ export const upgrades = {
     description: 'Mine the asteroid belt for resources',
     prerequisites: ['zeroGManufacturing'],
   },
-  lunarBase: {
-    id: 'lunarBase', name: 'Lunar Base', era: 5,
+  outerColony: {
+    id: 'outerColony', name: 'Outer Colony', era: 5,
     cost: { orbitalInfra: 40, rocketFuel: 60, steel: 80 },
     effects: [
       { type: 'production_add', target: 'colonies', value: 0.1 },
       { type: 'production_add', target: 'exoticMaterials', value: 0.3 },
     ],
-    description: 'Establish a permanent lunar settlement — first step to colonization',
+    description: 'Establish a colony on a nearby moon — first step to system-wide expansion',
     prerequisites: ['zeroGManufacturing'],
   },
-  helium3Extraction: {
-    id: 'helium3Extraction', name: 'Helium-3 Extraction', era: 5,
+  fuelRefinery: {
+    id: 'fuelRefinery', name: 'Orbital Fuel Refinery', era: 5,
     cost: { rocketFuel: 50, research: 60, orbitalInfra: 25 },
     effects: [
       { type: 'production_mult', target: 'energy', value: 5 },
       { type: 'production_add', target: 'rocketFuel', value: 0.5 },
     ],
-    description: 'Mine lunar helium-3 for fusion fuel — massive energy and fuel boost',
+    description: 'Refine fuel in orbit — massive energy and fuel boost',
     prerequisites: ['zeroGManufacturing'],
   },
   geneticEngineering: {
