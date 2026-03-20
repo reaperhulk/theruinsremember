@@ -2,7 +2,7 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import { tick } from '../engine/tick.js';
 
 const SAVE_KEY = 'incremental-game-save';
-const SAVE_INTERVAL = 30000; // 30 seconds
+const SAVE_INTERVAL = 15000; // 15 seconds — more frequent saves
 
 export function useGameLoop(initialState) {
   const [offlineReport, setOfflineReport] = useState(null);
