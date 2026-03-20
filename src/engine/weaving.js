@@ -123,9 +123,10 @@ export function resolveWeave(state) {
   const weaveCombo = (state.weaveCombo || 0) + 1;
   const comboMult = 1 + (weaveCombo - 1) * 0.5; // x1, x1.5, x2, x2.5...
 
-  // Apply bonus as timed effect
+  // Apply bonus as timed effect (era-scaled)
   const bonus = TYPE_BONUSES[matchType];
-  const effectMult = bonus.mult * comboMult;
+  const eraScale = 1 + (state.era - 8) * 0.5; // x1 at era 8, x2 at era 10
+  const effectMult = bonus.mult * comboMult * Math.max(1, eraScale);
   const effect = {
     id: `weave_${matchType}_${state.totalTime}`,
     endsAt: state.totalTime + BONUS_DURATION,

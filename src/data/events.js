@@ -876,6 +876,162 @@ export const events = {
     duration: 55,
     effect: { resourceId: 'quantumEchoes', rateMultBonus: 12 },
   },
+
+  // --- More events for variety ---
+
+  // Era 2
+  feudalReform: {
+    id: 'feudalReform',
+    name: 'Feudal Reform',
+    description: 'A progressive reform doubles labor efficiency!',
+    minEra: 2,
+    type: 'timed',
+    duration: 30,
+    effect: { resourceId: 'labor', rateMultBonus: 4 },
+  },
+  mineralVein: {
+    id: 'mineralVein',
+    name: 'Deep Mineral Vein',
+    description: 'Miners strike a deep vein of precious minerals!',
+    minEra: 2,
+    type: 'instant',
+    effect: { resourceId: 'materials', amount: 90 },
+  },
+
+  // Era 3
+  aiAssistant: {
+    id: 'aiAssistant',
+    name: 'AI Assistant',
+    description: 'An AI assistant automates routine tasks — data output triples!',
+    minEra: 3,
+    type: 'timed',
+    duration: 40,
+    effect: { resourceId: 'data', rateMultBonus: 3 },
+  },
+  serverFarm: {
+    id: 'serverFarm',
+    name: 'Server Farm Expansion',
+    description: 'A new server farm comes online — electronics production boosted!',
+    minEra: 3,
+    type: 'instant',
+    effect: { resourceId: 'electronics', amount: 35 },
+  },
+
+  // Era 4
+  spaceElevator: {
+    id: 'spaceElevator',
+    name: 'Space Elevator',
+    description: 'A space elevator slashes launch costs — orbital infrastructure surges!',
+    minEra: 4,
+    type: 'timed',
+    duration: 45,
+    effect: { resourceId: 'orbitalInfra', rateMultBonus: 5 },
+  },
+  fusionIgnition: {
+    id: 'fusionIgnition',
+    name: 'Fusion Ignition',
+    description: 'Fusion reactors achieve net positive energy!',
+    minEra: 4,
+    type: 'instant',
+    effect: { resourceId: 'energy', amount: 300 },
+  },
+
+  // Era 5
+  ringWorldBlueprint: {
+    id: 'ringWorldBlueprint',
+    name: 'Ringworld Blueprint',
+    description: 'Ancient blueprints for a ringworld are decoded — colony potential soars!',
+    minEra: 5,
+    type: 'instant',
+    effect: { resourceId: 'colonies', amount: 15 },
+  },
+
+  // Era 6
+  hyperlaneSurvey: {
+    id: 'hyperlaneSurvey',
+    name: 'Hyperlane Survey',
+    description: 'Scouts map new hyperlanes — star systems discovered!',
+    minEra: 6,
+    type: 'timed',
+    duration: 40,
+    effect: { resourceId: 'starSystems', rateMultBonus: 5 },
+  },
+
+  // Era 7
+  neutronStarCapture: {
+    id: 'neutronStarCapture',
+    name: 'Neutron Star Capture',
+    description: 'Engineers harness a neutron star — stellar forge output spikes!',
+    minEra: 7,
+    type: 'instant',
+    effect: { resourceId: 'stellarForge', amount: 30 },
+  },
+  matrioshkaBrain: {
+    id: 'matrioshkaBrain',
+    name: 'Matrioshka Brain',
+    description: 'A computational megastructure comes online — research explodes!',
+    minEra: 7,
+    type: 'timed',
+    duration: 50,
+    effect: { resourceId: 'research', rateMultBonus: 8 },
+  },
+
+  // Era 8
+  federationPact: {
+    id: 'federationPact',
+    name: 'Federation Pact',
+    description: 'A galactic federation is formed — influence skyrockets!',
+    minEra: 8,
+    type: 'timed',
+    duration: 55,
+    effect: { resourceId: 'galacticInfluence', rateMultBonus: 6 },
+  },
+  voidMining: {
+    id: 'voidMining',
+    name: 'Void Mining',
+    description: 'Mining the void between galaxies yields exotic matter!',
+    minEra: 8,
+    type: 'instant',
+    effect: { resourceId: 'exoticMatter', amount: 90 },
+  },
+
+  // Era 9
+  universalHarmony: {
+    id: 'universalHarmony',
+    name: 'Universal Harmony',
+    description: 'All universal constants align perfectly — production maximized!',
+    minEra: 9,
+    type: 'timed',
+    duration: 55,
+    effect: { resourceId: 'universalConstants', rateMultBonus: 8 },
+  },
+  cosmicSingularity: {
+    id: 'cosmicSingularity',
+    name: 'Cosmic Singularity',
+    description: 'A singularity erupts with cosmic power!',
+    minEra: 9,
+    type: 'instant',
+    effect: { resourceId: 'cosmicPower', amount: 350 },
+  },
+
+  // Era 10
+  infinityMirror: {
+    id: 'infinityMirror',
+    name: 'Infinity Mirror',
+    description: 'Realities reflect endlessly — reality fragments multiply!',
+    minEra: 10,
+    type: 'timed',
+    duration: 50,
+    effect: { resourceId: 'realityFragments', rateMultBonus: 12 },
+  },
+  multiversalSymphony: {
+    id: 'multiversalSymphony',
+    name: 'Multiversal Symphony',
+    description: 'All realities resonate in harmony — quantum echoes flood in!',
+    minEra: 10,
+    type: 'instant',
+    effect: { resourceId: 'quantumEchoes', amount: 100 },
+  },
 };
 
 // Get events eligible for the current era

@@ -137,4 +137,19 @@ export const achievements = [
   { id: 'prestigeAscendant', name: 'Prestige Ascendant', description: 'Prestige 50 times', check: s => (s.prestigeCount || 0) >= 50, reward: 25 },
   { id: 'starNetwork15', name: 'Galactic Highway', description: 'Create 15 star routes', check: s => (s.starRoutes?.length || 0) >= 15, reward: 5 },
   { id: 'repeatAddict50', name: 'Industrial Titan', description: 'Buy any repeatable upgrade 50 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 50), reward: 10 },
+
+  // --- More achievements ---
+  { id: 'sextillion', name: 'Sextillionaire', description: 'Have 1 sextillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e21), reward: 20 },
+  { id: 'speedrunEra5fast', name: 'Hyperdrive', description: 'Reach Era 5 in under 7 minutes', check: s => s.era >= 5 && (s.bestEraTimes?.[5] || Infinity) < 420, reward: 7 },
+  { id: 'upgrade300', name: 'Upgrade Deity', description: 'Purchase 300 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 300, reward: 40 },
+  { id: 'techOracle', name: 'Tech Oracle', description: 'Unlock 60 technologies', check: s => Object.keys(s.tech || {}).length >= 60, reward: 20 },
+  { id: 'hack200', name: 'Rootkit', description: 'Complete 200 hacks', check: s => (s.hackSuccesses || 0) >= 200, reward: 15 },
+  { id: 'weave200', name: 'Weave Deity', description: 'Complete 200 weaves', check: s => (s.totalWeaves || 0) >= 200, reward: 15 },
+  { id: 'docking200', name: 'Admiral', description: 'Land 200 perfect docks', check: s => (s.dockingPerfects || 0) >= 200, reward: 15 },
+  { id: 'trade1000', name: 'Trade Overlord', description: 'Complete 1000 trades', check: s => (s.totalTrades || 0) >= 1000, reward: 20 },
+  { id: 'gem10000', name: 'Gem Eternal', description: 'Find 10000 gems', check: s => (s.totalGems || 0) >= 10000, reward: 25 },
+  { id: 'prestigeTranscendent', name: 'Prestige Transcendent', description: 'Prestige 100 times', check: s => (s.prestigeCount || 0) >= 100, reward: 50 },
+  { id: 'starNetwork25', name: 'Cosmic Web', description: 'Create 25 star routes', check: s => (s.starRoutes?.length || 0) >= 25, reward: 10 },
+  { id: 'colonyOverlord', name: 'Colony Overlord', description: 'Assign 50+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 50; }, reward: 10 },
+  { id: 'marathon72', name: 'Endurance', description: 'Play for 72 hours total', check: s => s.totalTime >= 259200, reward: 15 },
 ];
