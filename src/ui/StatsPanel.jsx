@@ -1,7 +1,7 @@
 import { eraNames } from '../engine/eras.js';
 import { getPrestigeSummary } from '../engine/prestige.js';
 import { getAchievementList } from '../engine/achievements.js';
-import { formatTime } from './format.js';
+import { formatTime, formatNumber } from './format.js';
 
 export function StatsPanel({ state }) {
   const achievementList = getAchievementList(state);
@@ -64,6 +64,12 @@ export function StatsPanel({ state }) {
           <span>Production Mult</span>
           <span>x{state.prestigeMultiplier.toFixed(1)}</span>
         </div>
+        {(state.totalResourcesProduced || 0) > 0 && (
+          <div className="stat-row">
+            <span>Total Produced</span>
+            <span>{formatNumber(state.totalResourcesProduced)} units</span>
+          </div>
+        )}
         {state.prestigeCount > 0 && (
           <>
             <div className="stat-row">
