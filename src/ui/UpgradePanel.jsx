@@ -176,7 +176,10 @@ export function UpgradePanel({ state, onUpdate }) {
           {upcoming.map(u => (
             <div key={u.id} className="upcoming-upgrade">
               <span className="upcoming-name">{u.name}</span>
-              <span className="upcoming-desc">{u.description}</span>
+              <span className="upcoming-desc">
+                {u.missingPrereq && <span style={{ color: '#ffcc44' }}>Needs: {u.missingPrereq}</span>}
+                {u.missingPrereq && ' — '}{u.description}
+              </span>
             </div>
           ))}
         </div>

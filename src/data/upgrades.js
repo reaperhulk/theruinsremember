@@ -191,7 +191,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 0.6 },
     ],
     description: 'Mechanized agriculture triples food output',
-    prerequisites: ['assemblyLines'],
+    prerequisites: ['textileFactory'],
   },
 
   // Era 3: Digital Age
@@ -220,7 +220,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.4 },
     ],
     description: 'Statistical algorithms double research and data analysis',
-    prerequisites: ['digitalSensors'],
+    prerequisites: ['internet'],
   },
   cloudComputing: {
     id: 'cloudComputing', name: 'Cloud Computing', era: 3,
@@ -253,7 +253,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.3 },
     ],
     description: 'Artificial intelligence accelerates research and generates data',
-    prerequisites: ['internet'],
+    prerequisites: ['patternAnalysis'],
   },
   quantumComputing: {
     id: 'quantumComputing', name: 'Quantum Computing', era: 3,
@@ -274,7 +274,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'data', value: 3 },
     ],
     description: 'Secure systems boost research and expand data storage',
-    prerequisites: ['cloudComputing'],
+    prerequisites: ['cloudStorage'],
   },
 
   // Era 4: Space Age
@@ -305,28 +305,28 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.3 },
     ],
     description: 'Coordinate space missions — steady fuel production and telemetry data',
-    prerequisites: ['quantumComputing'],
+    prerequisites: ['rocketScience'],
   },
   reusableRockets: {
     id: 'reusableRockets', name: 'Reusable Rockets', era: 4,
     cost: { rocketFuel: 15, steel: 30, research: 20, labor: 50 },
     effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }],
     description: 'Cheaper access to space',
-    prerequisites: ['rocketScience'],
+    prerequisites: ['nuclearReactor'],
   },
   solarArrays: {
     id: 'solarArrays', name: 'Solar Arrays', era: 4,
     cost: { electronics: 25, steel: 20, energy: 15 },
     effects: [{ type: 'production_mult', target: 'energy', value: 5 }],
     description: 'Orbital solar panels multiply energy output',
-    prerequisites: ['nuclearReactor'],
+    prerequisites: ['deepSpaceProbe'],
   },
   spaceStation: {
     id: 'spaceStation', name: 'Space Station', era: 4,
     cost: { rocketFuel: 60, steel: 80, electronics: 40, food: 120 },
     effects: [{ type: 'production_add', target: 'orbitalInfra', value: 0.5 }],
     description: 'Permanent orbital habitat',
-    prerequisites: ['reusableRockets'],
+    prerequisites: ['missionControl'],
   },
   orbitalTelescope: {
     id: 'orbitalTelescope', name: 'Orbital Telescope', era: 4,
@@ -356,7 +356,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 0.2 },
     ],
     description: 'Manufacture in orbit — gateway to the solar system',
-    prerequisites: ['spaceStation'],
+    prerequisites: ['spaceElevator'],
   },
 
   spaceDebrisCollector: {
@@ -387,7 +387,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 0.3 },
     ],
     description: 'Probes transmit data from deep space — steady data and research',
-    prerequisites: ['rocketScience'],
+    prerequisites: ['advancedMaterials'],
   },
   nuclearReactor: {
     id: 'nuclearReactor', name: 'Nuclear Reactor', era: 4,
@@ -901,7 +901,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'research', value: 2 },
     ],
     description: 'Industrial storage expands capacity for steel, electronics, and research',
-    prerequisites: ['microchipFab'],
+    prerequisites: ['industrialFarming'],
   },
   supplyChain: {
     id: 'supplyChain', name: 'Supply Chain', era: 2,
@@ -941,7 +941,7 @@ export const upgrades = {
       { type: 'production_add', target: 'orbitalInfra', value: 0.2 },
     ],
     description: 'Gravity assist maneuvers save fuel and build infrastructure',
-    prerequisites: ['reusableRockets'],
+    prerequisites: ['advancedRocketry'],
   },
   advancedRocketry: {
     id: 'advancedRocketry', name: 'Advanced Rocketry', era: 4,
@@ -1553,7 +1553,7 @@ export const upgrades = {
       { type: 'production_add', target: 'software', value: 0.3 },
     ],
     description: 'Social networks double data generation',
-    prerequisites: ['openSource'],
+    prerequisites: ['virtualReality'],
   },
   cloudStorage: {
     id: 'cloudStorage', name: 'Cloud Storage', era: 3,
@@ -1574,7 +1574,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'data', value: 5 },
     ],
     description: 'Decentralized ledger doubles electronics and expands data capacity',
-    prerequisites: ['quantumEncryption'],
+    prerequisites: ['socialMedia'],
   },
   robotics: {
     id: 'robotics', name: 'Robotics', era: 3,
@@ -1584,7 +1584,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 0.5 },
     ],
     description: 'Robotic automation triples labor and generates electronics',
-    prerequisites: ['aiResearch'],
+    prerequisites: ['bigData'],
   },
   bigData: {
     id: 'bigData', name: 'Big Data', era: 3,
@@ -1594,7 +1594,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 1 },
     ],
     description: 'Massive data analysis triples data output and boosts research',
-    prerequisites: ['aiResearch'],
+    prerequisites: ['energyMatrix'],
   },
   encryptionProtocol: {
     id: 'encryptionProtocol', name: 'Encryption Protocol', era: 3,
@@ -1806,7 +1806,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'energy', value: 3 },
     ],
     description: 'Digital energy management doubles output and triples capacity',
-    prerequisites: ['iotNetwork'],
+    prerequisites: ['digitalSensors'],
   },
   cosmicFarming: {
     id: 'cosmicFarming', name: 'Cosmic Farming', era: 9,
@@ -2261,13 +2261,13 @@ export const upgrades = {
   telegraphNetwork: { id: 'telegraphNetwork', name: 'Telegraph Network', era: 2, cost: { electronics: 14, steel: 18, labor: 20 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.3 }], description: 'Long-distance communication doubles electronics and aids research', prerequisites: ['industrialMemory'] },
 
   // Era 3
-  virtualReality: { id: 'virtualReality', name: 'Virtual Reality', era: 3, cost: { software: 22, electronics: 28, data: 16 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Immersive VR doubles software development and data collection', prerequisites: ['socialMedia'] },
+  virtualReality: { id: 'virtualReality', name: 'Virtual Reality', era: 3, cost: { software: 22, electronics: 28, data: 16 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Immersive VR doubles software development and data collection', prerequisites: ['openSource'] },
   quantumComputer: { id: 'quantumComputer', name: 'Quantum Computer', era: 3, cost: { research: 45, electronics: 35, data: 20 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'data', value: 0.8 }], description: 'Quantum computation triples research speed', prerequisites: ['generativeAI'] },
   socialNetwork: { id: 'socialNetwork', name: 'Social Network', era: 3, cost: { software: 15, data: 12, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Social platforms triple data generation', prerequisites: ['temporalEcho','meshNetwork'] },
 
   // Era 4
   ionDrive: { id: 'ionDrive', name: 'Ion Drive', era: 4, cost: { rocketFuel: 20, research: 30, electronics: 22 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'Efficient ion propulsion doubles fuel economy', prerequisites: ['plasmaThrusters'] },
-  spaceElevator: { id: 'spaceElevator', name: 'Space Elevator', era: 4, cost: { orbitalInfra: 12, steel: 35, energy: 28 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.2 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'A tether to orbit triples infrastructure buildup', prerequisites: ['orbitalShipyard'] },
+  spaceElevator: { id: 'spaceElevator', name: 'Space Elevator', era: 4, cost: { orbitalInfra: 12, steel: 35, energy: 28 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.2 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'A tether to orbit triples infrastructure buildup', prerequisites: ['refueling'] },
   gravityAssist: { id: 'gravityAssist', name: 'Gravity Assist Lab', era: 4, cost: { research: 32, orbitalInfra: 8, rocketFuel: 15 }, effects: [{ type: 'production_add', target: 'research', value: 0.6 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Master gravity slingshots for efficient travel', prerequisites: ['deepSpaceRelay'] },
 
   // Era 5

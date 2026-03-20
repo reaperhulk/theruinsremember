@@ -158,7 +158,12 @@ export function getUpcomingUpgrades(state) {
     const unmet = def.prerequisites.filter(p => !state.upgrades[p]).length;
     // Show if exactly 1 prerequisite is missing
     return unmet === 1;
-  }).slice(0, 3); // Show max 3 upcoming
+  }).map(def => {
+    // Find the missing prerequisite
+    const missingPrereq = def.prerequisites.find(p => !state.upgrades[p]);
+    const missingName = missingPrereq ? (upgradeDefs[missingPrereq]?.name || missingPrereq) : null;
+    return { ...def, missingPrereq: missingName };
+  }).slice(0, 5); // Show max 5 upcoming
 }
 
 // Get list of purchased upgrades
