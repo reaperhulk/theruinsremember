@@ -22,7 +22,7 @@ export function EraProgress({ state }) {
 
   return (
     <div className="panel era-panel">
-      <h2>Era {state.era}: {currentEra}</h2>
+      <h2>Era {state.era}: {currentEra} {eraCompletion >= 100 && '(complete)'}</h2>
       {!isMaxEra && !upgradesMet && (
         <p className="era-hint">
           Buy {minUpgrades - eraUpgradeCount} more upgrades, then research ★ tech to advance
