@@ -123,4 +123,18 @@ export const achievements = [
   { id: 'gem1000', name: 'Gem Deity', description: 'Find 1000 gems', check: s => (s.totalGems || 0) >= 1000, reward: 15 },
   { id: 'repeatAddict20', name: 'Mass Producer Elite', description: 'Buy any repeatable upgrade 20 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 20), reward: 5 },
   { id: 'marathon24', name: 'Day Runner', description: 'Play for 24 hours total', check: s => s.totalTime >= 86400, reward: 10 },
+
+  // --- New achievements ---
+  { id: 'quintillion', name: 'Quintillionaire', description: 'Have 1 quintillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e18), reward: 15 },
+  { id: 'speedrunEra3fast', name: 'Lightning Start', description: 'Reach Era 3 in under 3 minutes', check: s => s.era >= 3 && (s.bestEraTimes?.[3] || Infinity) < 180, reward: 5 },
+  { id: 'upgrade250', name: 'Upgrade Overlord', description: 'Purchase 250 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 250, reward: 30 },
+  { id: 'techSage', name: 'Tech Sage', description: 'Unlock 50 technologies', check: s => Object.keys(s.tech || {}).length >= 50, reward: 15 },
+  { id: 'hack100', name: 'Zero Day', description: 'Complete 100 hacks', check: s => (s.hackSuccesses || 0) >= 100, reward: 10 },
+  { id: 'weave100', name: 'Weave Grandmaster', description: 'Complete 100 weaves', check: s => (s.totalWeaves || 0) >= 100, reward: 10 },
+  { id: 'docking100', name: 'Flight Commander', description: 'Land 100 perfect docks', check: s => (s.dockingPerfects || 0) >= 100, reward: 10 },
+  { id: 'trade500', name: 'Trade Titan', description: 'Complete 500 trades', check: s => (s.totalTrades || 0) >= 500, reward: 15 },
+  { id: 'gem5000', name: 'Gem Cosmos', description: 'Find 5000 gems', check: s => (s.totalGems || 0) >= 5000, reward: 20 },
+  { id: 'prestigeAscendant', name: 'Prestige Ascendant', description: 'Prestige 50 times', check: s => (s.prestigeCount || 0) >= 50, reward: 25 },
+  { id: 'starNetwork15', name: 'Galactic Highway', description: 'Create 15 star routes', check: s => (s.starRoutes?.length || 0) >= 15, reward: 5 },
+  { id: 'repeatAddict50', name: 'Industrial Titan', description: 'Buy any repeatable upgrade 50 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 50), reward: 10 },
 ];

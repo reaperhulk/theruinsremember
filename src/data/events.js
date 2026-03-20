@@ -729,6 +729,153 @@ export const events = {
     type: 'instant',
     effect: { resourceId: 'exoticMaterials', amount: 80 },
   },
+
+  // --- New events ---
+
+  // Era 2
+  ironRush: {
+    id: 'ironRush',
+    name: 'Iron Rush',
+    description: 'A massive iron deposit is uncovered — steel floods the market!',
+    minEra: 2,
+    type: 'instant',
+    effect: { resourceId: 'steel', amount: 50 },
+  },
+  bumperHarvest: {
+    id: 'bumperHarvest',
+    name: 'Bumper Harvest',
+    description: 'Perfect weather yields a record-breaking harvest!',
+    minEra: 2,
+    type: 'timed',
+    duration: 30,
+    effect: { resourceId: 'food', rateMultBonus: 4 },
+  },
+
+  // Era 3
+  cloudComputing: {
+    id: 'cloudComputing',
+    name: 'Cloud Computing Boom',
+    description: 'Cloud infrastructure scales exponentially — data production surges!',
+    minEra: 3,
+    type: 'timed',
+    duration: 35,
+    effect: { resourceId: 'data', rateMultBonus: 5 },
+  },
+  chipBreakthrough: {
+    id: 'chipBreakthrough',
+    name: 'Chip Breakthrough',
+    description: 'A new semiconductor process yields a flood of electronics!',
+    minEra: 3,
+    type: 'instant',
+    effect: { resourceId: 'electronics', amount: 40 },
+  },
+
+  // Era 4
+  gravityAssist: {
+    id: 'gravityAssist',
+    name: 'Gravity Assist',
+    description: 'A planetary alignment provides free delta-v — rocket fuel saved!',
+    minEra: 4,
+    type: 'instant',
+    effect: { resourceId: 'rocketFuel', amount: 120 },
+  },
+  orbitalFactory: {
+    id: 'orbitalFactory',
+    name: 'Orbital Factory Online',
+    description: 'A zero-g factory enters service — orbital infrastructure booms!',
+    minEra: 4,
+    type: 'timed',
+    duration: 40,
+    effect: { resourceId: 'orbitalInfra', rateMultBonus: 4 },
+  },
+
+  // Era 5
+  terraformingSuccess: {
+    id: 'terraformingSuccess',
+    name: 'Terraforming Success',
+    description: 'A planet completes terraforming — new colonies established!',
+    minEra: 5,
+    type: 'instant',
+    effect: { resourceId: 'colonies', amount: 10 },
+  },
+
+  // Era 6
+  interstellarBeacon: {
+    id: 'interstellarBeacon',
+    name: 'Interstellar Beacon',
+    description: 'An ancient beacon activates, revealing hidden star systems!',
+    minEra: 6,
+    type: 'instant',
+    effect: { resourceId: 'starSystems', amount: 12 },
+  },
+  darkMatterLens: {
+    id: 'darkMatterLens',
+    name: 'Dark Matter Lens',
+    description: 'A gravitational lens focuses dark energy into your collectors!',
+    minEra: 6,
+    type: 'timed',
+    duration: 50,
+    effect: { resourceId: 'darkEnergy', rateMultBonus: 6 },
+  },
+
+  // Era 7
+  dysonSwarmSync: {
+    id: 'dysonSwarmSync',
+    name: 'Dyson Swarm Synchronization',
+    description: 'All Dyson satellites align — stellar forge output peaks!',
+    minEra: 7,
+    type: 'timed',
+    duration: 45,
+    effect: { resourceId: 'stellarForge', rateMultBonus: 7 },
+  },
+
+  // Era 8
+  galacticSummit: {
+    id: 'galacticSummit',
+    name: 'Galactic Summit',
+    description: 'A summit of elder civilizations grants vast influence!',
+    minEra: 8,
+    type: 'instant',
+    effect: { resourceId: 'galacticInfluence', amount: 150 },
+  },
+  exoticMatterRefinery: {
+    id: 'exoticMatterRefinery',
+    name: 'Exotic Matter Refinery',
+    description: 'A new refinery process multiplies exotic matter yield!',
+    minEra: 8,
+    type: 'timed',
+    duration: 50,
+    effect: { resourceId: 'exoticMatter', rateMultBonus: 6 },
+  },
+
+  // Era 9
+  intergalacticTide: {
+    id: 'intergalacticTide',
+    name: 'Intergalactic Tide',
+    description: 'A tide of energy sweeps between galaxies — cosmic power floods in!',
+    minEra: 9,
+    type: 'instant',
+    effect: { resourceId: 'cosmicPower', amount: 250 },
+  },
+
+  // Era 10
+  omniversalRipple: {
+    id: 'omniversalRipple',
+    name: 'Omniversal Ripple',
+    description: 'A ripple across all realities deposits reality fragments!',
+    minEra: 10,
+    type: 'instant',
+    effect: { resourceId: 'realityFragments', amount: 400 },
+  },
+  parallelConvergence: {
+    id: 'parallelConvergence',
+    name: 'Parallel Convergence',
+    description: 'Infinite parallel selves synchronize — quantum echoes explode!',
+    minEra: 10,
+    type: 'timed',
+    duration: 55,
+    effect: { resourceId: 'quantumEchoes', rateMultBonus: 12 },
+  },
 };
 
 // Get events eligible for the current era
