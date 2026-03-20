@@ -87,6 +87,10 @@ export function TechTree({ state, onUpdate }) {
           const prereqNames = tech.prerequisites
             .map(p => techTree[p]?.name || p)
             .filter(Boolean);
+          // Count how many other techs this one enables
+          const enablesCount = Object.values(techTree).filter(t =>
+            t.prerequisites.includes(tech.id) && !state.tech[t.id]
+          ).length;
           return (
             <button
               key={tech.id}
@@ -118,6 +122,11 @@ export function TechTree({ state, onUpdate }) {
               )}
               {prereqNames.length > 0 && (
                 <div className="tech-prereqs">Requires: {prereqNames.join(', ')}</div>
+              )}
+              {enablesCount > 0 && (
+                <div className="tech-prereqs" style={{ color: '#88ccaa' }}>
+                  Unlocks {enablesCount} more tech{enablesCount > 1 ? 's' : ''}
+                </div>
               )}
               {tech.excludes && (
                 <div className="tech-prereqs" style={{ color: '#ff8866' }}>

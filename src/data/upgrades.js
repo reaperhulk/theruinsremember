@@ -2590,6 +2590,29 @@ export const upgrades = {
   // Era 10: cross-link quantum echo and reality fragment chains
   echoRealityFeedback: { id: 'echoRealityFeedback', name: 'Echo-Reality Feedback', era: 10, cost: { quantumEchoes: 90, realityFragments: 120, cosmicPower: 300 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 30 }, { type: 'production_add', target: 'realityFragments', value: 30 }], description: 'Echoes reshape reality which generates more echoes — feedback loop established', prerequisites: ['dimensionalAnchors', 'omniscienceEngine'] },
   fragmentConstantSynthesis: { id: 'fragmentConstantSynthesis', name: 'Fragment-Constant Synthesis', era: 10, cost: { realityFragments: 140, universalConstants: 28, quantumEchoes: 85 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 25 }, { type: 'production_add', target: 'universalConstants', value: 25 }], description: 'Synthesize fragments and constants from quantum substrate — dual production', prerequisites: ['realityWeaving', 'parallelProcessing'] },
+
+  // --- 7 cross-era synergy upgrades — early investments pay off in later eras ---
+
+  // Era 5: foundry (era 1) + nanofabricator (era 5) → boosts steel AND exotic materials
+  nanoforgedSteel: { id: 'nanoforgedSteel', name: 'Nanoforged Steel', era: 5, cost: { exoticMaterials: 18, research: 45, steel: 60 }, effects: [{ type: 'production_mult', target: 'steel', value: 5 }, { type: 'production_add', target: 'exoticMaterials', value: 1.5 }], description: 'Ancient forging wisdom meets nanoscale precision — steel mastery boosts exotic output', prerequisites: ['foundry', 'nanofabricator'] },
+
+  // Era 5: industrialFarming (era 2) + geneticEngineering (era 5) → boosts food AND colonies
+  biosyntheticHarvest: { id: 'biosyntheticHarvest', name: 'Biosynthetic Harvest', era: 5, cost: { food: 200, research: 50, colonies: 3 }, effects: [{ type: 'production_mult', target: 'food', value: 8 }, { type: 'production_add', target: 'colonies', value: 0.15 }], description: 'Industrial farming scaled to genetic perfection — feeds entire colonies from nothing', prerequisites: ['industrialFarming', 'geneticEngineering'] },
+
+  // Era 6: computingLab (era 2) + aiGovernance (era 6) → boosts electronics AND research
+  digitalStellarMind: { id: 'digitalStellarMind', name: 'Digital Stellar Mind', era: 6, cost: { research: 80, starSystems: 4, electronics: 120 }, effects: [{ type: 'production_mult', target: 'electronics', value: 8 }, { type: 'production_add', target: 'research', value: 4.8 }], description: 'Early computing principles scaled to stellar AI — electronics and research surge', prerequisites: ['computingLab', 'aiGovernance'] },
+
+  // Era 6: waterMill (era 1) + dysonSwarms (era 6) → boosts energy AND dark energy
+  stellarWaterwheel: { id: 'stellarWaterwheel', name: 'Stellar Waterwheel', era: 6, cost: { energy: 150, darkEnergy: 20, starSystems: 5 }, effects: [{ type: 'production_mult', target: 'energy', value: 15 }, { type: 'production_add', target: 'darkEnergy', value: 1.6 }], description: 'The simple waterwheel principle applied to stellar plasma currents — energy mastery', prerequisites: ['waterMill', 'dysonSwarms'] },
+
+  // Era 7: steelForge (era 2) + starLifting (era 7) → boosts materials AND stellar forge
+  cosmicAnvil: { id: 'cosmicAnvil', name: 'Cosmic Anvil', era: 7, cost: { stellarForge: 14, megastructures: 5, steel: 300 }, effects: [{ type: 'production_mult', target: 'materials', value: 8 }, { type: 'production_add', target: 'stellarForge', value: 3.2 }], description: 'Metallurgy perfected over eras — star-forged steel feeds back into the stellar forge', prerequisites: ['steelForge', 'starLifting'] },
+
+  // Era 7: aiResearch (era 3) + matrioshkaBrain (era 7) → boosts software AND megastructures
+  sentientArchitect: { id: 'sentientArchitect', name: 'Sentient Architect', era: 7, cost: { megastructures: 8, research: 120, software: 60 }, effects: [{ type: 'production_mult', target: 'software', value: 15 }, { type: 'production_add', target: 'megastructures', value: 2.4 }], description: 'AI research lineage culminates in architects that design their own megastructures', prerequisites: ['aiResearch', 'matrioshkaBrain'] },
+
+  // Era 8: blockchain (era 3) + galacticSenate (era 8) → boosts data AND galactic influence
+  galacticLedger: { id: 'galacticLedger', name: 'Galactic Ledger', era: 8, cost: { galacticInfluence: 200, data: 120, research: 150 }, effects: [{ type: 'production_mult', target: 'data', value: 12 }, { type: 'production_add', target: 'galacticInfluence', value: 6.4 }], description: 'Early blockchain principles govern galactic trade — trust at cosmic scale', prerequisites: ['blockchain', 'galacticSenate'] },
 };
 
 // Balance scaling: multiply upgrade costs by era-dependent factors
