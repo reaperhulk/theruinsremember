@@ -287,8 +287,11 @@ body {
 .upcoming-upgrade {
   display: flex;
   justify-content: space-between;
-  padding: 2px 4px;
-  opacity: 0.4;
+  padding: 3px 6px;
+  opacity: 0.5;
+  background: rgba(40, 40, 60, 0.3);
+  border-radius: 3px;
+  margin-bottom: 2px;
   font-size: 0.8em;
 }
 
