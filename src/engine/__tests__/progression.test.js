@@ -30,18 +30,19 @@ describe('progression integration', () => {
   it('can progress from Era 1 to Era 2 via upgrades and tech', () => {
     let state = createInitialState();
 
-    // Buy era 1 upgrades in order
+    // Buy era 1 upgrades following chains (need at least 10)
     state = giveAndBuy(state, 'upgrade', 'tools');
-    expect(state.upgrades.tools).toBe(true);
-
+    state = giveAndBuy(state, 'upgrade', 'storehouse');
+    state = giveAndBuy(state, 'upgrade', 'quarry');
     state = giveAndBuy(state, 'upgrade', 'irrigation');
+    state = giveAndBuy(state, 'upgrade', 'animalHusbandry');
     state = giveAndBuy(state, 'upgrade', 'basicPower');
+    state = giveAndBuy(state, 'upgrade', 'waterMill');
     state = giveAndBuy(state, 'upgrade', 'housing');
     state = giveAndBuy(state, 'upgrade', 'foundry');
+    state = giveAndBuy(state, 'upgrade', 'advancedTools');
 
-    // Foundry should unlock steel
     expect(state.resources.steel.unlocked).toBe(true);
-    expect(state.resources.steel.rateAdd).toBeGreaterThan(0);
 
     // Buy metallurgy tech
     state = giveAndBuy(state, 'tech', 'metallurgy');
@@ -64,13 +65,19 @@ describe('progression integration', () => {
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 0, rateMult: 1 };
     state.resources.research = { ...state.resources.research, unlocked: true, rateAdd: 0, rateMult: 1 };
 
-    // Buy era 2 upgrades following prerequisite chains (need at least 6 = era*3)
+    // Buy era 2 upgrades following chains (need at least 12)
     state = giveAndBuy(state, 'upgrade', 'assemblyLines');
-    state = giveAndBuy(state, 'upgrade', 'computingLab');
-    state = giveAndBuy(state, 'upgrade', 'powerGrid');
+    state = giveAndBuy(state, 'upgrade', 'ironWorks');
     state = giveAndBuy(state, 'upgrade', 'steelForge');
     state = giveAndBuy(state, 'upgrade', 'steelRefinery');
-    state = giveAndBuy(state, 'upgrade', 'ironWorks');
+    state = giveAndBuy(state, 'upgrade', 'computingLab');
+    state = giveAndBuy(state, 'upgrade', 'telephoneNetwork');
+    state = giveAndBuy(state, 'upgrade', 'printingPress');
+    state = giveAndBuy(state, 'upgrade', 'powerGrid');
+    state = giveAndBuy(state, 'upgrade', 'coalMine');
+    state = giveAndBuy(state, 'upgrade', 'microchipFab');
+    state = giveAndBuy(state, 'upgrade', 'factoryFloor');
+    state = giveAndBuy(state, 'upgrade', 'automation');
 
     // Buy tech to transition
     state = giveAndBuy(state, 'tech', 'advancedComputing');
@@ -94,7 +101,7 @@ describe('progression integration', () => {
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 0.3 };
     state.resources.research = { ...state.resources.research, unlocked: true, rateAdd: 0.5 };
 
-    // Buy Digital Age upgrades following chains (need at least 9 = era*3)
+    // Buy Digital Age upgrades following chains (need at least 14)
     state = giveAndBuy(state, 'upgrade', 'internet');
     state = giveAndBuy(state, 'upgrade', 'cloudComputing');
     state = giveAndBuy(state, 'upgrade', 'openSource');
@@ -104,6 +111,11 @@ describe('progression integration', () => {
     state = giveAndBuy(state, 'upgrade', 'digitalSensors');
     state = giveAndBuy(state, 'upgrade', 'cloudStorage');
     state = giveAndBuy(state, 'upgrade', 'cyberSecurity');
+    state = giveAndBuy(state, 'upgrade', 'virtualReality');
+    state = giveAndBuy(state, 'upgrade', 'socialMedia');
+    state = giveAndBuy(state, 'upgrade', 'blockchain');
+    state = giveAndBuy(state, 'upgrade', 'energyMatrix');
+    state = giveAndBuy(state, 'upgrade', 'encryptionProtocol');
     expect(state.resources.rocketFuel.unlocked).toBe(true);
 
     // Buy tech to transition

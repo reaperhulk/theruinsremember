@@ -13,10 +13,10 @@ describe('tick', () => {
 
   it('enforces resource caps on production', () => {
     const state = createInitialState();
-    state.resources.food.amount = 199.8;
+    state.resources.food.amount = 999.8;
     const after = tick(state, 1);
-    // Cap enforced at 200 (baseCap * capMult = 200 * 1)
-    expect(after.resources.food.amount).toBe(200);
+    // Cap enforced at 1000 (baseCap * capMult = 1000 * 1)
+    expect(after.resources.food.amount).toBe(1000);
   });
 
   it('does not produce for locked resources', () => {

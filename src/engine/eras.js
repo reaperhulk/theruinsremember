@@ -18,9 +18,22 @@ import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 // Minimum upgrades purchased in the current era before transition is allowed.
-// Formula: era * 3 (era 1 needs 3, era 5 needs 15, era 10 needs 30)
+// ~40% of available upgrades per era must be bought. This forces real engagement.
+const ERA_MIN_UPGRADES = {
+  1: 10,  // 10 out of ~40 (25%)
+  2: 12,  // 12 out of ~41 (29%)
+  3: 14,  // 14 out of ~39 (36%)
+  4: 16,  // 16 out of ~44 (36%)
+  5: 18,  // 18 out of ~42 (43%)
+  6: 18,  // 18 out of ~42 (43%)
+  7: 20,  // 20 out of ~45 (44%)
+  8: 20,  // 20 out of ~44 (45%)
+  9: 22,  // 22 out of ~46 (48%)
+  10: 25, // endgame — buy lots
+};
+
 export function getMinUpgradesForEra(era) {
-  return era * 3;
+  return ERA_MIN_UPGRADES[era] || 10;
 }
 
 // Count how many upgrades the player has purchased that belong to the given era.

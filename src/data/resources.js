@@ -3,15 +3,15 @@
 
 export const resources = {
   // Era 1: Planetfall
-  labor: { id: 'labor', name: 'Labor', era: 1, baseCap: 100, baseRate: 0, description: 'Manual workforce' },
-  food: { id: 'food', name: 'Food', era: 1, baseCap: 200, baseRate: 0.5, description: 'Sustenance for settlers' },
-  materials: { id: 'materials', name: 'Materials', era: 1, baseCap: 150, baseRate: 0.2, description: 'Raw building materials' },
-  energy: { id: 'energy', name: 'Energy', era: 1, baseCap: 100, baseRate: 0.1, description: 'Power supply' },
+  labor: { id: 'labor', name: 'Labor', era: 1, baseCap: 500, baseRate: 0, description: 'Manual workforce' },
+  food: { id: 'food', name: 'Food', era: 1, baseCap: 1000, baseRate: 0.5, description: 'Sustenance for settlers' },
+  materials: { id: 'materials', name: 'Materials', era: 1, baseCap: 750, baseRate: 0.2, description: 'Raw building materials' },
+  energy: { id: 'energy', name: 'Energy', era: 1, baseCap: 500, baseRate: 0.1, description: 'Power supply' },
 
   // Era 2: Industrialization
-  steel: { id: 'steel', name: 'Steel', era: 2, baseCap: 300, baseRate: 0, description: 'Refined metal alloy' },
-  electronics: { id: 'electronics', name: 'Electronics', era: 2, baseCap: 200, baseRate: 0, description: 'Electronic components' },
-  research: { id: 'research', name: 'Research', era: 2, baseCap: 500, baseRate: 0, description: 'Scientific knowledge' },
+  steel: { id: 'steel', name: 'Steel', era: 2, baseCap: 1500, baseRate: 0, description: 'Refined metal alloy' },
+  electronics: { id: 'electronics', name: 'Electronics', era: 2, baseCap: 1000, baseRate: 0, description: 'Electronic components' },
+  research: { id: 'research', name: 'Research', era: 2, baseCap: 2500, baseRate: 0, description: 'Scientific knowledge' },
 
   // Era 3: Digital Age
   software: { id: 'software', name: 'Software', era: 3, baseCap: 300, baseRate: 0, description: 'Digital programs and algorithms' },
