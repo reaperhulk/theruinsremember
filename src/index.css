@@ -1302,6 +1302,12 @@ canvas:hover {
   font-weight: bold;
 }
 
+.toast-milestone {
+  background: rgba(200, 180, 80, 0.9);
+  color: #000;
+  font-weight: bold;
+}
+
 @keyframes toast-in {
   from { transform: translateX(100px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }

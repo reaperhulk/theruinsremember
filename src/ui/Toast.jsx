@@ -1,10 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
+import { resources as resourceDefs } from '../data/resources.js';
+import { formatNumber } from './format.js';
+
+const MILESTONES = [100, 1000, 10000, 100000, 1000000, 10000000, 100000000];
 
 export function Toast({ state }) {
   const [toasts, setToasts] = useState([]);
   const prevEraRef = useRef(state.era);
   const prevGemsRef = useRef(state.totalGems || 0);
   const prevEventsRef = useRef(state.eventLog?.length || 0);
+  const milestonesHitRef = useRef({});
   const idRef = useRef(0);
 
   useEffect(() => {
@@ -22,6 +27,19 @@ export function Toast({ state }) {
       newToasts.push({ id: ++idRef.current, text: 'Gem found!', type: 'gem' });
     }
     prevGemsRef.current = currentGems;
+
+    // Resource milestones
+    for (const [id, r] of Object.entries(state.resources)) {
+      if (!r.unlocked) continue;
+      for (const m of MILESTONES) {
+        const key = `${id}_${m}`;
+        if (r.amount >= m && !milestonesHitRef.current[key]) {
+          milestonesHitRef.current[key] = true;
+          const name = resourceDefs[id]?.name || id;
+          newToasts.push({ id: ++idRef.current, text: `${name} reached ${formatNumber(m)}!`, type: 'milestone' });
+        }
+      }
+    }
 
     // New event
     const currentEvents = state.eventLog?.length || 0;
@@ -41,13 +59,12 @@ export function Toast({ state }) {
 
     if (newToasts.length > 0) {
       setToasts(prev => [...prev, ...newToasts].slice(-5));
-      // Auto-remove after 4 seconds (longer for readability)
       const ids = newToasts.map(t => t.id);
       setTimeout(() => {
         setToasts(prev => prev.filter(t => !ids.includes(t.id)));
       }, 4000);
     }
-  }, [state.era, state.totalGems, state.eventLog?.length]);
+  }, [state.era, state.totalGems, state.eventLog?.length, state.resources]);
 
   if (toasts.length === 0) return null;
 
