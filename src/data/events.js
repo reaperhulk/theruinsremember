@@ -1213,6 +1213,44 @@ export const events = {
   // Era 10
   omniversalEcho: { id: 'omniversalEcho', name: 'Omniversal Echo', description: 'An echo reverberates across all realities — quantum echoes multiply!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
   realityMerge: { id: 'realityMerge', name: 'Reality Merge', description: 'Two parallel realities merge briefly — fragments explode!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
+
+  // --- 18 new events ---
+
+  // Era 2
+  workshopFire: { id: 'workshopFire', name: 'Workshop Discovery', description: 'A fire reveals hidden metal deposits — steel floods in!', minEra: 2, type: 'instant', effect: { resourceId: 'steel', amount: 45 } },
+  harvestMoon: { id: 'harvestMoon', name: 'Harvest Moon', description: 'A harvest moon blesses the fields — food output surges!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'food', rateMultBonus: 5 } },
+
+  // Era 3
+  algorithmicBreakthrough: { id: 'algorithmicBreakthrough', name: 'Algorithmic Breakthrough', description: 'A new algorithm revolutionizes data processing!', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'software', rateMultBonus: 5 } },
+  serverOptimization: { id: 'serverOptimization', name: 'Server Optimization', description: 'Server farms reach peak efficiency — data floods in!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 55 } },
+
+  // Era 4
+  orbitalResonance: { id: 'orbitalResonance', name: 'Orbital Resonance', description: 'Orbital mechanics align perfectly — infrastructure booms!', minEra: 4, type: 'timed', duration: 40, effect: { resourceId: 'orbitalInfra', rateMultBonus: 5 } },
+  deepSpaceSignal: { id: 'deepSpaceSignal', name: 'Deep Space Signal', description: 'A mysterious signal carries encoded research data!', minEra: 4, type: 'instant', effect: { resourceId: 'research', amount: 120 } },
+
+  // Era 5
+  jupiterSlingshot: { id: 'jupiterSlingshot', name: 'Jupiter Slingshot', description: 'A gravity assist around Jupiter yields enormous fuel savings!', minEra: 5, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 200 } },
+  colonyGoldenAge: { id: 'colonyGoldenAge', name: 'Colony Golden Age', description: 'Colonies enter a golden age — rapid expansion!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'colonies', rateMultBonus: 5 } },
+
+  // Era 6
+  darkEnergySpring: { id: 'darkEnergySpring', name: 'Dark Energy Spring', description: 'A natural dark energy spring erupts in your territory!', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 70 } },
+  interstellarRush: { id: 'interstellarRush', name: 'Interstellar Rush', description: 'A gold rush mentality drives star system colonization!', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
+
+  // Era 7
+  forgeOvercharge: { id: 'forgeOvercharge', name: 'Forge Overcharge', description: 'All stellar forges overcharge simultaneously — massive output!', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'stellarForge', rateMultBonus: 10 } },
+  megastructureBlitz: { id: 'megastructureBlitz', name: 'Megastructure Blitz', description: 'A construction blitz completes megastructures ahead of schedule!', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 15 } },
+
+  // Era 8
+  galacticAlliance: { id: 'galacticAlliance', name: 'Galactic Alliance', description: 'A grand alliance forms — influence and exotic matter pour in!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'galacticInfluence', rateMultBonus: 8 } },
+  exoticMatterGeyser2: { id: 'exoticMatterGeyser2', name: 'Exotic Matter Eruption', description: 'An exotic matter eruption floods your refineries!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 120 } },
+
+  // Era 9
+  cosmicTremor: { id: 'cosmicTremor', name: 'Cosmic Tremor', description: 'A tremor in the fabric of space amplifies cosmic power!', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'cosmicPower', rateMultBonus: 8 } },
+  universalConstantShift: { id: 'universalConstantShift', name: 'Universal Constant Shift', description: 'Constants shift favorably — a windfall of knowledge!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 30 } },
+
+  // Era 10
+  realityCascade: { id: 'realityCascade', name: 'Reality Cascade', description: 'A cascade of collapsing realities yields unprecedented fragments!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 700 } },
+  quantumFlood: { id: 'quantumFlood', name: 'Quantum Flood', description: 'A flood of quantum echoes from infinite parallel selves!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 18 } },
 };
 
 // Get events eligible for the current era

@@ -218,4 +218,18 @@ export const achievements = [
   { id: 'prestigeInfinite', name: 'Prestige Infinite', description: 'Prestige 1000 times', check: s => (s.prestigeCount || 0) >= 1000, reward: 300 },
   { id: 'allEra10Upgrades', name: 'Multiverse Master', description: 'Buy all Era 10 upgrades', check: s => { const era10 = ['realityWeaving','dimensionalAnchors','parallelProcessing','realityLoom','omniscienceEngine','dimensionalRift','infinityMirror','multiversalHarmony','infinityWell','echoSynthesizer','multiversalNexus']; return era10.every(id => s.upgrades?.[id]); }, reward: 50 },
   { id: 'colonyGalactic', name: 'Galactic Colonizer', description: 'Assign 500+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 500; }, reward: 25 },
+
+  // --- 12 new achievements ---
+  { id: 'speedrunEra2fast', name: 'Blitz Start', description: 'Reach Era 2 in under 90 seconds', check: s => s.era >= 2 && (s.bestEraTimes?.[2] || Infinity) < 90, reward: 5 },
+  { id: 'allEra2', name: 'Era 2 Complete', description: 'Buy all Era 2 gateway upgrades', check: s => ['assemblyLines','steelForge','ironWorks','powerGrid','computingLab'].every(id => s.upgrades?.[id]), reward: 3 },
+  { id: 'duodecillion', name: 'Duodecillionaire', description: 'Have 1 duodecillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e39), reward: 50 },
+  { id: 'parallelPaths', name: 'Parallel Paths', description: 'Buy 3 upgrades in the same era within 30 seconds', check: s => (s.fastUpgradeBurst || 0) >= 3, reward: 3 },
+  { id: 'darkEnergyMaster', name: 'Dark Energy Master', description: 'Accumulate 1000 dark energy', check: s => (s.resources?.darkEnergy?.amount || 0) >= 1000, reward: 5 },
+  { id: 'cosmicPowerSurge', name: 'Cosmic Power Surge', description: 'Accumulate 5000 cosmic power', check: s => (s.resources?.cosmicPower?.amount || 0) >= 5000, reward: 10 },
+  { id: 'stellarForgemaster', name: 'Stellar Forgemaster', description: 'Accumulate 500 stellar forge', check: s => (s.resources?.stellarForge?.amount || 0) >= 500, reward: 7 },
+  { id: 'megaBuilder', name: 'Mega Builder', description: 'Accumulate 200 megastructures', check: s => (s.resources?.megastructures?.amount || 0) >= 200, reward: 8 },
+  { id: 'exoticHoarder', name: 'Exotic Hoarder', description: 'Accumulate 10000 exotic matter', check: s => (s.resources?.exoticMatter?.amount || 0) >= 10000, reward: 10 },
+  { id: 'starConqueror', name: 'Star Conqueror', description: 'Control 500 star systems', check: s => (s.resources?.starSystems?.amount || 0) >= 500, reward: 8 },
+  { id: 'realityShaper', name: 'Reality Shaper', description: 'Accumulate 1000 reality fragments', check: s => (s.resources?.realityFragments?.amount || 0) >= 1000, reward: 15 },
+  { id: 'quantumMaster', name: 'Quantum Master', description: 'Accumulate 500 quantum echoes', check: s => (s.resources?.quantumEchoes?.amount || 0) >= 500, reward: 15 },
 ];
