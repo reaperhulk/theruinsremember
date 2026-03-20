@@ -4,6 +4,16 @@
 export function formatNumber(n) {
   if (!isFinite(n)) return 'Infinity';
   if (n < 0) return '-' + formatNumber(-n);
+  if (n >= 1e63) return n.toExponential(1);             // beyond vigintillion, use scientific
+  if (n >= 1e60) return (n / 1e60).toFixed(1) + 'Vg';  // vigintillion
+  if (n >= 1e57) return (n / 1e57).toFixed(1) + 'Od';  // octodecillion
+  if (n >= 1e54) return (n / 1e54).toFixed(1) + 'Sd';  // septendecillion
+  if (n >= 1e51) return (n / 1e51).toFixed(1) + 'Sxd'; // sexdecillion
+  if (n >= 1e48) return (n / 1e48).toFixed(1) + 'Qid'; // quindecillion
+  if (n >= 1e45) return (n / 1e45).toFixed(1) + 'Qad'; // quattuordecillion
+  if (n >= 1e42) return (n / 1e42).toFixed(1) + 'Td';  // tredecillion
+  if (n >= 1e39) return (n / 1e39).toFixed(1) + 'Dd';  // duodecillion
+  if (n >= 1e36) return (n / 1e36).toFixed(1) + 'Ud';  // undecillion
   if (n >= 1e33) return (n / 1e33).toFixed(1) + 'D';   // decillion
   if (n >= 1e30) return (n / 1e30).toFixed(1) + 'N';   // nonillion
   if (n >= 1e27) return (n / 1e27).toFixed(1) + 'O';   // octillion
