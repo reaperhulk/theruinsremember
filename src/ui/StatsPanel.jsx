@@ -88,7 +88,7 @@ export function StatsPanel({ state }) {
         )}
       </div>
 
-      <h3>Achievements ({earnedCount}/{achievementList.length})</h3>
+      <h3>Achievements ({earnedCount}/{achievementList.length} — {achievementList.filter(a => a.earned).reduce((s, a) => s + (a.reward || 0), 0)} pts earned)</h3>
       <div className="achievement-progress-bar">
         <div className="achievement-progress-fill" style={{ width: `${Math.floor(earnedCount / achievementList.length * 100)}%` }} />
       </div>
