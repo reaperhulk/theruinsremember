@@ -14,7 +14,7 @@ export function EventLog({ state }) {
 
   return (
     <div className="panel event-panel">
-      <h2>Events{activeEffects.length > 0 && ` (${activeEffects.length} active)`}</h2>
+      <h2>Events{activeEffects.length > 0 ? ` (${activeEffects.length} active)` : log.length > 0 ? ` (${log.length} recent)` : ''}</h2>
       {activeEffects.length > 0 && (
         <div className="active-effects">
           {activeEffects.map((effect, i) => {
