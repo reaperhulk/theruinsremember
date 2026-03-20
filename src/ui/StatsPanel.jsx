@@ -37,6 +37,10 @@ export function StatsPanel({ state }) {
           <span>{state.totalTrades || 0}</span>
         </div>
         <div className="stat-row">
+          <span>Star Routes</span>
+          <span>{state.starRoutes?.length || 0}</span>
+        </div>
+        <div className="stat-row">
           <span>Hacks</span>
           <span>{state.hackSuccesses || 0}</span>
         </div>
