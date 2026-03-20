@@ -85,7 +85,10 @@ export function StarChartPanel({ state, onUpdate }) {
       </div>
       {Object.keys(bonus).length > 0 && (
         <div className="colony-bonus">
-          Route bonus: {Object.entries(bonus).map(([r, v]) => `${r} +${v.toFixed(1)}`).join(', ')}
+          Routes: {Object.entries(bonus).map(([r, v]) => `${r} +${v.toFixed(1)}`).join(', ')}
+          <span style={{ color: '#888', marginLeft: '8px' }}>
+            (total: +{Object.values(bonus).reduce((s, v) => s + v, 0).toFixed(1)}/s)
+          </span>
         </div>
       )}
       <p className="mining-hint">
