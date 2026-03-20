@@ -2,10 +2,25 @@ import { useState } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable } from '../engine/upgrades.js';
 import { canAfford } from '../engine/resources.js';
 
-function formatCost(cost) {
-  return Object.entries(cost)
-    .map(([id, amount]) => `${id}: ${amount}`)
-    .join(', ');
+import { formatNumber } from './format.js';
+
+function CostDisplay({ cost, state }) {
+  return (
+    <span className="upgrade-cost">
+      {Object.entries(cost).map(([id, amount], i) => {
+        const have = state.resources[id]?.amount || 0;
+        const enough = have >= amount;
+        return (
+          <span key={id}>
+            {i > 0 && ', '}
+            <span style={{ color: enough ? '#88cc88' : '#ff8888' }}>
+              {id}: {formatNumber(amount)}
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
 }
 
 function formatEffects(effects) {
@@ -110,7 +125,7 @@ export function UpgradePanel({ state, onUpdate }) {
                 {upgrade.repeatable && count > 0 && ` (x${count})`}
                 {upgrade.repeatable && <span className="repeatable-badge">repeatable</span>}
               </div>
-              <div className="upgrade-cost">{formatCost(cost)}</div>
+              <div className="upgrade-cost"><CostDisplay cost={cost} state={state} /></div>
               <div className="upgrade-desc">{upgrade.description}</div>
               <div className="upgrade-effects">
                 {upgrade.effects.map((e, i) => {

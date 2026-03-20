@@ -54,14 +54,14 @@ export const techTree = {
   // Era 4 → 5 (Space Age → Solar System)
   interplanetaryNav: {
     id: 'interplanetaryNav', name: 'Interplanetary Navigation', era: 4,
-    cost: { research: 1500, rocketFuel: 500, orbitalInfra: 150 },
+    cost: { research: 2500, rocketFuel: 800, orbitalInfra: 250 },
     prerequisites: [],
     grantsEra: null,
     description: 'Navigate between planets',
   },
   interplanetaryShip: {
     id: 'interplanetaryShip', name: 'Interplanetary Ship', era: 4,
-    cost: { orbitalInfra: 400, rocketFuel: 1200, steel: 1500, research: 2500 },
+    cost: { orbitalInfra: 600, rocketFuel: 2000, steel: 2500, research: 4000 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: 5,
     description: 'A ship capable of reaching other planets',
@@ -102,14 +102,14 @@ export const techTree = {
   // Era 7 → 8 (Dyson Era → Galactic)
   galacticAscendancy: {
     id: 'galacticAscendancy', name: 'Galactic Ascendancy', era: 7,
-    cost: { megastructures: 60, stellarForge: 200, research: 5000000 },
+    cost: { megastructures: 100, stellarForge: 350, research: 10000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Prepare for galactic-scale civilization',
   },
   galacticNetwork: {
     id: 'galacticNetwork', name: 'Galactic Network', era: 7,
-    cost: { megastructures: 150, stellarForge: 500, research: 20000000 },
+    cost: { megastructures: 250, stellarForge: 800, research: 50000000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: 8,
     description: 'Galaxy-spanning communication and travel network',
@@ -134,14 +134,14 @@ export const techTree = {
   // Era 9 → 10 (Intergalactic → Multiverse)
   realityScience: {
     id: 'realityScience', name: 'Reality Science', era: 9,
-    cost: { universalConstants: 20, cosmicPower: 20000, research: 500000000 },
+    cost: { universalConstants: 10, cosmicPower: 10000, research: 200000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Study the fabric of reality',
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
-    cost: { universalConstants: 60, cosmicPower: 60000, realityFragments: 30 },
+    cost: { universalConstants: 30, cosmicPower: 30000, realityFragments: 15 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
     description: 'Detect parallel universe signatures',
