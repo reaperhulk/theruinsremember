@@ -178,4 +178,18 @@ export const achievements = [
   { id: 'repeatAddict200', name: 'Infinite Factory', description: 'Buy any repeatable upgrade 200 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 200), reward: 20 },
   { id: 'trade5000', name: 'Omniversal Trader', description: 'Complete 5000 trades', check: s => (s.totalTrades || 0) >= 5000, reward: 30 },
   { id: 'marathon168', name: 'Week Runner', description: 'Play for 168 hours total', check: s => s.totalTime >= 604800, reward: 20 },
+
+  // --- 12 new achievements ---
+  { id: 'nonillion', name: 'Nonillionaire', description: 'Have 1 nonillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e30), reward: 35 },
+  { id: 'speedrunEra6', name: 'Interstellar Speedrun', description: 'Reach Era 6 in under 12 minutes', check: s => s.era >= 6 && (s.bestEraTimes?.[6] || Infinity) < 720, reward: 6 },
+  { id: 'upgrade500', name: 'Upgrade Transcendence', description: 'Purchase 500 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 500, reward: 75 },
+  { id: 'techVisionary', name: 'Tech Visionary', description: 'Unlock 75 technologies', check: s => Object.keys(s.tech || {}).length >= 75, reward: 35 },
+  { id: 'hack1000', name: 'Digital Ghost', description: 'Complete 1000 hacks', check: s => (s.hackSuccesses || 0) >= 1000, reward: 30 },
+  { id: 'weave1000', name: 'Weave Transcendent', description: 'Complete 1000 weaves', check: s => (s.totalWeaves || 0) >= 1000, reward: 30 },
+  { id: 'docking1000', name: 'Celestial Navigator', description: 'Land 1000 perfect docks', check: s => (s.dockingPerfects || 0) >= 1000, reward: 30 },
+  { id: 'trade10000', name: 'Universal Merchant', description: 'Complete 10000 trades', check: s => (s.totalTrades || 0) >= 10000, reward: 40 },
+  { id: 'gem25000', name: 'Gem Infinity', description: 'Find 25000 gems', check: s => (s.totalGems || 0) >= 25000, reward: 30 },
+  { id: 'prestigeOmnipotent', name: 'Prestige Omnipotent', description: 'Prestige 500 times', check: s => (s.prestigeCount || 0) >= 500, reward: 200 },
+  { id: 'repeatAddict500', name: 'Infinite Assembly', description: 'Buy any repeatable upgrade 500 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 500), reward: 25 },
+  { id: 'colonyEmpire', name: 'Colony Empire', description: 'Assign 200+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 200; }, reward: 20 },
 ];
