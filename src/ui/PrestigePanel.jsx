@@ -28,6 +28,9 @@ export function PrestigePanel({ state, onUpdate }) {
         </div>
       </div>
 
+      <div className="upgrade-progress-bar" style={{ margin: '4px 0 8px' }}>
+        <div className="upgrade-progress-fill" style={{ width: `${Math.floor(shop.filter(u => u.owned).length / shop.length * 100)}%`, background: 'linear-gradient(90deg, #8844cc, #cc44aa)' }} />
+      </div>
       <h3>Upgrades ({shop.filter(u => u.owned).length}/{shop.length})</h3>
       <div className="prestige-shop">
         {shop.map(u => (
