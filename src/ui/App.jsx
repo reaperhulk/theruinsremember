@@ -148,6 +148,28 @@ export function App() {
           }}>
             Export
           </button>
+          <button className="reset-btn" onClick={() => {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = '.json';
+            input.onchange = (e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = (ev) => {
+                try {
+                  const data = JSON.parse(ev.target.result);
+                  if (data.era && data.resources) {
+                    localStorage.setItem('incremental-game-save', ev.target.result);
+                    window.location.reload();
+                  }
+                } catch { alert('Invalid save file'); }
+              };
+              reader.readAsText(file);
+            };
+            input.click();
+          }}>
+            Import
+          </button>
           <button className="reset-btn" onClick={() => { if (confirm('Hard reset? This erases ALL progress including prestige!')) resetSave(); }}>
             Reset
           </button>
