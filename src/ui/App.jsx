@@ -170,7 +170,7 @@ export function App() {
           }}>
             Import
           </button>
-          <button className="reset-btn" onClick={() => { if (confirm('Hard reset? This erases ALL progress including prestige!')) resetSave(); }}>
+          <button className="reset-btn" onClick={() => { if (confirm('Hard reset?\nThis erases ALL progress including prestige upgrades!')) resetSave(); }}>
             Reset
           </button>
         </div>
