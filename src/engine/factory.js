@@ -59,7 +59,8 @@ export function getFactoryBonus(state) {
   const allFilled = LINES.every(line => (alloc[line] || 0) > 0);
   const efficiencyMult = allFilled ? 1.5 : 1;
   const hasFactoryExpert = state.prestigeUpgrades && state.prestigeUpgrades.factoryExpert;
-  const prestigeMult = hasFactoryExpert ? 2 : 1;
+  const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
+  const prestigeMult = (hasFactoryExpert ? 2 : 1) * (hasSavant ? 1.5 : 1);
   // Full capacity bonus: x2 when all worker slots used
   const totalAssigned = LINES.reduce((sum, l) => sum + (alloc[l] || 0), 0);
   const maxWorkers = getMaxWorkers(state);
