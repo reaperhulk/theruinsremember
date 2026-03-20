@@ -24,7 +24,7 @@ export function PrestigePanel({ state, onUpdate }) {
         </div>
         <div className="stat-row">
           <span>Next Prestige:</span>
-          <span>+{summary.points} pts, x{summary.bonus.toFixed(1)} mult{state.era < 10 ? ' (reach Era 10 first)' : ''}</span>
+          <span>+{summary.points} pts, x{summary.bonus.toFixed(1)} → total x{summary.newMultiplier.toFixed(1)}{state.era < 10 ? ' (Era 10 needed)' : ''}</span>
         </div>
       </div>
 
