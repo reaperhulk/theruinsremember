@@ -83,7 +83,7 @@ export function WeavingPanel({ state, onUpdate }) {
       )}
       {lastMatch && (
         <div className="hack-result success">
-          Woven {lastMatch}! x2 {lastMatch === 'temporal' ? 'cosmicPower' : lastMatch === 'spatial' ? 'exoticMatter' : lastMatch === 'causal' ? 'universalConstants' : 'realityFragments'} for 60s
+          Woven {lastMatch}! Boosting {lastMatch === 'temporal' ? 'Cosmic Power' : lastMatch === 'spatial' ? 'Exotic Matter' : lastMatch === 'causal' ? 'Universal Constants' : 'Reality Fragments'} for 60s
         </div>
       )}
       <div className="weave-controls">
