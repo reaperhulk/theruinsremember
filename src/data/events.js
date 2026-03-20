@@ -1032,6 +1032,42 @@ export const events = {
     type: 'instant',
     effect: { resourceId: 'quantumEchoes', amount: 100 },
   },
+
+  // --- 16 new events ---
+
+  // Era 2
+  apprenticeGuild: { id: 'apprenticeGuild', name: 'Apprentice Guild', description: 'A guild of apprentices boosts labor productivity!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'labor', rateMultBonus: 5 } },
+  coalDiscovery: { id: 'coalDiscovery', name: 'Coal Discovery', description: 'A massive coal deposit is discovered — energy reserves soar!', minEra: 2, type: 'instant', effect: { resourceId: 'energy', amount: 60 } },
+
+  // Era 3
+  cryptoMiningBoom: { id: 'cryptoMiningBoom', name: 'Crypto Mining Boom', description: 'A crypto boom drives electronics and data production!', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'electronics', rateMultBonus: 5 } },
+  openDataInitiative: { id: 'openDataInitiative', name: 'Open Data Initiative', description: 'Governments release massive datasets — data floods in!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 50 } },
+
+  // Era 4
+  titanExpedition: { id: 'titanExpedition', name: 'Titan Expedition', description: 'An expedition to Titan uncovers exotic fuel reserves!', minEra: 4, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 150 } },
+  solarWindSurge: { id: 'solarWindSurge', name: 'Solar Wind Surge', description: 'Intense solar winds supercharge orbital infrastructure!', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'orbitalInfra', rateMultBonus: 5 } },
+
+  // Era 5
+  iceGiantMining: { id: 'iceGiantMining', name: 'Ice Giant Mining', description: 'Mining operations on Uranus yield exotic materials!', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 70 } },
+  gravityLensing: { id: 'gravityLensing', name: 'Gravity Lensing', description: 'Gravitational lensing reveals hidden colonies!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'colonies', rateMultBonus: 4 } },
+
+  // Era 6
+  stellarNova: { id: 'stellarNova', name: 'Stellar Nova', description: 'A nearby nova scatters dark energy across your territory!', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 60 } },
+  firstContactProtocol: { id: 'firstContactProtocol', name: 'First Contact Protocol', description: 'Alien contact protocols yield galactic influence!', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'galacticInfluence', rateMultBonus: 4 } },
+
+  // Era 7
+  stellarQuake: { id: 'stellarQuake', name: 'Stellar Quake', description: 'A stellar quake shakes loose megastructure materials!', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 10 } },
+  dysonFlare: { id: 'dysonFlare', name: 'Dyson Flare', description: 'A Dyson sphere flare overcharges the stellar forge!', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'stellarForge', rateMultBonus: 8 } },
+
+  // Era 8
+  galacticRenaissance: { id: 'galacticRenaissance', name: 'Galactic Renaissance', description: 'A cultural renaissance sweeps the galaxy — influence explodes!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'galacticInfluence', rateMultBonus: 7 } },
+  exoticMatterCascade: { id: 'exoticMatterCascade', name: 'Exotic Matter Cascade', description: 'A cascade reaction multiplies exotic matter yield!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 100 } },
+
+  // Era 9
+  cosmicDawn: { id: 'cosmicDawn', name: 'Cosmic Dawn', description: 'The dawn of a new cosmic epoch — cosmic power surges!', minEra: 9, type: 'timed', duration: 55, effect: { resourceId: 'cosmicPower', rateMultBonus: 7 } },
+
+  // Era 10
+  omniversalBloom: { id: 'omniversalBloom', name: 'Omniversal Bloom', description: 'All realities bloom simultaneously — reality fragments rain down!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
 };
 
 // Get events eligible for the current era

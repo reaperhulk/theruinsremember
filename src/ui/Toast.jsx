@@ -35,11 +35,11 @@ export function Toast({ state }) {
 
     if (newToasts.length > 0) {
       setToasts(prev => [...prev, ...newToasts].slice(-5));
-      // Auto-remove after 3 seconds
+      // Auto-remove after 4 seconds (longer for readability)
       const ids = newToasts.map(t => t.id);
       setTimeout(() => {
         setToasts(prev => prev.filter(t => !ids.includes(t.id)));
-      }, 3000);
+      }, 4000);
     }
   }, [state.era, state.totalGems, state.eventLog?.length]);
 

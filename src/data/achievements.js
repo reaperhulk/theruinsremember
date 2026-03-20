@@ -152,4 +152,18 @@ export const achievements = [
   { id: 'starNetwork25', name: 'Cosmic Web', description: 'Create 25 star routes', check: s => (s.starRoutes?.length || 0) >= 25, reward: 10 },
   { id: 'colonyOverlord', name: 'Colony Overlord', description: 'Assign 50+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 50; }, reward: 10 },
   { id: 'marathon72', name: 'Endurance', description: 'Play for 72 hours total', check: s => s.totalTime >= 259200, reward: 15 },
+
+  // --- 12 new achievements ---
+  { id: 'septillion', name: 'Septillionaire', description: 'Have 1 septillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e24), reward: 25 },
+  { id: 'speedrunEra2', name: 'Quick Start', description: 'Reach Era 2 in under 2 minutes', check: s => s.era >= 2 && (s.bestEraTimes?.[2] || Infinity) < 120, reward: 3 },
+  { id: 'upgrade350', name: 'Upgrade Ascendant', description: 'Purchase 350 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 350, reward: 50 },
+  { id: 'techOmniscient', name: 'Tech Omniscient', description: 'Unlock 65 technologies', check: s => Object.keys(s.tech || {}).length >= 65, reward: 25 },
+  { id: 'hack300', name: 'Cyber Overlord', description: 'Complete 300 hacks', check: s => (s.hackSuccesses || 0) >= 300, reward: 20 },
+  { id: 'weave300', name: 'Weave Overlord', description: 'Complete 300 weaves', check: s => (s.totalWeaves || 0) >= 300, reward: 20 },
+  { id: 'docking300', name: 'Fleet Admiral', description: 'Land 300 perfect docks', check: s => (s.dockingPerfects || 0) >= 300, reward: 20 },
+  { id: 'trade2000', name: 'Trade Emperor', description: 'Complete 2000 trades', check: s => (s.totalTrades || 0) >= 2000, reward: 25 },
+  { id: 'repeatAddict100', name: 'Industrial God', description: 'Buy any repeatable upgrade 100 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 100), reward: 15 },
+  { id: 'colonyGod', name: 'Colony God', description: 'Assign 100+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 100; }, reward: 15 },
+  { id: 'starNetwork50', name: 'Universal Highway', description: 'Create 50 star routes', check: s => (s.starRoutes?.length || 0) >= 50, reward: 15 },
+  { id: 'prestigeEternal', name: 'Prestige Eternal', description: 'Prestige 200 times', check: s => (s.prestigeCount || 0) >= 200, reward: 100 },
 ];
