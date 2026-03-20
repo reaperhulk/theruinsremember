@@ -38,7 +38,8 @@ export function MiningPanel({ state, onUpdate }) {
         Mine for Gems
       </button>
       <p className="mining-hint">
-        Each miss increases chance by 2% (max 50%) — press Space to mine
+        Each miss +2% chance (max 50%) | Space to mine
+        {gems > 0 && ` | ${gems} gems = ${(gems * 5).toFixed(0)}x bonus materials`}
       </p>
     </div>
   );
