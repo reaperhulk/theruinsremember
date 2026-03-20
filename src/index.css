@@ -602,6 +602,12 @@ canvas:hover {
   gap: 8px;
   padding: 4px;
   background: rgba(40, 40, 60, 0.5);
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.factory-line:hover {
+  background: rgba(50, 50, 80, 0.6);
 }
 
 .line-label {
