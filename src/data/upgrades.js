@@ -866,7 +866,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 20 },
       { type: 'production_add', target: 'universalConstants', value: 20 },
     ],
-    description: 'Reflect reality upon itself — triple all multiverse resources',
+    description: 'Reflect reality upon itself — +20/s to echoes, fragments, and constants',
     prerequisites: ['dimensionalAnchors'],
   },
   multiversalHarmony: {
@@ -1018,7 +1018,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 40 },
       { type: 'production_add', target: 'universalConstants', value: 2 },
     ],
-    description: 'Weave the fabric of reality — x5 fragments and steady constants',
+    description: 'Weave the fabric of reality — +40 fragments/s and steady constants',
     prerequisites: ['parallelProcessing'],
   },
   omnipotence: {
@@ -1029,7 +1029,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 150 },
       { type: 'production_add', target: 'darkEnergy', value: 150 },
     ],
-    description: 'Achieve omnipotence — x20 to all cosmic-tier production',
+    description: 'Achieve omnipotence — +150/s to cosmic power, exotic matter, and dark energy',
     prerequisites: ['infiniteResonance'],
   },
   omniversalTrade: {
@@ -1050,7 +1050,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 40 },
       { type: 'production_add', target: 'universalConstants', value: 1 },
     ],
-    description: 'Weave dimensions together — x5 reality fragments and bonus constants',
+    description: 'Weave dimensions together — +40 reality fragments/s and bonus constants',
     prerequisites: ['realityFabric'],
   },
   quantumSymphony: {
@@ -1060,7 +1060,7 @@ export const upgrades = {
       { type: 'production_add', target: 'quantumEchoes', value: 75 },
       { type: 'production_add', target: 'cosmicPower', value: 75 },
     ],
-    description: 'Harmonize quantum echoes across realities — x10 echoes and cosmic power',
+    description: 'Harmonize quantum echoes across realities — +75 echoes/s and +75 cosmic power/s',
     prerequisites: ['singularityCore'],
   },
   multiversalLibrary: {
@@ -1071,7 +1071,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 400 },
       { type: 'production_add', target: 'software', value: 400 },
     ],
-    description: 'Collect all knowledge across all realities — x100 to digital resources',
+    description: 'Collect all knowledge across all realities — +400/s to research, data, and software',
     prerequisites: ['parallelProcessing'],
   },
   eternityEngine: {
@@ -1201,7 +1201,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 9.6 },
       { type: 'production_add', target: 'data', value: 3 },
     ],
-    description: 'Sensors spanning star systems — x5 research and +3 data/s',
+    description: 'Sensors spanning star systems — +9.6 research/s and +3 data/s',
     prerequisites: ['matrioshkaBrain'],
   },
   neutronStarForge: {
@@ -1221,7 +1221,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 9.6 },
       { type: 'production_add', target: 'energy', value: 4.8 },
     ],
-    description: 'Particle accelerator powered by a star — x5 research and x3 energy',
+    description: 'Particle accelerator powered by a star — +9.6 research/s and +4.8 energy/s',
     prerequisites: ['neuralUplink'],
   },
   planetaryRing: {
@@ -1241,7 +1241,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 9.6 },
       { type: 'production_add', target: 'megastructures', value: 2.4 },
     ],
-    description: 'AI-controlled Dyson swarms — x5 energy and x2 megastructures',
+    description: 'AI-controlled Dyson swarms — +9.6 energy/s and +2.4 megastructures/s',
     prerequisites: ['cosmicLens'],
   },
   gravitationalWave: {
@@ -1261,7 +1261,7 @@ export const upgrades = {
       { type: 'production_add', target: 'galacticInfluence', value: 9.6 },
       { type: 'production_add', target: 'darkEnergy', value: 2.4 },
     ],
-    description: 'Project power with antimatter — x5 influence and x2 dark energy',
+    description: 'Project power with antimatter — +9.6 influence/s and +2.4 dark energy/s',
     prerequisites: ['galacticSpire'],
   },
   ringWorld: {
@@ -1282,7 +1282,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 4.8 },
       { type: 'production_add', target: 'megastructures', value: 0.1 },
     ],
-    description: 'Permanent warp gates triple star system discovery',
+    description: 'Permanent warp gates boost star system discovery',
     prerequisites: ['matrioshkaBrain'],
   },
   dimensionalForge: {
@@ -1343,7 +1343,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 6.4 },
       { type: 'production_add', target: 'materials', value: 5 },
     ],
-    description: 'Mine across star systems — x5 exotic materials and +5 materials/s',
+    description: 'Mine across star systems — +6.4 exotic materials/s and +5 materials/s',
     prerequisites: ['dysonSwarms'],
   },
   warpConduit: {
@@ -1703,7 +1703,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 8 },
       { type: 'production_add', target: 'exoticMatter', value: 1 },
     ],
-    description: 'Generate stable wormholes — x3 star systems',
+    description: 'Generate stable wormholes — +8 star systems/s and +1 exotic matter/s',
     prerequisites: ['wormholeNetwork'],
   },
   civilizationNetwork: {
@@ -1714,7 +1714,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 4 },
       { type: 'production_add', target: 'data', value: 2 },
     ],
-    description: 'Connect all civilizations — double influence and research',
+    description: 'Connect all civilizations — boost influence, research, and data',
     prerequisites: ['galacticSenate'],
   },
   darkMatterConduit: {
@@ -1734,7 +1734,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 8 },
       { type: 'production_add', target: 'galacticInfluence', value: 4 },
     ],
-    description: 'Highways between star systems — x3 systems and x2 influence',
+    description: 'Highways between star systems — +8 systems/s and +4 influence/s',
     prerequisites: ['wormholeGenerator'],
   },
   quantumFabric: {
@@ -1744,7 +1744,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 8 },
       { type: 'production_add', target: 'research', value: 8 },
     ],
-    description: 'Weave quantum fabric — triple exotic matter and research',
+    description: 'Weave quantum fabric — +8 exotic matter/s and +8 research/s',
     prerequisites: ['voidAntenna'],
   },
   singularityHarvester: {
@@ -1795,7 +1795,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 6.4 },
       { type: 'production_add', target: 'software', value: 6.4 },
     ],
-    description: 'Interstellar neural computing — x5 electronics and software',
+    description: 'Interstellar neural computing — +6.4 electronics/s and +6.4 software/s',
     prerequisites: ['stellarCartography'],
   },
   energyMatrix: {
@@ -1981,7 +1981,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 9.6 },
       { type: 'production_add', target: 'software', value: 9.6 },
     ],
-    description: 'Computing at stellar scale — x5 data and software',
+    description: 'Computing at stellar scale — +9.6 data/s and +9.6 software/s',
     prerequisites: ['quantumEntangledSensors'],
   },
   photonSail: {
@@ -2054,10 +2054,10 @@ export const upgrades = {
   gravitySiphon: { id: 'gravitySiphon', name: 'Gravity Siphon', era: 5, cost: { rocketFuel: 40, energy: 50, research: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 4 }, { type: 'production_add', target: 'darkEnergy', value: 0.1 }], description: 'Siphon energy from gravity wells', prerequisites: ['dysonBubble'] },
   cometHarvester: { id: 'cometHarvester', name: 'Comet Harvester', era: 5, cost: { orbitalInfra: 20, rocketFuel: 30, materials: 100 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 0.5 }, { type: 'production_add', target: 'food', value: 2 }], description: 'Harvest comets for exotic ice and organic compounds', prerequisites: ['oortCloudMining'] },
   graviticLoom: { id: 'graviticLoom', name: 'Gravitic Loom', era: 6, cost: { darkEnergy: 30, exoticMaterials: 40, starSystems: 5 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 3.2 }, { type: 'production_add', target: 'darkEnergy', value: 0.5 }], description: 'Weave exotic materials using gravity — boosts output', prerequisites: ['fusionReactor'] },
-  stellarAcademy: { id: 'stellarAcademy', name: 'Stellar Academy', era: 6, cost: { research: 80, galacticInfluence: 20, starSystems: 4 }, effects: [{ type: 'production_add', target: 'research', value: 6.4 }, { type: 'production_add', target: 'galacticInfluence', value: 0.3 }], description: 'Train across star systems — x5 research', prerequisites: ['aiGovernance'] },
+  stellarAcademy: { id: 'stellarAcademy', name: 'Stellar Academy', era: 6, cost: { research: 80, galacticInfluence: 20, starSystems: 4 }, effects: [{ type: 'production_add', target: 'research', value: 6.4 }, { type: 'production_add', target: 'galacticInfluence', value: 0.3 }], description: 'Train across star systems — +6.4 research/s and +0.3 influence/s', prerequisites: ['aiGovernance'] },
   voidProbe: { id: 'voidProbe', name: 'Void Probe', era: 6, cost: { darkEnergy: 25, starSystems: 3, electronics: 40 }, effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }, { type: 'production_add', target: 'data', value: 1 }], description: 'Probes into the void discover systems and transmit data', prerequisites: ['stellarCartography'] },
   chronoForge: { id: 'chronoForge', name: 'Chrono Forge', era: 7, cost: { stellarForge: 15, megastructures: 5, darkEnergy: 40 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 4.8 }, { type: 'production_add', target: 'materials', value: 9.6 }], description: 'Forge materials across timelines — x3 stellar and x5 materials', prerequisites: ['starLifting'] },
-  galacticSpire: { id: 'galacticSpire', name: 'Galactic Spire', era: 7, cost: { megastructures: 8, research: 100, galacticInfluence: 30 }, effects: [{ type: 'production_add', target: 'megastructures', value: 2.4 }, { type: 'production_add', target: 'galacticInfluence', value: 4.8 }], description: 'A spire visible across the galaxy — doubles megastructures', prerequisites: ['chronoAccelerator'] },
+  galacticSpire: { id: 'galacticSpire', name: 'Galactic Spire', era: 7, cost: { megastructures: 8, research: 100, galacticInfluence: 30 }, effects: [{ type: 'production_add', target: 'megastructures', value: 2.4 }, { type: 'production_add', target: 'galacticInfluence', value: 4.8 }], description: 'A spire visible across the galaxy — +2.4 megastructures/s and +4.8 influence/s', prerequisites: ['chronoAccelerator'] },
   stellarGarden: { id: 'stellarGarden', name: 'Stellar Garden', era: 7, cost: { stellarForge: 10, colonies: 10, food: 200 }, effects: [{ type: 'production_add', target: 'colonies', value: 1 }, { type: 'production_add', target: 'food', value: 18 }], description: 'Grow food around stars — x10 food and +1 colony/s', prerequisites: ['gravitationalWave'] },
   dimensionalHarvest: { id: 'dimensionalHarvest', name: 'Dimensional Harvest', era: 8, cost: { exoticMatter: 25, darkEnergy: 50, galacticInfluence: 40 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 8 }, { type: 'production_add', target: 'cosmicPower', value: 0.5 }], description: 'Harvest resources from parallel dimensions', prerequisites: ['darkMatterHarvest'] },
   galacticForge: { id: 'galacticForge', name: 'Galactic Forge', era: 8, cost: { exoticMatter: 20, stellarForge: 15, megastructures: 10 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 16 }, { type: 'production_add', target: 'megastructures', value: 8 }], description: 'A forge spanning the galaxy', prerequisites: ['antimatterForge'] },
@@ -2076,7 +2076,7 @@ export const upgrades = {
   // Era 2
   cementFactory: { id: 'cementFactory', name: 'Cement Factory', era: 2, cost: { steel: 18, materials: 22, energy: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.3 }], description: 'Cement production boosts materials and generates steel', prerequisites: ['hydraulicPress'] },
   wirelessTelegraph: { id: 'wirelessTelegraph', name: 'Wireless Telegraph', era: 2, cost: { electronics: 15, research: 12, steel: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Wireless communication boosts research and electronics', prerequisites: ['telegraphLine'] },
-  canningFactory: { id: 'canningFactory', name: 'Canning Factory', era: 2, cost: { steel: 15, food: 20, labor: 15 }, effects: [{ type: 'cap_mult', target: 'food', value: 5 }, { type: 'production_add', target: 'food', value: 0.3 }], description: 'Preserved food doubles output and expands storage x5', prerequisites: ['industrialFarming'] },
+  canningFactory: { id: 'canningFactory', name: 'Canning Factory', era: 2, cost: { steel: 15, food: 20, labor: 15 }, effects: [{ type: 'cap_mult', target: 'food', value: 5 }, { type: 'production_add', target: 'food', value: 0.3 }], description: 'Preserved food boosts output and expands storage x5', prerequisites: ['industrialFarming'] },
 
   // Era 3
   deepLearning: { id: 'deepLearning', name: 'Deep Learning', era: 3, cost: { data: 20, software: 20, research: 25 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.5 }], description: 'Deep learning boosts research and generates software', prerequisites: ['bigData'] },
@@ -2170,7 +2170,7 @@ export const upgrades = {
   // Era 2
 
   // Era 3
-  blockchainLedger: { id: 'blockchainLedger', name: 'Blockchain Ledger', era: 3, cost: { software: 20, data: 15, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'cap_mult', target: 'software', value: 3 }], description: 'Distributed ledger triples data output and expands software capacity', prerequisites: ['blockchain'] },
+  blockchainLedger: { id: 'blockchainLedger', name: 'Blockchain Ledger', era: 3, cost: { software: 20, data: 15, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'cap_mult', target: 'software', value: 3 }], description: 'Distributed ledger boosts data output and expands software capacity', prerequisites: ['blockchain'] },
 
   // Era 4
   marsColony: { id: 'marsColony', name: 'Mars Colony', era: 4, cost: { rocketFuel: 25, steel: 35, food: 50, orbitalInfra: 8 }, effects: [{ type: 'production_add', target: 'research', value: 0.4 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'A Martian outpost provides steady research and materials', prerequisites: ['marsOutpost'] },
@@ -2217,7 +2217,7 @@ export const upgrades = {
 
   // Era 3
   neuralChip: { id: 'neuralChip', name: 'Neural Chip', era: 3, cost: { electronics: 25, software: 20, research: 30 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.8 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Brain-computer interface chips boost electronics and data output', prerequisites: ['roboticsLab'] },
-  meshNetwork: { id: 'meshNetwork', name: 'Mesh Network', era: 3, cost: { software: 18, electronics: 22, data: 14 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.8 }], description: 'Decentralized mesh networks double software and generate steady data', prerequisites: ['fiberOptic'] },
+  meshNetwork: { id: 'meshNetwork', name: 'Mesh Network', era: 3, cost: { software: 18, electronics: 22, data: 14 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.8 }], description: 'Decentralized mesh networks boost software and generate steady data', prerequisites: ['fiberOptic'] },
 
   // Era 4
   plasmaThrusters: { id: 'plasmaThrusters', name: 'Plasma Thrusters', era: 4, cost: { rocketFuel: 22, research: 28, electronics: 18 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }, { type: 'production_add', target: 'orbitalInfra', value: 0.3 }], description: 'Efficient plasma propulsion boosts fuel production and builds infrastructure', prerequisites: ['plasmaEngine'] },
@@ -2261,9 +2261,9 @@ export const upgrades = {
   telegraphNetwork: { id: 'telegraphNetwork', name: 'Telegraph Network', era: 2, cost: { electronics: 14, steel: 18, labor: 20 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.3 }], description: 'Long-distance communication doubles electronics and aids research', prerequisites: ['industrialMemory'] },
 
   // Era 3
-  virtualReality: { id: 'virtualReality', name: 'Virtual Reality', era: 3, cost: { software: 22, electronics: 28, data: 16 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Immersive VR doubles software development and data collection', prerequisites: ['socialMedia'] },
-  quantumComputer: { id: 'quantumComputer', name: 'Quantum Computer', era: 3, cost: { research: 45, electronics: 35, data: 20 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'data', value: 0.8 }], description: 'Quantum computation triples research speed', prerequisites: ['generativeAI'] },
-  socialNetwork: { id: 'socialNetwork', name: 'Social Network', era: 3, cost: { software: 15, data: 12, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Social platforms triple data generation', prerequisites: ['temporalEcho','meshNetwork'] },
+  virtualReality: { id: 'virtualReality', name: 'Virtual Reality', era: 3, cost: { software: 22, electronics: 28, data: 16 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'data', value: 0.4 }], description: 'Immersive VR boosts software development and data collection', prerequisites: ['socialMedia'] },
+  quantumComputer: { id: 'quantumComputer', name: 'Quantum Computer', era: 3, cost: { research: 45, electronics: 35, data: 20 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'data', value: 0.8 }], description: 'Quantum computation boosts research and data output', prerequisites: ['generativeAI'] },
+  socialNetwork: { id: 'socialNetwork', name: 'Social Network', era: 3, cost: { software: 15, data: 12, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Social platforms boost data and software output', prerequisites: ['temporalEcho','meshNetwork'] },
 
   // Era 4
   ionDrive: { id: 'ionDrive', name: 'Ion Drive', era: 4, cost: { rocketFuel: 20, research: 30, electronics: 22 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'Efficient ion propulsion doubles fuel economy', prerequisites: ['plasmaThrusters'] },
@@ -2309,7 +2309,7 @@ export const upgrades = {
   reagentPlant: { id: 'reagentPlant', name: 'Reagent Plant', era: 2, cost: { steel: 18, energy: 22, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Chemical processes generate energy and boost research', prerequisites: ['chemicalWorks'] },
 
   // Era 3
-  generativeAI: { id: 'generativeAI', name: 'Generative AI', era: 3, cost: { software: 28, data: 22, research: 30 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.6 }], description: 'Generative models triple data processing', prerequisites: ['deepLearning'] },
+  generativeAI: { id: 'generativeAI', name: 'Generative AI', era: 3, cost: { software: 28, data: 22, research: 30 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.6 }], description: 'Generative models boost data processing and research', prerequisites: ['deepLearning'] },
   fogComputing: { id: 'fogComputing', name: 'Fog Computing', era: 3, cost: { electronics: 30, software: 18, data: 14 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.4 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Distributed fog nodes boost electronics and software', prerequisites: ['edgeDrones'] },
   distributedLedger: { id: 'distributedLedger', name: 'Distributed Ledger', era: 3, cost: { data: 25, software: 20, energy: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.4 }, { type: 'cap_mult', target: 'data', value: 2 }], description: 'Immutable ledger doubles data output and capacity', prerequisites: ['blockchainLedger'] },
 
