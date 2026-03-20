@@ -27,6 +27,10 @@ export function StatsPanel({ state }) {
           </div>
         )}
         <div className="stat-row">
+          <span>Unlocked Resources</span>
+          <span>{Object.values(state.resources || {}).filter(r => r.unlocked).length}</span>
+        </div>
+        <div className="stat-row">
           <span>Upgrades</span>
           <span>{Object.keys(state.upgrades).length}</span>
         </div>
