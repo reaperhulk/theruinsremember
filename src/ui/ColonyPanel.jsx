@@ -35,7 +35,7 @@ export function ColonyPanel({ state, onUpdate }) {
 
   return (
     <div className="panel colony-panel">
-      <h2>Colonies</h2>
+      <h2>Colonies ({maxColonies} total)</h2>
       <div className="factory-info">
         <span>Colonies: {formatNumber(available)}/{formatNumber(maxColonies)} available</span>
         {maxColonies >= 3 && (
