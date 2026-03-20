@@ -129,7 +129,7 @@ export function App() {
   return (
     <div className={`game-container era-${state.era} ${shakeClass}`}>
       <header className="game-header">
-        <h1>Planet to Multiverse {state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888' }}>Era {state.era}</span>}</h1>
+        <h1>Planet to Multiverse{state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888', marginLeft: '8px' }}>Era {state.era}</span>}</h1>
         <div className="header-controls">
           {state.era >= ERA_COUNT && (
             <button className="prestige-btn" onClick={handlePrestige}>
