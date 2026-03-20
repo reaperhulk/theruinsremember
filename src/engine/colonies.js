@@ -65,13 +65,16 @@ export function getColonyBonus(state) {
   const isDiversified = activeFocuses.length === 3;
   const focusMult = isSpecialized ? 2 : (isDiversified ? 1.25 : 1);
 
+  // Era scaling: colony bonuses increase with era
+  const eraScale = 1 + (state.era - 5) * 0.3; // x1 at era 5, x2.5 at era 10
+
   const bonus = {};
   for (const focus of FOCUS_TYPES) {
     const count = assignments[focus] || 0;
     if (count > 0) {
       const focusBonus = FOCUS_BONUSES[focus];
       for (const [resource, rate] of Object.entries(focusBonus)) {
-        bonus[resource] = (bonus[resource] || 0) + count * rate * focusMult;
+        bonus[resource] = (bonus[resource] || 0) + count * rate * focusMult * eraScale;
       }
     }
   }
