@@ -165,6 +165,7 @@ export function App() {
               if (tab.id === 'upgrades') badge = affordableUpgrades;
               if (tab.id === 'tech') badge = affordableTech;
               if (tab.id === 'mini') badge = activeEffectCount;
+              if (tab.id === 'prestige') badge = state.prestigePoints || 0;
               return (
                 <button
                   key={tab.id}
