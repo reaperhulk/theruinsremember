@@ -69,6 +69,14 @@ export function PrestigePanel({ state, onUpdate }) {
           <span>Lifetime Trades:</span>
           <span>{(state.lifetimeTrades || 0) + (state.totalTrades || 0)}</span>
         </div>
+        <div className="stat-row">
+          <span>Lifetime Play:</span>
+          <span>{Math.floor(((state.lifetimePlayTime || 0) + state.totalTime) / 60)}m</span>
+        </div>
+        <div className="stat-row">
+          <span>Upgrades Owned:</span>
+          <span>{Object.keys(state.upgrades || {}).length} / {Object.keys(state.prestigeUpgrades || {}).length} prestige</span>
+        </div>
       </div>
       {Object.keys(bestTimes).length > 0 && (
         <>
