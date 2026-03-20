@@ -184,7 +184,7 @@ describe('upgrades', () => {
       const state = createInitialState();
       state.era = 2;
       // Set up prereqs
-      state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true, assemblyLines: true, computingLab: true };
+      state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true, assemblyLines: true, computingLab: true, telephoneNetwork: true, printingPress: true };
       state.resources.electronics.amount = 100;
       state.resources.electronics.unlocked = true;
       state.resources.steel.amount = 100;

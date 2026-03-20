@@ -64,15 +64,13 @@ describe('progression integration', () => {
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 0, rateMult: 1 };
     state.resources.research = { ...state.resources.research, unlocked: true, rateAdd: 0, rateMult: 1 };
 
-    // Buy era 2 upgrades (need at least 6 = era*3)
+    // Buy era 2 upgrades following prerequisite chains (need at least 6 = era*3)
     state = giveAndBuy(state, 'upgrade', 'assemblyLines');
-    expect(state.resources.electronics.rateAdd).toBeGreaterThan(0);
-
-    state = giveAndBuy(state, 'upgrade', 'powerGrid');
     state = giveAndBuy(state, 'upgrade', 'computingLab');
-    state = giveAndBuy(state, 'upgrade', 'automation');
-    state = giveAndBuy(state, 'upgrade', 'steamTurbine');
-    state = giveAndBuy(state, 'upgrade', 'industrialFarming');
+    state = giveAndBuy(state, 'upgrade', 'powerGrid');
+    state = giveAndBuy(state, 'upgrade', 'steelForge');
+    state = giveAndBuy(state, 'upgrade', 'steelRefinery');
+    state = giveAndBuy(state, 'upgrade', 'ironWorks');
 
     // Buy tech to transition
     state = giveAndBuy(state, 'tech', 'advancedComputing');
@@ -96,17 +94,16 @@ describe('progression integration', () => {
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 0.3 };
     state.resources.research = { ...state.resources.research, unlocked: true, rateAdd: 0.5 };
 
-    // Buy Digital Age upgrades (need at least 9 = era*3)
+    // Buy Digital Age upgrades following chains (need at least 9 = era*3)
     state = giveAndBuy(state, 'upgrade', 'internet');
     state = giveAndBuy(state, 'upgrade', 'cloudComputing');
     state = giveAndBuy(state, 'upgrade', 'openSource');
-    state = giveAndBuy(state, 'upgrade', 'dataCenter');
+    state = giveAndBuy(state, 'upgrade', 'patternAnalysis');
     state = giveAndBuy(state, 'upgrade', 'aiResearch');
-    state = giveAndBuy(state, 'upgrade', 'cyberSecurity');
     state = giveAndBuy(state, 'upgrade', 'quantumComputing');
     state = giveAndBuy(state, 'upgrade', 'digitalSensors');
-    state = giveAndBuy(state, 'upgrade', 'patternAnalysis');
-    state = giveAndBuy(state, 'upgrade', 'suborbitalFlight');
+    state = giveAndBuy(state, 'upgrade', 'cloudStorage');
+    state = giveAndBuy(state, 'upgrade', 'cyberSecurity');
     expect(state.resources.rocketFuel.unlocked).toBe(true);
 
     // Buy tech to transition

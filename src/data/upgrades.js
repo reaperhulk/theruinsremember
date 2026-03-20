@@ -336,7 +336,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.5 },
     ],
     description: 'Deep space observations accelerate research and data collection',
-    prerequisites: ['spaceStation'],
+    prerequisites: ['solarArrays'],
   },
   launchComplex: {
     id: 'launchComplex', name: 'Launch Complex', era: 4,
@@ -407,7 +407,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 0.5 },
     ],
     description: 'Orbital satellites triple data collection and boost research',
-    prerequisites: ['spaceStation'],
+    prerequisites: ['orbitalTelescope'],
   },
 
   // Era 5: Solar System
@@ -449,14 +449,14 @@ export const upgrades = {
       { type: 'production_mult', target: 'labor', value: 3 },
     ],
     description: 'Optimized biology boosts food and labor output dramatically',
-    prerequisites: ['asteroidMining'],
+    prerequisites: ['terraforming'],
   },
   terraforming: {
     id: 'terraforming', name: 'Terraforming', era: 5,
     cost: { exoticMaterials: 60, research: 150, energy: 200, food: 250 },
     effects: [{ type: 'production_add', target: 'colonies', value: 0.2 }],
     description: 'Make other worlds habitable',
-    prerequisites: ['asteroidMining'],
+    prerequisites: ['outerColony'],
   },
   orbitalHabitat: {
     id: 'orbitalHabitat', name: 'Orbital Habitat', era: 5,
@@ -476,7 +476,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 0.2 },
     ],
     description: 'Nearly limitless energy — gateway to the stars',
-    prerequisites: ['terraforming'],
+    prerequisites: ['geneticEngineering'],
   },
   antimatterDrive: {
     id: 'antimatterDrive', name: 'Antimatter Drive', era: 5,
@@ -486,7 +486,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'exoticMaterials', value: 3 },
     ],
     description: 'Antimatter propulsion — vastly more efficient than fusion',
-    prerequisites: ['fusionPower'],
+    prerequisites: ['solarWindCollector'],
   },
   gravityWell: {
     id: 'gravityWell', name: 'Gravity Well', era: 5,
@@ -931,7 +931,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
     ],
     description: 'A permanent base on the Moon — research and materials',
-    prerequisites: ['marsColony'],
+    prerequisites: ['spaceDebrisCollector'],
   },
   gravitySling: {
     id: 'gravitySling', name: 'Gravity Sling', era: 4,
@@ -1523,7 +1523,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.3 },
     ],
     description: 'Deep coal mining doubles energy and produces materials',
-    prerequisites: ['steelRefinery'],
+    prerequisites: ['powerGrid'],
   },
   communalKitchen: {
     id: 'communalKitchen', name: 'Communal Kitchen', era: 1,
@@ -1624,7 +1624,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 0.2 },
     ],
     description: 'Harvest solar wind for energy and trace exotic materials',
-    prerequisites: ['fuelRefinery','fusionPower'],
+    prerequisites: ['fusionPower'],
   },
   oortCloudMining: {
     id: 'oortCloudMining', name: 'Oort Cloud Mining', era: 5,
@@ -1644,7 +1644,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 0.5 },
     ],
     description: 'A rotating ring station triples orbital infrastructure',
-    prerequisites: ['asteroidMining'],
+    prerequisites: ['titanMining'],
   },
   spaceHabitat: {
     id: 'spaceHabitat', name: 'Space Habitat', era: 5,
@@ -1654,7 +1654,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 2 },
     ],
     description: 'Self-sustaining habitats in space — labor and food in orbit',
-    prerequisites: ['terraforming'],
+    prerequisites: ['marsColony'],
   },
   outerPlanetsMission: {
     id: 'outerPlanetsMission', name: 'Outer Planets Mission', era: 5,
@@ -2137,7 +2137,7 @@ export const upgrades = {
   lightSail: { id: 'lightSail', name: 'Light Sail', era: 4, cost: { electronics: 18, rocketFuel: 12, research: 20 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Light sails double energy and fuel efficiency', prerequisites: ['solarArrays','solarSail'] },
 
   // Era 5
-  heliumMiner: { id: 'heliumMiner', name: 'Helium-3 Miner', era: 5, cost: { rocketFuel: 30, exoticMaterials: 12, energy: 25 }, effects: [{ type: 'production_add', target: 'energy', value: 2 }, { type: 'production_add', target: 'rocketFuel', value: 0.5 }], description: 'Mine helium-3 from gas giants — triple energy and bonus fuel', prerequisites: ['fusionPower'] },
+  heliumMiner: { id: 'heliumMiner', name: 'Helium-3 Miner', era: 5, cost: { rocketFuel: 30, exoticMaterials: 12, energy: 25 }, effects: [{ type: 'production_add', target: 'energy', value: 2 }, { type: 'production_add', target: 'rocketFuel', value: 0.5 }], description: 'Mine helium-3 from gas giants — triple energy and bonus fuel', prerequisites: ['dysonBubble'] },
 
   // Era 6
   darkMatterAntenna: { id: 'darkMatterAntenna', name: 'Dark Matter Antenna', era: 6, cost: { darkEnergy: 28, research: 55, starSystems: 3 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 1.6 }, { type: 'production_add', target: 'research', value: 1 }], description: 'Detect dark matter signals — double dark energy and steady research', prerequisites: ['warpDrive'] },
@@ -2173,7 +2173,7 @@ export const upgrades = {
   blockchainLedger: { id: 'blockchainLedger', name: 'Blockchain Ledger', era: 3, cost: { software: 20, data: 15, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'cap_mult', target: 'software', value: 3 }], description: 'Distributed ledger triples data output and expands software capacity', prerequisites: ['blockchain'] },
 
   // Era 4
-  marsColony: { id: 'marsColony', name: 'Mars Colony', era: 4, cost: { rocketFuel: 25, steel: 35, food: 50, orbitalInfra: 8 }, effects: [{ type: 'production_add', target: 'research', value: 0.4 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'A Martian outpost provides steady research and materials', prerequisites: ['marsOutpost'] },
+  marsColony: { id: 'marsColony', name: 'Mars Colony', era: 4, cost: { rocketFuel: 25, steel: 35, food: 50, orbitalInfra: 8 }, effects: [{ type: 'production_add', target: 'research', value: 0.4 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'A Martian outpost provides steady research and materials', prerequisites: ['terraforming'] },
   orbitalShipyard: { id: 'orbitalShipyard', name: 'Orbital Shipyard', era: 4, cost: { orbitalInfra: 15, steel: 40, electronics: 20 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.3 }], description: 'Build ships in orbit — double infrastructure and steady steel', prerequisites: ['orbitalFactory'] },
 
   // Era 5
@@ -2266,7 +2266,7 @@ export const upgrades = {
   socialNetwork: { id: 'socialNetwork', name: 'Social Network', era: 3, cost: { software: 15, data: 12, electronics: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Social platforms triple data generation', prerequisites: ['temporalEcho','meshNetwork'] },
 
   // Era 4
-  ionDrive: { id: 'ionDrive', name: 'Ion Drive', era: 4, cost: { rocketFuel: 20, research: 30, electronics: 22 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'Efficient ion propulsion doubles fuel economy', prerequisites: ['plasmaThrusters'] },
+  ionDrive: { id: 'ionDrive', name: 'Ion Drive', era: 4, cost: { rocketFuel: 20, research: 30, electronics: 22 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.6 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'Efficient ion propulsion doubles fuel economy', prerequisites: ['lunarBase'] },
   spaceElevator: { id: 'spaceElevator', name: 'Space Elevator', era: 4, cost: { orbitalInfra: 12, steel: 35, energy: 28 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.2 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'A tether to orbit triples infrastructure buildup', prerequisites: ['refueling'] },
   gravityAssist: { id: 'gravityAssist', name: 'Gravity Assist Lab', era: 4, cost: { research: 32, orbitalInfra: 8, rocketFuel: 15 }, effects: [{ type: 'production_add', target: 'research', value: 0.6 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Master gravity slingshots for efficient travel', prerequisites: ['deepSpaceRelay'] },
 
