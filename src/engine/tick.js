@@ -6,6 +6,7 @@ import { getColonyBonus } from './colonies.js';
 import { getRouteBonus } from './starChart.js';
 import { mine } from './mining.js';
 import { checkAchievements } from './achievements.js';
+import { checkComboReset } from './weaving.js';
 
 // Resource consumption rates
 const FOOD_PER_LABOR = 0.3;       // Food consumed per labor/s
@@ -89,6 +90,9 @@ export function tick(state, dt) {
 
   // Expire timed effects
   newState = expireEffects(newState);
+
+  // Check weave combo reset (120s inactivity)
+  newState = checkComboReset(newState);
 
   // Random events (Era 3+)
   const { state: afterEvent, event } = checkForEvent(newState, dt);

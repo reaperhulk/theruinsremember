@@ -2,14 +2,21 @@
 // Assign workers to production lines for bonus output.
 // Workers are drawn from a pool based on labor rate.
 
-const MAX_WORKERS = 10;
+const BASE_MAX_WORKERS = 10;
 const LINES = ['steel', 'electronics', 'research'];
+
+// Max workers scales with era: min(10 + era*2, 30)
+export function getMaxWorkers(state) {
+  const era = state.era || 1;
+  return Math.min(BASE_MAX_WORKERS + era * 2, 30);
+}
 
 // Get available worker pool (based on labor production level)
 export function getWorkerPool(state) {
   const laborRate = state.resources.labor?.rateAdd || 0;
   const laborMult = state.resources.labor?.rateMult || 1;
-  return Math.min(Math.floor((laborRate * laborMult) + 2), MAX_WORKERS);
+  const maxWorkers = getMaxWorkers(state);
+  return Math.min(Math.floor((laborRate * laborMult) + 2), maxWorkers);
 }
 
 // Get current allocation from state

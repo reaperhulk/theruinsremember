@@ -35,6 +35,19 @@ function applyEffects(state, effects) {
         break;
     }
   }
+
+  // Handle production_mult_all as a second pass (no target needed)
+  for (const effect of effects) {
+    if (effect.type === 'production_mult_all') {
+      for (const id of Object.keys(newResources)) {
+        newResources[id] = {
+          ...newResources[id],
+          rateMult: newResources[id].rateMult * effect.value,
+        };
+      }
+    }
+  }
+
   return { ...state, resources: newResources };
 }
 
@@ -97,6 +110,22 @@ export function purchaseUpgrade(state, upgradeId) {
     ...afterEffects,
     upgrades: { ...afterEffects.upgrades, [upgradeId]: newValue },
   };
+}
+
+// Buy as many of a repeatable upgrade as affordable. Returns new state or null.
+export function buyMaxRepeatable(state, upgradeId) {
+  const def = upgradeDefs[upgradeId];
+  if (!def || !def.repeatable) return null;
+
+  let current = state;
+  let purchased = 0;
+  while (true) {
+    const next = purchaseUpgrade(current, upgradeId);
+    if (!next) break;
+    current = next;
+    purchased++;
+  }
+  return purchased > 0 ? current : null;
 }
 
 // Get list of upgrades available to purchase

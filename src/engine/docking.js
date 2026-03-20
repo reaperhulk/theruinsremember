@@ -58,12 +58,15 @@ export function attemptDock(state, position) {
   const hasDockingPro = state.prestigeUpgrades && state.prestigeUpgrades.dockingPro;
   const dockPrestigeMult = hasDockingPro ? 2 : 1;
 
-  // Apply rewards scaled by prestige and combo
+  // Era scaling: later eras give proportionally more docking rewards
+  const eraScale = 1 + (state.era - 4) * 0.25;
+
+  // Apply rewards scaled by prestige, combo, and era
   const newResources = { ...state.resources };
   for (const [resourceId, amount] of Object.entries(rewards)) {
     const r = newResources[resourceId];
     if (r && r.unlocked) {
-      const scaled = amount * state.prestigeMultiplier * comboMult * dockPrestigeMult;
+      const scaled = amount * state.prestigeMultiplier * comboMult * dockPrestigeMult * eraScale;
       newResources[resourceId] = { ...r, amount: r.amount + scaled };
     }
   }

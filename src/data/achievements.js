@@ -109,4 +109,18 @@ export const achievements = [
   { id: 'weaveMaster', name: 'Weave Master', description: 'Complete 50 weaves', check: s => (s.totalWeaves || 0) >= 50, reward: 5 },
   { id: 'gemOverlord', name: 'Gem Overlord', description: 'Find 500 gems', check: s => (s.totalGems || 0) >= 500, reward: 10 },
   { id: 'allPrestige', name: 'Prestige Collector', description: 'Buy all prestige upgrades', check: s => Object.keys(s.prestigeUpgrades || {}).length >= 15, reward: 20 },
+
+  // New achievements
+  { id: 'quadrillion', name: 'Quadrillionaire', description: 'Have 1 quadrillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e15), reward: 10 },
+  { id: 'speedrunEra7', name: 'Dyson Speedrun', description: 'Reach Era 7 in under 15 minutes', check: s => s.era >= 7 && (s.bestEraTimes?.[7] || Infinity) < 900, reward: 7 },
+  { id: 'upgrade160', name: 'Upgrade Tyrant', description: 'Purchase 160 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 160, reward: 20 },
+  { id: 'techScholar', name: 'Tech Scholar', description: 'Unlock 40 technologies', check: s => Object.keys(s.tech || {}).length >= 40, reward: 10 },
+  { id: 'eventSurvivor', name: 'Event Survivor', description: 'Witness 100 events', check: s => (s.eventLog?.length || 0) >= 20 && s.totalTime > 1200, reward: 5 },
+  { id: 'dockCombo10', name: 'Docking Legend', description: 'Reach a 10x docking combo', check: s => (s.dockingCombo || 0) >= 10, reward: 5 },
+  { id: 'weaveCombo5', name: 'Reality Sculptor', description: 'Reach a 5x weave combo', check: s => (s.weaveCombo || 0) >= 5, reward: 5 },
+  { id: 'prestigeGrandmaster', name: 'Prestige Grandmaster', description: 'Prestige 20 times', check: s => (s.prestigeCount || 0) >= 20, reward: 15 },
+  { id: 'trade200', name: 'Trade Mogul', description: 'Complete 200 trades', check: s => (s.totalTrades || 0) >= 200, reward: 10 },
+  { id: 'gem1000', name: 'Gem Deity', description: 'Find 1000 gems', check: s => (s.totalGems || 0) >= 1000, reward: 15 },
+  { id: 'repeatAddict20', name: 'Mass Producer Elite', description: 'Buy any repeatable upgrade 20 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 20), reward: 5 },
+  { id: 'marathon24', name: 'Day Runner', description: 'Play for 24 hours total', check: s => s.totalTime >= 86400, reward: 10 },
 ];

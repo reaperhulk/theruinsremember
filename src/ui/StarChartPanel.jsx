@@ -3,6 +3,7 @@ import { getUnlockedSystems, getRoutes, createRoute, removeRoute, getRouteBonus,
 
 export function StarChartPanel({ state, onUpdate }) {
   const [selected, setSelected] = useState(null);
+  const [hovered, setHovered] = useState(null);
   const systems = getUnlockedSystems(state);
   const routes = getRoutes(state);
   const bonus = getRouteBonus(state);
@@ -46,19 +47,38 @@ export function StarChartPanel({ state, onUpdate }) {
               />
             );
           })}
-          {systems.map(sys => (
-            <g key={sys.id} onClick={() => handleSystemClick(sys.id)} style={{ cursor: 'pointer' }}>
+          {systems.map(sys => {
+            const isHovered = hovered === sys.id;
+            const isSelected = selected === sys.id;
+            const bonusText = Object.entries(sys.bonus)
+              .map(([r, v]) => `${r}: +${v}`)
+              .join(', ');
+            return (
+            <g
+              key={sys.id}
+              onClick={() => handleSystemClick(sys.id)}
+              onMouseEnter={() => setHovered(sys.id)}
+              onMouseLeave={() => setHovered(null)}
+              style={{ cursor: 'pointer' }}
+            >
               <circle
                 cx={sys.x * 100} cy={sys.y * 100}
-                r={selected === sys.id ? 3 : 2}
-                fill={selected === sys.id ? '#ffdd44' : '#88ccff'}
+                r={isSelected ? 3 : isHovered ? 2.5 : 2}
+                fill={isSelected ? '#ffdd44' : isHovered ? '#bbddff' : '#88ccff'}
               />
               <text
                 x={sys.x * 100} y={sys.y * 100 - 4}
                 fill="#aaddff" fontSize="3" textAnchor="middle"
               >{sys.name}</text>
+              {isHovered && (
+                <text
+                  x={sys.x * 100} y={sys.y * 100 + 6}
+                  fill="#ffeeaa" fontSize="2.5" textAnchor="middle"
+                >{bonusText}</text>
+              )}
             </g>
-          ))}
+            );
+          })}
         </svg>
       </div>
       {Object.keys(bonus).length > 0 && (

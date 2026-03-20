@@ -8,19 +8,38 @@ export function HackingPanel({ state, onUpdate }) {
   const [playerInput, setPlayerInput] = useState([]);
   const [lastResult, setLastResult] = useState(null);
   const [sequenceVisible, setSequenceVisible] = useState(true);
+  const [countdown, setCountdown] = useState(0);
   const timerRef = useRef(null);
+  const countdownRef = useRef(null);
   const challenge = state.hackChallenge;
   const successes = state.hackSuccesses || 0;
   const difficulty = state.hackDifficulty || 0;
 
   // When a new challenge starts, show sequence briefly then hide
+  // Also run a countdown timer so the player knows how long they have
   useEffect(() => {
     if (challenge) {
+      const hideMs = Math.max(1000, SHOW_TIME - difficulty * 100);
       setSequenceVisible(true);
+      setCountdown(hideMs / 1000);
+
+      // Countdown interval updates every 100ms
+      countdownRef.current = setInterval(() => {
+        setCountdown(prev => {
+          const next = prev - 0.1;
+          return next > 0 ? next : 0;
+        });
+      }, 100);
+
       timerRef.current = setTimeout(() => {
         setSequenceVisible(false);
-      }, SHOW_TIME - difficulty * 100); // Harder = less time to memorize (min 1s)
-      return () => clearTimeout(timerRef.current);
+        clearInterval(countdownRef.current);
+        setCountdown(0);
+      }, hideMs);
+      return () => {
+        clearTimeout(timerRef.current);
+        clearInterval(countdownRef.current);
+      };
     }
   }, [challenge?.sequence?.join(',')]);
 
@@ -44,8 +63,6 @@ export function HackingPanel({ state, onUpdate }) {
       });
     }
   };
-
-  const showTime = Math.max(1, (SHOW_TIME - difficulty * 100) / 1000);
 
   return (
     <div className="panel hacking-panel">
@@ -74,8 +91,8 @@ export function HackingPanel({ state, onUpdate }) {
                 {sequenceVisible ? s : '?'}
               </span>
             ))}
-            {sequenceVisible && (
-              <span className="hack-timer">({showTime.toFixed(1)}s)</span>
+            {sequenceVisible && countdown > 0 && (
+              <span className="hack-timer">({countdown.toFixed(1)}s)</span>
             )}
           </div>
           <div className="hack-input">

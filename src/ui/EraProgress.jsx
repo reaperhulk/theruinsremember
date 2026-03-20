@@ -1,4 +1,5 @@
 import { eraNames, ERA_COUNT } from '../engine/eras.js';
+import { calculateProduction } from '../engine/resources.js';
 
 function formatTime(seconds) {
   if (seconds < 60) return `${Math.floor(seconds)}s`;
@@ -13,6 +14,12 @@ export function EraProgress({ state }) {
   const isMaxEra = state.era >= ERA_COUNT;
   const upgradeCount = Object.keys(state.upgrades || {}).length;
   const techCount = Object.keys(state.tech || {}).length;
+
+  // Calculate total production rate across all unlocked resources
+  const rates = calculateProduction(state);
+  const totalRate = Object.entries(rates)
+    .filter(([id]) => state.resources[id]?.unlocked)
+    .reduce((sum, [, rate]) => sum + Math.max(0, rate), 0);
 
   return (
     <div className="panel era-panel">
@@ -31,6 +38,9 @@ export function EraProgress({ state }) {
         <span> | Tech: {techCount}</span>
         {state.prestigeMultiplier > 1 && (
           <span> | Prestige: x{state.prestigeMultiplier.toFixed(1)}</span>
+        )}
+        {totalRate > 0 && (
+          <span> | Total: {totalRate.toFixed(1)}/s</span>
         )}
       </div>
     </div>

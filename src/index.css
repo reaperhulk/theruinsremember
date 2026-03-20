@@ -11,6 +11,24 @@ body {
   min-height: 100vh;
 }
 
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .game-container {
   max-width: 900px;
   margin: 0 auto;
@@ -372,11 +390,45 @@ canvas:hover {
 /* Prestige button glow */
 .prestige-btn {
   animation: prestige-glow 2s ease-in-out infinite;
+  background: linear-gradient(135deg, #3a2266, #5533aa);
+  color: #d0b0ff;
+  border: 1px solid #7744cc;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: bold;
+}
+
+.prestige-btn:hover {
+  background: linear-gradient(135deg, #5533aa, #7744cc);
 }
 
 @keyframes prestige-glow {
   0%, 100% { box-shadow: 0 0 5px rgba(180, 100, 255, 0.3); }
   50% { box-shadow: 0 0 15px rgba(180, 100, 255, 0.6); }
+}
+
+/* Reset button styling */
+.reset-btn {
+  background: #3a2020;
+  color: #ff8888;
+  border: 1px solid #5a3030;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85em;
+}
+
+.reset-btn:hover {
+  background: #5a3030;
+}
+
+/* Header title gradient */
+.game-header h1 {
+  background: linear-gradient(90deg, #8be9fd, #bd93f9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Tech exclusion choice highlight */
@@ -632,6 +684,29 @@ canvas:hover {
   background: rgba(200, 0, 0, 0.1);
 }
 
+/* Hack countdown timer */
+.hack-countdown {
+  text-align: center;
+  font-size: 1.2em;
+  color: #ff8866;
+  font-weight: bold;
+  margin: 4px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Star chart tooltip */
+.star-tooltip {
+  position: absolute;
+  background: rgba(10, 10, 30, 0.95);
+  border: 1px solid #4488aa;
+  padding: 4px 8px;
+  font-size: 0.75em;
+  color: #aaddff;
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+}
+
 /* Docking */
 .docking-panel {
   background: #1a1a2e;
@@ -687,7 +762,7 @@ canvas:hover {
   margin-bottom: 4px;
 }
 
-.dock-result.dock-perfect { color: #ffdd44; font-weight: bold; animation: dock-flash 0.3s ease; }
+.dock-result.dock-perfect { color: #ffdd44; font-weight: bold; animation: dock-flash 0.3s ease; text-shadow: 0 0 10px rgba(255, 221, 68, 0.5); }
 .dock-result.dock-good { color: #88dd88; }
 .dock-result.dock-miss { color: #ff8888; }
 
@@ -767,6 +842,13 @@ canvas:hover {
   border: 1px solid #6a3a6a;
   font-weight: bold;
   font-size: 0.9em;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+
+.weave-fragment:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px currentColor;
 }
 
 .weave-controls {
@@ -1003,10 +1085,12 @@ canvas:hover {
 
 .achievement.earned {
   background: rgba(100, 200, 100, 0.08);
+  border-left: 2px solid #88dd88;
 }
 
 .achievement.locked {
   opacity: 0.4;
+  border-left: 2px solid transparent;
 }
 
 .achievement-name {
@@ -1387,5 +1471,22 @@ canvas:hover {
   canvas {
     max-width: 100%;
     height: auto;
+  }
+
+  .game-header h1 {
+    font-size: 1em;
+  }
+
+  .prestige-btn {
+    font-size: 0.8em;
+    padding: 4px 8px;
+  }
+
+  .star-svg {
+    height: 120px;
+  }
+
+  .offline-report {
+    padding: 12px;
   }
 }

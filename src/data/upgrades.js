@@ -2030,6 +2030,228 @@ export const upgrades = {
     prerequisites: ['galaxySeeding'],
     requirePrestige: 2,
   },
+
+  // --- New upgrades ---
+
+  // Era 1
+  potteryKiln: {
+    id: 'potteryKiln', name: 'Pottery Kiln', era: 1,
+    cost: { materials: 22, energy: 12, labor: 10 },
+    effects: [
+      { type: 'cap_mult', target: 'food', value: 2 },
+      { type: 'production_add', target: 'materials', value: 0.4 },
+    ],
+    description: 'Fired clay vessels expand food storage and generate materials',
+    prerequisites: ['basicPower'],
+  },
+  lumberMill: {
+    id: 'lumberMill', name: 'Lumber Mill', era: 1,
+    cost: { materials: 28, labor: 14, energy: 10 },
+    effects: [
+      { type: 'production_mult', target: 'materials', value: 2 },
+      { type: 'production_add', target: 'energy', value: 0.4 },
+    ],
+    description: 'Processed lumber doubles material output and fuels energy',
+    prerequisites: ['tools'],
+  },
+
+  // Era 2
+  hydraulicPress: {
+    id: 'hydraulicPress', name: 'Hydraulic Press', era: 2,
+    cost: { steel: 22, energy: 18, labor: 15 },
+    effects: [
+      { type: 'production_mult', target: 'steel', value: 2 },
+      { type: 'production_add', target: 'materials', value: 0.5 },
+    ],
+    description: 'Hydraulic forging doubles steel and produces raw materials',
+    prerequisites: ['steamTurbine'],
+  },
+  telegraphLine: {
+    id: 'telegraphLine', name: 'Telegraph Line', era: 2,
+    cost: { electronics: 10, steel: 12, energy: 10 },
+    effects: [
+      { type: 'production_add', target: 'research', value: 0.4 },
+      { type: 'production_mult', target: 'electronics', value: 2 },
+    ],
+    description: 'Long-distance communication accelerates research and electronics',
+    prerequisites: ['computingLab'],
+  },
+
+  // Era 3
+  neuralNetwork: {
+    id: 'neuralNetwork', name: 'Neural Network', era: 3,
+    cost: { data: 18, software: 22, research: 30 },
+    effects: [
+      { type: 'production_mult', target: 'software', value: 2 },
+      { type: 'production_mult', target: 'research', value: 2 },
+    ],
+    description: 'Deep neural networks double software and research output',
+    prerequisites: ['machinelearning'],
+  },
+  edgeComputing: {
+    id: 'edgeComputing', name: 'Edge Computing', era: 3,
+    cost: { electronics: 25, data: 12, energy: 18 },
+    effects: [
+      { type: 'production_mult', target: 'data', value: 2 },
+      { type: 'production_add', target: 'electronics', value: 0.5 },
+    ],
+    description: 'Distributed edge nodes double data output and produce electronics',
+    prerequisites: ['cloudComputing'],
+  },
+
+  // Era 4
+  orbitalFactory: {
+    id: 'orbitalFactory', name: 'Orbital Factory', era: 4,
+    cost: { orbitalInfra: 12, steel: 35, electronics: 20 },
+    effects: [
+      { type: 'production_mult', target: 'steel', value: 3 },
+      { type: 'production_add', target: 'orbitalInfra', value: 0.3 },
+    ],
+    description: 'Manufacturing in zero-g triples steel and builds orbital infrastructure',
+    prerequisites: ['spaceStation'],
+  },
+  marsRover: {
+    id: 'marsRover', name: 'Mars Rover', era: 4,
+    cost: { rocketFuel: 18, electronics: 20, research: 20 },
+    effects: [
+      { type: 'production_add', target: 'research', value: 0.5 },
+      { type: 'production_add', target: 'data', value: 0.3 },
+    ],
+    description: 'Robotic rovers on Mars discover new data and boost research',
+    prerequisites: ['rocketScience'],
+  },
+
+  // Era 5
+  cryogenicStorage: {
+    id: 'cryogenicStorage', name: 'Cryogenic Storage', era: 5,
+    cost: { exoticMaterials: 15, energy: 40, research: 30 },
+    effects: [
+      { type: 'cap_mult', target: 'rocketFuel', value: 5 },
+      { type: 'cap_mult', target: 'exoticMaterials', value: 3 },
+    ],
+    description: 'Cryo-tanks massively expand fuel and exotic material storage',
+    prerequisites: ['fusionPower'],
+  },
+  solarSail: {
+    id: 'solarSail', name: 'Solar Sail Fleet', era: 5,
+    cost: { exoticMaterials: 18, energy: 45, orbitalInfra: 15 },
+    effects: [
+      { type: 'production_mult', target: 'colonies', value: 2 },
+      { type: 'production_add', target: 'energy', value: 2 },
+    ],
+    description: 'Light-propelled fleets double colony growth and harvest solar energy',
+    prerequisites: ['asteroidMining'],
+  },
+
+  // Era 6
+  hyperdriveCore: {
+    id: 'hyperdriveCore', name: 'Hyperdrive Core', era: 6,
+    cost: { darkEnergy: 30, exoticMaterials: 40, research: 75 },
+    effects: [
+      { type: 'production_mult', target: 'starSystems', value: 2 },
+      { type: 'production_mult', target: 'darkEnergy', value: 2 },
+    ],
+    description: 'Upgraded hyperdrive doubles star system discovery and dark energy',
+    prerequisites: ['warpDrive'],
+  },
+  xenoBotany: {
+    id: 'xenoBotany', name: 'Xeno-Botany', era: 6,
+    cost: { starSystems: 4, food: 200, research: 60 },
+    effects: [
+      { type: 'production_mult', target: 'food', value: 5 },
+      { type: 'production_add', target: 'exoticMaterials', value: 0.5 },
+    ],
+    description: 'Alien plant life revolutionizes food production and yields exotic materials',
+    prerequisites: ['stellarCartography'],
+  },
+
+  // Era 7
+  stellarComputer: {
+    id: 'stellarComputer', name: 'Stellar Computer', era: 7,
+    cost: { stellarForge: 14, megastructures: 6, research: 90 },
+    effects: [
+      { type: 'production_mult', target: 'data', value: 5 },
+      { type: 'production_mult', target: 'software', value: 5 },
+    ],
+    description: 'Computing at stellar scale — x5 data and software',
+    prerequisites: ['matrioshkaBrain'],
+  },
+  photonSail: {
+    id: 'photonSail', name: 'Photon Sail Armada', era: 7,
+    cost: { megastructures: 5, darkEnergy: 35, energy: 200 },
+    effects: [
+      { type: 'production_add', target: 'starSystems', value: 0.3 },
+      { type: 'production_mult', target: 'colonies', value: 5 },
+    ],
+    description: 'Light-speed armada colonizes new stars rapidly',
+    prerequisites: ['dysonSphere'],
+  },
+
+  // Era 8
+  cosmicSentinel: {
+    id: 'cosmicSentinel', name: 'Cosmic Sentinel', era: 8,
+    cost: { galacticInfluence: 70, exoticMatter: 30, darkEnergy: 50 },
+    effects: [
+      { type: 'production_mult', target: 'galacticInfluence', value: 3 },
+      { type: 'cap_mult', target: 'galacticInfluence', value: 5 },
+    ],
+    description: 'Galaxy-guarding sentinels triple influence and expand its capacity',
+    prerequisites: ['galacticSenate'],
+  },
+  neutroniumRefinery: {
+    id: 'neutroniumRefinery', name: 'Neutronium Refinery', era: 8,
+    cost: { exoticMatter: 25, stellarForge: 15, energy: 200 },
+    effects: [
+      { type: 'production_mult', target: 'exoticMatter', value: 3 },
+      { type: 'production_add', target: 'stellarForge', value: 1 },
+    ],
+    description: 'Refine neutron star matter for exotic materials and forge output',
+    prerequisites: ['darkMatterHarvest'],
+  },
+
+  // Era 9
+  cosmicLoom: {
+    id: 'cosmicLoom', name: 'Cosmic Loom', era: 9,
+    cost: { universalConstants: 12, cosmicPower: 110, realityFragments: 6 },
+    effects: [
+      { type: 'production_add', target: 'realityFragments', value: 0.8 },
+      { type: 'production_mult', target: 'universalConstants', value: 3 },
+    ],
+    description: 'Weave cosmic threads into reality fragments and amplify constants',
+    prerequisites: ['entropyReversal'],
+  },
+  galacticSeed: {
+    id: 'galacticSeed', name: 'Galactic Seed', era: 9,
+    cost: { cosmicPower: 70, exoticMatter: 50, colonies: 20 },
+    effects: [
+      { type: 'production_mult', target: 'colonies', value: 10 },
+      { type: 'production_add', target: 'cosmicPower', value: 2 },
+    ],
+    description: 'Seed entire galaxies with civilizations — massive colony and power boost',
+    prerequisites: ['galaxySeeding'],
+  },
+
+  // Era 10
+  realityCompiler: {
+    id: 'realityCompiler', name: 'Reality Compiler', era: 10,
+    cost: { quantumEchoes: 60, universalConstants: 20, realityFragments: 90 },
+    effects: [
+      { type: 'production_mult', target: 'realityFragments', value: 5 },
+      { type: 'production_mult', target: 'quantumEchoes', value: 3 },
+    ],
+    description: 'Compile raw reality into structured fragments — x5 fragments and x3 echoes',
+    prerequisites: ['parallelProcessing'],
+  },
+  omniversalBeacon: {
+    id: 'omniversalBeacon', name: 'Omniversal Beacon', era: 10,
+    cost: { quantumEchoes: 110, realityFragments: 160, cosmicPower: 450 },
+    effects: [
+      { type: 'production_mult', target: 'cosmicPower', value: 15 },
+      { type: 'production_add', target: 'universalConstants', value: 3 },
+    ],
+    description: 'Broadcast across every reality — x15 cosmic power and +3 constants/s',
+    prerequisites: ['omniscienceEngine'],
+  },
 };
 
 export function getUpgradesForEra(era) {

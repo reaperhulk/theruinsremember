@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost } from '../engine/upgrades.js';
+import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable } from '../engine/upgrades.js';
 import { canAfford } from '../engine/resources.js';
 
 function formatCost(cost) {
@@ -12,6 +12,7 @@ function formatEffects(effects) {
   return effects.map(e => {
     switch (e.type) {
       case 'production_mult': return `x${e.value} ${e.target}`;
+      case 'production_mult_all': return `x${e.value} ALL production`;
       case 'production_add': return `+${e.value} ${e.target}/s`;
       case 'cap_mult': return `x${e.value} ${e.target} cap`;
       case 'unlock_resource': return `Unlock ${e.target}`;
@@ -97,8 +98,8 @@ export function UpgradePanel({ state, onUpdate }) {
           const count = typeof state.upgrades[upgrade.id] === 'number' ? state.upgrades[upgrade.id] : 0;
           const progress = affordable ? 1 : getAffordProgress(state, cost);
           return (
+            <div key={upgrade.id} className="upgrade-row">
             <button
-              key={upgrade.id}
               className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'}`}
               disabled={!affordable}
               onClick={() => onUpdate(s => purchaseUpgrade(s, upgrade.id))}
@@ -117,6 +118,7 @@ export function UpgradePanel({ state, onUpdate }) {
                   let cls = 'effect-tag';
                   switch (e.type) {
                     case 'production_mult': label = `x${e.value} ${e.target}`; cls += ' effect-mult'; break;
+                    case 'production_mult_all': label = `x${e.value} ALL production`; cls += ' effect-mult'; break;
                     case 'production_add': label = `+${e.value} ${e.target}/s`; cls += ' effect-add'; break;
                     case 'cap_mult': label = `x${e.value} ${e.target} cap`; cls += ' effect-cap'; break;
                     case 'unlock_resource': label = `Unlock ${e.target}`; cls += ' effect-unlock'; break;
@@ -133,6 +135,16 @@ export function UpgradePanel({ state, onUpdate }) {
                 </div>
               )}
             </button>
+            {upgrade.repeatable && affordable && (
+              <button
+                className="upgrade-btn buy-max-btn affordable"
+                onClick={() => onUpdate(s => buyMaxRepeatable(s, upgrade.id))}
+                title="Buy as many as you can afford"
+              >
+                Buy Max
+              </button>
+            )}
+            </div>
           );
         })}
       </div>

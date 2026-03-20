@@ -15,6 +15,7 @@ const TYPE_BONUSES = {
 const WEAVE_COST = { realityFragments: 5 };
 const BONUS_DURATION = 60; // seconds
 const CHAOS_CHANCE = 0.15; // 15% chance for chaos (wild card) fragment
+const COMBO_RESET_TIME = 120; // seconds of no weaving before combo resets
 
 // Generate a random fragment type.
 // roll is 0-1 for deterministic testing.
@@ -140,11 +141,23 @@ export function resolveWeave(state) {
       weavingGrid: newGrid,
       totalWeaves: (state.totalWeaves || 0) + 1,
       weaveCombo,
+      lastWeaveTime: state.totalTime,
       activeEffects: [...(state.activeEffects || []), effect],
     },
     matched: true,
     matchType,
   };
+}
+
+// Check if combo should reset due to inactivity (120s).
+// Call this from the tick loop or before weaving.
+export function checkComboReset(state) {
+  if ((state.weaveCombo || 0) === 0) return state;
+  const lastWeaveTime = state.lastWeaveTime || 0;
+  if (state.totalTime - lastWeaveTime >= COMBO_RESET_TIME) {
+    return { ...state, weaveCombo: 0 };
+  }
+  return state;
 }
 
 // Clear the weaving grid (discard fragments)

@@ -387,6 +387,59 @@ export const techTree = {
     effects: [{ type: 'production_mult', target: 'energy', value: 5 }, { type: 'production_mult', target: 'materials', value: 3 }],
     excludes: 'bioEngineering',
   },
+
+  // New optional tech nodes
+  quantumGravity: {
+    id: 'quantumGravity', name: 'Quantum Gravity', era: 5,
+    cost: { research: 90, exoticMaterials: 25, energy: 70 },
+    prerequisites: ['advancedPropulsion'],
+    grantsEra: null,
+    description: 'Unify quantum mechanics and gravity — double colonies and triple orbital infra',
+    effects: [{ type: 'production_mult', target: 'colonies', value: 2 }, { type: 'production_mult', target: 'orbitalInfra', value: 3 }],
+  },
+  darkEnergyManipulation: {
+    id: 'darkEnergyManipulation', name: 'Dark Energy Manipulation', era: 6,
+    cost: { darkEnergy: 40, research: 85, starSystems: 8 },
+    prerequisites: ['galacticCartography'],
+    grantsEra: null,
+    description: 'Directly manipulate dark energy — triple dark energy and double star systems',
+    effects: [{ type: 'production_mult', target: 'darkEnergy', value: 3 }, { type: 'production_mult', target: 'starSystems', value: 2 }],
+  },
+  antimatterTheory: {
+    id: 'antimatterTheory', name: 'Antimatter Theory', era: 4,
+    cost: { research: 45, rocketFuel: 20, energy: 30 },
+    prerequisites: ['interplanetaryNav'],
+    grantsEra: null,
+    description: 'Theoretical antimatter physics — double fuel and triple research',
+    effects: [{ type: 'production_mult', target: 'rocketFuel', value: 2 }, { type: 'production_mult', target: 'research', value: 3 }],
+  },
+  cosmicWeaving: {
+    id: 'cosmicWeaving', name: 'Cosmic Weaving', era: 10,
+    cost: { quantumEchoes: 25, realityFragments: 60, universalConstants: 15 },
+    prerequisites: ['omniversalAwareness'],
+    grantsEra: null,
+    description: 'Weave the fabric of the cosmos — x5 reality fragments and x3 quantum echoes',
+    effects: [{ type: 'production_mult', target: 'realityFragments', value: 5 }, { type: 'production_mult', target: 'quantumEchoes', value: 3 }],
+  },
+  // Era 2 branching: automation vs craftsmanship
+  automationTheory: {
+    id: 'automationTheory', name: 'Automation Theory', era: 2,
+    cost: { research: 25, electronics: 15, steel: 20 },
+    prerequisites: ['advancedComputing'],
+    grantsEra: null,
+    description: 'Full automation — triple labor and double electronics',
+    effects: [{ type: 'production_mult', target: 'labor', value: 3 }, { type: 'production_mult', target: 'electronics', value: 2 }],
+    excludes: 'artisanCrafts',
+  },
+  artisanCrafts: {
+    id: 'artisanCrafts', name: 'Artisan Crafts', era: 2,
+    cost: { research: 25, materials: 20, food: 25 },
+    prerequisites: ['advancedComputing'],
+    grantsEra: null,
+    description: 'Master craftsmanship — triple materials and double food',
+    effects: [{ type: 'production_mult', target: 'materials', value: 3 }, { type: 'production_mult', target: 'food', value: 2 }],
+    excludes: 'automationTheory',
+  },
 };
 
 export function getTechForEra(era) {

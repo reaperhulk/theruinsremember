@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getWorkerPool, allocateWorker, getAllocation, getFactoryBonus } from '../factory.js';
+import { getWorkerPool, getMaxWorkers, allocateWorker, getAllocation, getFactoryBonus } from '../factory.js';
 import { createInitialState } from '../state.js';
 
 describe('factory', () => {
@@ -50,5 +50,35 @@ describe('factory', () => {
     const state = createInitialState();
     state.factoryAllocation = { steel: 2, electronics: 0, research: 0 };
     expect(getFactoryBonus(state)).toEqual({});
+  });
+
+  describe('era-scaled max workers', () => {
+    it('returns 10 + era*2 for low eras', () => {
+      const state = makeEra2State();
+      // era 2: min(10 + 2*2, 30) = 14
+      expect(getMaxWorkers(state)).toBe(14);
+    });
+
+    it('caps at 30 workers for high eras', () => {
+      const state = makeEra2State();
+      state.era = 10;
+      // era 10: min(10 + 10*2, 30) = 30
+      expect(getMaxWorkers(state)).toBe(30);
+    });
+
+    it('allows more workers at higher eras with sufficient labor', () => {
+      const state = makeEra2State();
+      state.era = 5;
+      state.resources.labor.rateAdd = 20;
+      // pool = min(floor(20 * 1) + 2, min(10 + 5*2, 30)) = min(22, 20) = 20
+      expect(getWorkerPool(state)).toBe(20);
+    });
+
+    it('worker pool still limited by labor rate', () => {
+      const state = makeEra2State();
+      state.era = 10;
+      // laborRate = 2, rateMult = 1 => pool = min(floor(2) + 2, 30) = 4
+      expect(getWorkerPool(state)).toBe(4);
+    });
   });
 });
