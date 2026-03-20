@@ -28,14 +28,15 @@ export function EraProgress({ state }) {
         </p>
       )}
       <div className="era-stats">
-        <span>Time played: {formatTime(state.totalTime)}</span>
-        <span> | Upgrades: {upgradeCount}</span>
-        <span> | Tech: {techCount}</span>
+        <span>{formatTime(state.totalTime)}</span>
+        <span> | {upgradeCount} upgrades</span>
+        <span> | {techCount} tech</span>
+        {(state.totalGems || 0) > 0 && <span> | {state.totalGems} gems</span>}
         {state.prestigeMultiplier > 1 && (
-          <span> | Prestige: x{state.prestigeMultiplier.toFixed(1)}</span>
+          <span> | x{state.prestigeMultiplier.toFixed(1)}</span>
         )}
         {totalRate > 0 && (
-          <span> | Total: {formatNumber(totalRate)}/s</span>
+          <span> | {formatNumber(totalRate)}/s</span>
         )}
       </div>
     </div>

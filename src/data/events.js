@@ -1068,6 +1068,41 @@ export const events = {
 
   // Era 10
   omniversalBloom: { id: 'omniversalBloom', name: 'Omniversal Bloom', description: 'All realities bloom simultaneously — reality fragments rain down!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
+
+  // --- 16 new events ---
+
+  // Era 2
+  inventorsFair: { id: 'inventorsFair', name: 'Inventors Fair', description: 'Brilliant minds gather — electronics production accelerated!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'electronics', rateMultBonus: 4 } },
+  floodPlainBounty: { id: 'floodPlainBounty', name: 'Flood Plain Bounty', description: 'Fertile floodplains yield an enormous harvest!', minEra: 2, type: 'instant', effect: { resourceId: 'food', amount: 70 } },
+
+  // Era 3
+  viralAlgorithm: { id: 'viralAlgorithm', name: 'Viral Algorithm', description: 'An algorithm goes viral — software production surges!', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'software', rateMultBonus: 6 } },
+  dataCenterExpansion: { id: 'dataCenterExpansion', name: 'Data Center Expansion', description: 'A new mega data center comes online — data floods in!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 60 } },
+
+  // Era 4
+  microMeteorShower: { id: 'microMeteorShower', name: 'Micro-Meteor Shower', description: 'Tiny meteors carry exotic trace elements — research boosted!', minEra: 4, type: 'timed', duration: 30, effect: { resourceId: 'research', rateMultBonus: 5 } },
+  orbitalManufacturing: { id: 'orbitalManufacturing', name: 'Orbital Manufacturing Surge', description: 'Zero-G manufacturing hits peak — steel output spikes!', minEra: 4, type: 'instant', effect: { resourceId: 'steel', amount: 150 } },
+
+  // Era 5
+  kuiperBeltStrike: { id: 'kuiperBeltStrike', name: 'Kuiper Belt Strike', description: 'Miners hit a massive Kuiper belt deposit — colonies boom!', minEra: 5, type: 'timed', duration: 35, effect: { resourceId: 'colonies', rateMultBonus: 6 } },
+
+  // Era 6
+  warpFieldHarvest: { id: 'warpFieldHarvest', name: 'Warp Field Harvest', description: 'A warp field collapses and releases energy — galactic influence surges!', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'galacticInfluence', rateMultBonus: 5 } },
+  nebularCondensation: { id: 'nebularCondensation', name: 'Nebular Condensation', description: 'A nebula condenses into star-forming clouds — star systems discovered!', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 15 } },
+
+  // Era 7
+  dysonRingAlignment: { id: 'dysonRingAlignment', name: 'Dyson Ring Alignment', description: 'All Dyson rings align — megastructure construction accelerated!', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
+
+  // Era 8
+  cosmicFilamentDiscovery: { id: 'cosmicFilamentDiscovery', name: 'Cosmic Filament Discovery', description: 'A cosmic filament is tapped for exotic matter!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 7 } },
+
+  // Era 9
+  voidWhisper: { id: 'voidWhisper', name: 'Void Whisper', description: 'Whispers from the void reveal universal constants!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 20 } },
+  intergalacticMigration: { id: 'intergalacticMigration', name: 'Intergalactic Migration', description: 'A wave of intergalactic migrants brings cosmic knowledge!', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'cosmicPower', rateMultBonus: 8 } },
+
+  // Era 10
+  realityFracture: { id: 'realityFracture', name: 'Reality Fracture', description: 'A fracture in reality spills quantum echoes everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 150 } },
+  omniversalHarvest: { id: 'omniversalHarvest', name: 'Omniversal Harvest', description: 'All realities contribute to a massive harvest of fragments!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'realityFragments', rateMultBonus: 15 } },
 };
 
 // Get events eligible for the current era
