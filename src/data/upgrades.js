@@ -1111,7 +1111,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 12 },
       { type: 'production_add', target: 'cosmicPower', value: 6 },
     ],
-    description: 'Harvest reality itself — triple fragments and double cosmic power',
+    description: 'Harvest reality itself — +12 fragments/s and +6 cosmic power/s',
     prerequisites: ['entropyHarvester'],
   },
   cosmicMemory: {
@@ -1121,7 +1121,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 45 },
       { type: 'production_add', target: 'universalConstants', value: 0.3 },
     ],
-    description: 'The universe remembers — x10 research from cosmic memory banks',
+    description: 'The universe remembers — +45 research/s and +0.3 constants/s',
     prerequisites: ['universalTranslator'],
   },
   dimensionalTap: {
@@ -1141,7 +1141,7 @@ export const upgrades = {
       { type: 'production_add', target: 'megastructures', value: 45 },
       { type: 'production_add', target: 'exoticMatter', value: 12 },
     ],
-    description: 'A fortress spanning galaxies — x10 megastructures and x3 exotic matter',
+    description: 'A fortress spanning galaxies — +45 megastructures/s and +12 exotic matter/s',
     prerequisites: ['cosmicInfrastructure'],
   },
   temporalBattery: {
@@ -2027,7 +2027,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 40 },
       { type: 'production_add', target: 'quantumEchoes', value: 20 },
     ],
-    description: 'Compile raw reality into structured fragments — x5 fragments and x3 echoes',
+    description: 'Compile raw reality into structured fragments — +40 fragments/s and +20 echoes/s',
     prerequisites: ['multiversalLibrary'],
   },
   omniversalBeacon: {
@@ -2037,7 +2037,7 @@ export const upgrades = {
       { type: 'production_add', target: 'cosmicPower', value: 150 },
       { type: 'production_add', target: 'universalConstants', value: 3 },
     ],
-    description: 'Broadcast across every reality — x15 cosmic power and +3 constants/s',
+    description: 'Broadcast across every reality — +150 cosmic power/s and +3 constants/s',
     prerequisites: ['omniscienceEngine'],
   },
 
@@ -2065,7 +2065,7 @@ export const upgrades = {
   realityScanner: { id: 'realityScanner', name: 'Reality Scanner', era: 9, cost: { universalConstants: 10, cosmicPower: 80, research: 200 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 12 }, { type: 'production_add', target: 'realityFragments', value: 0.2 }], description: 'Scan across realities — triple constants', prerequisites: ['universalFactory'] },
   cosmicArchitect: { id: 'cosmicArchitect', name: 'Cosmic Architect', era: 9, cost: { universalConstants: 12, megastructures: 15, cosmicPower: 120 }, effects: [{ type: 'production_add', target: 'megastructures', value: 45 }, { type: 'production_add', target: 'universalConstants', value: 0.3 }], description: 'Build across the cosmos — x10 megastructures', prerequisites: ['darkMatterLens'] },
   echoChorus: { id: 'echoChorus', name: 'Echo Chorus', era: 10, cost: { quantumEchoes: 60, realityFragments: 100, cosmicPower: 200 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 2 }], description: 'Harmonize echoes across realities — x5 echoes', prerequisites: ['infinityMirror'] },
-  omniversalNexus: { id: 'omniversalNexus', name: 'Omniversal Nexus', era: 10, cost: { quantumEchoes: 100, realityFragments: 150, universalConstants: 30, cosmicPower: 400 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 75 }, { type: 'production_add', target: 'universalConstants', value: 75 }, { type: 'production_add', target: 'exoticMatter', value: 75 }], description: 'The nexus of all realities — x10 cosmic, constants, and exotic', prerequisites: ['omniversalBeacon'] },
+  omniversalNexus: { id: 'omniversalNexus', name: 'Omniversal Nexus', era: 10, cost: { quantumEchoes: 100, realityFragments: 150, universalConstants: 30, cosmicPower: 400 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 75 }, { type: 'production_add', target: 'universalConstants', value: 75 }, { type: 'production_add', target: 'exoticMatter', value: 75 }], description: 'The nexus of all realities — +75/s to cosmic power, constants, and exotic matter', prerequisites: ['omniversalBeacon'] },
 
   // --- 30 new upgrades (3 per era) ---
 
@@ -2202,7 +2202,7 @@ export const upgrades = {
   // Era 10
   infinityWell: { id: 'infinityWell', name: 'Infinity Well', era: 10, cost: { quantumEchoes: 60, realityFragments: 90, cosmicPower: 300 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 20 }, { type: 'production_add', target: 'cosmicPower', value: 40 }], description: 'A well of infinite potential — x3 echoes and x5 cosmic power', prerequisites: ['infinityFount'] },
   realityAnchor: { id: 'realityAnchor', name: 'Reality Anchor', era: 10, cost: { realityFragments: 120, universalConstants: 20, exoticMatter: 80 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 40 }, { type: 'production_add', target: 'universalConstants', value: 20 }], description: 'Anchor realities in place — x5 fragments and x3 constants', prerequisites: ['infinityWellspring'] },
-  omniversalForge: { id: 'omniversalForge', name: 'Omniversal Forge', era: 10, cost: { quantumEchoes: 90, realityFragments: 150, universalConstants: 25 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 40 }, { type: 'production_add', target: 'exoticMatter', value: 40 }], description: 'Forge across all realities — x5 echoes, fragments, and exotic matter', prerequisites: ['omniversalNexus'] },
+  omniversalForge: { id: 'omniversalForge', name: 'Omniversal Forge', era: 10, cost: { quantumEchoes: 90, realityFragments: 150, universalConstants: 25 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 40 }, { type: 'production_add', target: 'exoticMatter', value: 40 }], description: 'Forge across all realities — +40/s to echoes, fragments, and exotic matter', prerequisites: ['omniversalNexus'] },
 
   // --- 33 new upgrades (3+ per era) ---
 

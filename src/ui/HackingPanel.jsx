@@ -112,7 +112,8 @@ export function HackingPanel({ state, onUpdate }) {
             ))}
           </div>
           <div className="hack-reward">
-            Reward: x{challenge.multiplier.toFixed(1)} Data & Software for {state.prestigeUpgrades?.hackMaster ? 60 : 30}s
+            x{challenge.multiplier.toFixed(1)} Data & Software for {state.prestigeUpgrades?.hackMaster ? 60 : 30}s
+            {difficulty > 0 && <span style={{ color: '#888' }}> (difficulty {difficulty})</span>}
           </div>
         </div>
       )}
