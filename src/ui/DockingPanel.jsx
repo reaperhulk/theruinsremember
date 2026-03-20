@@ -57,7 +57,9 @@ export function DockingPanel({ state, onUpdate }) {
       <button className="mine-btn" onClick={handleDock} disabled={onCooldown}>
         {onCooldown ? `Cooldown...` : 'Dock!'}
       </button>
-      <p className="mining-hint">Hit the green zone — consecutive docks increase rewards up to x2</p>
+      <p className="mining-hint">
+        Hit green zone for fuel+infra | Perfect for exotic too | Combo up to x2
+      </p>
     </div>
   );
 }
