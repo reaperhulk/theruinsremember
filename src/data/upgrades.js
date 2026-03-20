@@ -198,8 +198,8 @@ export const upgrades = {
   internet: {
     id: 'internet', name: 'Internet', era: 3,
     cost: { electronics: 80, research: 60 },
-    effects: [{ type: 'production_add', target: 'software', value: 0.5 }],
-    description: 'Global communication network enables software development',
+    effects: [{ type: 'production_add', target: 'software', value: 1.5 }],
+    description: 'Global communication network enables rapid software development',
     prerequisites: ['computingLab'],
   },
   digitalSensors: {
