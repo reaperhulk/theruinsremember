@@ -64,7 +64,7 @@ export function ColonyPanel({ state, onUpdate }) {
               <span className="line-label" style={{ color: focus.color }}>
                 {focus.label}: {count}
               </span>
-              <span className="line-bonus">{focus.desc} each</span>
+              <span className="line-bonus">{count > 0 ? `${focus.desc} x${count}` : focus.desc}</span>
               <div className="line-controls">
                 <button
                   disabled={count <= 0}
