@@ -83,6 +83,12 @@ export function TradingPanel({ state, onUpdate }) {
           <button className="gather-btn" onClick={() => setAmount(10)} style={{ flex: 1 }}>10</button>
           <button className="gather-btn" onClick={() => setAmount(100)} style={{ flex: 1 }}>100</button>
           <button className="gather-btn" onClick={() => setAmount(1000)} style={{ flex: 1 }}>1K</button>
+          {ratio && fromId && (
+            <button className="gather-btn" onClick={() => {
+              const maxAmount = Math.floor(state.resources[fromId]?.amount * (ratio.output / ratio.input));
+              if (maxAmount > 0) setAmount(maxAmount);
+            }} style={{ flex: 1, color: '#ffdd44' }}>Max</button>
+          )}
         </div>
         <button
           className={`trade-btn ${canTrade ? 'affordable' : 'too-expensive'}`}
