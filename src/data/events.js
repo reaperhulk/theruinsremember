@@ -1251,6 +1251,41 @@ export const events = {
   // Era 10
   realityCascade: { id: 'realityCascade', name: 'Reality Cascade', description: 'A cascade of collapsing realities yields unprecedented fragments!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 700 } },
   quantumFlood: { id: 'quantumFlood', name: 'Quantum Flood', description: 'A flood of quantum echoes from infinite parallel selves!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 18 } },
+
+  // --- 16 new events ---
+  // Era 2
+  ironRush: { id: 'ironRush', name: 'Iron Rush', description: 'Prospectors discover a massive iron deposit — steel production surges!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 5 } },
+  inventorsFair: { id: 'inventorsFair', name: 'Inventors Fair', description: 'Brilliant minds gather and share ideas — electronics windfall!', minEra: 2, type: 'instant', effect: { resourceId: 'electronics', amount: 30 } },
+
+  // Era 3
+  aiAwakening: { id: 'aiAwakening', name: 'AI Awakening', description: 'An AI system achieves a new level of insight — research triples!', minEra: 3, type: 'timed', duration: 25, effect: { resourceId: 'research', rateMultBonus: 5 } },
+  dataLake: { id: 'dataLake', name: 'Data Lake Overflow', description: 'Archived data lakes release stored information!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 40 } },
+
+  // Era 4
+  gravitationalSlingshot: { id: 'gravitationalSlingshot', name: 'Gravitational Slingshot', description: 'A perfect planetary alignment boosts fuel efficiency!', minEra: 4, type: 'timed', duration: 30, effect: { resourceId: 'rocketFuel', rateMultBonus: 6 } },
+  spaceStationBoom: { id: 'spaceStationBoom', name: 'Space Station Boom', description: 'A new generation of space stations goes online!', minEra: 4, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 20 } },
+
+  // Era 5
+  exoplanetGoldmine: { id: 'exoplanetGoldmine', name: 'Exoplanet Goldmine', description: 'An exoplanet with extraordinary mineral wealth is discovered!', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 80 } },
+
+  // Era 6
+  hyperlaneBreach: { id: 'hyperlaneBreach', name: 'Hyperlane Breach', description: 'A natural hyperlane opens — rapid star system colonization!', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
+
+  // Era 7
+  stellarRenaissance: { id: 'stellarRenaissance', name: 'Stellar Renaissance', description: 'A cultural renaissance in stellar engineering inspires breakthroughs!', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
+  forgeHarmonic: { id: 'forgeHarmonic', name: 'Forge Harmonic', description: 'All stellar forges achieve harmonic resonance!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 25 } },
+
+  // Era 8
+  influenceTide: { id: 'influenceTide', name: 'Influence Tide', description: 'A tide of political goodwill sweeps the galaxy!', minEra: 8, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 200 } },
+  exoticMatterStorm: { id: 'exoticMatterStorm', name: 'Exotic Matter Storm', description: 'A storm of exotic matter sweeps through your territory!', minEra: 8, type: 'timed', duration: 40, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
+
+  // Era 9
+  cosmicConvergence: { id: 'cosmicConvergence', name: 'Cosmic Convergence', description: 'Cosmic forces converge — universal constants multiply!', minEra: 9, type: 'timed', duration: 45, effect: { resourceId: 'universalConstants', rateMultBonus: 8 } },
+  voidRipple: { id: 'voidRipple', name: 'Void Ripple', description: 'A ripple through the void yields a burst of cosmic power!', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 300 } },
+
+  // Era 10
+  realityBloom: { id: 'realityBloom', name: 'Reality Bloom', description: 'Realities bloom like flowers — fragments rain from everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
+  echoSymphony: { id: 'echoSymphony', name: 'Echo Symphony', description: 'Infinite echoes sing in harmony — quantum echoes amplified beyond measure!', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
 };
 
 // Get events eligible for the current era

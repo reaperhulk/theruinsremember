@@ -787,8 +787,9 @@ canvas:hover {
 .dock-bar {
   position: relative;
   height: 30px;
-  background: #111;
+  background: linear-gradient(180deg, #0a0a0a, #1a1a1a);
   border: 1px solid #333;
+  border-radius: 4px;
   margin-bottom: 8px;
   overflow: hidden;
 }
