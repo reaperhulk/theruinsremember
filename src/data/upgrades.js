@@ -2129,7 +2129,7 @@ export const upgrades = {
 
   // Era 3
   roboticsLab: { id: 'roboticsLab', name: 'Robotics Lab', era: 3, cost: { research: 25, electronics: 18, software: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 1.6 }, { type: 'production_add', target: 'electronics', value: 0.5 }], description: 'Advanced robotics multiplies labor x5 and generates electronics', prerequisites: ['autonomousDrone'] },
-  edgeDrones: { id: 'edgeDrones', name: 'Edge Drones', era: 3, cost: { electronics: 20, software: 14, data: 12 }, effects: [{ type: 'production_add', target: 'data', value: 0.4 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Edge computing drones double data and generate electronics', prerequisites: ['energyMatrix'] },
+  edgeDrones: { id: 'edgeDrones', name: 'Edge Drones', era: 3, cost: { electronics: 20, software: 14, data: 12 }, effects: [{ type: 'production_add', target: 'data', value: 0.4 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Edge computing drones boost data and generate electronics', prerequisites: ['energyMatrix'] },
 
   // Era 4
   marsOutpost: { id: 'marsOutpost', name: 'Mars Outpost', era: 4, cost: { rocketFuel: 25, steel: 35, food: 30 }, effects: [{ type: 'production_add', target: 'research', value: 0.5 }, { type: 'production_add', target: 'exoticMaterials', value: 0.1 }], description: 'A Martian outpost yields research and trace exotic materials', prerequisites: ['marsRover'] },
@@ -2212,7 +2212,7 @@ export const upgrades = {
 
   // Era 2
   blastFurnace: { id: 'blastFurnace', name: 'Blast Furnace', era: 2, cost: { steel: 20, energy: 22, materials: 18 }, effects: [{ type: 'production_add', target: 'steel', value: 0.6 }, { type: 'production_add', target: 'energy', value: 0.5 }], description: 'Industrial blast furnaces triple steel output with waste heat recovery', prerequisites: ['oilRefinery'] },
-  railroadExpansion: { id: 'railroadExpansion', name: 'Railroad Expansion', era: 2, cost: { steel: 18, labor: 22, materials: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'food', value: 0.3 }], description: 'Extended rail lines triple material transport and double food distribution', prerequisites: ['laborUnion'] },
+  railroadExpansion: { id: 'railroadExpansion', name: 'Railroad Expansion', era: 2, cost: { steel: 18, labor: 22, materials: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'food', value: 0.3 }], description: 'Extended rail lines boost material transport and food distribution', prerequisites: ['laborUnion'] },
   clockwork: { id: 'clockwork', name: 'Clockwork Automation', era: 2, cost: { electronics: 12, steel: 15, research: 8 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.3 }, { type: 'production_add', target: 'labor', value: 0.3 }], description: 'Precision clockwork mechanisms automate delicate tasks', prerequisites: ['wirelessTelegraph'] },
 
   // Era 3
@@ -2306,11 +2306,11 @@ export const upgrades = {
 
   // Era 2
   railroadNetwork: { id: 'railroadNetwork', name: 'Railroad Network', era: 2, cost: { steel: 24, materials: 20, labor: 22 }, effects: [{ type: 'production_add', target: 'materials', value: 0.3 }, { type: 'production_add', target: 'steel', value: 0.3 }], description: 'Rail transport boosts materials and steel throughput', prerequisites: ['ironWorks'] },
-  reagentPlant: { id: 'reagentPlant', name: 'Reagent Plant', era: 2, cost: { steel: 18, energy: 22, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Chemical processes double energy and boost research', prerequisites: ['chemicalWorks'] },
+  reagentPlant: { id: 'reagentPlant', name: 'Reagent Plant', era: 2, cost: { steel: 18, energy: 22, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.3 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Chemical processes generate energy and boost research', prerequisites: ['chemicalWorks'] },
 
   // Era 3
   generativeAI: { id: 'generativeAI', name: 'Generative AI', era: 3, cost: { software: 28, data: 22, research: 30 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.6 }], description: 'Generative models triple data processing', prerequisites: ['deepLearning'] },
-  fogComputing: { id: 'fogComputing', name: 'Fog Computing', era: 3, cost: { electronics: 30, software: 18, data: 14 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.4 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Distributed fog nodes double electronics and software', prerequisites: ['edgeDrones'] },
+  fogComputing: { id: 'fogComputing', name: 'Fog Computing', era: 3, cost: { electronics: 30, software: 18, data: 14 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.4 }, { type: 'production_add', target: 'software', value: 0.4 }], description: 'Distributed fog nodes boost electronics and software', prerequisites: ['edgeDrones'] },
   distributedLedger: { id: 'distributedLedger', name: 'Distributed Ledger', era: 3, cost: { data: 25, software: 20, energy: 18 }, effects: [{ type: 'production_add', target: 'data', value: 0.4 }, { type: 'cap_mult', target: 'data', value: 2 }], description: 'Immutable ledger doubles data output and capacity', prerequisites: ['blockchainLedger'] },
 
   // Era 4
@@ -2354,12 +2354,12 @@ export const upgrades = {
 
   // Era 2
   canalSystem: { id: 'canalSystem', name: 'Canal System', era: 2, cost: { steel: 18, materials: 25, labor: 20 }, effects: [{ type: 'production_add', target: 'food', value: 0.3 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'Canals transport goods and irrigate distant fields', prerequisites: ['textileFactory'] },
-  dynamoGenerator: { id: 'dynamoGenerator', name: 'Dynamo Generator', era: 2, cost: { steel: 22, electronics: 8, energy: 15 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'electronics', value: 0.2 }], description: 'Electromagnetic generators triple energy and produce electronics', prerequisites: ['blastFurnace'] },
-  laborUnion: { id: 'laborUnion', name: 'Labor Union', era: 2, cost: { food: 25, labor: 20, materials: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 0.6 }, { type: 'cap_mult', target: 'labor', value: 2 }], description: 'Organized labor triples output and doubles capacity', prerequisites: ['conveyor'] },
+  dynamoGenerator: { id: 'dynamoGenerator', name: 'Dynamo Generator', era: 2, cost: { steel: 22, electronics: 8, energy: 15 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'electronics', value: 0.2 }], description: 'Electromagnetic generators boost energy and produce electronics', prerequisites: ['blastFurnace'] },
+  laborUnion: { id: 'laborUnion', name: 'Labor Union', era: 2, cost: { food: 25, labor: 20, materials: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 0.6 }, { type: 'cap_mult', target: 'labor', value: 2 }], description: 'Organized labor boosts output and doubles capacity', prerequisites: ['conveyor'] },
 
   // Era 3
-  neuralNetwork: { id: 'neuralNetwork', name: 'Neural Network', era: 3, cost: { software: 22, data: 18, research: 30 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'research', value: 0.4 }], description: 'Deep neural networks double software and research output', prerequisites: ['neuralChip'] },
-  digitalTwin: { id: 'digitalTwin', name: 'Digital Twin', era: 3, cost: { software: 20, research: 25, data: 15 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Digital twins of physical systems triple data collection', prerequisites: ['virtualReality'] },
+  neuralNetwork: { id: 'neuralNetwork', name: 'Neural Network', era: 3, cost: { software: 22, data: 18, research: 30 }, effects: [{ type: 'production_add', target: 'software', value: 0.4 }, { type: 'production_add', target: 'research', value: 0.4 }], description: 'Deep neural networks boost software and research output', prerequisites: ['neuralChip'] },
+  digitalTwin: { id: 'digitalTwin', name: 'Digital Twin', era: 3, cost: { software: 20, research: 25, data: 15 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.5 }], description: 'Digital twins of physical systems boost data collection and research', prerequisites: ['virtualReality'] },
 
   // Era 4
   solarSail: { id: 'solarSail', name: 'Solar Sail', era: 4, cost: { research: 25, electronics: 20, rocketFuel: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 1 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Solar sails harvest light pressure for energy and fuel savings', prerequisites: ['ionDrive'] },
@@ -2400,7 +2400,7 @@ export const upgrades = {
   fishTrap: { id: 'fishTrap', name: 'Fish Trap', era: 1, cost: { food: 8, materials: 10, labor: 6 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'food', value: 0.2 }], description: 'Woven fish traps provide reliable protein — double food output', prerequisites: ['fishingWharf'] },
 
   // Era 2
-  pneumaticPress: { id: 'pneumaticPress', name: 'Pneumatic Press', era: 2, cost: { steel: 30, energy: 25, labor: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.3 }, { type: 'production_add', target: 'materials', value: 0.6 }], description: 'Compressed air presses shape metal efficiently — double steel', prerequisites: ['cementFactory'] },
+  pneumaticPress: { id: 'pneumaticPress', name: 'Pneumatic Press', era: 2, cost: { steel: 30, energy: 25, labor: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.3 }, { type: 'production_add', target: 'materials', value: 0.6 }], description: 'Compressed air presses shape metal efficiently — boosts steel and materials', prerequisites: ['cementFactory'] },
   printingPress: { id: 'printingPress', name: 'Printing Press', era: 2, cost: { materials: 30, steel: 18, research: 15 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'cap_mult', target: 'research', value: 2 }], description: 'Mass-produced knowledge doubles research output and capacity', prerequisites: ['telephoneNetwork'] },
 
   // Era 3
@@ -2438,9 +2438,9 @@ export const upgrades = {
   infinityWellspring: { id: 'infinityWellspring', name: 'Infinity Wellspring', era: 10, cost: { universalConstants: 30, cosmicPower: 500, realityFragments: 90 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 20 }, { type: 'production_add', target: 'cosmicPower', value: 20 }], description: 'Tap into an infinite wellspring of universal energy', prerequisites: ['dimensionalGateway'] },
 
   // --- 5 additional upgrades ---
-  ropeAndPulley: { id: 'ropeAndPulley', name: 'Rope and Pulley', era: 1, cost: { materials: 12, labor: 8, food: 6 }, effects: [{ type: 'production_add', target: 'labor', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'Simple machines double labor efficiency', prerequisites: ['lumberMill'] },
-  edgeComputing: { id: 'edgeComputing', name: 'Edge Computing', era: 3, cost: { software: 28, data: 18, electronics: 22 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 0.4 }], description: 'Distributed edge nodes triple data processing', prerequisites: ['fogComputing'] },
-  orbitalTether: { id: 'orbitalTether', name: 'Orbital Tether', era: 4, cost: { orbitalInfra: 18, steel: 70, rocketFuel: 40 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.2 }, { type: 'production_add', target: 'rocketFuel', value: 1 }], description: 'Space elevator tethers triple orbital infrastructure', prerequisites: ['plasmaShield'] },
+  ropeAndPulley: { id: 'ropeAndPulley', name: 'Rope and Pulley', era: 1, cost: { materials: 12, labor: 8, food: 6 }, effects: [{ type: 'production_add', target: 'labor', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'Simple machines boost labor and materials output', prerequisites: ['lumberMill'] },
+  edgeComputing: { id: 'edgeComputing', name: 'Edge Computing', era: 3, cost: { software: 28, data: 18, electronics: 22 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 0.4 }], description: 'Distributed edge nodes boost data processing and electronics', prerequisites: ['fogComputing'] },
+  orbitalTether: { id: 'orbitalTether', name: 'Orbital Tether', era: 4, cost: { orbitalInfra: 18, steel: 70, rocketFuel: 40 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.2 }, { type: 'production_add', target: 'rocketFuel', value: 1 }], description: 'Space elevator tethers boost orbital infrastructure and fuel output', prerequisites: ['plasmaShield'] },
   voidAnchor: { id: 'voidAnchor', name: 'Void Anchor', era: 9, cost: { cosmicPower: 200, universalConstants: 15, darkEnergy: 250 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 12 }, { type: 'production_add', target: 'cosmicPower', value: 2 }], description: 'Anchor points in the void stabilize cosmic power', prerequisites: ['voidCartographer'] },
 };
 

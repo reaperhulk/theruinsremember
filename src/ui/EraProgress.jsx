@@ -27,9 +27,14 @@ export function EraProgress({ state }) {
       )}
       {!isMaxEra && (
         <p className="era-hint" style={{ color: upgradesMet ? '#88ff88' : '#ffcc44' }}>
-          Upgrades: {eraUpgradeCount}/{minUpgrades} needed for next era
-          {!upgradesMet && ' — purchase more upgrades to progress'}
+          Upgrades: {eraUpgradeCount}/{minUpgrades} needed
+          {upgradesMet ? ' ✓' : ''}
         </p>
+        {!upgradesMet && (
+          <div className="upgrade-progress-bar" style={{ margin: '2px 0 4px' }}>
+            <div className={`upgrade-progress-fill ${eraUpgradeCount / minUpgrades > 0.8 ? 'almost' : ''}`} style={{ width: `${Math.floor(eraUpgradeCount / minUpgrades * 100)}%` }} />
+          </div>
+        )}
       )}
       {isMaxEra && (
         <p className="era-hint" style={{ color: '#bb88ff' }}>
