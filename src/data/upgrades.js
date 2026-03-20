@@ -2403,7 +2403,7 @@ export const upgrades = {
 
   // Era 2
   pneumaticPress: { id: 'pneumaticPress', name: 'Pneumatic Press', era: 2, cost: { steel: 30, energy: 25, labor: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.3 }, { type: 'production_add', target: 'materials', value: 0.6 }], description: 'Compressed air presses shape metal efficiently — boosts steel and materials', prerequisites: ['cementFactory'] },
-  printingPress: { id: 'printingPress', name: 'Printing Press', era: 2, cost: { materials: 30, steel: 18, research: 15 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'cap_mult', target: 'research', value: 2 }], description: 'Mass-produced knowledge doubles research output and capacity', prerequisites: ['telephoneNetwork'] },
+  printingPress: { id: 'printingPress', name: 'Printing Press', era: 2, cost: { materials: 30, steel: 18, research: 15 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'cap_mult', target: 'research', value: 2 }], description: 'Mass-produced knowledge boosts research +0.3/s and doubles capacity', prerequisites: ['telephoneNetwork'] },
 
   // Era 3
   firewallMatrix: { id: 'firewallMatrix', name: 'Firewall Matrix', era: 3, cost: { software: 25, research: 20, data: 15 }, effects: [{ type: 'cap_mult', target: 'data', value: 3 }, { type: 'production_add', target: 'software', value: 0.5 }], description: 'Advanced firewalls protect data assets — triple data capacity', prerequisites: ['digitalTwin'] },
