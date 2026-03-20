@@ -1,4 +1,4 @@
-import { eraNames, ERA_COUNT } from '../engine/eras.js';
+import { eraNames, ERA_COUNT, getMinUpgradesForEra, countEraUpgrades } from '../engine/eras.js';
 import { calculateProduction } from '../engine/resources.js';
 import { formatNumber, formatTime } from './format.js';
 
@@ -7,6 +7,9 @@ export function EraProgress({ state }) {
   const isMaxEra = state.era >= ERA_COUNT;
   const upgradeCount = Object.keys(state.upgrades || {}).length;
   const techCount = Object.keys(state.tech || {}).length;
+  const eraUpgradeCount = countEraUpgrades(state, state.era);
+  const minUpgrades = getMinUpgradesForEra(state.era);
+  const upgradesMet = eraUpgradeCount >= minUpgrades;
 
   // Calculate total production rate across all unlocked resources
   const rates = calculateProduction(state);
@@ -20,6 +23,12 @@ export function EraProgress({ state }) {
       {!isMaxEra && (
         <p className="era-hint">
           Research starred (★) technologies to advance to the next era
+        </p>
+      )}
+      {!isMaxEra && (
+        <p className="era-hint" style={{ color: upgradesMet ? '#88ff88' : '#ffcc44' }}>
+          Upgrades: {eraUpgradeCount}/{minUpgrades} needed for next era
+          {!upgradesMet && ' — purchase more upgrades to progress'}
         </p>
       )}
       {isMaxEra && (
