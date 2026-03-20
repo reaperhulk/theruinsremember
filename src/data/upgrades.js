@@ -219,7 +219,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 0.4 },
       { type: 'production_add', target: 'data', value: 0.4 },
     ],
-    description: 'Statistical algorithms double research and data analysis',
+    description: 'Statistical algorithms boost research and data analysis',
     prerequisites: ['digitalSensors'],
   },
   cloudComputing: {
@@ -376,7 +376,7 @@ export const upgrades = {
       { type: 'production_add', target: 'orbitalInfra', value: 0.6 },
       { type: 'cap_mult', target: 'rocketFuel', value: 3 },
     ],
-    description: 'Refuel in orbit — double infrastructure and triple fuel capacity',
+    description: 'Refuel in orbit — boost infrastructure and triple fuel capacity',
     prerequisites: ['spaceStation'],
   },
   deepSpaceProbe: {
@@ -396,7 +396,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 1.2 },
       { type: 'production_add', target: 'research', value: 0.3 },
     ],
-    description: 'Nuclear fission triples energy and generates research data',
+    description: 'Nuclear fission generates +1.2 energy/s and research data',
     prerequisites: ['deepSpaceProbe'],
   },
   satelliteNetwork: {
@@ -406,7 +406,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 1.2 },
       { type: 'production_add', target: 'research', value: 0.5 },
     ],
-    description: 'Orbital satellites triple data collection and boost research',
+    description: 'Orbital satellites boost data collection and research',
     prerequisites: ['spaceStation'],
   },
 
@@ -495,7 +495,7 @@ export const upgrades = {
       { type: 'production_add', target: 'rocketFuel', value: 2 },
       { type: 'production_add', target: 'orbitalInfra', value: 0.3 },
     ],
-    description: 'Harness gravity for propulsion — triple fuel and boost orbital infrastructure',
+    description: 'Harness gravity for propulsion — +2 fuel/s and boost orbital infrastructure',
     prerequisites: ['terraforming'],
   },
   solarCollector: {
@@ -505,7 +505,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 2 },
       { type: 'cap_mult', target: 'energy', value: 5 },
     ],
-    description: 'Harvest solar energy across the system — triple output and expand capacity',
+    description: 'Harvest solar energy across the system — +2 energy/s and x5 capacity',
     prerequisites: ['asteroidMining'],
   },
   miningDrone: {
@@ -889,7 +889,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.6 },
       { type: 'production_add', target: 'steel', value: 0.5 },
     ],
-    description: 'Rail transport triples materials and boosts steel production',
+    description: 'Rail transport boosts materials and steel production',
     prerequisites: ['automation'],
   },
   warehouse: {
@@ -910,7 +910,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 0.3 },
       { type: 'production_add', target: 'materials', value: 0.3 },
     ],
-    description: 'Efficient logistics double steel and materials output',
+    description: 'Efficient logistics boost steel and materials output',
     prerequisites: ['steelRefinery'],
   },
   asteroidDefense: {
@@ -950,7 +950,7 @@ export const upgrades = {
       { type: 'production_add', target: 'rocketFuel', value: 1.2 },
       { type: 'cap_mult', target: 'rocketFuel', value: 3 },
     ],
-    description: 'Next-gen rockets triple fuel production and capacity',
+    description: 'Next-gen rockets boost fuel production and triple capacity',
     prerequisites: ['gravitySling'],
   },
   quantumNetwork: {
@@ -960,7 +960,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 1.2 },
       { type: 'production_add', target: 'electronics', value: 0.6 },
     ],
-    description: 'Entangled communication triples data and doubles electronics',
+    description: 'Entangled communication boosts data and electronics output',
     prerequisites: ['satelliteNetwork'],
   },
   voidHarvester: {
@@ -971,7 +971,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 4 },
       { type: 'production_add', target: 'galacticInfluence', value: 4 },
     ],
-    description: 'Harvest the void — double three key galactic resources',
+    description: 'Harvest the void — +4/s to exotic matter, dark energy, and influence',
     prerequisites: ['culturalAssimilation'],
   },
 
@@ -1333,7 +1333,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 1.6 },
       { type: 'cap_mult', target: 'starSystems', value: 3 },
     ],
-    description: 'Better navigation doubles star system discovery and triples capacity',
+    description: 'Better navigation boosts star system discovery and triples capacity',
     prerequisites: ['stellarCartography'],
   },
   galacticMining: {
@@ -1353,7 +1353,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 3.2 },
       { type: 'cap_mult', target: 'darkEnergy', value: 5 },
     ],
-    description: 'Permanent warp conduits triple dark energy and expand capacity',
+    description: 'Permanent warp conduits boost dark energy and expand capacity x5',
     prerequisites: ['dysonSwarms'],
   },
   fusionReactor: {
@@ -1363,7 +1363,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 12 },
       { type: 'production_add', target: 'darkEnergy', value: 0.5 },
     ],
-    description: 'Interstellar fusion — x10 energy and bonus dark energy',
+    description: 'Interstellar fusion — +12 energy/s and bonus dark energy',
     prerequisites: ['warpDrive'],
   },
   diplomaticCorps: {
@@ -1643,7 +1643,7 @@ export const upgrades = {
       { type: 'production_add', target: 'orbitalInfra', value: 2 },
       { type: 'production_add', target: 'exoticMaterials', value: 0.5 },
     ],
-    description: 'A rotating ring station triples orbital infrastructure',
+    description: 'A rotating ring station boosts orbital infrastructure and exotic materials',
     prerequisites: ['asteroidMining'],
   },
   spaceHabitat: {

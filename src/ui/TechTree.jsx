@@ -80,6 +80,21 @@ export function TechTree({ state, onUpdate }) {
               </div>
               <div className="tech-cost"><CostDisplay cost={tech.cost} state={state} /></div>
               <div className="tech-desc">{tech.description}</div>
+              {tech.effects && tech.effects.length > 0 && (
+                <div className="upgrade-effects">
+                  {tech.effects.map((e, i) => {
+                    let label = '';
+                    let cls = 'effect-tag';
+                    switch (e.type) {
+                      case 'production_mult': label = `x${e.value} ${resourceName(e.target)}`; cls += ' effect-mult'; break;
+                      case 'production_add': label = `+${e.value} ${resourceName(e.target)}/s`; cls += ' effect-add'; break;
+                      case 'cap_mult': label = `x${e.value} ${resourceName(e.target)} cap`; cls += ' effect-cap'; break;
+                      case 'unlock_resource': label = `Unlock ${resourceName(e.target)}`; cls += ' effect-unlock'; break;
+                    }
+                    return label ? <span key={i} className={cls}>{label}</span> : null;
+                  })}
+                </div>
+              )}
               {prereqNames.length > 0 && (
                 <div className="tech-prereqs">Requires: {prereqNames.join(', ')}</div>
               )}
