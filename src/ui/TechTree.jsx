@@ -49,7 +49,7 @@ export function TechTree({ state, onUpdate }) {
   if (available.length === 0) {
     return (
       <div className="panel tech-panel">
-        <h2>Technology ({available.length} available{unlockedCount > 0 ? `, ${unlockedCount} done` : ''})</h2>
+        <h2>Technology{unlockedCount > 0 ? ` — ${unlockedCount} done` : ''}</h2>
         <p className="empty-message">No research available</p>
       </div>
     );
@@ -57,7 +57,7 @@ export function TechTree({ state, onUpdate }) {
 
   return (
     <div className="panel tech-panel">
-      <h2>Technology ({available.length} available{unlockedCount > 0 ? `, ${unlockedCount} done` : ''})</h2>
+      <h2>Technology{available.length > 0 ? ` (${available.length} available)` : ''}{unlockedCount > 0 ? ` — ${unlockedCount} done` : ''}</h2>
       <div className="tech-list">
         {available.sort((a, b) => (b.grantsEra ? 1 : 0) - (a.grantsEra ? 1 : 0)).map(tech => {
           const affordable = canAfford(state, tech.cost);
