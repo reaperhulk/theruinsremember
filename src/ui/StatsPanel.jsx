@@ -1,6 +1,8 @@
 import { eraNames, countEraUpgrades } from '../engine/eras.js';
 import { getPrestigeSummary } from '../engine/prestige.js';
 import { getAchievementList } from '../engine/achievements.js';
+import { getEffectiveRate } from '../engine/resources.js';
+import { resources as resourceDefs } from '../data/resources.js';
 import { formatTime, formatNumber } from './format.js';
 
 export function StatsPanel({ state }) {
@@ -106,6 +108,22 @@ export function StatsPanel({ state }) {
             </div>
           </>
         )}
+      </div>
+
+      <h3>Production Rates</h3>
+      <div className="stats-grid">
+        {Object.entries(state.resources)
+          .filter(([, r]) => r.unlocked)
+          .map(([id]) => ({ id, rate: getEffectiveRate(state, id), name: resourceDefs[id]?.name || id }))
+          .filter(r => r.rate > 0)
+          .sort((a, b) => b.rate - a.rate)
+          .slice(0, 8)
+          .map(r => (
+            <div key={r.id} className="stat-row">
+              <span>{r.name}</span>
+              <span style={{ color: '#88dd88' }}>+{formatNumber(r.rate)}/s</span>
+            </div>
+          ))}
       </div>
 
       <h3>Achievements ({earnedCount}/{achievementList.length} — {achievementList.filter(a => a.earned).reduce((s, a) => s + (a.reward || 0), 0)} pts earned)</h3>
