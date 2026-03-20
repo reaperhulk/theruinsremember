@@ -115,7 +115,7 @@ export function UpgradePanel({ state, onUpdate }) {
   return (
     <div className="panel upgrade-panel">
       <h2>
-        Upgrades{filteredAvailable.length > 0 ? ` (${filteredAvailable.length})` : ''}{upcoming.length > 0 ? ` — ${upcoming.length} soon` : ''}
+        Upgrades{filteredAvailable.length > 0 ? ` (${filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length}/${filteredAvailable.length})` : ''}{upcoming.length > 0 ? ` — ${upcoming.length} soon` : ''}
         {purchased.length > 0 && (
           <span
             className="toggle-purchased"
