@@ -40,7 +40,7 @@ export function DockingPanel({ state, onUpdate }) {
     <div className="panel docking-panel">
       <h2>Orbital Docking {info.successes > 0 && `(${info.successes} docks)`}</h2>
       <div className="dock-info">
-        <span>Docks: {info.successes}/{info.attempts}</span>
+        <span>Docks: {info.successes}/{info.attempts}{info.attempts > 0 && ` (${Math.floor(info.successes/info.attempts*100)}%)`}</span>
         <span>Perfect: {info.perfects}</span>
         {combo > 0 && <span style={{ color: '#ffdd44' }}>Combo: x{combo} (+{Math.min(combo, 5) * 20}%)</span>}
       </div>
