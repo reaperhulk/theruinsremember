@@ -103,11 +103,11 @@ export function UpgradePanel({ state, onUpdate }) {
           ))}
         </div>
       )}
-      {available.length > 3 && (
+      {available.length > 4 && (
         <div className="upgrade-sort">
-          <button className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>Default</button>
-          <button className={sortBy === 'affordable' ? 'active' : ''} onClick={() => setSortBy('affordable')}>Affordable</button>
-          <button className={sortBy === 'cheapest' ? 'active' : ''} onClick={() => setSortBy('cheapest')}>Cheapest</button>
+          <button className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>All</button>
+          <button className={sortBy === 'affordable' ? 'active' : ''} onClick={() => setSortBy('affordable')}>Can Buy</button>
+          <button className={sortBy === 'cheapest' ? 'active' : ''} onClick={() => setSortBy('cheapest')}>Cheap</button>
         </div>
       )}
       <div className="upgrade-list">
