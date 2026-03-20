@@ -53,7 +53,7 @@ export function MiningPanel({ state, onUpdate }) {
         )}
       </button>
       <p className="mining-hint">
-        +2%/miss (max 50%) | Space to mine
+        +2%/miss (max 50%) | Space to mine{autoMine ? ' | Auto-mining active' : ''}
       </p>
     </div>
   );
