@@ -45,7 +45,7 @@ export function WeavingPanel({ state, onUpdate }) {
 
   return (
     <div className="panel weaving-panel">
-      <h2>Reality Weaving {stats.totalWeaves > 0 && `(${stats.totalWeaves} weaves)`}</h2>
+      <h2>Reality Weaving{stats.totalWeaves > 0 ? ` (${stats.totalWeaves} weaves)` : ''}</h2>
       <div className="dock-info">
         <span>Weaves: {stats.totalWeaves}</span>
         <span>Grid: {grid.length}</span>

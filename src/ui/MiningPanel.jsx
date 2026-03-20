@@ -32,7 +32,7 @@ export function MiningPanel({ state, onUpdate }) {
 
   return (
     <div className="panel mining-panel">
-      <h2>Mining ({gems} gems){autoMine && <span style={{ fontSize: '0.6em', color: '#88ff88' }}> [AUTO]</span>}</h2>
+      <h2>Mining{gems > 0 ? ` (${gems} gems)` : ''}{autoMine && <span style={{ fontSize: '0.6em', color: '#88ff88' }}> [AUTO]</span>}</h2>
       <div className="mining-info">
         <span>Chance: {chance.toFixed(0)}%</span>
         <span>Streak: {streak}</span>
