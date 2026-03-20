@@ -18,6 +18,24 @@ export function calculateProduction(state) {
   return rates;
 }
 
+// Calculate net production (accounting for consumption)
+export function getNetRate(state, resourceId) {
+  const grossRate = getEffectiveRate(state, resourceId);
+  if (resourceId === 'food') {
+    const laborRate = getEffectiveRate(state, 'labor');
+    return grossRate - laborRate * 0.3;
+  }
+  if (resourceId === 'energy') {
+    const elecRate = getEffectiveRate(state, 'electronics');
+    return grossRate - elecRate * 0.2;
+  }
+  if (resourceId === 'rocketFuel' && state.era >= 4) {
+    const orbRate = getEffectiveRate(state, 'orbitalInfra');
+    return grossRate - orbRate * 0.5;
+  }
+  return grossRate;
+}
+
 // Check if we can afford a cost object { resourceId: amount, ... }
 export function canAfford(state, cost) {
   for (const [resourceId, amount] of Object.entries(cost)) {

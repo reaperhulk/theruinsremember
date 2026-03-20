@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
-import { getEffectiveRate, getEffectiveCap, gather } from '../engine/resources.js';
+import { getEffectiveRate, getEffectiveCap, getNetRate, gather } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
 import { getFactoryBonus } from '../engine/factory.js';
 import { getColonyBonus } from '../engine/colonies.js';
@@ -88,7 +88,16 @@ export function ResourcePanel({ state, onUpdate }) {
                         )}
                       </span>
                       <span className="resource-rate">
-                        {r.rate > 0 ? `+${formatNumber(r.rate)}/s` : ''}
+                        {r.rate > 0 ? (() => {
+                          const net = getNetRate(state, r.id);
+                          const isConsumed = ['food','energy','rocketFuel'].includes(r.id) && net < r.rate;
+                          if (isConsumed) {
+                            return <span style={{ color: net >= 0 ? '#88dd88' : '#ff8844' }}>
+                              {net >= 0 ? '+' : ''}{formatNumber(net)}/s
+                            </span>;
+                          }
+                          return `+${formatNumber(r.rate)}/s`;
+                        })() : ''}
                       </span>
                       <span className="resource-gather">
                         <button
