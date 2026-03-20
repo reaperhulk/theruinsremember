@@ -1330,6 +1330,40 @@ export const events = {
   // Era 10
   realityHarmonicConvergence: { id: 'realityHarmonicConvergence', name: 'Reality Harmonic Convergence', description: 'All realities enter harmonic convergence — fragments and echoes flood in!', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'realityFragments', rateMultBonus: 18 } },
   quantumCascadeEvent: { id: 'quantumCascadeEvent', name: 'Quantum Cascade', description: 'A cascade of quantum events produces an unprecedented echo surge!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 200 } },
+
+  // --- 22 new late-game events (eras 6-10) ---
+
+  // Era 6
+  darkEnergyVortex: { id: 'darkEnergyVortex', name: 'Dark Energy Vortex', description: 'A spiraling vortex of dark energy concentrates in your sector — collectors overload!', minEra: 6, type: 'timed', duration: 50, effect: { resourceId: 'darkEnergy', rateMultBonus: 7 } },
+  stellarCartography: { id: 'stellarCartography', name: 'Stellar Cartography', description: 'Advanced cartography reveals an entire hidden star cluster!', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 18 } },
+  interstellarTributeFleet: { id: 'interstellarTributeFleet', name: 'Interstellar Tribute Fleet', description: 'A tribute fleet from a distant civilization arrives bearing exotic gifts!', minEra: 6, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 100 } },
+  darkEnergyLattice: { id: 'darkEnergyLattice', name: 'Dark Energy Lattice', description: 'Dark energy crystallizes into a harvestable lattice structure!', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'darkEnergy', rateMultBonus: 8 } },
+
+  // Era 7
+  dysonSphereOverclock: { id: 'dysonSphereOverclock', name: 'Dyson Sphere Overclock', description: 'Emergency overclock pushes the Dyson sphere beyond rated capacity!', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'stellarForge', rateMultBonus: 12 } },
+  megastructureAvalanche: { id: 'megastructureAvalanche', name: 'Megastructure Avalanche', description: 'Self-replicating constructors finish a wave of megastructures simultaneously!', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 20 } },
+  stellarForgeSupernova: { id: 'stellarForgeSupernova', name: 'Stellar Forge Supernova', description: 'A controlled supernova feeds the forge with stellar plasma!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 40 } },
+  nicollDysonBeam: { id: 'nicollDysonBeam', name: 'Nicoll-Dyson Beam', description: 'The Dyson sphere focuses a beam of pure energy — megastructure output surges!', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'megastructures', rateMultBonus: 10 } },
+
+  // Era 8
+  galacticSenateVote: { id: 'galacticSenateVote', name: 'Galactic Senate Vote', description: 'The senate votes in your favor — influence skyrockets!', minEra: 8, type: 'timed', duration: 55, effect: { resourceId: 'galacticInfluence', rateMultBonus: 9 } },
+  exoticMatterSingularity: { id: 'exoticMatterSingularity', name: 'Exotic Matter Singularity', description: 'An exotic matter singularity forms — matter pours from its event horizon!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 150 } },
+  galacticLibraryAccess: { id: 'galacticLibraryAccess', name: 'Galactic Library Access', description: 'Access to a Type III civilization library is granted — research explodes!', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 10 } },
+  exoticMatterFountain: { id: 'exoticMatterFountain', name: 'Exotic Matter Fountain', description: 'A fountain of exotic matter erupts from a white hole!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 9 } },
+
+  // Era 9
+  cosmicStringHarvest: { id: 'cosmicStringHarvest', name: 'Cosmic String Harvest', description: 'A cosmic string is harvested for its immense energy — cosmic power floods in!', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 400 } },
+  universalConstantLock: { id: 'universalConstantLock', name: 'Universal Constant Lock', description: 'Scientists lock universal constants in a favorable configuration!', minEra: 9, type: 'timed', duration: 55, effect: { resourceId: 'universalConstants', rateMultBonus: 12 } },
+  bigCrunchEcho: { id: 'bigCrunchEcho', name: 'Big Crunch Echo', description: 'An echo of a universe\'s big crunch releases compressed cosmic power!', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 500 } },
+  darkFlowSurge: { id: 'darkFlowSurge', name: 'Dark Flow Surge', description: 'The mysterious dark flow accelerates — universal constants crystallize!', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
+
+  // Era 10
+  omniversalGenesis: { id: 'omniversalGenesis', name: 'Omniversal Genesis', description: 'A new universe is born within the multiverse — reality fragments condense from the chaos!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 1000 } },
+  quantumDecoherenceWave: { id: 'quantumDecoherenceWave', name: 'Quantum Decoherence Wave', description: 'A wave of decoherence collapses infinite possibilities into quantum echoes!', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'quantumEchoes', rateMultBonus: 20 } },
+  multiversalRift: { id: 'multiversalRift', name: 'Multiversal Rift', description: 'A permanent rift between realities tears open — fragments pour through endlessly!', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'realityFragments', rateMultBonus: 20 } },
+  infiniteMirrorHall: { id: 'infiniteMirrorHall', name: 'Infinite Mirror Hall', description: 'Realities reflect infinitely inward — quantum echoes compound beyond measure!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 250 } },
+  realitySeedPlanting: { id: 'realitySeedPlanting', name: 'Reality Seed Planting', description: 'Seeds of new realities are planted and bloom instantly — fragments scatter!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 800 } },
+  quantumEntanglementStorm: { id: 'quantumEntanglementStorm', name: 'Quantum Entanglement Storm', description: 'A storm of entangled particles synchronizes across realities — echoes multiply!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 22 } },
 };
 
 // Get events eligible for the current era

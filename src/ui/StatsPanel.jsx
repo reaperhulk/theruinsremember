@@ -74,6 +74,12 @@ export function StatsPanel({ state }) {
             <span>{formatNumber(state.totalResourcesProduced)} units</span>
           </div>
         )}
+        {(state.peakProductionRate || 0) > 0 && (
+          <div className="stat-row">
+            <span>Peak Rate</span>
+            <span>{formatNumber(state.peakProductionRate)}/s</span>
+          </div>
+        )}
         {state.prestigeCount > 0 && (
           <>
             <div className="stat-row">

@@ -145,7 +145,12 @@ export function tick(state, dt) {
     for (const [id, rate] of Object.entries(rates)) {
       if (rate > 0 && newState.resources[id]?.unlocked) totalProduced += rate * dt * 30;
     }
-    newState = { ...newState, totalResourcesProduced: totalProduced };
+    // Track peak production rate
+    const totalRate = Object.entries(rates).reduce((sum, [id, rate]) => {
+      return sum + (rate > 0 && newState.resources[id]?.unlocked ? rate : 0);
+    }, 0);
+    const peakRate = Math.max(newState.peakProductionRate || 0, totalRate);
+    newState = { ...newState, totalResourcesProduced: totalProduced, peakProductionRate: peakRate };
   }
 
   // Check for era transition
