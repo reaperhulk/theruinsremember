@@ -142,6 +142,11 @@ export function App() {
       </header>
 
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
+      {state.totalTime < 5 && (
+        <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.7em', color: '#555', padding: '2px 0' }}>
+          Keys: 1-6 tabs | Space mine
+        </div>
+      )}
       <EraTransition era={state.era} />
       <Toast state={state} />
       <EraProgress state={state} />
