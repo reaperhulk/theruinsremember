@@ -1463,6 +1463,15 @@ export function GameCanvas({ state, onUpdate }) {
       const upgradeCount = Object.keys(stateRef.current.upgrades || {}).length;
       drawUpgradeIndicator(ctx, w, h, upgradeCount);
 
+      // Draw era name watermark in top-left
+      ctx.save();
+      ctx.font = 'bold 9px monospace';
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.textAlign = 'left';
+      const eraLabels = ['', 'Planetfall', 'Industrial', 'Digital', 'Space', 'Solar', 'Interstellar', 'Dyson', 'Galactic', 'Intergalactic', 'Multiverse'];
+      ctx.fillText(eraLabels[era] || '', 4, 12);
+      ctx.restore();
+
       // Spawn particles on gem find (detect change)
       const currentGems = stateRef.current.totalGems || 0;
       if (currentGems > prevGemsRef.current) {

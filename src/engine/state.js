@@ -34,5 +34,12 @@ export function createInitialState() {
     eventLog: [],       // [{ message, time }] — last 10 events
     // Trading (Era 6+)
     totalTrades: 0,
+    // Era time tracking
+    bestEraTimes: {},
+    // Prestige
+    prestigeCount: 0,
+    prestigePoints: 0,
+    prestigeUpgrades: {},
+    achievements: {},
   };
 }
