@@ -137,7 +137,15 @@ export function tick(state, dt) {
   // Check for era transition
   const nextEra = checkEraTransition(newState);
   if (nextEra !== null) {
+    const eraLabels = { 2: 'Industrialization', 3: 'Digital Age', 4: 'Space Age', 5: 'Solar System', 6: 'Interstellar', 7: 'Dyson Era', 8: 'Galactic', 9: 'Intergalactic', 10: 'Multiverse' };
     newState = transitionEra(newState, nextEra);
+    newState = {
+      ...newState,
+      eventLog: [...(newState.eventLog || []), {
+        message: `ERA ${nextEra}: ${eraLabels[nextEra] || 'Unknown'} — New resources and upgrades unlocked!`,
+        time: newState.totalTime,
+      }].slice(-10),
+    };
   }
 
   // Check achievements (every 60 ticks to reduce overhead)
