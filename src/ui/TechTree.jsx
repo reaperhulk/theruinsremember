@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { getAvailableTech, unlockTech } from '../engine/tech.js';
-import { canAfford } from '../engine/resources.js';
+import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
 
@@ -25,6 +25,19 @@ function CostDisplay({ cost, state }) {
       })}
     </span>
   );
+}
+
+function getTimeToAfford(state, cost) {
+  let maxTime = 0;
+  for (const [resourceId, amount] of Object.entries(cost)) {
+    const r = state.resources[resourceId];
+    const have = r ? r.amount : 0;
+    if (have >= amount) continue;
+    const rate = getEffectiveRate(state, resourceId);
+    if (rate <= 0) return Infinity;
+    maxTime = Math.max(maxTime, (amount - have) / rate);
+  }
+  return maxTime;
 }
 
 // Get afford progress for tech (same pattern as upgrades)
@@ -111,11 +124,19 @@ export function TechTree({ state, onUpdate }) {
                   Choose one: excludes {techTree[tech.excludes]?.name || tech.excludes}
                 </div>
               )}
-              {!affordable && (
-                <div className="upgrade-progress-bar">
-                  <div className="upgrade-progress-fill" style={{ width: `${Math.floor(progress * 100)}%` }} />
-                </div>
-              )}
+              {!affordable && (() => {
+                const eta = getTimeToAfford(state, tech.cost);
+                return (
+                  <div className="upgrade-progress-bar">
+                    <div className="upgrade-progress-fill" style={{ width: `${Math.floor(progress * 100)}%` }} />
+                    {eta < Infinity && eta > 0 && (
+                      <span style={{ position: 'absolute', right: '4px', top: '0', fontSize: '0.7em', color: '#888', lineHeight: '8px' }}>
+                        ~{eta < 60 ? `${Math.ceil(eta)}s` : eta < 3600 ? `${Math.ceil(eta / 60)}m` : `${Math.floor(eta / 3600)}h`}
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
             </button>
           );
         })}
