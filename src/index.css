@@ -114,6 +114,7 @@ body {
   color: #7cb7ff;
   margin-bottom: 8px;
   border-bottom: 1px solid #2a2a4a;
+  transition: border-color 1s ease;
   padding-bottom: 4px;
   display: flex;
   align-items: center;
