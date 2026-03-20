@@ -3,6 +3,15 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { calculateProduction } from '../engine/resources.js';
 import { formatNumber, formatTime } from './format.js';
 
+function getLoreHint(eraCompletion, isMaxEra) {
+  if (isMaxEra) return 'You stand at the threshold of infinity.';
+  if (eraCompletion === 0) return 'The journey begins...';
+  if (eraCompletion < 25) return 'Foundations are being laid.';
+  if (eraCompletion < 50) return 'Momentum builds.';
+  if (eraCompletion < 75) return 'The next breakthrough approaches.';
+  return 'The horizon shifts. A new age dawns.';
+}
+
 export function EraProgress({ state }) {
   const currentEra = eraNames[state.era] || `Era ${state.era}`;
   const isMaxEra = state.era >= ERA_COUNT;
@@ -13,6 +22,7 @@ export function EraProgress({ state }) {
   const upgradesMet = eraUpgradeCount >= minUpgrades;
   const totalEraUpgrades = Object.values(upgradeDefs).filter(u => u.era === state.era).length;
   const eraCompletion = totalEraUpgrades > 0 ? Math.floor(eraUpgradeCount / totalEraUpgrades * 100) : 0;
+  const loreHint = getLoreHint(eraCompletion, isMaxEra);
 
   // Calculate total production rate across all unlocked resources
   const rates = calculateProduction(state);
@@ -23,6 +33,7 @@ export function EraProgress({ state }) {
   return (
     <div className="panel era-panel">
       <h2>Era {state.era}: {currentEra} {eraCompletion >= 100 && '(complete)'}</h2>
+      <p style={{ fontSize: '0.8em', color: '#998866', fontStyle: 'italic', margin: '0 0 4px' }}>{loreHint}</p>
       {!isMaxEra && !upgradesMet && (
         <p className="era-hint">
           Buy {minUpgrades - eraUpgradeCount} more upgrades, then research ★ tech to advance

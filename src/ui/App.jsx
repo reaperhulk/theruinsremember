@@ -22,7 +22,7 @@ import { EraTransition } from './EraTransition.jsx';
 import { Toast } from './Toast.jsx';
 import { OfflineReport } from './OfflineReport.jsx';
 import { performPrestige, calculatePrestigeBonus } from '../engine/prestige.js';
-import { ERA_COUNT } from '../engine/eras.js';
+import { ERA_COUNT, eraNames } from '../engine/eras.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
 import { canAfford } from '../engine/resources.js';
@@ -129,7 +129,7 @@ export function App() {
   return (
     <div className={`game-container era-${state.era} ${shakeClass}`}>
       <header className="game-header">
-        <h1>Planet to Multiverse{state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888', marginLeft: '8px' }}>Era {state.era}</span>}</h1>
+        <h1>Planet to Multiverse{state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888', marginLeft: '8px' }}>Era {state.era}: {eraNames[state.era]}</span>}</h1>
         <div className="header-controls">
           {state.era >= ERA_COUNT && (
             <button className="prestige-btn" onClick={handlePrestige}>

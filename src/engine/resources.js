@@ -87,8 +87,8 @@ export function getEffectiveCap(state, resourceId) {
   if (!r) return 0;
   const def = resourceDefs[resourceId];
   if (!def) return 0;
-  // Era scaling: resources from earlier eras get cap boost in later eras
+  // Era scaling: resources from earlier eras get a small cap boost in later eras
   const eraDiff = Math.max(0, (state.era || 1) - def.era);
-  const eraCapScale = Math.pow(2, eraDiff); // Double cap per era beyond origin
+  const eraCapScale = 1 + eraDiff * 0.25; // +25% per era beyond origin
   return def.baseCap * r.capMult * eraCapScale;
 }
