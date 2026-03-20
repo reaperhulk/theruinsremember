@@ -166,4 +166,16 @@ export const achievements = [
   { id: 'colonyGod', name: 'Colony God', description: 'Assign 100+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 100; }, reward: 15 },
   { id: 'starNetwork50', name: 'Universal Highway', description: 'Create 50 star routes', check: s => (s.starRoutes?.length || 0) >= 50, reward: 15 },
   { id: 'prestigeEternal', name: 'Prestige Eternal', description: 'Prestige 200 times', check: s => (s.prestigeCount || 0) >= 200, reward: 100 },
+
+  // --- 10 new achievements ---
+  { id: 'octillion', name: 'Octillionaire', description: 'Have 1 octillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e27), reward: 30 },
+  { id: 'upgrade400', name: 'Upgrade Godhood', description: 'Purchase 400 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 400, reward: 60 },
+  { id: 'techArchitect', name: 'Tech Architect', description: 'Unlock 70 technologies', check: s => Object.keys(s.tech || {}).length >= 70, reward: 30 },
+  { id: 'speedrunEra8', name: 'Galactic Speedrun', description: 'Reach Era 8 in under 20 minutes', check: s => s.era >= 8 && (s.bestEraTimes?.[8] || Infinity) < 1200, reward: 8 },
+  { id: 'hack500', name: 'Cyber Deity', description: 'Complete 500 hacks', check: s => (s.hackSuccesses || 0) >= 500, reward: 25 },
+  { id: 'weave500', name: 'Weave Eternal', description: 'Complete 500 weaves', check: s => (s.totalWeaves || 0) >= 500, reward: 25 },
+  { id: 'docking500', name: 'Grand Admiral', description: 'Land 500 perfect docks', check: s => (s.dockingPerfects || 0) >= 500, reward: 25 },
+  { id: 'repeatAddict200', name: 'Infinite Factory', description: 'Buy any repeatable upgrade 200 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 200), reward: 20 },
+  { id: 'trade5000', name: 'Omniversal Trader', description: 'Complete 5000 trades', check: s => (s.totalTrades || 0) >= 5000, reward: 30 },
+  { id: 'marathon168', name: 'Week Runner', description: 'Play for 168 hours total', check: s => s.totalTime >= 604800, reward: 20 },
 ];

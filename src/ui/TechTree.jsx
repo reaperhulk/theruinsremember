@@ -1,11 +1,29 @@
 import { getAvailableTech, unlockTech } from '../engine/tech.js';
 import { canAfford } from '../engine/resources.js';
 import { techTree } from '../data/tech-tree.js';
+import { resources as resourceDefs } from '../data/resources.js';
 
-function formatCost(cost) {
-  return Object.entries(cost)
-    .map(([id, amount]) => `${id}: ${amount}`)
-    .join(', ');
+function resourceName(id) {
+  return resourceDefs[id]?.name || id;
+}
+
+function CostDisplay({ cost, state }) {
+  return (
+    <span>
+      {Object.entries(cost).map(([id, amount], i) => {
+        const have = state.resources[id]?.amount || 0;
+        const enough = have >= amount;
+        return (
+          <span key={id}>
+            {i > 0 && ', '}
+            <span style={{ color: enough ? '#88cc88' : '#ff8888' }}>
+              {resourceName(id)}: {amount}
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
 }
 
 // Get afford progress for tech (same pattern as upgrades)
@@ -60,7 +78,7 @@ export function TechTree({ state, onUpdate }) {
                 {tech.name}
                 {tech.grantsEra && <span className="era-gate"> ★ Era {tech.grantsEra}</span>}
               </div>
-              <div className="tech-cost">{formatCost(tech.cost)}</div>
+              <div className="tech-cost"><CostDisplay cost={tech.cost} state={state} /></div>
               <div className="tech-desc">{tech.description}</div>
               {prereqNames.length > 0 && (
                 <div className="tech-prereqs">Requires: {prereqNames.join(', ')}</div>

@@ -1,14 +1,7 @@
 import { eraNames } from '../engine/eras.js';
 import { getPrestigeSummary } from '../engine/prestige.js';
 import { getAchievementList } from '../engine/achievements.js';
-
-function formatTime(seconds) {
-  if (seconds < 60) return `${Math.floor(seconds)}s`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`;
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  return `${h}h ${m}m`;
-}
+import { formatTime } from './format.js';
 
 export function StatsPanel({ state }) {
   const achievementList = getAchievementList(state);

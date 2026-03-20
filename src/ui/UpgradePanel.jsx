@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades } from '../engine/upgrades.js';
 import { canAfford } from '../engine/resources.js';
+import { resources as resourceDefs } from '../data/resources.js';
 
 import { formatNumber } from './format.js';
+
+function resourceName(id) {
+  return resourceDefs[id]?.name || id;
+}
 
 function CostDisplay({ cost, state }) {
   return (
@@ -14,7 +19,7 @@ function CostDisplay({ cost, state }) {
           <span key={id}>
             {i > 0 && ', '}
             <span style={{ color: enough ? '#88cc88' : '#ff8888' }}>
-              {id}: {formatNumber(amount)}
+              {resourceName(id)}: {formatNumber(amount)}
             </span>
           </span>
         );
@@ -26,11 +31,11 @@ function CostDisplay({ cost, state }) {
 function formatEffects(effects) {
   return effects.map(e => {
     switch (e.type) {
-      case 'production_mult': return `x${e.value} ${e.target}`;
+      case 'production_mult': return `x${e.value} ${resourceName(e.target)}`;
       case 'production_mult_all': return `x${e.value} ALL production`;
-      case 'production_add': return `+${e.value} ${e.target}/s`;
-      case 'cap_mult': return `x${e.value} ${e.target} cap`;
-      case 'unlock_resource': return `Unlock ${e.target}`;
+      case 'production_add': return `+${e.value} ${resourceName(e.target)}/s`;
+      case 'cap_mult': return `x${e.value} ${resourceName(e.target)} cap`;
+      case 'unlock_resource': return `Unlock ${resourceName(e.target)}`;
       default: return '';
     }
   }).filter(Boolean).join(', ');
@@ -134,11 +139,11 @@ export function UpgradePanel({ state, onUpdate }) {
                   let label = '';
                   let cls = 'effect-tag';
                   switch (e.type) {
-                    case 'production_mult': label = `x${e.value} ${e.target}`; cls += ' effect-mult'; break;
+                    case 'production_mult': label = `x${e.value} ${resourceName(e.target)}`; cls += ' effect-mult'; break;
                     case 'production_mult_all': label = `x${e.value} ALL production`; cls += ' effect-mult'; break;
-                    case 'production_add': label = `+${e.value} ${e.target}/s`; cls += ' effect-add'; break;
-                    case 'cap_mult': label = `x${e.value} ${e.target} cap`; cls += ' effect-cap'; break;
-                    case 'unlock_resource': label = `Unlock ${e.target}`; cls += ' effect-unlock'; break;
+                    case 'production_add': label = `+${e.value} ${resourceName(e.target)}/s`; cls += ' effect-add'; break;
+                    case 'cap_mult': label = `x${e.value} ${resourceName(e.target)} cap`; cls += ' effect-cap'; break;
+                    case 'unlock_resource': label = `Unlock ${resourceName(e.target)}`; cls += ' effect-unlock'; break;
                   }
                   return <span key={i} className={cls}>{label}</span>;
                 })}
