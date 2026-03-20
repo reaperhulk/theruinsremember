@@ -1472,6 +1472,20 @@ export function GameCanvas({ state, onUpdate }) {
       ctx.fillText(eraLabels[era] || '', 4, 12);
       ctx.restore();
 
+      // Prosperity glow — subtle light at top-right based on total upgrades
+      if (upgradeCount > 0) {
+        const intensity = Math.min(upgradeCount / 50, 1);
+        const eraHues = [0, 30, 60, 120, 180, 210, 240, 270, 300, 330, 0];
+        const hue = eraHues[era] || 0;
+        ctx.save();
+        const grad = ctx.createRadialGradient(w - 10, 10, 0, w - 10, 10, 30);
+        grad.addColorStop(0, `hsla(${hue}, 80%, 70%, ${intensity * 0.4})`);
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.fillRect(w - 40, 0, 40, 40);
+        ctx.restore();
+      }
+
       // Spawn particles on gem find (detect change)
       const currentGems = stateRef.current.totalGems || 0;
       if (currentGems > prevGemsRef.current) {
