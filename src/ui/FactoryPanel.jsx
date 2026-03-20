@@ -23,6 +23,12 @@ export function FactoryPanel({ state, onUpdate }) {
         {efficient && <span style={{ color: '#88ff88' }}>+50%</span>}
         {fullCapacity && <span style={{ color: '#ffdd44' }}>x2 full!</span>}
       </div>
+      <div className="upgrade-progress-bar" style={{ margin: '2px 0 6px' }}>
+        <div
+          className={`upgrade-progress-fill ${totalAssigned / pool > 0.8 ? 'almost' : ''}`}
+          style={{ width: `${pool > 0 ? Math.floor(totalAssigned / pool * 100) : 0}%` }}
+        />
+      </div>
       <div className="factory-lines">
         {LINES.map(line => {
           const count = allocation[line.id] || 0;
