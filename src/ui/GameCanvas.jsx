@@ -913,6 +913,178 @@ function drawEra8(ctx, w, h, t) {
   }
 }
 
+// --- Era 9: Intergalactic ---
+function drawIntergalactic(ctx, w, h, t) {
+  // Deep cosmic void
+  const bgGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, 0, w * 0.5, h * 0.5, w);
+  bgGrad.addColorStop(0, '#0a0020');
+  bgGrad.addColorStop(0.4, '#050012');
+  bgGrad.addColorStop(1, '#020008');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, w, h);
+
+  drawStarField(ctx, w, h, 30, 500, t);
+
+  // Cosmic web — filaments connecting galaxy clusters
+  const nodes = [];
+  const nodeRng = seededRandom(999);
+  for (let i = 0; i < 12; i++) {
+    nodes.push({ x: nodeRng() * w, y: nodeRng() * h, size: 3 + nodeRng() * 8 });
+  }
+
+  // Draw filaments between nearby nodes
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < w * 0.4) {
+        const alpha = (1 - dist / (w * 0.4)) * 0.12;
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.5 + i + j);
+        ctx.strokeStyle = `rgba(100,60,200,${alpha * pulse})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        const mx = (nodes[i].x + nodes[j].x) / 2 + Math.sin(t * 0.3 + i) * 10;
+        const my = (nodes[i].y + nodes[j].y) / 2 + Math.cos(t * 0.4 + j) * 8;
+        ctx.quadraticCurveTo(mx, my, nodes[j].x, nodes[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Galaxy cluster nodes with glow
+  for (const node of nodes) {
+    const hue = (node.x * 2 + node.y + t * 10) % 360;
+    drawGlowCircle(ctx, node.x, node.y, node.size * 0.3, `hsla(${hue},70%,60%,0.6)`, node.size * 1.5);
+    ctx.fillStyle = `hsla(${hue},80%,80%,0.7)`;
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node.size * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Gravitational lensing arcs near center
+  const cx = w * 0.5, cy = h * 0.5;
+  for (let arc = 0; arc < 4; arc++) {
+    const arcAngle = t * 0.1 + arc * Math.PI / 2;
+    const arcR = 30 + arc * 12;
+    const hue = (arc * 90 + t * 20) % 360;
+    ctx.strokeStyle = `hsla(${hue},60%,60%,${0.08 + 0.05 * Math.sin(t + arc)})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, arcR, arcAngle, arcAngle + Math.PI * 0.6);
+    ctx.stroke();
+  }
+
+  // Central void attractor
+  const voidGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 25);
+  voidGrad.addColorStop(0, `rgba(60,0,120,${0.3 + 0.15 * Math.sin(t * 0.8)})`);
+  voidGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = voidGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// --- Era 10: Multiverse ---
+function drawMultiverse(ctx, w, h, t) {
+  // Shifting void background
+  ctx.fillStyle = '#030008';
+  ctx.fillRect(0, 0, w, h);
+
+  // Overlapping reality planes with distinct colors
+  const planes = [
+    { hue: 0, phase: 0, speed: 0.15 },
+    { hue: 120, phase: 2, speed: 0.2 },
+    { hue: 240, phase: 4, speed: 0.12 },
+    { hue: 60, phase: 1, speed: 0.18 },
+    { hue: 300, phase: 3, speed: 0.25 },
+  ];
+
+  for (const plane of planes) {
+    const ox = Math.sin(t * plane.speed + plane.phase) * 20;
+    const oy = Math.cos(t * plane.speed * 0.7 + plane.phase) * 15;
+    const alpha = 0.04 + 0.02 * Math.sin(t * 0.4 + plane.phase);
+    ctx.fillStyle = `hsla(${plane.hue},50%,25%,${alpha})`;
+    ctx.fillRect(ox - 20, oy - 20, w + 40, h + 40);
+  }
+
+  // Quantum interference pattern
+  for (let x = 0; x < w; x += 4) {
+    const wave1 = Math.sin(x * 0.05 + t * 2) * 0.5;
+    const wave2 = Math.sin(x * 0.08 - t * 1.5) * 0.3;
+    const intensity = Math.abs(wave1 + wave2);
+    if (intensity > 0.3) {
+      ctx.fillStyle = `rgba(200,100,255,${intensity * 0.08})`;
+      ctx.fillRect(x, 0, 3, h);
+    }
+  }
+
+  // Reality bubbles — each is a "universe"
+  const bubbleRng = seededRandom(1010);
+  for (let i = 0; i < 8; i++) {
+    const bx = bubbleRng() * w;
+    const by = bubbleRng() * h;
+    const br = 10 + bubbleRng() * 25;
+    const breathe = 1 + 0.1 * Math.sin(t * 1.2 + i * 0.8);
+    const hue = (i * 45 + t * 15) % 360;
+
+    // Membrane
+    ctx.strokeStyle = `hsla(${hue},70%,60%,${0.15 + 0.1 * Math.sin(t * 2 + i)})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(bx, by, br * breathe, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Interior glow
+    const bubbleGrad = ctx.createRadialGradient(bx, by, 0, bx, by, br * breathe);
+    bubbleGrad.addColorStop(0, `hsla(${hue},80%,70%,0.12)`);
+    bubbleGrad.addColorStop(0.7, `hsla(${hue},60%,40%,0.04)`);
+    bubbleGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = bubbleGrad;
+    ctx.beginPath();
+    ctx.arc(bx, by, br * breathe, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Mini stars inside bubble
+    for (let s = 0; s < 5; s++) {
+      const sx = bx + (bubbleRng() - 0.5) * br * 1.2;
+      const sy = by + (bubbleRng() - 0.5) * br * 1.2;
+      const dd = Math.sqrt((sx - bx) ** 2 + (sy - by) ** 2);
+      if (dd < br * breathe * 0.9) {
+        const twinkle = 0.3 + 0.7 * Math.sin(t * 5 + s + i);
+        ctx.fillStyle = `rgba(255,255,255,${twinkle * 0.5})`;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 0.5 + bubbleRng() * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  // Central nexus — the convergence point of all realities
+  const cx = w * 0.5, cy = h * 0.5;
+  for (let ring = 0; ring < 6; ring++) {
+    const rr = 8 + ring * 7;
+    const ringSpeed = (ring % 2 === 0 ? 1 : -1) * (1 + ring * 0.3);
+    const hue = (ring * 60 + t * 30) % 360;
+    ctx.strokeStyle = `hsla(${hue},80%,65%,${0.2 - ring * 0.025})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rr, rr * 0.6, t * ringSpeed * 0.1, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Nexus core
+  const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 12);
+  coreGrad.addColorStop(0, `rgba(255,255,255,${0.5 + 0.3 * Math.sin(t * 3)})`);
+  coreGrad.addColorStop(0.5, `rgba(200,100,255,0.2)`);
+  coreGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = coreGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 // --- Era 3 (new): Digital Age ---
 function drawDigitalAge(ctx, w, h, t) {
   // Dark background with circuit-board feel
@@ -1213,8 +1385,8 @@ function getClickableElements(era, w, h, t) {
     });
   }
 
-  if (era === 7) {
-    // Galaxies
+  if (era === 9) {
+    // Intergalactic — galaxy clusters + cosmic web
     const galaxies = [
       { x: w * 0.2, y: h * 0.3, size: 20 },
       { x: w * 0.7, y: h * 0.25, size: 28 },
@@ -1234,8 +1406,8 @@ function getClickableElements(era, w, h, t) {
     });
   }
 
-  if (era === 8) {
-    // Portals
+  if (era === 10) {
+    // Multiverse — reality portals + quantum echoes
     const portals = [
       { x: w * 0.25, y: h * 0.35, r: 22 },
       { x: w * 0.72, y: h * 0.55, r: 18 },
@@ -1454,8 +1626,8 @@ export function GameCanvas({ state, onUpdate }) {
         case 6: drawEra5(ctx, w, h, t); break;  // Interstellar
         case 7: drawDysonEra(ctx, w, h, t); break;
         case 8: drawEra6(ctx, w, h, t); break;  // Galactic
-        case 9: drawEra7(ctx, w, h, t); break;  // Intergalactic
-        case 10: drawEra8(ctx, w, h, t); break; // Multiverse
+        case 9: drawIntergalactic(ctx, w, h, t); break;
+        case 10: drawMultiverse(ctx, w, h, t); break;
         default: drawEra1(ctx, w, h, t); break;
       }
 

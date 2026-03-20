@@ -661,7 +661,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 0.2 },
     ],
     description: 'Gravitational lensing reveals hidden star systems and dark energy',
-    prerequisites: ['dysonSphere'],
+    prerequisites: ['starLifting'],
   },
 
   // Era 8: Galactic
@@ -1043,7 +1043,7 @@ export const upgrades = {
       { type: 'production_add', target: 'cosmicPower', value: 5 },
     ],
     description: 'Trade between parallel realities — everything flows',
-    prerequisites: ['realityWeaving'],
+    prerequisites: ['dimensionalAnchors'],
   },
   dimensionalWeaver: {
     id: 'dimensionalWeaver', name: 'Dimensional Weaver', era: 10,
@@ -1164,7 +1164,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 1 },
     ],
     description: 'Connect galaxies — massive colony expansion and star system discovery',
-    prerequisites: ['voidBridges'],
+    prerequisites: ['cosmicInfrastructure'],
   },
   darkMatterLens: {
     id: 'darkMatterLens', name: 'Dark Matter Lens', era: 9,
@@ -1214,7 +1214,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 36 },
     ],
     description: 'Forge materials in neutron star cores — extreme pressure yields',
-    prerequisites: ['starLifting'],
+    prerequisites: ['megastructureFoundry'],
   },
   stellarAccelerator: {
     id: 'stellarAccelerator', name: 'Stellar Accelerator', era: 7,
@@ -1326,7 +1326,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 1.6 },
     ],
     description: 'Mine nebulae for dark energy and exotic materials',
-    prerequisites: ['warpDrive'],
+    prerequisites: ['stellarCartography'],
   },
   stellarNavigation: {
     id: 'stellarNavigation', name: 'Stellar Navigation', era: 6,
@@ -1366,7 +1366,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 0.5 },
     ],
     description: 'Interstellar fusion — +12 energy/s and bonus dark energy',
-    prerequisites: ['warpDrive'],
+    prerequisites: ['darkEnergyCollector'],
   },
   diplomaticCorps: {
     id: 'diplomaticCorps', name: 'Diplomatic Corps', era: 6,
@@ -1686,7 +1686,7 @@ export const upgrades = {
       { type: 'production_add', target: 'rocketFuel', value: 1 },
     ],
     description: 'Mine methane lakes on Titan for exotic materials and fuel',
-    prerequisites: ['asteroidMining'],
+    prerequisites: ['outerColony'],
   },
   exoplanetSurvey: {
     id: 'exoplanetSurvey', name: 'Exoplanet Survey', era: 5,
@@ -1706,7 +1706,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 1 },
     ],
     description: 'Generate stable wormholes — +8 star systems/s and +1 exotic matter/s',
-    prerequisites: ['wormholeNetwork'],
+    prerequisites: ['darkMatterHarvest'],
   },
   civilizationNetwork: {
     id: 'civilizationNetwork', name: 'Civilization Network', era: 8,
@@ -2110,7 +2110,7 @@ export const upgrades = {
 
   // Era 9
   entropyLens: { id: 'entropyLens', name: 'Entropy Lens', era: 9, cost: { universalConstants: 12, cosmicPower: 100, darkEnergy: 70 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 12 }, { type: 'production_add', target: 'universalConstants', value: 6 }], description: 'Focus entropy into power — +12 cosmic power/s and +6 constants/s', prerequisites: ['entropyReversal', 'singularityDrive'] },
-  dimensionalBeacon: { id: 'dimensionalBeacon', name: 'Dimensional Beacon', era: 9, cost: { cosmicPower: 90, universalConstants: 10, realityFragments: 5 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 0.5 }, { type: 'production_add', target: 'cosmicPower', value: 6 }], description: 'Beacon across dimensions draws reality fragments', prerequisites: ['voidBridges'] },
+  dimensionalBeacon: { id: 'dimensionalBeacon', name: 'Dimensional Beacon', era: 9, cost: { cosmicPower: 90, universalConstants: 10, realityFragments: 5 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 0.5 }, { type: 'production_add', target: 'cosmicPower', value: 6 }], description: 'Beacon across dimensions draws reality fragments', prerequisites: ['entropyReversal'] },
   cosmicSynthesizer: { id: 'cosmicSynthesizer', name: 'Cosmic Synthesizer', era: 9, cost: { universalConstants: 15, exoticMatter: 50, cosmicPower: 120 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 24 }, { type: 'production_add', target: 'universalConstants', value: 0.3 }], description: 'Synthesize exotic matter from cosmic energy — +24 exotic matter/s', prerequisites: ['cosmicFarming'] },
 
   // Era 10
@@ -2240,7 +2240,7 @@ export const upgrades = {
   stellarComputeGrid: { id: 'stellarComputeGrid', name: 'Stellar Compute Grid', era: 7, cost: { megastructures: 9, research: 120, software: 60 }, effects: [{ type: 'production_add', target: 'research', value: 9.6 }, { type: 'production_add', target: 'data', value: 9.6 }], description: 'A compute grid spanning stars — +9.6 research/s and +9.6 data/s', prerequisites: ['stellarComputer', 'hyperspaceTap'] },
 
   // Era 8
-  darkMatterLoom: { id: 'darkMatterLoom', name: 'Dark Matter Loom', era: 8, cost: { exoticMatter: 35, darkEnergy: 50, megastructures: 12 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 8 }, { type: 'production_add', target: 'megastructures', value: 4 }], description: 'Weave dark matter into structures — +8 exotic matter/s and +4 megastructures/s', prerequisites: ['darkMatterHarvest'] },
+  darkMatterLoom: { id: 'darkMatterLoom', name: 'Dark Matter Loom', era: 8, cost: { exoticMatter: 35, darkEnergy: 50, megastructures: 12 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 8 }, { type: 'production_add', target: 'megastructures', value: 4 }], description: 'Weave dark matter into structures — +8 exotic matter/s and +4 megastructures/s', prerequisites: ['galacticSenate'] },
   galacticAcademy: { id: 'galacticAcademy', name: 'Galactic Academy', era: 8, cost: { galacticInfluence: 70, research: 150, colonies: 25 }, effects: [{ type: 'production_add', target: 'research', value: 16 }, { type: 'production_add', target: 'galacticInfluence', value: 4 }], description: 'An academy for all species — +16 research/s and +4 influence/s', prerequisites: ['galacticLibrary'] },
   voidSiphon: { id: 'voidSiphon', name: 'Void Siphon', era: 8, cost: { darkEnergy: 60, cosmicPower: 8, exoticMatter: 20 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 0.5 }, { type: 'production_add', target: 'darkEnergy', value: 8 }], description: 'Siphon energy from the void — +8 dark energy/s and trickle cosmic power', prerequisites: ['matterReplicators'] },
 
@@ -2249,7 +2249,7 @@ export const upgrades = {
   temporalAccumulator: { id: 'temporalAccumulator', name: 'Temporal Accumulator', era: 9, cost: { universalConstants: 16, cosmicPower: 130, galacticInfluence: 80 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 12 }, { type: 'production_add', target: 'galacticInfluence', value: 24 }], description: 'Accumulate temporal knowledge — +12 constants/s and +24 influence/s', prerequisites: ['temporalArchive'] },
 
   // Era 10
-  quantumForge: { id: 'quantumForge', name: 'Quantum Forge', era: 10, cost: { quantumEchoes: 70, realityFragments: 100, cosmicPower: 350 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 20 }], description: 'Forge quantum echoes into reality — +40 echoes/s and +20 fragments/s', prerequisites: ['dimensionalAnchors'] },
+  quantumForge: { id: 'quantumForge', name: 'Quantum Forge', era: 10, cost: { quantumEchoes: 70, realityFragments: 100, cosmicPower: 350 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 20 }], description: 'Forge quantum echoes into reality — +40 echoes/s and +20 fragments/s', prerequisites: ['parallelProcessing'] },
   infiniteRegress: { id: 'infiniteRegress', name: 'Infinite Regress', era: 10, cost: { universalConstants: 30, quantumEchoes: 90, realityFragments: 120 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 40 }, { type: 'production_add', target: 'cosmicPower', value: 40 }], description: 'Infinite recursion amplifies constants and cosmic power — +40/s each', prerequisites: ['echoSynthesizer'] },
   realityHarvester: { id: 'realityHarvester', name: 'Reality Harvester', era: 10, cost: { realityFragments: 140, quantumEchoes: 60, universalConstants: 22 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 75 }, { type: 'production_add', target: 'quantumEchoes', value: 2 }], description: 'Harvest fragments from dying realities — +75 fragments/s and +2 echoes/s', prerequisites: ['omniversalTrade'] },
 
@@ -2296,7 +2296,7 @@ export const upgrades = {
   voidCartographer: { id: 'voidCartographer', name: 'Void Cartographer', era: 9, cost: { universalConstants: 18, cosmicPower: 140, galacticInfluence: 90 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 12 }, { type: 'production_add', target: 'exoticMatter', value: 12 }], description: 'Map the void between realities — +12 constants/s and +12 exotic matter/s', prerequisites: ['universalTranslator'] },
 
   // Era 10
-  multiversalLoom: { id: 'multiversalLoom', name: 'Multiversal Loom', era: 10, cost: { quantumEchoes: 80, realityFragments: 110, cosmicPower: 380 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 3 }], description: 'Weave echoes across realities — +40 quantum echoes/s and +3 fragments/s', prerequisites: ['dimensionalAnchors'] },
+  multiversalLoom: { id: 'multiversalLoom', name: 'Multiversal Loom', era: 10, cost: { quantumEchoes: 80, realityFragments: 110, cosmicPower: 380 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 3 }], description: 'Weave echoes across realities — +40 quantum echoes/s and +3 fragments/s', prerequisites: ['realityWeaving'] },
   paradoxResolver: { id: 'paradoxResolver', name: 'Paradox Resolver', era: 10, cost: { universalConstants: 28, quantumEchoes: 95, realityFragments: 130 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 40 }], description: 'Resolve paradoxes to stabilize reality — +40 constants/s and +40 fragments/s', prerequisites: ['multiversalNexus'] },
   echoAmplifier: { id: 'echoAmplifier', name: 'Echo Amplifier', era: 10, cost: { quantumEchoes: 100, realityFragments: 80, universalConstants: 20 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 75 }, { type: 'production_add', target: 'cosmicPower', value: 20 }, { type: 'cap_mult', target: 'quantumEchoes', value: 3 }], description: 'Amplify quantum echoes from all realities — +75 echoes/s and +20 cosmic power/s', prerequisites: ['multiversalHub'] },
   // --- 30 new upgrades (3 per era) — agent batch ---
@@ -2369,7 +2369,7 @@ export const upgrades = {
 
   // Era 5
   cryogenicVault: { id: 'cryogenicVault', name: 'Cryogenic Vault', era: 5, cost: { colonies: 5, research: 40, steel: 60 }, effects: [{ type: 'cap_mult', target: 'colonies', value: 5 }, { type: 'production_add', target: 'colonies', value: 0.1 }], description: 'Preserve colonists in cryo — expand colony capacity and growth', prerequisites: ['gravityTractor'] },
-  helium3Mining: { id: 'helium3Mining', name: 'Helium-3 Mining', era: 5, cost: { rocketFuel: 40, exoticMaterials: 15, orbitalInfra: 25 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 2 }, { type: 'production_add', target: 'energy', value: 2 }], description: 'Mine helium-3 from gas giants for fuel and energy', prerequisites: ['asteroidMining'] },
+  helium3Mining: { id: 'helium3Mining', name: 'Helium-3 Mining', era: 5, cost: { rocketFuel: 40, exoticMaterials: 15, orbitalInfra: 25 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 2 }, { type: 'production_add', target: 'energy', value: 2 }], description: 'Mine helium-3 from gas giants for fuel and energy', prerequisites: ['fuelRefinery'] },
 
   // Era 6 (3 regular + already has parallel paths via warpDrive)
   darkEnergyRefinery: { id: 'darkEnergyRefinery', name: 'Dark Energy Refinery', era: 6, cost: { darkEnergy: 30, energy: 120, research: 70 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 3.2 }, { type: 'production_add', target: 'energy', value: 3 }], description: 'Refine raw dark energy into usable forms — +3.2 dark energy/s and +3 energy/s', prerequisites: ['antimatterRefinery', 'xenoBiome'] },
