@@ -138,6 +138,20 @@ export function UpgradePanel({ state, onUpdate }) {
           ))}
         </div>
       )}
+      {(() => {
+        const affordableNonRepeatable = filteredAvailable.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
+        return affordableNonRepeatable.length >= 3 && (
+          <button
+            className="gather-btn"
+            style={{ width: '100%', marginBottom: '4px', padding: '4px', fontSize: '0.8em' }}
+            onClick={() => {
+              affordableNonRepeatable.forEach(u => onUpdate(s => purchaseUpgrade(s, u.id)));
+            }}
+          >
+            Buy All Affordable ({affordableNonRepeatable.length})
+          </button>
+        );
+      })()}
       {available.length > 4 && (
         <div className="upgrade-sort">
           <button className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>All</button>
