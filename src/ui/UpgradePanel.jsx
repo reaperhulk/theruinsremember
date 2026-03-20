@@ -166,8 +166,9 @@ export function UpgradePanel({ state, onUpdate }) {
                 className="upgrade-btn buy-max-btn affordable"
                 onClick={() => onUpdate(s => buyMaxRepeatable(s, upgrade.id))}
                 title="Buy as many as you can afford"
+                style={{ fontSize: '0.8em', padding: '4px 8px' }}
               >
-                Buy Max
+                Max
               </button>
             )}
             </div>
