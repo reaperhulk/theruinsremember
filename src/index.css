@@ -1342,6 +1342,13 @@ canvas:hover {
   color: #88dd88;
 }
 
+.resource-row.consuming .resource-name::after {
+  content: ' (consumed)';
+  font-size: 0.7em;
+  color: #ff8844;
+  opacity: 0.6;
+}
+
 @keyframes resource-pulse {
   0%, 100% { background: transparent; }
   50% { background: rgba(80, 200, 80, 0.06); }

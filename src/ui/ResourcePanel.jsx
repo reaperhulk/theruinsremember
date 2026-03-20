@@ -75,7 +75,7 @@ export function ResourcePanel({ state, onUpdate }) {
                   if (r.id === 'rocketFuel' && state.era >= 4) tooltipParts.push(`Consumed by: orbital infra (0.5/orbital/s)`);
                   const tooltip = tooltipParts.join('\n');
                   return (
-                    <div key={r.id} className={`resource-row ${r.rate > 0 ? 'producing' : ''}`} title={tooltip}>
+                    <div key={r.id} className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${(r.id === 'food' || r.id === 'energy' || r.id === 'rocketFuel') && r.rate > 0 ? 'consuming' : ''}`} title={tooltip}>
                       <span className="resource-name">
                         {r.def?.name || r.id}
                       </span>
