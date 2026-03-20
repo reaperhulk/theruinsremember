@@ -422,6 +422,7 @@ body {
 /* Era */
 .era-panel {
   text-align: center;
+  transition: background 1s ease;
 }
 
 .era-panel h2 {
@@ -438,6 +439,12 @@ body {
 .era-stats {
   font-size: 0.8em;
   color: #666;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Era progress smooth transition */
+.era-panel .upgrade-progress-fill {
+  transition: width 0.5s ease-out;
 }
 
 /* Canvas */
