@@ -1,4 +1,9 @@
 import { formatNumber, formatTime } from './format.js';
+import { resources as resourceDefs } from '../data/resources.js';
+
+function resourceName(id) {
+  return resourceDefs[id]?.name || id;
+}
 
 export function OfflineReport({ report, onDismiss }) {
   if (!report) return null;
@@ -16,7 +21,7 @@ export function OfflineReport({ report, onDismiss }) {
             <div className="offline-gains">
               {gains.map(([id, amount]) => (
                 <div key={id} className="offline-gain-row">
-                  <span>{id}</span>
+                  <span>{resourceName(id)}</span>
                   <span className="offline-gain-amount">+{formatNumber(amount)}</span>
                 </div>
               ))}

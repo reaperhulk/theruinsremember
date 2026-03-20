@@ -121,6 +121,26 @@ export const upgrades = {
     description: 'Mass production of steel and basic electronics',
     prerequisites: ['foundry'],
   },
+  printingPress: {
+    id: 'printingPress', name: 'Printing Press', era: 2,
+    cost: { steel: 12, materials: 20, labor: 15 },
+    effects: [
+      { type: 'production_add', target: 'research', value: 0.3 },
+      { type: 'cap_mult', target: 'research', value: 2 },
+    ],
+    description: 'Mass printed books expand research capacity',
+    prerequisites: ['foundry'],
+  },
+  railroad: {
+    id: 'railroad', name: 'Railroad', era: 2,
+    cost: { steel: 25, materials: 20, labor: 25 },
+    effects: [
+      { type: 'production_mult', target: 'materials', value: 3 },
+      { type: 'production_add', target: 'steel', value: 0.5 },
+    ],
+    description: 'Rail transport triples materials and boosts steel production',
+    prerequisites: ['foundry'],
+  },
   powerGrid: {
     id: 'powerGrid', name: 'Power Grid', era: 2,
     cost: { steel: 40, electronics: 15 },
