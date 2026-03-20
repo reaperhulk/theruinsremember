@@ -29,7 +29,7 @@ export function StarChartPanel({ state, onUpdate }) {
 
   return (
     <div className="panel star-chart-panel">
-      <h2>Star Chart ({routes.length} routes, {systems.length} systems)</h2>
+      <h2>Star Chart{routes.length > 0 ? ` (${routes.length} routes)` : ` (${systems.length} systems)`}</h2>
       <div className="dock-info">
         <span>Routes: {routes.length}/10</span>
         <span>Systems: {systems.length}</span>
