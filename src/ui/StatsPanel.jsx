@@ -130,6 +130,17 @@ export function StatsPanel({ state }) {
       <div className="achievement-progress-bar">
         <div className="achievement-progress-fill" style={{ width: `${Math.floor(earnedCount / achievementList.length * 100)}%` }} />
       </div>
+      {achievementList.filter(a => !a.earned).length > 0 && achievementList.filter(a => !a.earned).length <= 20 && (
+        <div className="achievement-list" style={{ marginBottom: '6px' }}>
+          <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '2px' }}>Next up:</div>
+          {achievementList.filter(a => !a.earned).slice(0, 3).map(a => (
+            <div key={a.id} className="achievement locked" style={{ opacity: 0.7 }}>
+              <span className="achievement-name">? {a.name}</span>
+              <span className="achievement-desc">{a.description} (+{a.reward}pts)</span>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="achievement-list">
         {achievementList.filter(a => a.earned).map(a => (
           <div key={a.id} className="achievement earned">
