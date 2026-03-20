@@ -116,9 +116,9 @@ export const upgrades = {
     cost: { steel: 15, energy: 20, food: 25 },
     effects: [
       { type: 'production_mult', target: 'steel', value: 3 },
-      { type: 'production_add', target: 'electronics', value: 0.3 },
+      { type: 'production_add', target: 'electronics', value: 0.5 },
     ],
-    description: 'Mass production of steel and basic electronics',
+    description: 'Mass production of steel and electronics',
     prerequisites: ['foundry'],
   },
   steelForge: {
@@ -151,8 +151,8 @@ export const upgrades = {
   computingLab: {
     id: 'computingLab', name: 'Computing Lab', era: 2,
     cost: { electronics: 30, energy: 40, food: 50 },
-    effects: [{ type: 'production_add', target: 'research', value: 0.5 }],
-    description: 'Begin scientific research',
+    effects: [{ type: 'production_add', target: 'research', value: 1.0 }],
+    description: 'Begin scientific research — steady research output',
     prerequisites: ['assemblyLines'],
   },
   automation: {
