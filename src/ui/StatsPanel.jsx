@@ -83,16 +83,18 @@ export function StatsPanel({ state }) {
         <div className="achievement-progress-fill" style={{ width: `${Math.floor(earnedCount / achievementList.length * 100)}%` }} />
       </div>
       <div className="achievement-list">
-        {achievementList.map(a => (
-          <div key={a.id} className={`achievement ${a.earned ? 'earned' : 'locked'}`}>
-            <span className="achievement-name">
-              {a.earned ? a.name : '???'}
-            </span>
-            <span className="achievement-desc">
-              {a.earned ? `${a.description} (+${a.reward}pts)` : 'Hidden'}
-            </span>
+        {achievementList.filter(a => a.earned).map(a => (
+          <div key={a.id} className="achievement earned">
+            <span className="achievement-name">{a.name}</span>
+            <span className="achievement-desc">{a.description} (+{a.reward}pts)</span>
           </div>
         ))}
+        {achievementList.length - earnedCount > 0 && (
+          <div className="achievement locked">
+            <span className="achievement-name">+ {achievementList.length - earnedCount} hidden achievements</span>
+            <span className="achievement-desc">Keep playing to discover them!</span>
+          </div>
+        )}
       </div>
     </div>
   );
