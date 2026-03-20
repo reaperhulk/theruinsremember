@@ -46,7 +46,11 @@ export function FactoryPanel({ state, onUpdate }) {
           );
         })}
       </div>
-      <p className="mining-hint">Assign workers to boost production lines{!efficient && ' — fill all lines for +50% bonus'}</p>
+      <p className="mining-hint">
+        {!efficient ? 'Fill all lines for +50%' : ''}
+        {efficient && !fullCapacity ? ' — use all workers for x2' : ''}
+        {fullCapacity ? ' — Maximum output!' : ''}
+      </p>
     </div>
   );
 }
