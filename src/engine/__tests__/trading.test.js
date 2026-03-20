@@ -68,8 +68,8 @@ describe('trading', () => {
   });
 
   describe('executeTrade', () => {
-    it('returns null if era < 6', () => {
-      let state = makeState({ era: 5 });
+    it('returns null if era < 4', () => {
+      let state = makeState({ era: 3 });
       state = withUnlocked(state, 'food', 100);
       state = withUnlocked(state, 'materials', 0);
       const result = executeTrade(state, 'food', 'materials', 10);
