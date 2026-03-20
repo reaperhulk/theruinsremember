@@ -73,6 +73,8 @@ export function ResourcePanel({ state, onUpdate }) {
                   if (r.id === 'food' && r.rate > 0) tooltipParts.push(`Consumed by: labor (0.3/labor/s)`);
                   if (r.id === 'energy') tooltipParts.push(`Consumed by: electronics (0.2/elec/s)`);
                   if (r.id === 'rocketFuel' && state.era >= 4) tooltipParts.push(`Consumed by: orbital infra (0.5/orbital/s)`);
+                  tooltipParts.push(`Effective: ${formatNumber(r.rate)}/s`);
+                  if (r.cap > 0) tooltipParts.push(`Cap: ${formatNumber(r.cap)}`);
                   const tooltip = tooltipParts.join('\n');
                   return (
                     <div key={r.id} className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0)) ? 'consuming' : ''}`} title={tooltip}>
