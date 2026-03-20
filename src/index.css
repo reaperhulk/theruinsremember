@@ -115,6 +115,10 @@ body {
   margin-bottom: 8px;
   border-bottom: 1px solid #2a2a4a;
   padding-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 /* Resources */
