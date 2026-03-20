@@ -1286,6 +1286,18 @@ export const events = {
   // Era 10
   realityBlossom: { id: 'realityBlossom', name: 'Reality Blossom', description: 'Realities blossom like flowers — fragments rain from everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
   echoSymphony: { id: 'echoSymphony', name: 'Echo Symphony', description: 'Infinite echoes sing in harmony — quantum echoes amplified beyond measure!', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
+
+  // Final push to 1000 content items
+  geologicalSurvey: { id: 'geologicalSurvey', name: 'Geological Survey', description: 'Rich mineral deposits found beneath the surface!', minEra: 2, type: 'instant', effect: { resourceId: 'materials', amount: 60 } },
+  scientificRenaissance: { id: 'scientificRenaissance', name: 'Scientific Renaissance', description: 'A burst of scientific progress!', minEra: 3, type: 'timed', duration: 40, effect: { resourceId: 'research', rateMultBonus: 5 } },
+  orbitalAlignment: { id: 'orbitalAlignment', name: 'Orbital Alignment', description: 'Planets align for optimal launch windows!', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'rocketFuel', rateMultBonus: 5 } },
+  solarMaximum: { id: 'solarMaximum', name: 'Solar Maximum', description: 'The sun reaches peak activity — energy floods your collectors!', minEra: 5, type: 'timed', duration: 45, effect: { resourceId: 'energy', rateMultBonus: 8 } },
+  interstellarCurrent: { id: 'interstellarCurrent', name: 'Interstellar Current', description: 'A current of dark energy sweeps through the sector!', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 80 } },
+  galacticHarmonics: { id: 'galacticHarmonics', name: 'Galactic Harmonics', description: 'Stellar vibrations produce exotic materials!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 30 } },
+  cosmicDawn: { id: 'cosmicDawn', name: 'Cosmic Dawn', description: 'A new cosmic age begins — all production surges!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
+  entropyShift: { id: 'entropyShift', name: 'Entropy Shift', description: 'Entropy momentarily reverses — universal constants crystallize!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 25 } },
+  multiversalEcho: { id: 'multiversalEcho', name: 'Multiversal Echo', description: 'An echo from every reality simultaneously — massive fragment surge!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 800 } },
+  dimensionalCollapse: { id: 'dimensionalCollapse', name: 'Dimensional Collapse', description: 'A dimension collapses — quantum echoes scatter everywhere!', minEra: 10, type: 'timed', duration: 40, effect: { resourceId: 'quantumEchoes', rateMultBonus: 20 } },
 };
 
 // Get events eligible for the current era

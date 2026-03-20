@@ -246,4 +246,21 @@ export const achievements = [
   { id: 'repeatAddict2000', name: 'Perpetual Machine', description: 'Buy any repeatable upgrade 2000 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 2000), reward: 35 },
   { id: 'starNetwork100', name: 'Omniversal Web', description: 'Create 100 star routes', check: s => (s.starRoutes?.length || 0) >= 100, reward: 20 },
   { id: 'marathon720', name: 'Month Runner', description: 'Play for 720 hours total', check: s => s.totalTime >= 2592000, reward: 30 },
+
+  // Final push — 1000 content milestone
+  { id: 'allEras', name: 'All Eras', description: 'Visit every era in a single run', check: s => s.era >= 10, reward: 10 },
+  { id: 'speedrunEra2', name: 'Quick Industrialist', description: 'Reach Era 2 in under 2 minutes', check: s => s.era >= 2 && (s.bestEraTimes?.[2] || Infinity) < 120, reward: 3 },
+  { id: 'gemStreak20', name: 'Hot Streak', description: 'Reach a mining streak of 20', check: s => (s.miningStreak || 0) >= 20, reward: 2 },
+  { id: 'combo3dock', name: 'Triple Dock', description: 'Reach a 3x docking combo', check: s => (s.dockingCombo || 0) >= 3, reward: 2 },
+  { id: 'firstWeave', name: 'First Weave', description: 'Complete your first reality weave', check: s => (s.totalWeaves || 0) >= 1, reward: 1 },
+  { id: 'firstHack', name: 'First Hack', description: 'Complete your first hack', check: s => (s.hackSuccesses || 0) >= 1, reward: 1 },
+  { id: 'firstDock', name: 'First Dock', description: 'Land your first dock', check: s => (s.dockingSuccesses || 0) >= 1, reward: 1 },
+  { id: 'firstRoute', name: 'First Route', description: 'Create your first star route', check: s => (s.starRoutes?.length || 0) >= 1, reward: 1 },
+  { id: 'allMiniGames', name: 'Mini-Game Master', description: 'Use all 7 mini-games (mine, factory, hack, dock, colony, star chart, weave)', check: s => (s.totalGems || 0) > 0 && Object.keys(s.factoryAllocation || {}).length > 0 && (s.hackSuccesses || 0) > 0 && (s.dockingAttempts || 0) > 0 && (s.colonyAssignments?.growth || 0) + (s.colonyAssignments?.science || 0) + (s.colonyAssignments?.industry || 0) > 0 && (s.starRoutes?.length || 0) > 0 && (s.totalWeaves || 0) > 0, reward: 10 },
+  { id: 'tenPrestigeUpgrades', name: 'Prestige Veteran', description: 'Buy 10 prestige upgrades', check: s => Object.keys(s.prestigeUpgrades || {}).length >= 10, reward: 5 },
+  { id: 'resourceDiversifier', name: 'Resource Diversifier', description: 'Have 15 unlocked resources simultaneously', check: s => Object.values(s.resources || {}).filter(r => r.unlocked).length >= 15, reward: 3 },
+  { id: 'upgradeSavant', name: 'Upgrade Savant', description: 'Purchase 250 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 250, reward: 15 },
+  { id: 'eventCollector', name: 'Event Collector', description: 'See 30 events in a single run', check: s => (s.eventLog?.length || 0) >= 8 && s.totalTime > 300, reward: 3 },
+  { id: 'factoryMaxed', name: 'Factory Maxed', description: 'Assign 20+ factory workers', check: s => { const a = s.factoryAllocation || {}; return (a.steel||0) + (a.electronics||0) + (a.research||0) >= 20; }, reward: 5 },
+  { id: 'thousandContent', name: 'Content Complete', description: 'You found the 1000th piece of content — the multiverse is truly infinite', check: s => s.era >= 10 && Object.keys(s.upgrades || {}).length >= 100, reward: 100 },
 ];
