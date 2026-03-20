@@ -8,7 +8,7 @@ export function PrestigePanel({ state, onUpdate }) {
 
   return (
     <div className="panel prestige-panel">
-      <h2>Prestige Shop</h2>
+      <h2>Prestige ({points} pts, {shop.filter(u => u.owned).length}/{shop.length} owned)</h2>
       <div className="prestige-info">
         <div className="stat-row">
           <span>Prestige Points:</span>
