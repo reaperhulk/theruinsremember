@@ -1600,6 +1600,15 @@ canvas:hover {
 }
 
 /* Upgrade row hover lift */
+.upgrade-row {
+  animation: upgrade-appear 0.2s ease-out;
+}
+
+@keyframes upgrade-appear {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .upgrade-row:hover .upgrade-btn:not(:disabled) {
   transform: translateY(-1px);
   transition: transform 0.15s ease;
