@@ -204,4 +204,18 @@ export const achievements = [
   { id: 'weave500long', name: 'Fabric Weaver', description: 'Complete 500 weaves', check: s => (s.totalWeaves || 0) >= 500, reward: 25 },
   { id: 'gem50000', name: 'Gem Singularity', description: 'Find 50000 gems', check: s => (s.totalGems || 0) >= 50000, reward: 30 },
   { id: 'repeatAddict1000', name: 'Eternal Assembly', description: 'Buy any repeatable upgrade 1000 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 1000), reward: 30 },
+
+  // --- 12 new achievements ---
+  { id: 'undecillion', name: 'Undecillionaire', description: 'Have 1 undecillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e36), reward: 45 },
+  { id: 'speedrunEra10fast', name: 'Reality Bender', description: 'Reach Era 10 in under 20 minutes', check: s => s.era >= 10 && (s.bestEraTimes?.[10] || Infinity) < 1200, reward: 15 },
+  { id: 'upgrade550', name: 'Upgrade Infinity', description: 'Purchase 550 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 550, reward: 80 },
+  { id: 'techTranscendent', name: 'Tech Transcendent', description: 'Unlock 85 technologies', check: s => Object.keys(s.tech || {}).length >= 85, reward: 45 },
+  { id: 'hack1500', name: 'Digital Phantom', description: 'Complete 1500 hacks', check: s => (s.hackSuccesses || 0) >= 1500, reward: 35 },
+  { id: 'weave1500', name: 'Weave Omniscient', description: 'Complete 1500 weaves', check: s => (s.totalWeaves || 0) >= 1500, reward: 35 },
+  { id: 'docking1500', name: 'Stellar Navigator', description: 'Land 1500 perfect docks', check: s => (s.dockingPerfects || 0) >= 1500, reward: 35 },
+  { id: 'trade15000', name: 'Omniversal Bazaar', description: 'Complete 15000 trades', check: s => (s.totalTrades || 0) >= 15000, reward: 45 },
+  { id: 'gem100000', name: 'Gem Omnipotence', description: 'Find 100000 gems', check: s => (s.totalGems || 0) >= 100000, reward: 40 },
+  { id: 'prestigeInfinite', name: 'Prestige Infinite', description: 'Prestige 1000 times', check: s => (s.prestigeCount || 0) >= 1000, reward: 300 },
+  { id: 'allEra10Upgrades', name: 'Multiverse Master', description: 'Buy all Era 10 upgrades', check: s => { const era10 = ['realityWeaving','dimensionalAnchors','parallelProcessing','realityLoom','omniscienceEngine','dimensionalRift','infinityMirror','multiversalHarmony','infinityWell','echoSynthesizer','multiversalNexus']; return era10.every(id => s.upgrades?.[id]); }, reward: 50 },
+  { id: 'colonyGalactic', name: 'Galactic Colonizer', description: 'Assign 500+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 500; }, reward: 25 },
 ];

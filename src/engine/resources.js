@@ -65,11 +65,17 @@ export function gather(state, resourceId, amount = 1) {
   if (!r || !r.unlocked) return state;
   const eraScale = 1 + (state.era - 1) * 0.5;
   const gathered = amount * r.rateMult * state.prestigeMultiplier * eraScale;
+  const cap = getEffectiveCap(state, resourceId);
+  let newAmount = r.amount + gathered;
+  // Enforce cap on gathering (clicking)
+  if (cap > 0 && newAmount > cap) {
+    newAmount = Math.max(r.amount, cap); // don't reduce if already over
+  }
   return {
     ...state,
     resources: {
       ...state.resources,
-      [resourceId]: { ...r, amount: r.amount + gathered },
+      [resourceId]: { ...r, amount: newAmount },
     },
   };
 }

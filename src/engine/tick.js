@@ -1,4 +1,4 @@
-import { calculateProduction } from './resources.js';
+import { calculateProduction, getEffectiveCap } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
 import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
 import { getFactoryBonus } from './factory.js';
@@ -48,7 +48,12 @@ export function tick(state, dt) {
     const timedMult = getTimedRateMultiplier(state, id);
     effectiveRate *= timedMult;
 
-    const newAmount = r.amount + effectiveRate * dt;
+    const cap = getEffectiveCap(state, id);
+    let newAmount = r.amount + effectiveRate * dt;
+    // Enforce resource cap: production cannot push above cap
+    if (cap > 0 && newAmount > cap && effectiveRate > 0) {
+      newAmount = Math.max(r.amount, cap); // don't reduce if already over cap (e.g. from giveAll)
+    }
     newResources[id] = { ...r, amount: Math.max(0, newAmount) };
   }
 
