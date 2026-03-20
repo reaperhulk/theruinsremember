@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
 import { executeTrade, getTradeRatio } from '../engine/trading.js';
-
-function formatNumber(n) {
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
-  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
-  return n.toFixed(1);
-}
+import { formatNumber } from './format.js';
 
 export function TradingPanel({ state, onUpdate }) {
   const [fromId, setFromId] = useState('');

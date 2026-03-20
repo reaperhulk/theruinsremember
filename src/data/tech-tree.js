@@ -22,14 +22,14 @@ export const techTree = {
   // Era 2 → 3 (Digital Age)
   advancedComputing: {
     id: 'advancedComputing', name: 'Advanced Computing', era: 2,
-    cost: { research: 30, electronics: 20 },
+    cost: { research: 60, electronics: 40 },
     prerequisites: [],
     grantsEra: null,
     description: 'Powerful computational systems',
   },
   digitalRevolution: {
     id: 'digitalRevolution', name: 'Digital Revolution', era: 2,
-    cost: { research: 50, electronics: 40, steel: 30 },
+    cost: { research: 100, electronics: 80, steel: 60 },
     prerequisites: ['advancedComputing'],
     grantsEra: 3,
     description: 'The world goes digital — software and data become key resources',
@@ -38,14 +38,14 @@ export const techTree = {
   // Era 3 → 4 (Digital Age → Space Age)
   globalNetwork: {
     id: 'globalNetwork', name: 'Global Network', era: 3,
-    cost: { software: 25, data: 10 },
+    cost: { software: 60, data: 30 },
     prerequisites: [],
     grantsEra: null,
     description: 'A planet-spanning digital network — prerequisite for space era tech',
   },
   spaceProgram: {
     id: 'spaceProgram', name: 'Space Program', era: 3,
-    cost: { software: 40, data: 20, research: 60 },
+    cost: { software: 120, data: 60, research: 150 },
     prerequisites: ['globalNetwork'],
     grantsEra: 4,
     description: 'An organized program to reach space',
@@ -54,14 +54,14 @@ export const techTree = {
   // Era 4 → 5 (Space Age → Solar System)
   interplanetaryNav: {
     id: 'interplanetaryNav', name: 'Interplanetary Navigation', era: 4,
-    cost: { research: 50, rocketFuel: 40, orbitalInfra: 15 },
+    cost: { research: 150, rocketFuel: 100, orbitalInfra: 40 },
     prerequisites: [],
     grantsEra: null,
     description: 'Navigate between planets',
   },
   interplanetaryShip: {
     id: 'interplanetaryShip', name: 'Interplanetary Ship', era: 4,
-    cost: { orbitalInfra: 30, rocketFuel: 80, steel: 100, research: 60 },
+    cost: { orbitalInfra: 80, rocketFuel: 200, steel: 300, research: 200 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: 5,
     description: 'A ship capable of reaching other planets',
@@ -70,14 +70,14 @@ export const techTree = {
   // Era 5 → 6 (Solar System → Interstellar)
   advancedPropulsion: {
     id: 'advancedPropulsion', name: 'Advanced Propulsion', era: 5,
-    cost: { research: 80, exoticMaterials: 30, energy: 100 },
+    cost: { research: 250, exoticMaterials: 80, energy: 300 },
     prerequisites: [],
     grantsEra: null,
     description: 'Beyond chemical rockets',
   },
   ftlResearch: {
     id: 'ftlResearch', name: 'FTL Research', era: 5,
-    cost: { research: 120, exoticMaterials: 50, colonies: 10 },
+    cost: { research: 400, exoticMaterials: 150, colonies: 20 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: 6,
     description: 'Faster-than-light travel theory',
@@ -86,14 +86,14 @@ export const techTree = {
   // Era 6 → 7 (Interstellar → Dyson Era)
   galacticCartography: {
     id: 'galacticCartography', name: 'Galactic Cartography', era: 6,
-    cost: { starSystems: 15, research: 100, darkEnergy: 40 },
+    cost: { starSystems: 30, research: 300, darkEnergy: 100 },
     prerequisites: [],
     grantsEra: null,
     description: 'Map the galaxy',
   },
   megaEngineering: {
     id: 'megaEngineering', name: 'Mega Engineering', era: 6,
-    cost: { starSystems: 20, darkEnergy: 60, research: 120 },
+    cost: { starSystems: 50, darkEnergy: 150, research: 400 },
     prerequisites: ['galacticCartography'],
     grantsEra: 7,
     description: 'Engineering on a stellar scale — gateway to the Dyson Era',
@@ -102,14 +102,14 @@ export const techTree = {
   // Era 7 → 8 (Dyson Era → Galactic)
   galacticAscendancy: {
     id: 'galacticAscendancy', name: 'Galactic Ascendancy', era: 7,
-    cost: { megastructures: 10, stellarForge: 20, research: 150 },
+    cost: { megastructures: 30, stellarForge: 60, research: 500 },
     prerequisites: [],
     grantsEra: null,
     description: 'Prepare for galactic-scale civilization',
   },
   galacticNetwork: {
     id: 'galacticNetwork', name: 'Galactic Network', era: 7,
-    cost: { megastructures: 15, stellarForge: 30, research: 200 },
+    cost: { megastructures: 50, stellarForge: 100, research: 800 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: 8,
     description: 'Galaxy-spanning communication and travel network',
@@ -118,14 +118,14 @@ export const techTree = {
   // Era 8 → 9 (Galactic → Intergalactic)
   cosmicEngineering: {
     id: 'cosmicEngineering', name: 'Cosmic Engineering', era: 8,
-    cost: { exoticMatter: 40, galacticInfluence: 80, research: 200 },
+    cost: { exoticMatter: 200, galacticInfluence: 400, research: 1000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Engineer on a cosmic scale',
   },
   intergalacticBeacon: {
     id: 'intergalacticBeacon', name: 'Intergalactic Beacon', era: 8,
-    cost: { exoticMatter: 60, galacticInfluence: 150, cosmicPower: 20 },
+    cost: { exoticMatter: 400, galacticInfluence: 800, cosmicPower: 100 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: 9,
     description: 'Signal reaching beyond the galaxy',
@@ -134,14 +134,14 @@ export const techTree = {
   // Era 9 → 10 (Intergalactic → Multiverse)
   realityScience: {
     id: 'realityScience', name: 'Reality Science', era: 9,
-    cost: { universalConstants: 15, cosmicPower: 200, research: 400 },
+    cost: { universalConstants: 50, cosmicPower: 800, research: 1500 },
     prerequisites: [],
     grantsEra: null,
     description: 'Study the fabric of reality',
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
-    cost: { universalConstants: 25, cosmicPower: 400, realityFragments: 10 },
+    cost: { universalConstants: 80, cosmicPower: 1500, realityFragments: 40 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
     description: 'Detect parallel universe signatures',

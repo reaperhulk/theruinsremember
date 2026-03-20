@@ -5,14 +5,7 @@ import { eraNames } from '../engine/eras.js';
 import { getFactoryBonus } from '../engine/factory.js';
 import { getColonyBonus } from '../engine/colonies.js';
 import { getRouteBonus } from '../engine/starChart.js';
-
-function formatNumber(n) {
-  if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
-  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
-  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
-  return n.toFixed(1);
-}
+import { formatNumber } from './format.js';
 
 export function ResourcePanel({ state, onUpdate }) {
   const [collapsed, setCollapsed] = useState({});
