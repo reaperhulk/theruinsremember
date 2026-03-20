@@ -1,5 +1,8 @@
 import { getAssignableColonies, getColonyAssignments, getTotalColoniesAssigned, assignColonies, getColonyBonus, getColonyStrategy } from '../engine/colonies.js';
 import { formatNumber } from './format.js';
+import { resources as resourceDefs } from '../data/resources.js';
+
+function resourceName(id) { return resourceDefs[id]?.name || id; }
 
 const FOCUS_TYPES = [
   { id: 'growth', label: 'Growth', desc: 'food +2, labor +0.5', color: '#88dd88' },
@@ -78,7 +81,7 @@ export function ColonyPanel({ state, onUpdate }) {
       </div>
       {Object.keys(bonus).length > 0 && (
         <div className="colony-bonus">
-          Bonus: {Object.entries(bonus).map(([r, v]) => `${r} +${v.toFixed(1)}`).join(', ')}
+          Bonus: {Object.entries(bonus).map(([r, v]) => `${resourceName(r)} +${v.toFixed(1)}`).join(', ')}
         </div>
       )}
       {strategy.type !== 'none' && (
