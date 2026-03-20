@@ -59,7 +59,7 @@ export const upgrades = {
     cost: { materials: 60, energy: 50, food: 30 },
     effects: [
       { type: 'unlock_resource', target: 'steel', value: 1 },
-      { type: 'production_add', target: 'steel', value: 0.3 },
+      { type: 'production_add', target: 'steel', value: 0.5 },
     ],
     description: 'Smelt metals into steel — gateway to industrialization',
     prerequisites: ['basicPower', 'tools'],
@@ -125,8 +125,8 @@ export const upgrades = {
     id: 'steelForge', name: 'Steel Forge', era: 2,
     cost: { steel: 12, materials: 20, labor: 15 },
     effects: [
-      { type: 'production_add', target: 'electronics', value: 0.1 },
-      { type: 'production_add', target: 'steel', value: 0.3 },
+      { type: 'production_add', target: 'electronics', value: 0.2 },
+      { type: 'production_add', target: 'steel', value: 0.5 },
     ],
     description: 'A dedicated steel forge boosts steel output and produces basic electronics',
     prerequisites: ['foundry'],
@@ -178,11 +178,11 @@ export const upgrades = {
   factoryFloor: {
     id: 'factoryFloor', name: 'Factory Floor', era: 2,
     cost: { steel: 15, electronics: 10, labor: 20 },
-    effects: [{ type: 'production_add', target: 'electronics', value: 0.2 }],
-    description: 'Each factory floor adds +0.2 electronics/s',
+    effects: [{ type: 'production_add', target: 'electronics', value: 0.4 }],
+    description: 'Each factory floor adds +0.4 electronics/s',
     prerequisites: ['assemblyLines'],
     repeatable: true,
-    costScale: 1.4,
+    costScale: 1.3,
   },
   industrialFarming: {
     id: 'industrialFarming', name: 'Industrial Farming', era: 2,
@@ -302,8 +302,8 @@ export const upgrades = {
     id: 'missionControl', name: 'Mission Control', era: 4,
     cost: { software: 30, electronics: 25, research: 20 },
     effects: [
-      { type: 'production_add', target: 'rocketFuel', value: 0.2 },
-      { type: 'production_add', target: 'data', value: 0.3 },
+      { type: 'production_add', target: 'rocketFuel', value: 0.8 },
+      { type: 'production_add', target: 'data', value: 0.5 },
     ],
     description: 'Coordinate space missions — steady fuel production and telemetry data',
     prerequisites: ['quantumComputing'],
@@ -325,7 +325,7 @@ export const upgrades = {
   spaceStation: {
     id: 'spaceStation', name: 'Space Station', era: 4,
     cost: { rocketFuel: 60, steel: 80, electronics: 40, food: 120 },
-    effects: [{ type: 'production_add', target: 'orbitalInfra', value: 0.5 }],
+    effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.0 }],
     description: 'Permanent orbital habitat',
     prerequisites: ['reusableRockets'],
   },
@@ -342,11 +342,11 @@ export const upgrades = {
   launchComplex: {
     id: 'launchComplex', name: 'Launch Complex', era: 4,
     cost: { steel: 30, energy: 20, rocketFuel: 10 },
-    effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.2 }],
-    description: 'Each launch complex adds +0.2 rocket fuel/s',
+    effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.5 }],
+    description: 'Each launch complex adds +0.5 rocket fuel/s',
     prerequisites: ['rocketScience'],
     repeatable: true,
-    costScale: 1.5,
+    costScale: 1.3,
   },
   zeroGManufacturing: {
     id: 'zeroGManufacturing', name: 'Zero-G Manufacturing', era: 4,
@@ -763,7 +763,7 @@ export const upgrades = {
   voidBridges: {
     id: 'voidBridges', name: 'Void Bridges', era: 9,
     cost: { cosmicPower: 600, darkEnergy: 400, exoticMatter: 300, labor: 3000 },
-    effects: [{ type: 'production_add', target: 'universalConstants', value: 0.1 }],
+    effects: [{ type: 'production_add', target: 'universalConstants', value: 0.5 }],
     description: 'Bridge the void between galaxy clusters',
     prerequisites: ['galaxySeeding'],
   },
@@ -2059,11 +2059,11 @@ export const upgrades = {
   stellarAcademy: { id: 'stellarAcademy', name: 'Stellar Academy', era: 6, cost: { research: 80, galacticInfluence: 20, starSystems: 4 }, effects: [{ type: 'production_add', target: 'research', value: 6.4 }, { type: 'production_add', target: 'galacticInfluence', value: 0.3 }], description: 'Train across star systems — +6.4 research/s and +0.3 influence/s', prerequisites: ['aiGovernance'] },
   voidProbe: { id: 'voidProbe', name: 'Void Probe', era: 6, cost: { darkEnergy: 25, starSystems: 3, electronics: 40 }, effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }, { type: 'production_add', target: 'data', value: 1 }], description: 'Probes into the void discover systems and transmit data', prerequisites: ['stellarCartography'] },
   chronoForge: { id: 'chronoForge', name: 'Chrono Forge', era: 7, cost: { stellarForge: 15, megastructures: 5, darkEnergy: 40 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 4.8 }, { type: 'production_add', target: 'materials', value: 9.6 }], description: 'Forge materials across timelines — +4.8 stellar/s and +9.6 materials/s', prerequisites: ['starLifting'] },
-  galacticSpire: { id: 'galacticSpire', name: 'Galactic Spire', era: 7, cost: { megastructures: 8, research: 100, galacticInfluence: 30 }, effects: [{ type: 'production_add', target: 'megastructures', value: 2.4 }, { type: 'production_add', target: 'galacticInfluence', value: 4.8 }], description: 'A spire visible across the galaxy — +2.4 megastructures/s and +4.8 influence/s', prerequisites: ['chronoAccelerator'] },
+  galacticSpire: { id: 'galacticSpire', name: 'Galactic Spire', era: 7, cost: { megastructures: 8, research: 100, galacticInfluence: 30 }, effects: [{ type: 'production_add', target: 'megastructures', value: 2.4 }, { type: 'production_add', target: 'galacticInfluence', value: 4.8 }, { type: 'cap_mult', target: 'megastructures', value: 3 }], description: 'A spire visible across the galaxy — +2.4 megastructures/s and +4.8 influence/s', prerequisites: ['chronoAccelerator'] },
   stellarGarden: { id: 'stellarGarden', name: 'Stellar Garden', era: 7, cost: { stellarForge: 10, colonies: 10, food: 200 }, effects: [{ type: 'production_add', target: 'colonies', value: 1 }, { type: 'production_add', target: 'food', value: 18 }], description: 'Grow food around stars — +18 food/s and +1 colony/s', prerequisites: ['gravitationalWave'] },
   dimensionalHarvest: { id: 'dimensionalHarvest', name: 'Dimensional Harvest', era: 8, cost: { exoticMatter: 25, darkEnergy: 50, galacticInfluence: 40 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 8 }, { type: 'production_add', target: 'cosmicPower', value: 0.5 }], description: 'Harvest resources from parallel dimensions', prerequisites: ['darkMatterHarvest', 'singularityHarvester'] },
   galacticForge: { id: 'galacticForge', name: 'Galactic Forge', era: 8, cost: { exoticMatter: 20, stellarForge: 15, megastructures: 10 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 16 }, { type: 'production_add', target: 'megastructures', value: 8 }], description: 'A forge spanning the galaxy', prerequisites: ['antimatterForge'] },
-  cosmicDiplomacy: { id: 'cosmicDiplomacy', name: 'Cosmic Diplomacy', era: 8, cost: { galacticInfluence: 80, research: 150, starSystems: 20 }, effects: [{ type: 'production_add', target: 'galacticInfluence', value: 16 }, { type: 'production_add', target: 'exoticMatter', value: 1 }], description: 'Cosmic-scale diplomacy — +16 influence/s and +1 exotic matter/s', prerequisites: ['galacticSenate', 'galacticRelay'] },
+  cosmicDiplomacy: { id: 'cosmicDiplomacy', name: 'Cosmic Diplomacy', era: 8, cost: { galacticInfluence: 80, research: 150, starSystems: 20 }, effects: [{ type: 'production_add', target: 'galacticInfluence', value: 16 }, { type: 'production_add', target: 'exoticMatter', value: 1 }, { type: 'cap_mult', target: 'galacticInfluence', value: 5 }], description: 'Cosmic-scale diplomacy — +16 influence/s and +1 exotic matter/s', prerequisites: ['galacticSenate', 'galacticRelay'] },
   realityScanner: { id: 'realityScanner', name: 'Reality Scanner', era: 9, cost: { universalConstants: 10, cosmicPower: 80, research: 200 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 12 }, { type: 'production_add', target: 'realityFragments', value: 0.2 }], description: 'Scan across realities — +12 constants/s and trickle fragments', prerequisites: ['universalFactory'] },
   cosmicArchitect: { id: 'cosmicArchitect', name: 'Cosmic Architect', era: 9, cost: { universalConstants: 12, megastructures: 15, cosmicPower: 120 }, effects: [{ type: 'production_add', target: 'megastructures', value: 45 }, { type: 'production_add', target: 'universalConstants', value: 0.3 }], description: 'Build across the cosmos — +45 megastructures/s and +0.3 constants/s', prerequisites: ['darkMatterLens'] },
   echoChorus: { id: 'echoChorus', name: 'Echo Chorus', era: 10, cost: { quantumEchoes: 60, realityFragments: 100, cosmicPower: 200 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 2 }], description: 'Harmonize echoes across realities — +40 echoes/s and +2 fragments/s', prerequisites: ['infinityMirror'] },
@@ -2160,7 +2160,7 @@ export const upgrades = {
 
   // Era 10
   paradoxEngine: { id: 'paradoxEngine', name: 'Paradox Engine', era: 10, cost: { quantumEchoes: 85, realityFragments: 130, universalConstants: 28 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'universalConstants', value: 40 }], description: 'Harness paradoxes — +40 echoes/s and +40 constants/s from logical contradictions', prerequisites: ['echoChorus'] },
-  multiversalNexus: { id: 'multiversalNexus', name: 'Multiversal Nexus', era: 10, cost: { realityFragments: 160, quantumEchoes: 70, cosmicPower: 400 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 75 }, { type: 'production_add', target: 'cosmicPower', value: 10 }], description: 'A nexus linking all realities — +75 fragments/s and +10 cosmic/s', prerequisites: ['infiniteLattice', 'realityCompiler'] },
+  multiversalNexus: { id: 'multiversalNexus', name: 'Multiversal Nexus', era: 10, cost: { realityFragments: 160, quantumEchoes: 70, cosmicPower: 400 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 75 }, { type: 'production_add', target: 'cosmicPower', value: 10 }, { type: 'cap_mult', target: 'realityFragments', value: 2 }], description: 'A nexus linking all realities — +75 fragments/s and +10 cosmic/s', prerequisites: ['infiniteLattice', 'realityCompiler'] },
   eternalCatalyst: { id: 'eternalCatalyst', name: 'Eternal Catalyst', era: 10, cost: { quantumEchoes: 110, universalConstants: 32, realityFragments: 110 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 75 }, { type: 'production_add', target: 'darkEnergy', value: 75 }, { type: 'production_add', target: 'exoticMatter', value: 75 }], description: 'An eternal catalyst transmuting all cosmic resources — +75/s to cosmic trio', prerequisites: ['realityHarvester'] },
 
   // --- 30 new upgrades (3 per era) ---
@@ -2279,7 +2279,7 @@ export const upgrades = {
   // Era 6
   warpBeacon: { id: 'warpBeacon', name: 'Warp Beacon', era: 6, cost: { darkEnergy: 28, starSystems: 5, energy: 80 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 1.6 }, { type: 'production_add', target: 'starSystems', value: 1.6 }], description: 'Beacons guide ships through warp — boost dark energy and star systems', prerequisites: ['graviticLoom'] },
   nebulaMiner: { id: 'nebulaMiner', name: 'Nebula Miner', era: 6, cost: { exoticMaterials: 40, starSystems: 4, research: 55 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 3.2 }, { type: 'production_add', target: 'darkEnergy', value: 0.3 }], description: 'Mine nebulae for exotic materials and dark energy', prerequisites: ['nebulaMining', 'interstellarAcademy'] },
-  interstellarAcademy: { id: 'interstellarAcademy', name: 'Interstellar Academy', era: 6, cost: { research: 70, galacticInfluence: 15, colonies: 10 }, effects: [{ type: 'production_add', target: 'research', value: 6.4 }, { type: 'production_add', target: 'galacticInfluence', value: 1.6 }], description: 'An academy spanning star systems — +6.4 research/s and +1.6 influence/s', prerequisites: ['quantumRadio'] },
+  interstellarAcademy: { id: 'interstellarAcademy', name: 'Interstellar Academy', era: 6, cost: { research: 70, galacticInfluence: 15, colonies: 10 }, effects: [{ type: 'production_add', target: 'research', value: 6.4 }, { type: 'production_add', target: 'galacticInfluence', value: 1.6 }, { type: 'cap_mult', target: 'research', value: 3 }], description: 'An academy spanning star systems — +6.4 research/s, +1.6 influence/s, and x3 research capacity', prerequisites: ['quantumRadio'] },
 
   // Era 7
   chronoReactor: { id: 'chronoReactor', name: 'Chrono-Reactor', era: 7, cost: { stellarForge: 20, darkEnergy: 40, megastructures: 7 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 2.4 }, { type: 'production_add', target: 'darkEnergy', value: 2.4 }], description: 'Reactors fueled by temporal loops — boost forge and dark energy output', prerequisites: ['chronoForge'] },
@@ -2298,7 +2298,7 @@ export const upgrades = {
   // Era 10
   multiversalLoom: { id: 'multiversalLoom', name: 'Multiversal Loom', era: 10, cost: { quantumEchoes: 80, realityFragments: 110, cosmicPower: 380 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 3 }], description: 'Weave echoes across realities — +40 quantum echoes/s and +3 fragments/s', prerequisites: ['dimensionalAnchors'] },
   paradoxResolver: { id: 'paradoxResolver', name: 'Paradox Resolver', era: 10, cost: { universalConstants: 28, quantumEchoes: 95, realityFragments: 130 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 40 }], description: 'Resolve paradoxes to stabilize reality — +40 constants/s and +40 fragments/s', prerequisites: ['multiversalNexus'] },
-  echoAmplifier: { id: 'echoAmplifier', name: 'Echo Amplifier', era: 10, cost: { quantumEchoes: 100, realityFragments: 80, universalConstants: 20 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 75 }, { type: 'production_add', target: 'cosmicPower', value: 20 }], description: 'Amplify quantum echoes from all realities — +75 echoes/s and +20 cosmic power/s', prerequisites: ['multiversalHub'] },
+  echoAmplifier: { id: 'echoAmplifier', name: 'Echo Amplifier', era: 10, cost: { quantumEchoes: 100, realityFragments: 80, universalConstants: 20 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 75 }, { type: 'production_add', target: 'cosmicPower', value: 20 }, { type: 'cap_mult', target: 'quantumEchoes', value: 3 }], description: 'Amplify quantum echoes from all realities — +75 echoes/s and +20 cosmic power/s', prerequisites: ['multiversalHub'] },
   // --- 30 new upgrades (3 per era) — agent batch ---
 
   // Era 1

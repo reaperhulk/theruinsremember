@@ -175,9 +175,9 @@ describe('upgrades', () => {
       state.upgrades.tools = true;
       const after = purchaseUpgrade(state, 'foundry');
       expect(after).not.toBeNull();
-      // foundry unlocks steel and adds 0.3 production
+      // foundry unlocks steel and adds production
       expect(after.resources.steel.unlocked).toBe(true);
-      expect(after.resources.steel.rateAdd).toBe(0.3);
+      expect(after.resources.steel.rateAdd).toBe(0.5);
     });
 
     it('applies production_add for automation upgrade', () => {

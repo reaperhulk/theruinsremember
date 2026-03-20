@@ -102,14 +102,14 @@ export const techTree = {
   // Era 7 → 8 (Dyson Era → Galactic)
   galacticAscendancy: {
     id: 'galacticAscendancy', name: 'Galactic Ascendancy', era: 7,
-    cost: { megastructures: 120, stellarForge: 400, research: 15000000 },
+    cost: { megastructures: 120, stellarForge: 400, research: 500000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Prepare for galactic-scale civilization',
   },
   galacticNetwork: {
     id: 'galacticNetwork', name: 'Galactic Network', era: 7,
-    cost: { megastructures: 300, stellarForge: 1000, research: 80000000 },
+    cost: { megastructures: 300, stellarForge: 1000, research: 800000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: 8,
     description: 'Galaxy-spanning communication and travel network',
@@ -118,14 +118,14 @@ export const techTree = {
   // Era 8 → 9 (Galactic → Intergalactic)
   cosmicEngineering: {
     id: 'cosmicEngineering', name: 'Cosmic Engineering', era: 8,
-    cost: { exoticMatter: 1500, galacticInfluence: 80000, research: 80000000 },
+    cost: { exoticMatter: 1500, galacticInfluence: 80000, research: 1000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Engineer on a cosmic scale',
   },
   intergalacticBeacon: {
     id: 'intergalacticBeacon', name: 'Intergalactic Beacon', era: 8,
-    cost: { exoticMatter: 4000, galacticInfluence: 200000, cosmicPower: 80 },
+    cost: { exoticMatter: 4000, galacticInfluence: 80000, cosmicPower: 80 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: 9,
     description: 'Signal reaching beyond the galaxy',
@@ -134,7 +134,7 @@ export const techTree = {
   // Era 9 → 10 (Intergalactic → Multiverse)
   realityScience: {
     id: 'realityScience', name: 'Reality Science', era: 9,
-    cost: { universalConstants: 10, cosmicPower: 10000, research: 200000000 },
+    cost: { universalConstants: 10, cosmicPower: 10000, research: 2000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Study the fabric of reality',
@@ -201,8 +201,8 @@ export const techTree = {
     cost: { research: 2000, exoticMaterials: 100 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: null,
-    description: 'Understanding gravity — double exotic materials production',
-    effects: [{ type: 'production_mult', target: 'exoticMaterials', value: 2 }],
+    description: 'Understanding gravity — double exotic materials production and x5 research capacity',
+    effects: [{ type: 'production_mult', target: 'exoticMaterials', value: 2 }, { type: 'cap_mult', target: 'research', value: 5 }],
   },
   xenolinguistics: {
     id: 'xenolinguistics', name: 'Xenolinguistics', era: 6,
@@ -217,8 +217,8 @@ export const techTree = {
     cost: { stellarForge: 30, research: 300000, megastructures: 10 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: null,
-    description: 'Manipulate time itself — massive research boost',
-    effects: [{ type: 'production_mult', target: 'research', value: 5 }],
+    description: 'Manipulate time itself — massive research boost and x10 research capacity',
+    effects: [{ type: 'production_mult', target: 'research', value: 5 }, { type: 'cap_mult', target: 'research', value: 10 }],
   },
   darkMatterPhysics: {
     id: 'darkMatterPhysics', name: 'Dark Matter Physics', era: 8,
@@ -249,11 +249,11 @@ export const techTree = {
   },
   multidimensionalMath: {
     id: 'multidimensionalMath', name: 'Multidimensional Mathematics', era: 9,
-    cost: { universalConstants: 30, cosmicPower: 30000, research: 500000000 },
+    cost: { universalConstants: 30, cosmicPower: 30000, research: 5000000 },
     prerequisites: ['realityScience'],
     grantsEra: null,
-    description: 'Understand higher dimensions — triple universal constants output',
-    effects: [{ type: 'production_mult', target: 'universalConstants', value: 3 }],
+    description: 'Understand higher dimensions — triple universal constants output and x10 research capacity',
+    effects: [{ type: 'production_mult', target: 'universalConstants', value: 3 }, { type: 'cap_mult', target: 'research', value: 10 }],
   },
   // Optional era 10 tech choice
   // Era 9 branching: void mastery vs reality mastery
@@ -279,7 +279,7 @@ export const techTree = {
   // Era 8 branching: expansion vs consolidation
   galacticExpansion: {
     id: 'galacticExpansion', name: 'Galactic Expansion', era: 8,
-    cost: { starSystems: 20000, exoticMatter: 2000, galacticInfluence: 50000 },
+    cost: { starSystems: 8000, exoticMatter: 2000, galacticInfluence: 50000 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
     description: 'Expand rapidly — x5 star systems and colonies',
@@ -288,7 +288,7 @@ export const techTree = {
   },
   galacticConsolidation: {
     id: 'galacticConsolidation', name: 'Galactic Consolidation', era: 8,
-    cost: { galacticInfluence: 80000, research: 50000000, megastructures: 30 },
+    cost: { galacticInfluence: 80000, research: 500000, megastructures: 30 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
     description: 'Consolidate power — x5 galactic influence and research',
@@ -323,7 +323,7 @@ export const techTree = {
   },
   infiniteEnergy: {
     id: 'infiniteEnergy', name: 'Infinite Energy', era: 10,
-    cost: { quantumEchoes: 500, realityFragments: 2000, cosmicPower: 10000000 },
+    cost: { quantumEchoes: 500, realityFragments: 2000, cosmicPower: 500000 },
     prerequisites: ['omniversalAwareness'],
     grantsEra: null,
     description: 'Tap infinite multiversal energy — x10 all energy and cosmic power',
@@ -332,7 +332,7 @@ export const techTree = {
   },
   infiniteKnowledge: {
     id: 'infiniteKnowledge', name: 'Infinite Knowledge', era: 10,
-    cost: { quantumEchoes: 500, realityFragments: 2000, research: 100000000000000 },
+    cost: { quantumEchoes: 500, realityFragments: 2000, research: 50000000 },
     prerequisites: ['omniversalAwareness'],
     grantsEra: null,
     description: 'Tap infinite multiversal knowledge — x10 all research and data',
@@ -462,7 +462,7 @@ export const techTree = {
   photonicsTheory: { id: 'photonicsTheory', name: 'Photonics', era: 3, cost: { research: 40, software: 30, data: 20 }, prerequisites: ['globalNetwork'], grantsEra: null, description: 'Light-based computing — boosted data and electronics', effects: [{ type: 'production_add', target: 'data', value: 6.0 }, { type: 'production_add', target: 'electronics', value: 3.0 }] },
   warpFieldTheory: { id: 'warpFieldTheory', name: 'Warp Field Theory', era: 5, cost: { research: 3500, exoticMaterials: 120, energy: 25000 }, prerequisites: ['advancedPropulsion'], grantsEra: null, description: 'Theoretical warp fields — boosted exotic materials and energy', effects: [{ type: 'production_add', target: 'exoticMaterials', value: 10.0 }, { type: 'production_add', target: 'energy', value: 20.0 }] },
   galacticEcology: { id: 'galacticEcology', name: 'Galactic Ecology', era: 6, cost: { starSystems: 40, research: 25000, darkEnergy: 2000 }, prerequisites: ['galacticCartography'], grantsEra: null, description: 'Understand galactic ecosystems — boosted star systems and colonies', effects: [{ type: 'production_add', target: 'starSystems', value: 50.0 }, { type: 'production_add', target: 'colonies', value: 25.0 }] },
-  dimensionalPhysics: { id: 'dimensionalPhysics', name: 'Dimensional Physics', era: 8, cost: { exoticMatter: 1200, darkEnergy: 8000, research: 60000000 }, prerequisites: ['cosmicEngineering'], grantsEra: null, description: 'Physics of higher dimensions — boosted exotic matter and cosmic power', effects: [{ type: 'production_add', target: 'exoticMatter', value: 200.0 }, { type: 'production_add', target: 'cosmicPower', value: 100.0 }] },
+  dimensionalPhysics: { id: 'dimensionalPhysics', name: 'Dimensional Physics', era: 8, cost: { exoticMatter: 1200, darkEnergy: 8000, research: 600000 }, prerequisites: ['cosmicEngineering'], grantsEra: null, description: 'Physics of higher dimensions — boosted exotic matter and cosmic power', effects: [{ type: 'production_add', target: 'exoticMatter', value: 200.0 }, { type: 'production_add', target: 'cosmicPower', value: 100.0 }] },
 
   // --- 6 new optional tech nodes ---
   geothermalEnergy: { id: 'geothermalEnergy', name: 'Geothermal Energy', era: 1, cost: { materials: 30, energy: 20, labor: 15 }, prerequisites: ['metallurgy'], grantsEra: null, description: 'Tap underground heat — boosted energy and materials output', effects: [{ type: 'production_add', target: 'energy', value: 2.0 }, { type: 'production_add', target: 'materials', value: 1.0 }] },
@@ -478,7 +478,7 @@ export const techTree = {
   quantumEncryption: { id: 'quantumEncryption', name: 'Quantum Encryption', era: 3, cost: { software: 35, data: 25, research: 45 }, prerequisites: ['globalNetwork'], grantsEra: null, description: 'Unbreakable encryption — boosted software and data output', effects: [{ type: 'production_add', target: 'software', value: 6.0 }, { type: 'production_add', target: 'data', value: 3.0 }] },
   gravityPlating: { id: 'gravityPlating', name: 'Gravity Plating', era: 4, cost: { research: 350, orbitalInfra: 40, rocketFuel: 100 }, prerequisites: ['interplanetaryNav'], grantsEra: null, description: 'Artificial gravity — boosted orbital infrastructure and colonies', effects: [{ type: 'production_add', target: 'orbitalInfra', value: 10.0 }, { type: 'production_add', target: 'colonies', value: 5.0 }] },
   stellarNeuroscience: { id: 'stellarNeuroscience', name: 'Stellar Neuroscience', era: 7, cost: { stellarForge: 25, megastructures: 10, research: 400000 }, prerequisites: ['galacticAscendancy'], grantsEra: null, description: 'Map stellar neural networks — boosted research and stellar forge', effects: [{ type: 'production_add', target: 'research', value: 100.0 }, { type: 'production_add', target: 'stellarForge', value: 100.0 }] },
-  cosmicCartography: { id: 'cosmicCartography', name: 'Cosmic Cartography', era: 8, cost: { galacticInfluence: 50000, exoticMatter: 2000, starSystems: 15000 }, prerequisites: ['cosmicEngineering'], grantsEra: null, description: 'Map the cosmic web — boosted star systems and galactic influence', effects: [{ type: 'production_add', target: 'starSystems', value: 200.0 }, { type: 'production_add', target: 'galacticInfluence', value: 100.0 }] },
+  cosmicCartography: { id: 'cosmicCartography', name: 'Cosmic Cartography', era: 8, cost: { galacticInfluence: 50000, exoticMatter: 2000, starSystems: 8000 }, prerequisites: ['cosmicEngineering'], grantsEra: null, description: 'Map the cosmic web — boosted star systems and galactic influence', effects: [{ type: 'production_add', target: 'starSystems', value: 200.0 }, { type: 'production_add', target: 'galacticInfluence', value: 100.0 }] },
   dimensionalResonance: { id: 'dimensionalResonance', name: 'Dimensional Resonance', era: 9, cost: { cosmicPower: 70000, universalConstants: 60, realityFragments: 20 }, prerequisites: ['realityScience'], grantsEra: null, description: 'Resonate across dimensions — boosted reality fragments and universal constants', effects: [{ type: 'production_add', target: 'realityFragments', value: 400.0 }, { type: 'production_add', target: 'universalConstants', value: 400.0 }] },
 
   // --- 6 new optional tech nodes ---
@@ -487,7 +487,7 @@ export const techTree = {
   biocomputing: { id: 'biocomputing', name: 'Biocomputing', era: 3, cost: { software: 45, data: 30, research: 55 }, prerequisites: ['globalNetwork'], grantsEra: null, description: 'Biological processors — boosted software and research output', effects: [{ type: 'production_add', target: 'software', value: 6.0 }, { type: 'production_add', target: 'research', value: 3.0 }] },
   solarForge: { id: 'solarForge', name: 'Solar Forge', era: 5, cost: { research: 4500, exoticMaterials: 140, energy: 22000 }, prerequisites: ['advancedPropulsion'], grantsEra: null, description: 'Forge materials in solar fire — boosted exoticMaterials and energy', effects: [{ type: 'production_add', target: 'exoticMaterials', value: 20.0 }, { type: 'production_add', target: 'energy', value: 10.0 }] },
   hyperspaceFolding: { id: 'hyperspaceFolding', name: 'Hyperspace Folding', era: 6, cost: { darkEnergy: 3500, research: 35000, starSystems: 120 }, prerequisites: ['galacticCartography'], grantsEra: null, description: 'Fold hyperspace for instant travel — boosted dark energy and star systems', effects: [{ type: 'production_add', target: 'darkEnergy', value: 50.0 }, { type: 'production_add', target: 'starSystems', value: 50.0 }] },
-  gravimetricLensing: { id: 'gravimetricLensing', name: 'Gravimetric Lensing', era: 8, cost: { exoticMatter: 2500, galacticInfluence: 70000, research: 70000000 }, prerequisites: ['cosmicEngineering'], grantsEra: null, description: 'Bend spacetime to observe distant galaxies — boosted galactic influence and exotic matter', effects: [{ type: 'production_add', target: 'galacticInfluence', value: 200.0 }, { type: 'production_add', target: 'exoticMatter', value: 100.0 }] },
+  gravimetricLensing: { id: 'gravimetricLensing', name: 'Gravimetric Lensing', era: 8, cost: { exoticMatter: 2500, galacticInfluence: 70000, research: 700000 }, prerequisites: ['cosmicEngineering'], grantsEra: null, description: 'Bend spacetime to observe distant galaxies — boosted galactic influence and exotic matter', effects: [{ type: 'production_add', target: 'galacticInfluence', value: 200.0 }, { type: 'production_add', target: 'exoticMatter', value: 100.0 }] },
 
   // --- 8 new optional tech nodes ---
   mineralogy: { id: 'mineralogy', name: 'Mineralogy', era: 1, cost: { materials: 32, labor: 18, energy: 15 }, prerequisites: ['metallurgy'], grantsEra: null, description: 'Study mineral composition — boosted materials and energy output', effects: [{ type: 'production_add', target: 'materials', value: 2.0 }, { type: 'production_add', target: 'energy', value: 1.0 }] },
@@ -497,7 +497,7 @@ export const techTree = {
   stellarEcology: { id: 'stellarEcology', name: 'Stellar Ecology', era: 5, cost: { research: 4200, colonies: 20, exoticMaterials: 130 }, prerequisites: ['advancedPropulsion'], grantsEra: null, description: 'Understand stellar ecosystems — boosted colonies and exotic materials', effects: [{ type: 'production_add', target: 'colonies', value: 20.0 }, { type: 'production_add', target: 'exoticMaterials', value: 10.0 }] },
   neutroniomAlloy: { id: 'neutroniomAlloy', name: 'Neutroniom Alloy', era: 6, cost: { darkEnergy: 4000, starSystems: 80, research: 28000 }, prerequisites: ['galacticCartography'], grantsEra: null, description: 'Forge neutronium alloy — boosted dark energy and exotic materials', effects: [{ type: 'production_add', target: 'darkEnergy', value: 50.0 }, { type: 'production_add', target: 'exoticMaterials', value: 25.0 }] },
   chronoEngineering: { id: 'chronoEngineering', name: 'Chrono-Engineering', era: 7, cost: { stellarForge: 30, megastructures: 14, research: 450000 }, prerequisites: ['galacticAscendancy'], grantsEra: null, description: 'Engineer across timelines — boosted megastructures and stellar forge', effects: [{ type: 'production_add', target: 'megastructures', value: 100.0 }, { type: 'production_add', target: 'stellarForge', value: 100.0 }] },
-  entanglementNetwork: { id: 'entanglementNetwork', name: 'Entanglement Network', era: 8, cost: { exoticMatter: 2000, galacticInfluence: 60000, research: 65000000 }, prerequisites: ['cosmicEngineering'], grantsEra: null, description: 'Quantum entanglement across galaxies — boosted exotic matter and galactic influence', effects: [{ type: 'production_add', target: 'exoticMatter', value: 200.0 }, { type: 'production_add', target: 'galacticInfluence', value: 200.0 }] },
+  entanglementNetwork: { id: 'entanglementNetwork', name: 'Entanglement Network', era: 8, cost: { exoticMatter: 2000, galacticInfluence: 60000, research: 650000 }, prerequisites: ['cosmicEngineering'], grantsEra: null, description: 'Quantum entanglement across galaxies — boosted exotic matter and galactic influence', effects: [{ type: 'production_add', target: 'exoticMatter', value: 200.0 }, { type: 'production_add', target: 'galacticInfluence', value: 200.0 }] },
 
   // --- 6 new optional tech nodes ---
   fermentation: { id: 'fermentation', name: 'Fermentation', era: 1, cost: { food: 28, labor: 18, materials: 12 }, prerequisites: ['metallurgy'], grantsEra: null, description: 'Fermented foods preserve longer — boosted food and labor', effects: [{ type: 'production_add', target: 'food', value: 2.0 }, { type: 'production_add', target: 'labor', value: 1.0 }] },

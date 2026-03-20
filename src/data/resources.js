@@ -18,7 +18,7 @@ export const resources = {
   data: { id: 'data', name: 'Data', era: 3, baseCap: 1000, baseRate: 0, description: 'Collected and processed information' },
 
   // Era 4: Space Age — caps must exceed scaled costs (5x base)
-  rocketFuel: { id: 'rocketFuel', name: 'Rocket Fuel', era: 4, baseCap: 2000, baseRate: 0, description: 'Propellant for rockets' },
+  rocketFuel: { id: 'rocketFuel', name: 'Rocket Fuel', era: 4, baseCap: 5000, baseRate: 0, description: 'Propellant for rockets' },
   orbitalInfra: { id: 'orbitalInfra', name: 'Orbital Infrastructure', era: 4, baseCap: 1000, baseRate: 0, description: 'Structures in orbit' },
 
   // Era 5: Solar System — caps must exceed scaled costs (7x base)
@@ -26,15 +26,15 @@ export const resources = {
   exoticMaterials: { id: 'exoticMaterials', name: 'Exotic Materials', era: 5, baseCap: 1000, baseRate: 0, description: 'Rare space resources' },
 
   // Era 6: Interstellar — caps for 10x scaling
-  starSystems: { id: 'starSystems', name: 'Star Systems', era: 6, baseCap: 1000, baseRate: 0, description: 'Colonized star systems' },
+  starSystems: { id: 'starSystems', name: 'Star Systems', era: 6, baseCap: 5000, baseRate: 0, description: 'Colonized star systems' },
   darkEnergy: { id: 'darkEnergy', name: 'Dark Energy', era: 6, baseCap: 5000, baseRate: 0, description: 'Mysterious cosmic force' },
 
   // Era 7: Dyson Era — caps for 12x scaling
-  megastructures: { id: 'megastructures', name: 'Megastructures', era: 7, baseCap: 500, baseRate: 0, description: 'Massive stellar-scale constructions' },
+  megastructures: { id: 'megastructures', name: 'Megastructures', era: 7, baseCap: 2000, baseRate: 0, description: 'Massive stellar-scale constructions' },
   stellarForge: { id: 'stellarForge', name: 'Stellar Forge Output', era: 7, baseCap: 2000, baseRate: 0, description: 'Output from star-powered forges' },
 
   // Era 8: Galactic — caps for 15x scaling
-  galacticInfluence: { id: 'galacticInfluence', name: 'Galactic Influence', era: 8, baseCap: 10000, baseRate: 0, description: 'Political power across the galaxy' },
+  galacticInfluence: { id: 'galacticInfluence', name: 'Galactic Influence', era: 8, baseCap: 100000, baseRate: 0, description: 'Political power across the galaxy' },
   exoticMatter: { id: 'exoticMatter', name: 'Exotic Matter', era: 8, baseCap: 3000, baseRate: 0, description: 'Matter with unusual properties' },
 
   // Era 9: Intergalactic — caps for 18x scaling
@@ -43,7 +43,7 @@ export const resources = {
 
   // Era 10: Multiverse — caps for 22x scaling
   realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 10, baseCap: 10000, baseRate: 0, description: 'Shards of alternate realities' },
-  quantumEchoes: { id: 'quantumEchoes', name: 'Quantum Echoes', era: 10, baseCap: 5000, baseRate: 0, description: 'Resonances from parallel universes' },
+  quantumEchoes: { id: 'quantumEchoes', name: 'Quantum Echoes', era: 10, baseCap: 20000, baseRate: 0, description: 'Resonances from parallel universes' },
 };
 
 export function getResourcesForEra(era) {
