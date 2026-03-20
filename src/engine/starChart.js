@@ -16,6 +16,10 @@ const STAR_SYSTEMS = [
   { id: 'betelgeuse', name: 'Betelgeuse', x: 0.4, y: 0.1, bonus: { stellarForge: 1 } },
   { id: 'rigel', name: 'Rigel', x: 0.6, y: 0.8, bonus: { darkEnergy: 3 } },
   { id: 'antares', name: 'Antares', x: 0.1, y: 0.4, bonus: { megastructures: 0.2 } },
+  { id: 'proxima', name: 'Proxima', x: 0.9, y: 0.3, bonus: { colonies: 0.5 } },
+  { id: 'capella', name: 'Capella', x: 0.3, y: 0.9, bonus: { food: 15 } },
+  { id: 'deneb', name: 'Deneb', x: 0.7, y: 0.4, bonus: { cosmicPower: 1 } },
+  { id: 'altair', name: 'Altair', x: 0.5, y: 0.1, bonus: { exoticMatter: 1 } },
 ];
 
 // Get unlocked star systems based on starSystems resource
