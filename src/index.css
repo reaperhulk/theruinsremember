@@ -1414,11 +1414,12 @@ canvas:hover {
 
 /* Upgrade progress bar */
 .upgrade-progress-bar {
-  height: 3px;
+  height: 8px;
   background: rgba(255, 255, 255, 0.08);
   margin-top: 4px;
   border-radius: 1px;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 }
 
 .upgrade-progress-fill {

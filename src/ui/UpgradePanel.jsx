@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades } from '../engine/upgrades.js';
-import { canAfford } from '../engine/resources.js';
+import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
 
 import { formatNumber } from './format.js';
@@ -39,6 +39,22 @@ function formatEffects(effects) {
       default: return '';
     }
   }).filter(Boolean).join(', ');
+}
+
+// Estimate seconds until affordable (worst bottleneck resource)
+function getTimeToAfford(state, cost) {
+  let maxTime = 0;
+  for (const [resourceId, amount] of Object.entries(cost)) {
+    const r = state.resources[resourceId];
+    const have = r ? r.amount : 0;
+    if (have >= amount) continue;
+    const rate = getEffectiveRate(state, resourceId);
+    if (rate <= 0) return Infinity;
+    const needed = amount - have;
+    const time = needed / rate;
+    if (time > maxTime) maxTime = time;
+  }
+  return maxTime;
 }
 
 // Calculate overall progress toward affording an upgrade (0-1)
@@ -176,14 +192,22 @@ export function UpgradePanel({ state, onUpdate }) {
                   return <span key={i} className={cls}>{label}</span>;
                 })}
               </div>
-              {!affordable && (
-                <div className="upgrade-progress-bar">
-                  <div
-                    className={`upgrade-progress-fill ${progress > 0.8 ? 'almost' : ''}`}
-                    style={{ width: `${Math.floor(progress * 100)}%` }}
-                  />
-                </div>
-              )}
+              {!affordable && (() => {
+                const eta = getTimeToAfford(state, cost);
+                return (
+                  <div className="upgrade-progress-bar">
+                    <div
+                      className={`upgrade-progress-fill ${progress > 0.8 ? 'almost' : ''}`}
+                      style={{ width: `${Math.floor(progress * 100)}%` }}
+                    />
+                    {eta < Infinity && eta > 0 && (
+                      <span className="upgrade-eta" style={{ position: 'absolute', right: '4px', top: '0', fontSize: '0.7em', color: '#888', lineHeight: '8px' }}>
+                        ~{eta < 60 ? `${Math.ceil(eta)}s` : eta < 3600 ? `${Math.ceil(eta / 60)}m` : `${Math.floor(eta / 3600)}h`}
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
             </button>
             {upgrade.repeatable && affordable && (
               <button
