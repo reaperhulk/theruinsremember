@@ -99,7 +99,7 @@ export function WeavingPanel({ state, onUpdate }) {
           </button>
         )}
       </div>
-      <p className="mining-hint">Draw 3 of the same type (chaos * is wild), consecutive weaves increase bonus</p>
+      <p className="mining-hint">Draw 3 matching (chaos * = wild) | Combos boost multiplier | 120s timeout</p>
     </div>
   );
 }
