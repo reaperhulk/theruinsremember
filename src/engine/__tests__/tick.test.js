@@ -11,12 +11,12 @@ describe('tick', () => {
     expect(after.resources.food.amount).toBeCloseTo(before + 0.5, 5);
   });
 
-  it('allows resources to grow beyond old baseCap', () => {
+  it('enforces resource caps on production', () => {
     const state = createInitialState();
     state.resources.food.amount = 199.8;
     const after = tick(state, 1);
-    // No cap — should exceed 200
-    expect(after.resources.food.amount).toBeCloseTo(200.3, 5);
+    // Cap enforced at 200 (baseCap * capMult = 200 * 1)
+    expect(after.resources.food.amount).toBe(200);
   });
 
   it('does not produce for locked resources', () => {

@@ -1199,11 +1199,11 @@ export const events = {
   hyperlaneDiscovery: { id: 'hyperlaneDiscovery', name: 'Hyperlane Discovery', description: 'A natural hyperlane is mapped — star system access surges!', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
 
   // Era 7
-  dysonFlare: { id: 'dysonFlare', name: 'Dyson Flare', description: 'A Dyson sphere captures a solar flare — massive energy!', minEra: 7, type: 'instant', effect: { resourceId: 'energy', amount: 500 } },
+  dysonCapture: { id: 'dysonCapture', name: 'Dyson Capture', description: 'A Dyson sphere captures a solar flare — massive energy!', minEra: 7, type: 'instant', effect: { resourceId: 'energy', amount: 500 } },
   forgeHarmonic: { id: 'forgeHarmonic', name: 'Forge Harmonic', description: 'Stellar forges enter harmonic resonance — output triples!', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
 
   // Era 8
-  galacticRenaissance: { id: 'galacticRenaissance', name: 'Galactic Renaissance', description: 'A renaissance of science sweeps the galaxy!', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 6 } },
+  galacticEnlightenment: { id: 'galacticEnlightenment', name: 'Galactic Enlightenment', description: 'An enlightenment of science sweeps the galaxy!', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 6 } },
   exoticMatterRift: { id: 'exoticMatterRift', name: 'Exotic Matter Rift', description: 'A rift opens, pouring exotic matter into normal space!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 100 } },
 
   // Era 9
