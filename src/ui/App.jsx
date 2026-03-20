@@ -111,6 +111,7 @@ export function App() {
   // Badge counts for tabs
   const affordableUpgrades = getAvailableUpgrades(state).filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
   const affordableTech = getAvailableTech(state).filter(t => canAfford(state, t.cost)).length;
+  const activeEffectCount = (state.activeEffects || []).length;
 
   // Get the active mini-game panel based on era
   const getMiniGamePanel = () => {
@@ -163,6 +164,7 @@ export function App() {
               let badge = 0;
               if (tab.id === 'upgrades') badge = affordableUpgrades;
               if (tab.id === 'tech') badge = affordableTech;
+              if (tab.id === 'mini') badge = activeEffectCount;
               return (
                 <button
                   key={tab.id}
