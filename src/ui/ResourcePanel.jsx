@@ -33,7 +33,7 @@ export function ResourcePanel({ state, onUpdate }) {
 
   return (
     <div className="panel resource-panel">
-      <h2>Resources</h2>
+      <h2>Resources ({unlockedResources.length} unlocked)</h2>
       {eras.map(era => {
         const isOld = era < state.era;
         const isCollapsed = collapsed[era] !== undefined ? collapsed[era] : (autoCollapse && isOld && eras.length > 2);

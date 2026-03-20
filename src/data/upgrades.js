@@ -73,7 +73,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.2 },
       { type: 'production_add', target: 'energy', value: 0.3 },
     ],
-    description: 'Better tools double materials again and generate energy',
+    description: 'Better tools boost materials and generate energy',
     prerequisites: ['foundry'],
   },
   gemPolisher: {
@@ -94,7 +94,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 0.4 },
       { type: 'production_add', target: 'software', value: 0.4 },
     ],
-    description: 'Find 20 gems to unlock — deep gem knowledge doubles research & software',
+    description: 'Find 20 gems to unlock — deep gem knowledge boosts research & software',
     prerequisites: ['internet'],
     requireGems: 20,
   },
@@ -128,7 +128,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 0.1 },
       { type: 'production_add', target: 'steel', value: 0.3 },
     ],
-    description: 'A dedicated steel forge doubles steel output and produces basic electronics',
+    description: 'A dedicated steel forge boosts steel output and produces basic electronics',
     prerequisites: ['foundry'],
   },
   ironWorks: {
@@ -138,7 +138,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.3 },
       { type: 'production_add', target: 'steel', value: 0.3 },
     ],
-    description: 'Heavy industry doubles materials and boosts steel production',
+    description: 'Heavy industry boosts materials and steel production',
     prerequisites: ['foundry'],
   },
   powerGrid: {
@@ -190,7 +190,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'food', value: 0.6 },
     ],
-    description: 'Mechanized agriculture triples food output',
+    description: 'Mechanized agriculture boosts food output by +0.6/s',
     prerequisites: ['assemblyLines'],
   },
 
