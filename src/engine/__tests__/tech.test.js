@@ -73,7 +73,8 @@ describe('tech', () => {
       state.resources.materials.amount = 100;
       const after = unlockTech(state, 'agriculture');
       expect(after).not.toBeNull();
-      expect(after.resources.food.rateMult).toBe(2);
+      // agriculture now gives production_add +1 food (was production_mult x2)
+      expect(after.resources.food.rateAdd).toBe(1);
     });
   });
 });
