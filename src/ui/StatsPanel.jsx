@@ -1,4 +1,4 @@
-import { eraNames } from '../engine/eras.js';
+import { eraNames, countEraUpgrades } from '../engine/eras.js';
 import { getPrestigeSummary } from '../engine/prestige.js';
 import { getAchievementList } from '../engine/achievements.js';
 import { formatTime, formatNumber } from './format.js';
@@ -26,6 +26,10 @@ export function StatsPanel({ state }) {
             <span>{formatTime(state.totalTime - state.bestEraTimes[state.era])}</span>
           </div>
         )}
+        <div className="stat-row">
+          <span>Era Upgrades</span>
+          <span>{countEraUpgrades(state, state.era)}</span>
+        </div>
         <div className="stat-row">
           <span>Unlocked Resources</span>
           <span>{Object.values(state.resources || {}).filter(r => r.unlocked).length}</span>
