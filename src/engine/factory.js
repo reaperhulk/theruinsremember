@@ -1,0 +1,70 @@
+// Factory Allocation mini-game for Era 2
+// Assign workers to production lines for bonus output.
+// Workers are drawn from a pool based on labor rate.
+
+const MAX_WORKERS = 10;
+const LINES = ['steel', 'electronics', 'research'];
+
+// Get available worker pool (based on labor production level)
+export function getWorkerPool(state) {
+  const laborRate = state.resources.labor?.rateAdd || 0;
+  const laborMult = state.resources.labor?.rateMult || 1;
+  return Math.min(Math.floor((laborRate * laborMult) + 2), MAX_WORKERS);
+}
+
+// Get current allocation from state
+export function getAllocation(state) {
+  return state.factoryAllocation || { steel: 0, electronics: 0, research: 0 };
+}
+
+// Get total workers currently assigned
+export function getTotalAssigned(state) {
+  const alloc = getAllocation(state);
+  return LINES.reduce((sum, line) => sum + (alloc[line] || 0), 0);
+}
+
+// Assign workers to a production line.
+// Returns new state or null if invalid.
+export function allocateWorker(state, line, count) {
+  if (!LINES.includes(line)) return null;
+  if (count < 0) return null;
+
+  const pool = getWorkerPool(state);
+  const alloc = { ...getAllocation(state) };
+  const currentTotal = LINES.reduce((sum, l) => sum + (l === line ? 0 : (alloc[l] || 0)), 0);
+
+  if (currentTotal + count > pool) return null;
+
+  alloc[line] = count;
+
+  return {
+    ...state,
+    factoryAllocation: alloc,
+  };
+}
+
+// Calculate production bonus from factory allocation.
+// Each worker on a line gives +0.3/s to that resource.
+// Efficiency bonus: when all lines have at least 1 worker, +50% output.
+export function getFactoryBonus(state) {
+  if (state.era < 2) return {};
+  const alloc = getAllocation(state);
+  const allFilled = LINES.every(line => (alloc[line] || 0) > 0);
+  const efficiencyMult = allFilled ? 1.5 : 1;
+  const hasFactoryExpert = state.prestigeUpgrades && state.prestigeUpgrades.factoryExpert;
+  const prestigeMult = hasFactoryExpert ? 2 : 1;
+  const bonus = {};
+  for (const line of LINES) {
+    const workers = alloc[line] || 0;
+    if (workers > 0) {
+      bonus[line] = workers * 0.3 * efficiencyMult * prestigeMult;
+    }
+  }
+  return bonus;
+}
+
+// Check if efficiency bonus is active
+export function hasEfficiencyBonus(state) {
+  const alloc = getAllocation(state);
+  return LINES.every(line => (alloc[line] || 0) > 0);
+}

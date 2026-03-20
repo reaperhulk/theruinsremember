@@ -1,0 +1,128 @@
+import { upgrades as upgradeDefs } from '../data/upgrades.js';
+import { canAfford, spend } from './resources.js';
+
+// Apply upgrade effects to state
+function applyEffects(state, effects) {
+  const newResources = { ...state.resources };
+  for (const effect of effects) {
+    const target = newResources[effect.target];
+    if (!target) continue;
+
+    switch (effect.type) {
+      case 'production_mult':
+        newResources[effect.target] = {
+          ...target,
+          rateMult: target.rateMult * effect.value,
+        };
+        break;
+      case 'production_add':
+        newResources[effect.target] = {
+          ...target,
+          rateAdd: target.rateAdd + effect.value,
+        };
+        break;
+      case 'cap_mult':
+        newResources[effect.target] = {
+          ...target,
+          capMult: target.capMult * effect.value,
+        };
+        break;
+      case 'unlock_resource':
+        newResources[effect.target] = {
+          ...target,
+          unlocked: true,
+        };
+        break;
+    }
+  }
+  return { ...state, resources: newResources };
+}
+
+// Scale cost for repeatable upgrades: baseCost * costScale^count
+function getScaledCost(baseCost, costScale, count) {
+  const scale = Math.pow(costScale, count);
+  const scaled = {};
+  for (const [resource, amount] of Object.entries(baseCost)) {
+    scaled[resource] = Math.ceil(amount * scale);
+  }
+  return scaled;
+}
+
+// Get the current cost for an upgrade (handles repeatable scaling)
+export function getUpgradeCost(state, upgradeId) {
+  const def = upgradeDefs[upgradeId];
+  if (!def) return null;
+  if (!def.repeatable) return def.cost;
+  const count = typeof state.upgrades[upgradeId] === 'number' ? state.upgrades[upgradeId] : 0;
+  // Universal Optimizer prestige upgrade: reduce cost scaling by 20%
+  const hasOptimizer = state.prestigeUpgrades && state.prestigeUpgrades.universalOptimizer;
+  const scale = hasOptimizer ? (def.costScale || 1.5) * 0.8 : (def.costScale || 1.5);
+  return getScaledCost(def.cost, scale, count);
+}
+
+// Purchase an upgrade. Returns new state or null if can't purchase.
+export function purchaseUpgrade(state, upgradeId) {
+  const def = upgradeDefs[upgradeId];
+  if (!def) return null;
+  if (def.era > state.era) return null;
+
+  const isRepeatable = def.repeatable === true;
+  const purchaseCount = typeof state.upgrades[upgradeId] === 'number'
+    ? state.upgrades[upgradeId]
+    : (state.upgrades[upgradeId] ? 1 : 0);
+
+  // Non-repeatable: can't buy again
+  if (!isRepeatable && state.upgrades[upgradeId]) return null;
+
+  // Check prerequisites
+  for (const prereq of def.prerequisites) {
+    if (!state.upgrades[prereq]) return null;
+  }
+
+  // Get actual cost (scaled for repeatables)
+  const cost = isRepeatable
+    ? getScaledCost(def.cost, def.costScale || 1.5, purchaseCount)
+    : def.cost;
+
+  // Check and spend cost
+  const afterSpend = spend(state, cost);
+  if (!afterSpend) return null;
+
+  // Apply effects
+  const afterEffects = applyEffects(afterSpend, def.effects);
+
+  const newValue = isRepeatable ? purchaseCount + 1 : true;
+
+  return {
+    ...afterEffects,
+    upgrades: { ...afterEffects.upgrades, [upgradeId]: newValue },
+  };
+}
+
+// Get list of upgrades available to purchase
+export function getAvailableUpgrades(state) {
+  return Object.values(upgradeDefs).filter(def => {
+    if (def.era > state.era) return false;
+    // Non-repeatable: hide if purchased
+    if (!def.repeatable && state.upgrades[def.id]) return false;
+    // Check prerequisites
+    for (const prereq of def.prerequisites) {
+      if (!state.upgrades[prereq]) return false;
+    }
+    // Check milestone requirements
+    if (def.requireGems && (state.totalGems || 0) < def.requireGems) return false;
+    if (def.requireTrades && (state.totalTrades || 0) < def.requireTrades) return false;
+    if (def.requirePrestige && (state.prestigeCount || 0) < def.requirePrestige) return false;
+    return true;
+  });
+}
+
+// Get list of purchased upgrades
+export function getPurchasedUpgrades(state) {
+  return Object.keys(state.upgrades).map(id => {
+    const def = upgradeDefs[id];
+    if (!def) return null;
+    const count = typeof state.upgrades[id] === 'number' ? state.upgrades[id] : 1;
+    return { ...def, purchaseCount: count };
+  }).filter(Boolean);
+}

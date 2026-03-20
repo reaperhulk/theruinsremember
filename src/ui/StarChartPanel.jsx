@@ -1,0 +1,76 @@
+import { useState } from 'react';
+import { getUnlockedSystems, getRoutes, createRoute, removeRoute, getRouteBonus, routeExists, getRouteStats } from '../engine/starChart.js';
+
+export function StarChartPanel({ state, onUpdate }) {
+  const [selected, setSelected] = useState(null);
+  const systems = getUnlockedSystems(state);
+  const routes = getRoutes(state);
+  const bonus = getRouteBonus(state);
+  const stats = getRouteStats(state);
+
+  const handleSystemClick = (sysId) => {
+    if (selected === null) {
+      setSelected(sysId);
+    } else if (selected === sysId) {
+      setSelected(null);
+    } else {
+      if (routeExists(state, selected, sysId)) {
+        onUpdate(s => removeRoute(s, selected, sysId));
+      } else {
+        onUpdate(s => createRoute(s, selected, sysId));
+      }
+      setSelected(null);
+    }
+  };
+
+  return (
+    <div className="panel star-chart-panel">
+      <h2>Star Chart</h2>
+      <div className="dock-info">
+        <span>Routes: {routes.length}/10</span>
+        <span>Systems: {systems.length}</span>
+        {stats.hubSystems > 0 && <span style={{ color: '#88ccff' }}>Hubs: {stats.hubSystems}</span>}
+      </div>
+      <div className="star-chart">
+        <svg viewBox="0 0 100 100" className="star-svg">
+          {routes.map((route, i) => {
+            const from = systems.find(s => s.id === route.from);
+            const to = systems.find(s => s.id === route.to);
+            if (!from || !to) return null;
+            return (
+              <line
+                key={i}
+                x1={from.x * 100} y1={from.y * 100}
+                x2={to.x * 100} y2={to.y * 100}
+                stroke="#4488aa" strokeWidth="0.8"
+              />
+            );
+          })}
+          {systems.map(sys => (
+            <g key={sys.id} onClick={() => handleSystemClick(sys.id)} style={{ cursor: 'pointer' }}>
+              <circle
+                cx={sys.x * 100} cy={sys.y * 100}
+                r={selected === sys.id ? 3 : 2}
+                fill={selected === sys.id ? '#ffdd44' : '#88ccff'}
+              />
+              <text
+                x={sys.x * 100} y={sys.y * 100 - 4}
+                fill="#aaddff" fontSize="3" textAnchor="middle"
+              >{sys.name}</text>
+            </g>
+          ))}
+        </svg>
+      </div>
+      {Object.keys(bonus).length > 0 && (
+        <div className="colony-bonus">
+          Route bonus: {Object.entries(bonus).map(([r, v]) => `${r} +${v.toFixed(1)}`).join(', ')}
+        </div>
+      )}
+      <p className="mining-hint">
+        Click two systems to create/remove routes (5 dark energy + 1 star system).
+        {stats.hubSystems > 0 && ' Hub systems (2+ routes) get +50% bonus.'}
+        {' '}Longer routes give more resources.
+      </p>
+    </div>
+  );
+}
