@@ -1298,6 +1298,38 @@ export const events = {
   entropyShift: { id: 'entropyShift', name: 'Entropy Shift', description: 'Entropy momentarily reverses — universal constants crystallize!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 25 } },
   multiversalEcho: { id: 'multiversalEcho', name: 'Multiversal Echo', description: 'An echo from every reality simultaneously — massive fragment surge!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 800 } },
   dimensionalCollapse: { id: 'dimensionalCollapse', name: 'Dimensional Collapse', description: 'A dimension collapses — quantum echoes scatter everywhere!', minEra: 10, type: 'timed', duration: 40, effect: { resourceId: 'quantumEchoes', rateMultBonus: 20 } },
+
+  // --- 12 new events ---
+
+  // Era 2
+  masterCraftsman: { id: 'masterCraftsman', name: 'Master Craftsman', description: 'A legendary craftsman inspires the workforce — labor surges!', minEra: 2, type: 'timed', duration: 35, effect: { resourceId: 'labor', rateMultBonus: 6 } },
+  ironVeinDiscovery: { id: 'ironVeinDiscovery', name: 'Iron Vein Discovery', description: 'A massive iron vein is discovered deep underground — materials flood in!', minEra: 2, type: 'instant', effect: { resourceId: 'materials', amount: 100 } },
+
+  // Era 3
+  neuralNetBreakthrough: { id: 'neuralNetBreakthrough', name: 'Neural Net Breakthrough', description: 'A neural network achieves superhuman analysis — software output explodes!', minEra: 3, type: 'timed', duration: 40, effect: { resourceId: 'software', rateMultBonus: 7 } },
+
+  // Era 4
+  moonbaseExpansion: { id: 'moonbaseExpansion', name: 'Moonbase Expansion', description: 'A lunar base doubles in size — orbital infrastructure booms!', minEra: 4, type: 'timed', duration: 40, effect: { resourceId: 'orbitalInfra', rateMultBonus: 6 } },
+
+  // Era 5
+  dysonPrototype: { id: 'dysonPrototype', name: 'Dyson Prototype', description: 'A Dyson prototype captures unexpected solar energy — exotic materials found!', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 90 } },
+
+  // Era 6
+  warpFieldStabilization: { id: 'warpFieldStabilization', name: 'Warp Field Stabilization', description: 'Warp fields stabilize perfectly — star system colonization accelerates!', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'starSystems', rateMultBonus: 7 } },
+
+  // Era 7
+  singularityCapture: { id: 'singularityCapture', name: 'Singularity Capture', description: 'A micro-singularity is captured — megastructure output surges!', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'megastructures', rateMultBonus: 10 } },
+  stellarForgeChain: { id: 'stellarForgeChain', name: 'Stellar Forge Chain Reaction', description: 'Multiple forges enter chain reaction — stellar forge output triples!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 35 } },
+
+  // Era 8
+  cosmicPowerSurge: { id: 'cosmicPowerSurge', name: 'Cosmic Power Surge', description: 'A massive surge of cosmic power ripples through the galaxy!', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'cosmicPower', rateMultBonus: 5 } },
+
+  // Era 9
+  universalResonance: { id: 'universalResonance', name: 'Universal Resonance', description: 'All universal constants resonate together — production peaks!', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
+
+  // Era 10
+  realityHarmonicConvergence: { id: 'realityHarmonicConvergence', name: 'Reality Harmonic Convergence', description: 'All realities enter harmonic convergence — fragments and echoes flood in!', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'realityFragments', rateMultBonus: 18 } },
+  quantumCascadeEvent: { id: 'quantumCascadeEvent', name: 'Quantum Cascade', description: 'A cascade of quantum events produces an unprecedented echo surge!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 200 } },
 };
 
 // Get events eligible for the current era
