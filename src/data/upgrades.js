@@ -2554,13 +2554,13 @@ const ERA_COST_SCALE = {
   1: 1,       // Era 1: base costs are fine (clicking-gated)
   2: 2,       // Era 2: double costs
   3: 3,       // Era 3: 3x costs
-  4: 8,       // Era 4: 8x costs (need more time here)
-  5: 8,       // Era 5: 8x costs
-  6: 8,       // Era 6: 8x costs (new resources are scarce, don't over-scale)
-  7: 15,      // Era 7: 15x costs (need more time here)
-  8: 20,      // Era 8: 20x costs
-  9: 12,      // Era 9: 12x costs (new resources are scarce)
-  10: 30,     // Era 10: 30x costs (endgame)
+  4: 5,       // Era 4: smooth step from 3 (was 8 — too steep a jump)
+  5: 7,       // Era 5: smooth step from 5 (new resources + high base costs)
+  6: 10,      // Era 6: interstellar scale, multipliers from era 5 compensate
+  7: 12,      // Era 7: smooth step from 10 (base costs already high)
+  8: 15,      // Era 8: smooth from 12 (base costs are very large)
+  9: 18,      // Era 9: smooth from 15 (no more drop — was 12, felt trivial after era 8)
+  10: 22,     // Era 10: smooth from 18 (endgame, but base costs are extreme already)
 };
 
 // Apply scaling to all upgrade costs
