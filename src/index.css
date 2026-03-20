@@ -272,6 +272,12 @@ body {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 4px;
+  animation: upcoming-fade 3s ease-in-out infinite;
+}
+
+@keyframes upcoming-fade {
+  0%, 100% { color: #666; }
+  50% { color: #888; }
 }
 
 .upcoming-upgrade {
