@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
-import { getEffectiveRate, gather } from '../engine/resources.js';
+import { getEffectiveRate, getEffectiveCap, gather } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
 import { getFactoryBonus } from '../engine/factory.js';
 import { getColonyBonus } from '../engine/colonies.js';
@@ -18,6 +18,7 @@ export function ResourcePanel({ state, onUpdate }) {
       ...r,
       def: resourceDefs[id],
       rate: getEffectiveRate(state, id),
+      cap: getEffectiveCap(state, id),
     }));
 
   // Group by era
@@ -78,8 +79,13 @@ export function ResourcePanel({ state, onUpdate }) {
                       <span className="resource-name">
                         {r.def?.name || r.id}
                       </span>
-                      <span className="resource-amount">
+                      <span className={`resource-amount ${r.cap > 0 && r.amount / r.cap > 0.9 ? 'near-cap' : ''}`}>
                         {formatNumber(r.amount)}
+                        {r.cap > 0 && r.amount / r.cap > 0.8 && (
+                          <span className="cap-indicator" title={`Cap: ${formatNumber(r.cap)}`}>
+                            /{formatNumber(r.cap)}
+                          </span>
+                        )}
                       </span>
                       <span className="resource-rate">
                         {r.rate > 0 ? `+${formatNumber(r.rate)}/s` : ''}

@@ -1432,6 +1432,15 @@ canvas:hover {
   font-variant-numeric: tabular-nums;
 }
 
+.resource-amount.near-cap {
+  color: #ff8844;
+}
+
+.cap-indicator {
+  font-size: 0.8em;
+  color: #888;
+}
+
 .resource-rate {
   font-variant-numeric: tabular-nums;
 }
