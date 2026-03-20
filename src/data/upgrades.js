@@ -282,9 +282,10 @@ export const upgrades = {
     id: 'rocketScience', name: 'Rocket Science', era: 4,
     cost: { research: 30, steel: 25, electronics: 15 },
     effects: [
-      { type: 'production_add', target: 'rocketFuel', value: 0.3 },
+      { type: 'production_add', target: 'rocketFuel', value: 1.0 },
+      { type: 'production_add', target: 'orbitalInfra', value: 0.2 },
     ],
-    description: 'Advanced rocket technology boosts fuel production',
+    description: 'Advanced rockets provide steady fuel and early orbital infrastructure',
     prerequisites: ['quantumComputing'],
   },
   advancedMaterials: {
@@ -393,10 +394,11 @@ export const upgrades = {
     id: 'nuclearReactor', name: 'Nuclear Reactor', era: 4,
     cost: { research: 35, steel: 40, electronics: 15 },
     effects: [
-      { type: 'production_add', target: 'energy', value: 1.2 },
+      { type: 'production_add', target: 'energy', value: 2.0 },
+      { type: 'production_add', target: 'rocketFuel', value: 0.5 },
       { type: 'production_add', target: 'research', value: 0.3 },
     ],
-    description: 'Nuclear fission generates +1.2 energy/s and research data',
+    description: 'Nuclear fission provides energy, fuel byproducts, and research data',
     prerequisites: ['deepSpaceProbe'],
   },
   satelliteNetwork: {
