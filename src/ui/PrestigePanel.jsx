@@ -22,12 +22,10 @@ export function PrestigePanel({ state, onUpdate }) {
           <span>Current Multiplier:</span>
           <span>x{state.prestigeMultiplier.toFixed(1)}</span>
         </div>
-        {state.era >= 10 && (
-          <div className="stat-row">
-            <span>Next Prestige:</span>
-            <span>+{summary.points} points, x{summary.bonus.toFixed(1)} bonus</span>
-          </div>
-        )}
+        <div className="stat-row">
+          <span>Next Prestige:</span>
+          <span>+{summary.points} pts, x{summary.bonus.toFixed(1)} mult{state.era < 10 ? ' (reach Era 10 first)' : ''}</span>
+        </div>
       </div>
 
       <h3>Upgrades ({shop.filter(u => u.owned).length}/{shop.length})</h3>
