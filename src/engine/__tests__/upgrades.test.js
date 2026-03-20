@@ -37,7 +37,7 @@ describe('upgrades', () => {
       const state = createInitialState();
       state.resources.materials.amount = 100;
       state.resources.food.amount = 100;
-      // housing requires 'tools'
+      // housing has prerequisites — can't buy without them
       const result = purchaseUpgrade(state, 'housing');
       expect(result).toBeNull();
     });
@@ -132,7 +132,8 @@ describe('upgrades', () => {
   describe('milestone upgrades', () => {
     it('hides gem-gated upgrades when gems below threshold', () => {
       const state = createInitialState();
-      state.upgrades = { tools: true };
+      // gemPolisher requires tools+quarry and 5 gems
+      state.upgrades = { tools: true, quarry: true };
       state.totalGems = 2;
       const available = getAvailableUpgrades(state);
       expect(available.map(u => u.id)).not.toContain('gemPolisher');
@@ -140,7 +141,7 @@ describe('upgrades', () => {
 
     it('shows gem-gated upgrades when gems at threshold', () => {
       const state = createInitialState();
-      state.upgrades = { tools: true };
+      state.upgrades = { tools: true, quarry: true };
       state.totalGems = 5;
       const available = getAvailableUpgrades(state);
       expect(available.map(u => u.id)).toContain('gemPolisher');
