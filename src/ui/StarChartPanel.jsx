@@ -45,6 +45,7 @@ export function StarChartPanel({ state, onUpdate }) {
                 x1={from.x * 100} y1={from.y * 100}
                 x2={to.x * 100} y2={to.y * 100}
                 stroke="#4488aa" strokeWidth="0.8"
+                opacity={0.6 + Math.sin(Date.now() / 1000 + i) * 0.2}
               />
             );
           })}
