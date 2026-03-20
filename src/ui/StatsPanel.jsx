@@ -20,6 +20,12 @@ export function StatsPanel({ state }) {
           <span>Play Time</span>
           <span>{formatTime(state.totalTime)}</span>
         </div>
+        {state.bestEraTimes && state.bestEraTimes[state.era] && (
+          <div className="stat-row">
+            <span>Time in Era</span>
+            <span>{formatTime(state.totalTime - state.bestEraTimes[state.era])}</span>
+          </div>
+        )}
         <div className="stat-row">
           <span>Upgrades</span>
           <span>{Object.keys(state.upgrades).length}</span>
