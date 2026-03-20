@@ -128,6 +128,7 @@ export function UpgradePanel({ state, onUpdate }) {
               title={`${upgrade.description}\nEffects: ${formatEffects(upgrade.effects)}`}
             >
               <div className="upgrade-name">
+                {upgrade.prerequisites.length > 0 && <span className="chain-depth" title="Chain depth">{'→'.repeat(Math.min(upgrade.prerequisites.length, 3))}</span>}
                 {upgrade.name}
                 {upgrade.repeatable && count > 0 && ` (x${count})`}
                 {upgrade.repeatable && <span className="repeatable-badge">repeatable</span>}

@@ -367,6 +367,12 @@ body {
   border: 1px solid rgba(221, 170, 68, 0.3);
 }
 
+.chain-depth {
+  color: #555;
+  font-size: 0.8em;
+  margin-right: 4px;
+}
+
 .repeatable-badge {
   display: inline-block;
   font-size: 0.7em;
