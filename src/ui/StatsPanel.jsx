@@ -64,6 +64,10 @@ export function StatsPanel({ state }) {
           <span>{state.prestigePoints || 0}</span>
         </div>
         <div className="stat-row">
+          <span>Mini-game Combos</span>
+          <span>Dock: {state.dockingCombo || 0} | Weave: {state.weaveCombo || 0}</span>
+        </div>
+        <div className="stat-row">
           <span>Production Mult</span>
           <span>x{state.prestigeMultiplier.toFixed(1)}</span>
         </div>
