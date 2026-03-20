@@ -1283,6 +1283,12 @@ canvas:hover {
   color: #fff;
 }
 
+.toast-achievement {
+  background: rgba(100, 200, 100, 0.9);
+  color: #000;
+  font-weight: bold;
+}
+
 @keyframes toast-in {
   from { transform: translateX(100px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }

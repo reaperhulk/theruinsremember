@@ -232,4 +232,18 @@ export const achievements = [
   { id: 'starConqueror', name: 'Star Conqueror', description: 'Control 500 star systems', check: s => (s.resources?.starSystems?.amount || 0) >= 500, reward: 8 },
   { id: 'realityShaper', name: 'Reality Shaper', description: 'Accumulate 1000 reality fragments', check: s => (s.resources?.realityFragments?.amount || 0) >= 1000, reward: 15 },
   { id: 'quantumMaster', name: 'Quantum Master', description: 'Accumulate 500 quantum echoes', check: s => (s.resources?.quantumEchoes?.amount || 0) >= 500, reward: 15 },
+
+  // --- 12 new achievements ---
+  { id: 'tredecillion', name: 'Tredecillionaire', description: 'Have 1 tredecillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e42), reward: 55 },
+  { id: 'upgrade600', name: 'Upgrade Eternity', description: 'Purchase 600 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 600, reward: 90 },
+  { id: 'techInfinite', name: 'Tech Infinite', description: 'Unlock 90 technologies', check: s => Object.keys(s.tech || {}).length >= 90, reward: 50 },
+  { id: 'speedrunEra10ultra', name: 'Reality Breaker', description: 'Reach Era 10 in under 15 minutes', check: s => s.era >= 10 && (s.bestEraTimes?.[10] || Infinity) < 900, reward: 20 },
+  { id: 'hack2000', name: 'Neural Ghost', description: 'Complete 2000 hacks', check: s => (s.hackSuccesses || 0) >= 2000, reward: 40 },
+  { id: 'weave2000', name: 'Weave Infinity', description: 'Complete 2000 weaves', check: s => (s.totalWeaves || 0) >= 2000, reward: 40 },
+  { id: 'docking2000', name: 'Cosmic Admiral', description: 'Land 2000 perfect docks', check: s => (s.dockingPerfects || 0) >= 2000, reward: 40 },
+  { id: 'trade25000', name: 'Omniversal Exchange', description: 'Complete 25000 trades', check: s => (s.totalTrades || 0) >= 25000, reward: 50 },
+  { id: 'gem25000v2', name: 'Gem Multiverse', description: 'Find 25000 gems across all runs', check: s => (s.totalGems || 0) >= 25000, reward: 35 },
+  { id: 'repeatAddict2000', name: 'Perpetual Machine', description: 'Buy any repeatable upgrade 2000 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 2000), reward: 35 },
+  { id: 'starNetwork100', name: 'Omniversal Web', description: 'Create 100 star routes', check: s => (s.starRoutes?.length || 0) >= 100, reward: 20 },
+  { id: 'marathon720', name: 'Month Runner', description: 'Play for 720 hours total', check: s => s.totalTime >= 2592000, reward: 30 },
 ];

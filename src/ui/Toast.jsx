@@ -28,7 +28,13 @@ export function Toast({ state }) {
     if (currentEvents > prevEventsRef.current && state.eventLog?.length > 0) {
       const latest = state.eventLog[state.eventLog.length - 1];
       if (latest && !latest.message.startsWith('Gem')) {
-        newToasts.push({ id: ++idRef.current, text: latest.message, type: 'event' });
+        const isAchievement = latest.message.startsWith('Achievement');
+        const isEra = latest.message.startsWith('ERA');
+        newToasts.push({
+          id: ++idRef.current,
+          text: latest.message,
+          type: isAchievement ? 'achievement' : isEra ? 'era' : 'event',
+        });
       }
     }
     prevEventsRef.current = currentEvents;

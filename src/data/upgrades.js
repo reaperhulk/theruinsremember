@@ -2781,7 +2781,7 @@ export const upgrades = {
   // Era 10
   omniversalLoom: { id: 'omniversalLoom', name: 'Omniversal Loom', era: 10, cost: { realityFragments: 100, quantumEchoes: 70, universalConstants: 25 }, effects: [{ type: 'production_mult', target: 'realityFragments', value: 5 }, { type: 'production_mult', target: 'quantumEchoes', value: 3 }], description: 'Weave all realities into a single tapestry — x5 fragments', prerequisites: ['realityForge'] },
   echoChamber: { id: 'echoChamber', name: 'Echo Chamber', era: 10, cost: { quantumEchoes: 80, realityFragments: 60, cosmicPower: 400 }, effects: [{ type: 'production_mult', target: 'quantumEchoes', value: 5 }, { type: 'production_add', target: 'universalConstants', value: 0.3 }], description: 'Amplify quantum echoes in a resonant chamber — x5 echoes', prerequisites: ['quantumHarvester'] },
-  infinityWell: { id: 'infinityWell2', name: 'Infinity Wellspring', era: 10, cost: { universalConstants: 30, cosmicPower: 500, realityFragments: 90 }, effects: [{ type: 'production_mult', target: 'universalConstants', value: 3 }, { type: 'production_mult', target: 'cosmicPower', value: 3 }], description: 'Tap into an infinite wellspring of universal energy', prerequisites: ['dimensionalGateway'] },
+  infinityWellspring: { id: 'infinityWellspring', name: 'Infinity Wellspring', era: 10, cost: { universalConstants: 30, cosmicPower: 500, realityFragments: 90 }, effects: [{ type: 'production_mult', target: 'universalConstants', value: 3 }, { type: 'production_mult', target: 'cosmicPower', value: 3 }], description: 'Tap into an infinite wellspring of universal energy', prerequisites: ['dimensionalGateway'] },
 };
 
 // Balance scaling: multiply upgrade costs by era-dependent factors
