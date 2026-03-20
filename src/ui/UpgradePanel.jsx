@@ -80,7 +80,7 @@ export function UpgradePanel({ state, onUpdate }) {
   return (
     <div className="panel upgrade-panel">
       <h2>
-        Upgrades ({sortedAvailable.length} available)
+        Upgrades ({sortedAvailable.length} now{upcoming.length > 0 ? `, ${upcoming.length} soon` : ''})
         {purchased.length > 0 && (
           <span
             className="toggle-purchased"

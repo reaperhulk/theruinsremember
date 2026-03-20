@@ -1412,7 +1412,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 0.2 },
       { type: 'production_add', target: 'materials', value: 0.2 },
     ],
-    description: 'A bustling marketplace doubles food and material trade',
+    description: 'A bustling marketplace boosts food and material trade',
     prerequisites: ['brickworks'],
   },
   granary: {
@@ -1452,7 +1452,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.2 },
       { type: 'production_add', target: 'food', value: 0.3 },
     ],
-    description: 'Water-powered mills double energy and grind grain for food',
+    description: 'Water-powered mills generate energy and grind grain for food',
     prerequisites: ['basicPower'],
   },
   tradePost: {
@@ -1472,7 +1472,7 @@ export const upgrades = {
       { type: 'production_add', target: 'labor', value: 0.3 },
       { type: 'production_add', target: 'energy', value: 0.3 },
     ],
-    description: 'Electric motors double labor efficiency',
+    description: 'Electric motors boost labor and energy output',
     prerequisites: ['steamTurbine'],
   },
   steelRefinery: {
@@ -1482,7 +1482,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 0.3 },
       { type: 'cap_mult', target: 'steel', value: 3 },
     ],
-    description: 'Refined smelting doubles steel and triples storage',
+    description: 'Refined smelting boosts steel output and triples storage',
     prerequisites: ['steelForge'],
   },
   chemicalPlant: {
@@ -1492,7 +1492,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.5 },
       { type: 'production_add', target: 'materials', value: 0.3 },
     ],
-    description: 'Chemical processing doubles materials and generates energy',
+    description: 'Chemical processing generates energy and materials',
     prerequisites: ['electricMotor'],
   },
   telephoneNetwork: {
@@ -1502,7 +1502,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 0.3 },
       { type: 'production_add', target: 'labor', value: 0.3 },
     ],
-    description: 'Instant communication doubles labor efficiency',
+    description: 'Instant communication boosts research and labor',
     prerequisites: ['computingLab'],
   },
   textileFactory: {
@@ -1522,7 +1522,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.3 },
       { type: 'production_add', target: 'materials', value: 0.3 },
     ],
-    description: 'Deep coal mining doubles energy and produces materials',
+    description: 'Deep coal mining generates energy and produces materials',
     prerequisites: ['steelRefinery'],
   },
   communalKitchen: {
@@ -1532,7 +1532,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 0.4 },
       { type: 'production_add', target: 'labor', value: 0.5 },
     ],
-    description: 'Shared meals triple food output and provide extra labor',
+    description: 'Shared meals boost food output and provide extra labor',
     prerequisites: ['animalHusbandry'],
   },
   deepMining: {
@@ -1552,7 +1552,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.4 },
       { type: 'production_add', target: 'software', value: 0.3 },
     ],
-    description: 'Social networks double data generation',
+    description: 'Social networks boost data and software output',
     prerequisites: ['openSource'],
   },
   cloudStorage: {
@@ -1573,7 +1573,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 0.4 },
       { type: 'cap_mult', target: 'data', value: 5 },
     ],
-    description: 'Decentralized ledger doubles electronics and expands data capacity',
+    description: 'Decentralized ledger boosts electronics and expands data capacity x5',
     prerequisites: ['quantumEncryption'],
   },
   robotics: {
@@ -1583,7 +1583,7 @@ export const upgrades = {
       { type: 'production_add', target: 'labor', value: 0.8 },
       { type: 'production_add', target: 'electronics', value: 0.5 },
     ],
-    description: 'Robotic automation triples labor and generates electronics',
+    description: 'Robotic automation boosts labor and generates electronics',
     prerequisites: ['aiResearch'],
   },
   bigData: {
@@ -1593,7 +1593,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.8 },
       { type: 'production_add', target: 'research', value: 1 },
     ],
-    description: 'Massive data analysis triples data output and boosts research',
+    description: 'Massive data analysis boosts data output and research',
     prerequisites: ['aiResearch'],
   },
   encryptionProtocol: {
@@ -1603,7 +1603,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.4 },
       { type: 'cap_mult', target: 'software', value: 3 },
     ],
-    description: 'Secure data doubles production and triples software capacity',
+    description: 'Secure data boosts production and triples software capacity',
     prerequisites: ['cyberSecurity'],
   },
   suborbitalFlight: {
@@ -1805,7 +1805,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.4 },
       { type: 'cap_mult', target: 'energy', value: 3 },
     ],
-    description: 'Digital energy management doubles output and triples capacity',
+    description: 'Digital energy management boosts output and triples capacity',
     prerequisites: ['iotNetwork'],
   },
   cosmicFarming: {
@@ -1899,7 +1899,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.2 },
       { type: 'production_add', target: 'energy', value: 0.4 },
     ],
-    description: 'Processed lumber doubles material output and fuels energy',
+    description: 'Processed lumber boosts material output and fuels energy',
     prerequisites: ['tools'],
   },
 
@@ -1911,7 +1911,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 0.3 },
       { type: 'production_add', target: 'materials', value: 0.5 },
     ],
-    description: 'Hydraulic forging doubles steel and produces raw materials',
+    description: 'Hydraulic forging boosts steel and produces raw materials',
     prerequisites: ['steamTurbine'],
   },
   telegraphLine: {
@@ -1935,7 +1935,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 1.2 },
       { type: 'production_add', target: 'orbitalInfra', value: 0.3 },
     ],
-    description: 'Manufacturing in zero-g triples steel and builds orbital infrastructure',
+    description: 'Manufacturing in zero-g boosts steel and builds orbital infrastructure',
     prerequisites: ['refueling'],
   },
   marsRover: {
@@ -2044,7 +2044,7 @@ export const upgrades = {
   // --- Worktree Agent: 30 new upgrades (3 per era) ---
   oxCart: { id: 'oxCart', name: 'Ox Cart', era: 1, cost: { food: 15, materials: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'labor', value: 0.2 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'Beast-drawn carts double labor and haul extra materials', prerequisites: ['huntingParty'] },
   oilRefinery: { id: 'oilRefinery', name: 'Oil Refinery', era: 2, cost: { steel: 25, energy: 20, materials: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.5 }], description: 'Refine petroleum — triple energy and generate steel byproducts', prerequisites: ['steamTurbine'] },
-  laboratoryComplex: { id: 'laboratoryComplex', name: 'Laboratory Complex', era: 2, cost: { electronics: 20, steel: 15, research: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'cap_mult', target: 'research', value: 3 }], description: 'Dedicated labs double research and triple capacity', prerequisites: ['computingLab'] },
+  laboratoryComplex: { id: 'laboratoryComplex', name: 'Laboratory Complex', era: 2, cost: { electronics: 20, steel: 15, research: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.3 }, { type: 'cap_mult', target: 'research', value: 3 }], description: 'Dedicated labs boost research and triple capacity', prerequisites: ['computingLab'] },
   conveyor: { id: 'conveyor', name: 'Conveyor System', era: 2, cost: { steel: 20, electronics: 10, energy: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.3 }, { type: 'production_add', target: 'electronics', value: 0.3 }], description: 'Automated conveyors double steel and electronics', prerequisites: ['railroad'] },
   fiberOptic: { id: 'fiberOptic', name: 'Fiber Optic Network', era: 3, cost: { electronics: 30, energy: 20, materials: 25 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 0.4 }], description: 'High-speed fiber triples data and doubles electronics', prerequisites: ['internet'] },
   autonomousDrone: { id: 'autonomousDrone', name: 'Autonomous Drone', era: 3, cost: { software: 20, electronics: 25, research: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 1 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'Drones add labor and double material gathering', prerequisites: ['robotics'] },
