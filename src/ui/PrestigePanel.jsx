@@ -42,9 +42,14 @@ export function PrestigePanel({ state, onUpdate }) {
               {u.name}
               {u.owned && ' [OWNED]'}
             </div>
-            <div className="upgrade-cost">{u.cost} points</div>
+            <div className="upgrade-cost">{u.cost} points {!u.owned && !u.affordable && !u.locked && points > 0 && `(${Math.floor(points / u.cost * 100)}%)`}</div>
             <div className="upgrade-desc">{u.description}</div>
             {u.locked && <div className="upgrade-desc" style={{ color: '#ff8888' }}>Requires: {u.requiresName}</div>}
+            {!u.owned && !u.locked && !u.affordable && points > 0 && (
+              <div className="upgrade-progress-bar">
+                <div className={`upgrade-progress-fill ${points / u.cost > 0.8 ? 'almost' : ''}`} style={{ width: `${Math.min(Math.floor(points / u.cost * 100), 100)}%` }} />
+              </div>
+            )}
           </button>
         ))}
       </div>
