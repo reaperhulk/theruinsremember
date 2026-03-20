@@ -34,8 +34,10 @@ export function MiningPanel({ state, onUpdate }) {
       <div className="mining-chance-bar">
         <div className="mining-chance-fill" style={{ width: `${chance}%` }} />
       </div>
-      <button className="mine-btn" onClick={handleMine}>
-        Mine for Gems
+      <button className="mine-btn" onClick={handleMine} style={{
+        background: `linear-gradient(90deg, #2a4a2a ${chance}%, #1a3a1a ${chance}%)`,
+      }}>
+        Mine for Gems {streak > 0 && `(${streak} streak)`}
       </button>
       <p className="mining-hint">
         Each miss +2% chance (max 50%) | Space to mine
