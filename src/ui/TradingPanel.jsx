@@ -78,16 +78,19 @@ export function TradingPanel({ state, onUpdate }) {
             </span>
           </div>
         )}
+        <div className="trade-row" style={{ gap: '4px' }}>
+          <button className="gather-btn" onClick={() => setAmount(1)} style={{ flex: 1 }}>1</button>
+          <button className="gather-btn" onClick={() => setAmount(10)} style={{ flex: 1 }}>10</button>
+          <button className="gather-btn" onClick={() => setAmount(100)} style={{ flex: 1 }}>100</button>
+          <button className="gather-btn" onClick={() => setAmount(1000)} style={{ flex: 1 }}>1K</button>
+        </div>
         <button
           className={`trade-btn ${canTrade ? 'affordable' : 'too-expensive'}`}
           disabled={!canTrade}
           onClick={handleTrade}
         >
-          Trade
+          Trade ({state.totalTrades || 0} completed)
         </button>
-      </div>
-      <div className="trade-stats">
-        Total trades: {state.totalTrades || 0}
       </div>
     </div>
   );
