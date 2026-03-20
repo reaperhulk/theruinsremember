@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { getUnlockedSystems, getRoutes, createRoute, removeRoute, getRouteBonus, routeExists, getRouteStats } from '../engine/starChart.js';
+import { resources as resourceDefs } from '../data/resources.js';
+
+function resourceName(id) { return resourceDefs[id]?.name || id; }
 
 export function StarChartPanel({ state, onUpdate }) {
   const [selected, setSelected] = useState(null);
@@ -85,7 +88,7 @@ export function StarChartPanel({ state, onUpdate }) {
       </div>
       {Object.keys(bonus).length > 0 && (
         <div className="colony-bonus">
-          Routes: {Object.entries(bonus).map(([r, v]) => `${r} +${v.toFixed(1)}`).join(', ')}
+          Routes: {Object.entries(bonus).map(([r, v]) => `${resourceName(r)} +${v.toFixed(1)}`).join(', ')}
           <span style={{ color: '#888', marginLeft: '8px' }}>
             (total: +{Object.values(bonus).reduce((s, v) => s + v, 0).toFixed(1)}/s)
           </span>
