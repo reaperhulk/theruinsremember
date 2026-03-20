@@ -39,7 +39,9 @@ export function WeavingPanel({ state, onUpdate }) {
   for (const f of grid) {
     counts[f] = (counts[f] || 0) + 1;
   }
-  const hasMatch = Object.values(counts).some(c => c >= 3);
+  const chaosCount = counts.chaos || 0;
+  const hasMatch = Object.values(counts).some(c => c >= 3) ||
+    ['temporal','spatial','causal','quantum'].some(t => ((counts[t]||0) + chaosCount) >= 3);
 
   return (
     <div className="panel weaving-panel">
@@ -59,6 +61,15 @@ export function WeavingPanel({ state, onUpdate }) {
         ))}
         {grid.length === 0 && <span className="empty-message">Draw fragments to begin</span>}
       </div>
+      {grid.length > 0 && (
+        <div className="weave-counts" style={{ display: 'flex', gap: '8px', fontSize: '0.75em', marginBottom: '4px' }}>
+          {['temporal','spatial','causal','quantum'].map(t => (
+            <span key={t} style={{ color: TYPE_COLORS[t], opacity: (counts[t]||0) > 0 ? 1 : 0.3 }}>
+              {t.charAt(0).toUpperCase()}: {(counts[t]||0)}{chaosCount > 0 ? `+${chaosCount}*` : ''}
+            </span>
+          ))}
+        </div>
+      )}
       {lastMatch && (
         <div className="hack-result success">
           Woven {lastMatch}! x2 {lastMatch === 'temporal' ? 'cosmicPower' : lastMatch === 'spatial' ? 'exoticMatter' : lastMatch === 'causal' ? 'universalConstants' : 'realityFragments'} for 60s
