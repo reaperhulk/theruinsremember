@@ -200,6 +200,7 @@ export function App() {
               if (tab.id === 'tech') badge = affordableTech;
               if (tab.id === 'mini') badge = activeEffectCount;
               if (tab.id === 'prestige') badge = state.prestigePoints || 0;
+              if (tab.id === 'trading') badge = state.totalTrades || 0;
               if (tab.id === 'stats') badge = Object.keys(state.achievements || {}).length || 0;
               return (
                 <button
