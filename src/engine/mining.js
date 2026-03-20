@@ -24,10 +24,14 @@ export function mine(state, roll = Math.random()) {
   const chance = getGemChance(state);
   const foundGem = roll < chance;
 
+  // Gem quality scales with total gems found (milestone bonus)
+  const totalGems = state.totalGems || 0;
+  const gemQuality = 1 + Math.floor(totalGems / 25) * 0.5; // +50% per 25 gems
+
   // Era scaling: mining stays relevant as eras increase
   const eraScale = 1 + (state.era - 1) * 0.5; // x1 at era 1, x5.5 at era 10
   const baseGather = 1 * r.rateMult * state.prestigeMultiplier * eraScale;
-  const gathered = foundGem ? baseGather * GEM_MULTIPLIER : baseGather;
+  const gathered = foundGem ? baseGather * GEM_MULTIPLIER * gemQuality : baseGather;
 
   const newState = {
     ...state,
