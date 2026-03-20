@@ -38,7 +38,7 @@ export function DockingPanel({ state, onUpdate }) {
 
   return (
     <div className="panel docking-panel">
-      <h2>Orbital Docking</h2>
+      <h2>Orbital Docking {info.successes > 0 && `(${info.successes} docks)`}</h2>
       <div className="dock-info">
         <span>Docks: {info.successes}/{info.attempts}</span>
         <span>Perfect: {info.perfects}</span>
