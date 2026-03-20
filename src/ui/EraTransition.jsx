@@ -33,6 +33,7 @@ export function EraTransition({ era }) {
       <div className="era-transition-content">
         <div className="era-transition-label">ERA {era}</div>
         <div className="era-transition-name">{eraNames[era]}</div>
+        <div style={{ fontSize: '0.9em', color: '#aaa', marginTop: '8px' }}>New resources and upgrades unlocked!</div>
       </div>
     </div>
   );
