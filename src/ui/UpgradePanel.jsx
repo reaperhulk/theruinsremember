@@ -56,7 +56,7 @@ function getAffordProgress(state, cost) {
 
 export function UpgradePanel({ state, onUpdate }) {
   const [showPurchased, setShowPurchased] = useState(false);
-  const [sortBy, setSortBy] = useState('default'); // 'default' | 'affordable' | 'cheapest'
+  const [sortBy, setSortBy] = useState('affordable'); // 'default' | 'affordable' | 'cheapest' — default to affordable
   const available = getAvailableUpgrades(state);
   const purchased = getPurchasedUpgrades(state);
 
