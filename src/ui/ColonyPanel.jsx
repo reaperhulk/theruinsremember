@@ -1,4 +1,5 @@
 import { getAssignableColonies, getColonyAssignments, getTotalColoniesAssigned, assignColonies, getColonyBonus, getColonyStrategy } from '../engine/colonies.js';
+import { formatNumber } from './format.js';
 
 const FOCUS_TYPES = [
   { id: 'growth', label: 'Growth', desc: 'food +2, labor +0.5', color: '#88dd88' },
@@ -36,7 +37,7 @@ export function ColonyPanel({ state, onUpdate }) {
     <div className="panel colony-panel">
       <h2>Colonies</h2>
       <div className="factory-info">
-        <span>Colonies: {available}/{maxColonies} available</span>
+        <span>Colonies: {formatNumber(available)}/{formatNumber(maxColonies)} available</span>
         {maxColonies >= 3 && (
           <button className="gather-btn" onClick={handleEvenSplit} style={{ fontSize: '0.7em', padding: '1px 6px' }}>
             Even Split

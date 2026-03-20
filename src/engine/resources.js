@@ -41,11 +41,12 @@ export function spend(state, cost) {
 }
 
 // Manually gather a resource (clicking). Returns new state.
-// Gather amount scales with rateMult so upgrades reward clicking too.
+// Gather amount scales with rateMult, prestige, and era so clicking stays relevant.
 export function gather(state, resourceId, amount = 1) {
   const r = state.resources[resourceId];
   if (!r || !r.unlocked) return state;
-  const gathered = amount * r.rateMult * state.prestigeMultiplier;
+  const eraScale = 1 + (state.era - 1) * 0.5;
+  const gathered = amount * r.rateMult * state.prestigeMultiplier * eraScale;
   return {
     ...state,
     resources: {
