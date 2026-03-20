@@ -70,11 +70,12 @@ describe('resources', () => {
       expect(after.resources.labor.amount).toBe(before + 1);
     });
 
-    it('allows gathering beyond old baseCap', () => {
+    it('caps gathering at resource cap', () => {
       const state = createInitialState();
-      state.resources.labor.amount = 500;
+      state.resources.labor.amount = 500; // over cap
       const after = gather(state, 'labor');
-      expect(after.resources.labor.amount).toBe(501);
+      // Cap enforcement: already over, stays at current
+      expect(after.resources.labor.amount).toBe(500);
     });
 
     it('applies prestige multiplier', () => {
