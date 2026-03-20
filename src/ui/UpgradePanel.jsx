@@ -111,8 +111,11 @@ export function UpgradePanel({ state, onUpdate }) {
         </div>
       )}
       <div className="upgrade-list">
-        {sortedAvailable.length === 0 && (
-          <p className="empty-message">No upgrades available</p>
+        {sortedAvailable.length === 0 && upcoming.length === 0 && (
+          <p className="empty-message">No upgrades available — buy prerequisite upgrades to unlock more</p>
+        )}
+        {sortedAvailable.length === 0 && upcoming.length > 0 && (
+          <p className="empty-message">Buy prerequisites to unlock {upcoming.length} upcoming upgrade{upcoming.length > 1 ? 's' : ''}</p>
         )}
         {sortedAvailable.map(upgrade => {
           const cost = getUpgradeCost(state, upgrade.id);
