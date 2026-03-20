@@ -12,11 +12,11 @@ export function EraTransition({ era }) {
       setVisible(true);
       setFadingOut(false);
 
-      const fadeTimer = setTimeout(() => setFadingOut(true), 1500);
+      const fadeTimer = setTimeout(() => setFadingOut(true), 2000);
       const hideTimer = setTimeout(() => {
         setVisible(false);
         setFadingOut(false);
-      }, 2500);
+      }, 3000);
 
       return () => {
         clearTimeout(fadeTimer);
