@@ -136,8 +136,20 @@ export function App() {
               Prestige (x{prestigeBonus.toFixed(1)} bonus)
             </button>
           )}
+          <button className="reset-btn" onClick={() => {
+            const save = localStorage.getItem('incremental-game-save');
+            if (save) {
+              const blob = new Blob([save], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url; a.download = 'planet-to-multiverse-save.json';
+              a.click(); URL.revokeObjectURL(url);
+            }
+          }}>
+            Export
+          </button>
           <button className="reset-btn" onClick={() => { if (confirm('Hard reset? This erases ALL progress including prestige!')) resetSave(); }}>
-            Hard Reset
+            Reset
           </button>
         </div>
       </header>
