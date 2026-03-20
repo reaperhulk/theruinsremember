@@ -139,6 +139,15 @@ export function tick(state, dt) {
     }
   }
 
+  // Track total production for stats (every 30 ticks to reduce overhead)
+  if (newState.totalTicks % 30 === 0) {
+    let totalProduced = newState.totalResourcesProduced || 0;
+    for (const [id, rate] of Object.entries(rates)) {
+      if (rate > 0 && newState.resources[id]?.unlocked) totalProduced += rate * dt * 30;
+    }
+    newState = { ...newState, totalResourcesProduced: totalProduced };
+  }
+
   // Check for era transition
   const nextEra = checkEraTransition(newState);
   if (nextEra !== null) {
