@@ -101,8 +101,8 @@ export function StatsPanel({ state }) {
         ))}
         {achievementList.length - earnedCount > 0 && (
           <div className="achievement locked">
-            <span className="achievement-name">+ {achievementList.length - earnedCount} hidden achievements</span>
-            <span className="achievement-desc">Keep playing to discover them!</span>
+            <span className="achievement-name">+ {achievementList.length - earnedCount} hidden</span>
+            <span className="achievement-desc">Keep playing to discover them! ({achievementList.filter(a => !a.earned).reduce((s, a) => s + (a.reward || 0), 0)} pts remaining)</span>
           </div>
         )}
       </div>
