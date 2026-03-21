@@ -6,8 +6,8 @@
 
 body {
   font-family: 'Courier New', monospace;
-  background: #1a1a2e;
-  color: #e0e0e0;
+  background: #0d0d1a;
+  color: #d8d0c8;
   min-height: 100vh;
 }
 
@@ -17,7 +17,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a2e;
+  background: #0d0d1a;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -32,13 +32,13 @@ body {
 button:focus-visible,
 select:focus-visible,
 input:focus-visible {
-  outline: 2px solid #7cb7ff;
+  outline: 2px solid #c8a040;
   outline-offset: 2px;
 }
 
 /* Ensure SVG interactive elements show focus */
 g[role="button"]:focus-visible {
-  outline: 2px solid #7cb7ff;
+  outline: 2px solid #c8a040;
   outline-offset: 2px;
 }
 
@@ -48,7 +48,7 @@ g[role="button"]:focus-visible {
   top: -40px;
   left: 0;
   background: #1a1a2e;
-  color: #8be9fd;
+  color: #d4a840;
   padding: 8px;
   z-index: 100;
 }
@@ -64,24 +64,24 @@ g[role="button"]:focus-visible {
   transition: border-color 1s ease;
 }
 
-/* Era-themed top border */
-.game-container.era-1 { border-top-color: #4a8a4a; }
-.game-container.era-2 { border-top-color: #8a6a3a; }
-.game-container.era-3 { border-top-color: #3a6a8a; }
-.game-container.era-4 { border-top-color: #6a6a8a; }
-.game-container.era-5 { border-top-color: #8a8a3a; }
-.game-container.era-6 { border-top-color: #3a5a8a; }
-.game-container.era-7 { border-top-color: #8a4a3a; }
-.game-container.era-8 { border-top-color: #6a3a8a; }
-.game-container.era-9 { border-top-color: #3a8a7a; }
-.game-container.era-10 { border-top-color: #8a3a8a; }
+/* Era-themed top border — warm amber palette matching logo */
+.game-container.era-1 { border-top-color: #8a7a3a; }
+.game-container.era-2 { border-top-color: #a08030; }
+.game-container.era-3 { border-top-color: #7a8a5a; }
+.game-container.era-4 { border-top-color: #8a8060; }
+.game-container.era-5 { border-top-color: #b09030; }
+.game-container.era-6 { border-top-color: #6a7a8a; }
+.game-container.era-7 { border-top-color: #c08030; }
+.game-container.era-8 { border-top-color: #8a6a50; }
+.game-container.era-9 { border-top-color: #7a9070; }
+.game-container.era-10 { border-top-color: #c0a040; }
 
 .game-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #3a3020;
   margin-bottom: 12px;
 }
 
@@ -101,17 +101,17 @@ g[role="button"]:focus-visible {
 }
 
 .panel {
-  background: #16213e;
-  border: 1px solid #333;
+  background: #12141e;
+  border: 1px solid #2a2418;
   padding: 10px;
   margin-bottom: 10px;
 }
 
 .panel h2 {
   font-size: 1em;
-  color: #7cb7ff;
+  color: #c8a850;
   margin-bottom: 8px;
-  border-bottom: 1px solid #2a2a4a;
+  border-bottom: 1px solid #2a2418;
   transition: border-color 1s ease;
   padding-bottom: 4px;
   display: flex;
@@ -207,9 +207,9 @@ g[role="button"]:focus-visible {
   width: 100%;
   text-align: left;
   padding: 8px;
-  background: #1a2845;
-  border: 1px solid #2a3855;
-  color: #e0e0e0;
+  background: #161820;
+  border: 1px solid #2a2418;
+  color: #d8d0c8;
   cursor: pointer;
   font-family: inherit;
   font-size: 0.8em;
@@ -218,8 +218,8 @@ g[role="button"]:focus-visible {
 
 .upgrade-btn:hover:not(:disabled),
 .tech-btn:hover:not(:disabled) {
-  background: #223355;
-  border-color: #4477aa;
+  background: #1e2028;
+  border-color: #8a7030;
 }
 
 .upgrade-btn:disabled,
@@ -230,7 +230,7 @@ g[role="button"]:focus-visible {
 
 .upgrade-btn.affordable,
 .tech-btn.affordable {
-  border-color: #44aa77;
+  border-color: #8aaa44;
 }
 
 .toggle-purchased {
@@ -323,9 +323,9 @@ g[role="button"]:focus-visible {
 }
 
 .upgrade-sort button.active {
-  color: #8be9fd;
-  border-color: #8be9fd;
-  background: rgba(139, 233, 253, 0.05);
+  color: #d4a840;
+  border-color: #d4a840;
+  background: rgba(212, 168, 64, 0.05);
 }
 
 .upgrade-sort button:hover {
@@ -380,7 +380,7 @@ g[role="button"]:focus-visible {
   display: inline-block;
   font-size: 0.7em;
   font-weight: normal;
-  color: #8be9fd;
+  color: #d4a840;
   border: 1px solid #8be9fd;
   border-radius: 3px;
   padding: 0 4px;
@@ -523,7 +523,7 @@ canvas:hover {
 
 /* Header title gradient — shifts with era */
 .game-header h1 {
-  background: linear-gradient(90deg, #8be9fd, #bd93f9);
+  background: linear-gradient(90deg, #c8a040, #e8c060, #d4a030);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1289,10 +1289,10 @@ canvas:hover {
 }
 
 .tab-btn.active {
-  color: #8be9fd;
+  color: #d4a840;
   border-color: #333;
   border-bottom-color: #1a1a2e;
-  background: rgba(139, 233, 253, 0.05);
+  background: rgba(212, 168, 64, 0.05);
 }
 
 .tab-badge {
@@ -1344,7 +1344,7 @@ canvas:hover {
 }
 
 .toast-era {
-  background: rgba(139, 233, 253, 0.9);
+  background: rgba(212, 168, 64, 0.9);
   color: #000;
   font-weight: bold;
 }
@@ -1405,7 +1405,7 @@ canvas:hover {
 }
 
 .offline-report h2 {
-  color: #8be9fd;
+  color: #d4a840;
   margin-bottom: 8px;
 }
 
@@ -1529,7 +1529,7 @@ canvas:hover {
 
 .era-transition-label {
   font-size: 1.2em;
-  color: #8be9fd;
+  color: #d4a840;
   letter-spacing: 6px;
   text-transform: uppercase;
   margin-bottom: 8px;
@@ -1539,13 +1539,13 @@ canvas:hover {
   font-size: 2.5em;
   font-weight: bold;
   color: #fff;
-  text-shadow: 0 0 20px rgba(139, 233, 253, 0.5), 0 0 40px rgba(139, 233, 253, 0.3);
+  text-shadow: 0 0 20px rgba(212, 168, 64, 0.5), 0 0 40px rgba(212, 168, 64, 0.3);
   animation: era-name-glow 1.5s ease-in-out infinite;
 }
 
 @keyframes era-name-glow {
-  0%, 100% { text-shadow: 0 0 20px rgba(139, 233, 253, 0.5), 0 0 40px rgba(139, 233, 253, 0.3); }
-  50% { text-shadow: 0 0 30px rgba(139, 233, 253, 0.8), 0 0 60px rgba(139, 233, 253, 0.5), 0 0 80px rgba(139, 233, 253, 0.2); }
+  0%, 100% { text-shadow: 0 0 20px rgba(212, 168, 64, 0.5), 0 0 40px rgba(212, 168, 64, 0.3); }
+  50% { text-shadow: 0 0 30px rgba(212, 168, 64, 0.8), 0 0 60px rgba(212, 168, 64, 0.5), 0 0 80px rgba(212, 168, 64, 0.2); }
 }
 
 .era-transition-unlocks {
@@ -1560,7 +1560,7 @@ canvas:hover {
 }
 
 .era-unlock-label {
-  color: #8be9fd;
+  color: #d4a840;
   font-weight: bold;
   margin-right: 4px;
 }
