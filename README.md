@@ -1,5 +1,7 @@
 # The Ruins Remember
 
+**[Play it now](https://reaperhulk.github.io/theruinsremember/)**
+
 An incremental/idle game about the last survivors of humanity crash-landing on a new planet and rebuilding civilization from scratch — only to discover that someone has done all of this before.
 
 ## The Story
