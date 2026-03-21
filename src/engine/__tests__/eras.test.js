@@ -6,9 +6,9 @@ import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 describe('eras', () => {
   describe('getMinUpgradesForEra', () => {
     it('returns configured minimum per era', () => {
-      expect(getMinUpgradesForEra(1)).toBe(10);
-      expect(getMinUpgradesForEra(5)).toBe(18);
-      expect(getMinUpgradesForEra(10)).toBe(25);
+      expect(getMinUpgradesForEra(1)).toBe(15);
+      expect(getMinUpgradesForEra(5)).toBe(25);
+      expect(getMinUpgradesForEra(10)).toBe(30);
     });
   });
 
@@ -54,9 +54,9 @@ describe('eras', () => {
     it('returns next era when gating tech is unlocked and enough upgrades purchased', () => {
       const state = createInitialState();
       state.tech.industrialRevolution = true;
-      // Purchase 10 era 1 upgrades to meet the minimum
+      // Purchase 15 era 1 upgrades to meet the minimum
       const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
-      for (let i = 0; i < 10 && i < era1Upgrades.length; i++) {
+      for (let i = 0; i < 15 && i < era1Upgrades.length; i++) {
         state.upgrades[era1Upgrades[i].id] = true;
       }
       expect(checkEraTransition(state)).toBe(2);
@@ -67,7 +67,7 @@ describe('eras', () => {
       state.tech.industrialRevolution = true;
       // Purchase era 2 upgrades instead of era 1
       const era2Upgrades = Object.values(upgradeDefs).filter(u => u.era === 2);
-      for (let i = 0; i < 10 && i < era2Upgrades.length; i++) {
+      for (let i = 0; i < 15 && i < era2Upgrades.length; i++) {
         state.upgrades[era2Upgrades[i].id] = true;
       }
       expect(checkEraTransition(state)).toBeNull();

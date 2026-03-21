@@ -86,6 +86,24 @@ export function tick(state, dt) {
     };
   }
 
+  // Era 5+: colonies consume exoticMaterials (building materials for colonies)
+  if (state.era >= 5 && newResources.exoticMaterials?.unlocked && newResources.colonies?.unlocked) {
+    const colonyRate = ((newResources.colonies.baseRate + newResources.colonies.rateAdd) * newResources.colonies.rateMult * state.prestigeMultiplier);
+    if (colonyRate > 0) {
+      const consumed = colonyRate * 0.2 * dt;
+      newResources.exoticMaterials = { ...newResources.exoticMaterials, amount: Math.max(0, newResources.exoticMaterials.amount - consumed) };
+    }
+  }
+
+  // Era 7+: megastructures consume stellarForge output
+  if (state.era >= 7 && newResources.stellarForge?.unlocked && newResources.megastructures?.unlocked) {
+    const megaRate = ((newResources.megastructures.baseRate + newResources.megastructures.rateAdd) * newResources.megastructures.rateMult * state.prestigeMultiplier);
+    if (megaRate > 0) {
+      const consumed = megaRate * 0.3 * dt;
+      newResources.stellarForge = { ...newResources.stellarForge, amount: Math.max(0, newResources.stellarForge.amount - consumed) };
+    }
+  }
+
   let newState = {
     ...state,
     resources: newResources,

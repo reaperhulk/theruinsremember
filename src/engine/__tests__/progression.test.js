@@ -30,7 +30,7 @@ describe('progression integration', () => {
   it('can progress from Era 1 to Era 2 via upgrades and tech', () => {
     let state = createInitialState();
 
-    // Buy era 1 upgrades following chains (need at least 10)
+    // Buy era 1 upgrades following chains (need at least 15)
     state = giveAndBuy(state, 'upgrade', 'tools');
     state = giveAndBuy(state, 'upgrade', 'storehouse');
     state = giveAndBuy(state, 'upgrade', 'quarry');
@@ -41,6 +41,11 @@ describe('progression integration', () => {
     state = giveAndBuy(state, 'upgrade', 'housing');
     state = giveAndBuy(state, 'upgrade', 'foundry');
     state = giveAndBuy(state, 'upgrade', 'advancedTools');
+    state = giveAndBuy(state, 'upgrade', 'communalKitchen');   // prereq: animalHusbandry
+    state = giveAndBuy(state, 'upgrade', 'brickworks');        // prereq: quarry
+    state = giveAndBuy(state, 'upgrade', 'marketplace');       // prereq: brickworks
+    state = giveAndBuy(state, 'upgrade', 'tradePost');         // prereq: marketplace
+    state = giveAndBuy(state, 'upgrade', 'expandWorkforce');   // prereq: housing
 
     expect(state.resources.steel.unlocked).toBe(true);
 
@@ -65,7 +70,7 @@ describe('progression integration', () => {
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 0, rateMult: 1 };
     state.resources.research = { ...state.resources.research, unlocked: true, rateAdd: 0, rateMult: 1 };
 
-    // Buy era 2 upgrades following chains (need at least 12)
+    // Buy era 2 upgrades following chains (need at least 20)
     state = giveAndBuy(state, 'upgrade', 'assemblyLines');
     state = giveAndBuy(state, 'upgrade', 'ironWorks');
     state = giveAndBuy(state, 'upgrade', 'steelForge');
@@ -78,6 +83,14 @@ describe('progression integration', () => {
     state = giveAndBuy(state, 'upgrade', 'microchipFab');
     state = giveAndBuy(state, 'upgrade', 'factoryFloor');
     state = giveAndBuy(state, 'upgrade', 'automation');
+    state = giveAndBuy(state, 'upgrade', 'steamTurbine');         // prereq: coalMine
+    state = giveAndBuy(state, 'upgrade', 'industrialFarming');    // prereq: assemblyLines
+    state = giveAndBuy(state, 'upgrade', 'railroad');             // prereq: automation
+    state = giveAndBuy(state, 'upgrade', 'warehouse');            // prereq: microchipFab
+    state = giveAndBuy(state, 'upgrade', 'supplyChain');          // prereq: steelRefinery
+    state = giveAndBuy(state, 'upgrade', 'electricMotor');        // prereq: steamTurbine
+    state = giveAndBuy(state, 'upgrade', 'chemicalPlant');        // prereq: electricMotor
+    state = giveAndBuy(state, 'upgrade', 'hydraulicPress');       // prereq: steelForge
 
     // Buy tech to transition
     state = giveAndBuy(state, 'tech', 'advancedComputing');
@@ -101,7 +114,7 @@ describe('progression integration', () => {
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 0.3 };
     state.resources.research = { ...state.resources.research, unlocked: true, rateAdd: 0.5 };
 
-    // Buy Digital Age upgrades following chains (need at least 14)
+    // Buy Digital Age upgrades following chains (need at least 22)
     state = giveAndBuy(state, 'upgrade', 'internet');
     state = giveAndBuy(state, 'upgrade', 'cloudComputing');
     state = giveAndBuy(state, 'upgrade', 'cloudStorage');
@@ -116,6 +129,14 @@ describe('progression integration', () => {
     state = giveAndBuy(state, 'upgrade', 'virtualReality');
     state = giveAndBuy(state, 'upgrade', 'dataCenter');
     state = giveAndBuy(state, 'upgrade', 'suborbitalFlight');
+    state = giveAndBuy(state, 'upgrade', 'robotics');            // prereq: aiResearch
+    state = giveAndBuy(state, 'upgrade', 'bigData');             // prereq: aiResearch
+    state = giveAndBuy(state, 'upgrade', 'fiberOptic');          // prereq: internet
+    state = giveAndBuy(state, 'upgrade', 'autonomousDrone');     // prereq: robotics
+    state = giveAndBuy(state, 'upgrade', 'iotNetwork');          // prereq: cloudComputing
+    state = giveAndBuy(state, 'upgrade', 'quantumEncryption');   // prereq: encryptionProtocol
+    state = giveAndBuy(state, 'upgrade', 'deepLearning');        // prereq: bigData
+    state = giveAndBuy(state, 'upgrade', 'meshNetwork');         // prereq: fiberOptic
     expect(state.resources.rocketFuel.unlocked).toBe(true);
 
     // Buy tech to transition

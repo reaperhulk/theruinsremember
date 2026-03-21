@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { mine } from '../engine/mining.js';
-import { gather } from '../engine/resources.js';
+import { gather, getEffectiveCap, getEffectiveRate } from '../engine/resources.js';
 
 // --- Shared Helpers ---
 
@@ -41,7 +41,7 @@ function drawGlowCircle(ctx, x, y, r, color, glowR) {
 function lerp(a, b, t) { return a + (b - a) * t; }
 
 // --- Era 1: Planetfall ---
-function drawEra1(ctx, w, h, t) {
+function drawEra1(ctx, w, h, t, state) {
   // Sky gradient (day cycle)
   const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.65);
   skyGrad.addColorStop(0, '#3a8fd4');
@@ -95,13 +95,16 @@ function drawEra1(ctx, w, h, t) {
     ctx.fill();
   }
 
-  // Small buildings
-  const buildings = [
+  // Small buildings — scale with upgrade count
+  const upgradeTotal = Object.keys(state?.upgrades || {}).length;
+  const visibleBuildings = Math.min(Math.floor(upgradeTotal / 3), 4);
+  const allBuildings = [
     { x: 40, w: 16, h: 20 },
     { x: 90, w: 12, h: 14 },
     { x: 200, w: 18, h: 24 },
     { x: 240, w: 10, h: 12 },
   ];
+  const buildings = allBuildings.slice(0, visibleBuildings);
   for (const b of buildings) {
     const groundY = h * 0.72 + Math.sin(b.x * 0.02 + 4) * 12 + Math.sin(b.x * 0.04 + 1 + t * 0.1) * 4;
     // Wall
@@ -203,7 +206,7 @@ function drawEra1(ctx, w, h, t) {
 }
 
 // --- Era 2: Industrialization ---
-function drawEra2(ctx, w, h, t) {
+function drawEra2(ctx, w, h, t, state) {
   // Day/night cycle
   const dayPhase = (Math.sin(t * 0.15) + 1) / 2; // 0=night, 1=day
   const skyR = Math.floor(lerp(15, 140, dayPhase));
@@ -223,13 +226,17 @@ function drawEra2(ctx, w, h, t) {
   ctx.fillStyle = groundGrad;
   ctx.fillRect(0, h * 0.65, w, h * 0.35);
 
-  // Factories
-  const factories = [
+  // Factories — scale with upgrade count
+  const factoryCount = Math.min(Math.floor(Object.keys(state?.upgrades || {}).length / 10) + 1, 6);
+  const allFactories = [
     { x: 15, bw: 45, bh: 50, stacks: 2 },
     { x: 80, bw: 35, bh: 40, stacks: 1 },
     { x: 135, bw: 55, bh: 55, stacks: 3 },
     { x: 210, bw: 50, bh: 45, stacks: 2 },
+    { x: 50, bw: 40, bh: 38, stacks: 1 },
+    { x: 170, bw: 48, bh: 52, stacks: 2 },
   ];
+  const factories = allFactories.slice(0, factoryCount);
 
   for (const f of factories) {
     const baseY = h * 0.65;
@@ -336,7 +343,7 @@ function drawEra2(ctx, w, h, t) {
 }
 
 // --- Era 3: Space Age ---
-function drawEra3(ctx, w, h, t) {
+function drawEra3(ctx, w, h, t, state) {
   // Deep space background
   ctx.fillStyle = '#000012';
   ctx.fillRect(0, 0, w, h);
@@ -448,7 +455,7 @@ function drawEra3(ctx, w, h, t) {
 }
 
 // --- Era 4: Solar System ---
-function drawEra4(ctx, w, h, t) {
+function drawEra4(ctx, w, h, t, state) {
   ctx.fillStyle = '#000008';
   ctx.fillRect(0, 0, w, h);
   drawStarField(ctx, w, h, 60, 444, t);
@@ -548,7 +555,7 @@ function drawEra4(ctx, w, h, t) {
 }
 
 // --- Era 5: Interstellar ---
-function drawEra5(ctx, w, h, t) {
+function drawEra5(ctx, w, h, t, state) {
   ctx.fillStyle = '#030010';
   ctx.fillRect(0, 0, w, h);
 
@@ -681,7 +688,7 @@ function drawEra5(ctx, w, h, t) {
 }
 
 // --- Era 6: Galactic ---
-function drawEra6(ctx, w, h, t) {
+function drawEra6(ctx, w, h, t, state) {
   ctx.fillStyle = '#020008';
   ctx.fillRect(0, 0, w, h);
   drawStarField(ctx, w, h, 40, 600, t);
@@ -767,7 +774,7 @@ function drawEra6(ctx, w, h, t) {
 }
 
 // --- Era 7: Intergalactic ---
-function drawEra7(ctx, w, h, t) {
+function drawEra7(ctx, w, h, t, state) {
   // Cosmic background radiation — subtle color variation
   const bgGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, 10, w * 0.5, h * 0.5, w);
   bgGrad.addColorStop(0, '#0a0515');
@@ -881,7 +888,7 @@ function drawEra7(ctx, w, h, t) {
 }
 
 // --- Era 8: Multiverse ---
-function drawEra8(ctx, w, h, t) {
+function drawEra8(ctx, w, h, t, state) {
   // Deep void base
   ctx.fillStyle = '#080010';
   ctx.fillRect(0, 0, w, h);
@@ -1006,7 +1013,7 @@ function drawEra8(ctx, w, h, t) {
 }
 
 // --- Era 9: Intergalactic ---
-function drawIntergalactic(ctx, w, h, t) {
+function drawIntergalactic(ctx, w, h, t, state) {
   // Deep cosmic void
   const bgGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, 0, w * 0.5, h * 0.5, w);
   bgGrad.addColorStop(0, '#0a0020');
@@ -1079,7 +1086,7 @@ function drawIntergalactic(ctx, w, h, t) {
 }
 
 // --- Era 10: Multiverse ---
-function drawMultiverse(ctx, w, h, t) {
+function drawMultiverse(ctx, w, h, t, state) {
   // Shifting void background
   ctx.fillStyle = '#030008';
   ctx.fillRect(0, 0, w, h);
@@ -1178,7 +1185,7 @@ function drawMultiverse(ctx, w, h, t) {
 }
 
 // --- Era 3 (new): Digital Age ---
-function drawDigitalAge(ctx, w, h, t) {
+function drawDigitalAge(ctx, w, h, t, state) {
   // Dark background with circuit-board feel
   ctx.fillStyle = '#0a0e1a';
   ctx.fillRect(0, 0, w, h);
@@ -1258,7 +1265,7 @@ function drawDigitalAge(ctx, w, h, t) {
 }
 
 // --- Era 7 (new): Dyson Era ---
-function drawDysonEra(ctx, w, h, t) {
+function drawDysonEra(ctx, w, h, t, state) {
   // Deep space background
   ctx.fillStyle = '#050510';
   ctx.fillRect(0, 0, w, h);
@@ -1539,35 +1546,33 @@ function drawFloatingTexts(ctx, floatingTexts) {
   }
 }
 
-// --- Upgrade progress indicator overlay ---
-function drawUpgradeIndicator(ctx, w, h, upgradeCount) {
-  // Draw small progress dots at bottom of canvas
-  const maxDots = 10;
-  const filled = Math.min(upgradeCount, maxDots);
-  const dotR = 2.5;
-  const gap = 8;
-  const totalW = maxDots * gap;
-  const startX = (w - totalW) / 2;
+// --- Era progress bar overlay ---
+function drawEraProgress(ctx, w, h, state) {
+  if (!state) return;
+  const era = state.era || 1;
+  const upgradeCount = Object.keys(state.upgrades || {}).length;
+  const barW = w * 0.6;
+  const barH = 6;
+  const barX = (w - barW) / 2;
+  const barY = h - 12;
 
   ctx.save();
-  for (let i = 0; i < maxDots; i++) {
-    const x = startX + i * gap + gap / 2;
-    const y = h - 6;
-    ctx.beginPath();
-    ctx.arc(x, y, dotR, 0, Math.PI * 2);
-    if (i < filled) {
-      ctx.fillStyle = 'rgba(139, 233, 253, 0.8)';
-    } else {
-      ctx.fillStyle = 'rgba(100, 100, 100, 0.3)';
-    }
-    ctx.fill();
-  }
-  if (upgradeCount > maxDots) {
-    ctx.font = '8px monospace';
-    ctx.fillStyle = 'rgba(139, 233, 253, 0.6)';
-    ctx.textAlign = 'center';
-    ctx.fillText(`+${upgradeCount - maxDots}`, w / 2, h - 12);
-  }
+
+  // Background
+  ctx.fillStyle = 'rgba(255,255,255,0.1)';
+  ctx.fillRect(barX, barY, barW, barH);
+
+  // Fill — use total upgrades as rough progress
+  const progress = Math.min(upgradeCount / (era * 15), 1);
+  ctx.fillStyle = progress >= 1 ? '#44aa44' : '#aaaa44';
+  ctx.fillRect(barX, barY, barW * progress, barH);
+
+  // Text
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '8px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${upgradeCount} upgrades`, w / 2, barY - 2);
+
   ctx.restore();
 }
 
@@ -1624,6 +1629,9 @@ export function GameCanvas({ state, onUpdate }) {
   const particlesRef = useRef([]);
   const prevGemsRef = useRef(state.totalGems || 0);
   const prevEraRef = useRef(state.era);
+  const bonusOrbRef = useRef(null); // { x, y, spawnTime, type, resource }
+  const lastOrbTimeRef = useRef(performance.now() / 1000);
+  const nextOrbDelayRef = useRef(30 + Math.random() * 60); // 30-90s
 
   const handleCanvasClick = useCallback((e) => {
     const canvas = canvasRef.current;
@@ -1638,6 +1646,63 @@ export function GameCanvas({ state, onUpdate }) {
     const w = canvas.width;
     const h = canvas.height;
     const era = eraRef.current;
+    // Check bonus orb click first
+    if (bonusOrbRef.current) {
+      const orb = bonusOrbRef.current;
+      const dx = cx - orb.x;
+      const dy = cy - orb.y;
+      if (dx * dx + dy * dy <= 15 * 15) {
+        // Hit the bonus orb!
+        spawnParticles(particlesRef.current, orb.x, orb.y, 20, 'rgba(255,221,68,1)', 80);
+
+        if (orb.type === 'burst') {
+          // Grant 10x normal gather amount of a random era-appropriate resource
+          onUpdateRef.current(s => {
+            const res = s.resources[orb.resource];
+            if (!res || !res.unlocked) return s;
+            const burstAmount = 10;
+            return gather(s, orb.resource, burstAmount);
+          });
+          floatingTextsRef.current.push({ x: orb.x, y: orb.y, label: `★ Burst! +10 ${orb.resource}`, startTime: performance.now() });
+        } else if (orb.type === 'frenzy') {
+          // Grant 15-second 2x all production multiplier
+          onUpdateRef.current(s => ({
+            ...s,
+            activeEffects: [...(s.activeEffects || []), {
+              id: 'bonusOrb_frenzy',
+              endsAt: s.totalTime + 15,
+              effect: { resourceId: 'all', rateMultBonus: 2 },
+            }],
+          }));
+          floatingTextsRef.current.push({ x: orb.x, y: orb.y, label: '★ Frenzy! 2x for 15s', startTime: performance.now() });
+        } else if (orb.type === 'lucky') {
+          // Grant resources equal to 10 seconds of current production
+          onUpdateRef.current(s => {
+            const newResources = { ...s.resources };
+            for (const id of Object.keys(newResources)) {
+              const r = newResources[id];
+              if (!r || !r.unlocked) continue;
+              const rate = getEffectiveRate(s, id);
+              if (rate > 0) {
+                const cap = getEffectiveCap(s, id);
+                const added = Math.min(rate * 10, cap > 0 ? cap - r.amount : rate * 10);
+                if (added > 0) {
+                  newResources[id] = { ...r, amount: r.amount + added };
+                }
+              }
+            }
+            return { ...s, resources: newResources };
+          });
+          floatingTextsRef.current.push({ x: orb.x, y: orb.y, label: '★ Lucky! +10s production', startTime: performance.now() });
+        }
+
+        bonusOrbRef.current = null;
+        lastOrbTimeRef.current = t;
+        nextOrbDelayRef.current = 30 + Math.random() * 60;
+        return;
+      }
+    }
+
     const elements = getClickableElements(era, w, h, t);
 
     // Check elements in order (specific targets first, 'space' catch-all last)
@@ -1709,23 +1774,37 @@ export function GameCanvas({ state, onUpdate }) {
       // Era mapping: 1=Planetfall, 2=Industrialization, 3=Digital Age,
       // 4=Space Age, 5=Solar System, 6=Interstellar, 7=Dyson Era,
       // 8=Galactic, 9=Intergalactic, 10=Multiverse
+      const state = stateRef.current;
       switch (era) {
-        case 1: drawEra1(ctx, w, h, t); break;
-        case 2: drawEra2(ctx, w, h, t); break;
-        case 3: drawDigitalAge(ctx, w, h, t); break;
-        case 4: drawEra3(ctx, w, h, t); break;  // Space Age
-        case 5: drawEra4(ctx, w, h, t); break;  // Solar System
-        case 6: drawEra5(ctx, w, h, t); break;  // Interstellar
-        case 7: drawDysonEra(ctx, w, h, t); break;
-        case 8: drawEra6(ctx, w, h, t); break;  // Galactic
-        case 9: drawIntergalactic(ctx, w, h, t); break;
-        case 10: drawMultiverse(ctx, w, h, t); break;
-        default: drawEra1(ctx, w, h, t); break;
+        case 1: drawEra1(ctx, w, h, t, state); break;
+        case 2: drawEra2(ctx, w, h, t, state); break;
+        case 3: drawDigitalAge(ctx, w, h, t, state); break;
+        case 4: drawEra3(ctx, w, h, t, state); break;  // Space Age
+        case 5: drawEra4(ctx, w, h, t, state); break;  // Solar System
+        case 6: drawEra5(ctx, w, h, t, state); break;  // Interstellar
+        case 7: drawDysonEra(ctx, w, h, t, state); break;
+        case 8: drawEra6(ctx, w, h, t, state); break;  // Galactic
+        case 9: drawIntergalactic(ctx, w, h, t, state); break;
+        case 10: drawMultiverse(ctx, w, h, t, state); break;
+        default: drawEra1(ctx, w, h, t, state); break;
       }
 
-      // Draw upgrade progress indicator
+      // Production intensity glow
+      const totalRate = Object.values(state?.resources || {})
+        .filter(r => r.unlocked)
+        .reduce((sum, r) => sum + Math.max(0, (r.baseRate + r.rateAdd) * r.rateMult), 0);
+      const glowIntensity = Math.min(totalRate / 100, 1) * 0.15;
+      if (glowIntensity > 0.01) {
+        const glow = ctx.createRadialGradient(w/2, h/2, w*0.2, w/2, h/2, w*0.6);
+        glow.addColorStop(0, `rgba(100, 255, 100, ${glowIntensity})`);
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      // Draw era progress bar
       const upgradeCount = Object.keys(stateRef.current.upgrades || {}).length;
-      drawUpgradeIndicator(ctx, w, h, upgradeCount);
+      drawEraProgress(ctx, w, h, state);
 
       // Draw era name watermark in top-left
       ctx.save();
@@ -1747,6 +1826,89 @@ export function GameCanvas({ state, onUpdate }) {
         grad.addColorStop(1, 'transparent');
         ctx.fillStyle = grad;
         ctx.fillRect(w - 40, 0, 40, 40);
+        ctx.restore();
+      }
+
+      // --- Cap warning overlay ---
+      const cappedResources = Object.entries(stateRef.current?.resources || {})
+        .filter(([id, r]) => {
+          if (!r.unlocked || !r.amount) return false;
+          const cap = getEffectiveCap(stateRef.current, id);
+          return cap > 0 && r.amount / cap > 0.95;
+        });
+
+      if (cappedResources.length > 0) {
+        ctx.save();
+        const borderAlpha = 0.1 + 0.05 * Math.sin(t * 3);
+        ctx.strokeStyle = `rgba(255, 170, 50, ${borderAlpha})`;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(1, 1, w - 2, h - 2);
+        ctx.restore();
+      }
+
+      // --- Bonus orb system ---
+      // Spawn logic: if no orb and enough time elapsed, spawn one
+      if (!bonusOrbRef.current && (t - lastOrbTimeRef.current) >= nextOrbDelayRef.current) {
+        const eraResources = {
+          1: ['materials', 'food', 'energy'],
+          2: ['steel', 'electronics', 'energy'],
+          3: ['software', 'data', 'research'],
+          4: ['research', 'rocketFuel', 'energy'],
+          5: ['research', 'energy', 'steel'],
+          6: ['research', 'energy', 'software'],
+          7: ['research', 'energy', 'software'],
+          8: ['research', 'energy', 'software'],
+          9: ['research', 'energy', 'software'],
+          10: ['research', 'energy', 'software'],
+        };
+        const possibleRes = eraResources[era] || ['energy'];
+        const chosenResource = possibleRes[Math.floor(Math.random() * possibleRes.length)];
+        const types = ['burst', 'frenzy', 'lucky'];
+        const chosenType = types[Math.floor(Math.random() * types.length)];
+        bonusOrbRef.current = {
+          x: 20 + Math.random() * (w - 40),
+          y: 20 + Math.random() * (h - 40),
+          spawnTime: t,
+          type: chosenType,
+          resource: chosenResource,
+        };
+      }
+
+      // Expire orb after 8 seconds
+      if (bonusOrbRef.current) {
+        const orbAge = t - bonusOrbRef.current.spawnTime;
+        if (orbAge > 8) {
+          bonusOrbRef.current = null;
+          lastOrbTimeRef.current = t;
+          nextOrbDelayRef.current = 30 + Math.random() * 60;
+        }
+      }
+
+      // Draw bonus orb
+      if (bonusOrbRef.current) {
+        const orb = bonusOrbRef.current;
+        const age = t - orb.spawnTime;
+        const fade = age > 6 ? Math.max(0, 1 - (age - 6) / 2) : 1;
+        const pulse = 0.7 + 0.3 * Math.sin(age * 4);
+        const r = 12 + 3 * Math.sin(age * 2);
+
+        ctx.save();
+        ctx.globalAlpha = fade * pulse;
+        const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, r);
+        grad.addColorStop(0, '#ffdd44');
+        grad.addColorStop(0.5, '#ffaa22');
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(orb.x, orb.y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Star shape in center
+        ctx.fillStyle = `rgba(255, 255, 200, ${fade})`;
+        ctx.font = `${10 + Math.sin(age * 3) * 2}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('\u2605', orb.x, orb.y);
         ctx.restore();
       }
 
