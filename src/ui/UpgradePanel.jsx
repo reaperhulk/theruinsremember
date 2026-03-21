@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades } from '../engine/upgrades.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -124,6 +124,18 @@ export function UpgradePanel({ state, onUpdate }) {
     [filteredAvailable, state.resources]
   );
 
+  // Pre-compute enables counts for all upgrades (avoids O(N*M) per render)
+  const enablesCountMap = useMemo(() => {
+    const map = {};
+    for (const u of Object.values(upgradeDefs)) {
+      if (state.upgrades[u.id]) continue;
+      for (const prereq of u.prerequisites) {
+        map[prereq] = (map[prereq] || 0) + 1;
+      }
+    }
+    return map;
+  }, [state.upgrades]);
+
   return (
     <div className="panel upgrade-panel">
       <h2>
@@ -230,12 +242,9 @@ export function UpgradePanel({ state, onUpdate }) {
                   return <span key={i} className={cls}>{label}</span>;
                 })}
               </div>
-              {(() => {
-                const enablesCount = Object.values(upgradeDefs).filter(u =>
-                  u.prerequisites.includes(upgrade.id) && !state.upgrades[u.id]
-                ).length;
-                return enablesCount > 0 ? <div className="text-hint" style={{ color: '#88ccaa' }}>Enables {enablesCount} upgrade{enablesCount > 1 ? 's' : ''}</div> : null;
-              })()}
+              {enablesCountMap[upgrade.id] > 0 && (
+                <div className="text-hint" style={{ color: '#88ccaa' }}>Enables {enablesCountMap[upgrade.id]} upgrade{enablesCountMap[upgrade.id] > 1 ? 's' : ''}</div>
+              )}
               {!affordable && (() => {
                 const eta = getTimeToAfford(state, cost);
                 return (

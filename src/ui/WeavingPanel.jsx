@@ -58,16 +58,16 @@ export function WeavingPanel({ state, onUpdate }) {
         <span>Weaves: {stats.totalWeaves}</span>
         <span>Grid: {grid.length}</span>
         {(state.weaveCombo || 0) > 0 && (
-          <span style={{ color: '#ffdd44' }}>Combo: x{(1 + ((state.weaveCombo || 0) - 1) * 0.5).toFixed(1)}</span>
+          <span style={{ color: '#ffdd44' }} title="Consecutive successful weaves boost rewards">Combo: x{(1 + ((state.weaveCombo || 0) - 1) * 0.5).toFixed(1)}</span>
         )}
       </div>
-      <div className="weave-grid">
+      <div className="weave-grid" role="list" aria-label="Weaving grid">
         {grid.map((f, i) => (
-          <span key={i} className="weave-fragment" style={{ color: TYPE_COLORS[f] }} title={f}>
+          <span key={i} className="weave-fragment" style={{ color: TYPE_COLORS[f], borderColor: TYPE_COLORS[f] + '88' }} title={`${f}${f === 'chaos' ? ' (wild — counts as any type)' : ''}`} role="listitem">
             {f === 'chaos' ? '***' : f === 'temporal' ? 'TMP' : f === 'spatial' ? 'SPC' : f === 'causal' ? 'CSL' : 'QNT'}
           </span>
         ))}
-        {grid.length === 0 && <span className="empty-message">Draw fragments to begin</span>}
+        {grid.length === 0 && <span className="empty-message">Draw fragments to begin (costs 5 reality fragments)</span>}
       </div>
       {grid.length > 0 && (
         <div className="weave-counts" style={{ display: 'flex', gap: '8px', fontSize: '0.75em', marginBottom: '4px' }}>
@@ -95,19 +95,22 @@ export function WeavingPanel({ state, onUpdate }) {
         </div>
       )}
       <div className="weave-controls">
-        <button className="mine-btn" onClick={handleDraw}>
+        <button className="mine-btn" onClick={handleDraw} aria-label="Draw a random fragment for 5 reality fragments">
           Draw Fragment (5 reality fragments)
         </button>
-        <button className="mine-btn" onClick={handleWeave} disabled={!hasMatch}>
-          Weave Match
+        <button className="mine-btn" onClick={handleWeave} disabled={!hasMatch} aria-label={hasMatch ? 'Weave matching fragments' : 'Need 3 matching fragments to weave'}>
+          {hasMatch ? 'Weave Match!' : 'Weave Match'}
         </button>
         {grid.length > 0 && (
-          <button className="reset-btn" onClick={handleClear} style={{ marginTop: '4px' }}>
+          <button className="reset-btn" onClick={handleClear} style={{ marginTop: '4px' }} aria-label="Clear all fragments from the grid">
             Clear Grid
           </button>
         )}
       </div>
-      <p className="mining-hint">TMP=Temporal SPC=Spatial CSL=Causal QNT=Quantum ***=Chaos(wild) | 3 match to weave | Combos boost | 120s timeout</p>
+      <p className="mining-hint">
+        TMP=Temporal SPC=Spatial CSL=Causal QNT=Quantum ***=Chaos(wild)
+        <br />3 of a kind to weave | Chaos counts as any type | Combos boost rewards | Grid clears after 120s
+      </p>
     </div>
   );
 }

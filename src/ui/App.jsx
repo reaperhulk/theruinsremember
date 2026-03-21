@@ -129,7 +129,7 @@ export function App() {
         return newState;
       });
     }
-  }, [state.era, updateState]);
+  }, [state.era, state.hackChallenge, updateState]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -167,7 +167,7 @@ export function App() {
               Prestige (x{prestigeBonus.toFixed(1)} bonus)
             </button>
           )}
-          <button className="reset-btn" onClick={() => {
+          <button className="reset-btn" aria-label="Export save file" onClick={() => {
             const save = localStorage.getItem('incremental-game-save');
             if (save) {
               const blob = new Blob([save], { type: 'application/json' });
@@ -179,7 +179,7 @@ export function App() {
           }}>
             Export
           </button>
-          <button className="reset-btn" onClick={() => {
+          <button className="reset-btn" aria-label="Import save file" onClick={() => {
             const input = document.createElement('input');
             input.type = 'file'; input.accept = '.json';
             input.onchange = (e) => {
@@ -201,7 +201,7 @@ export function App() {
           }}>
             Import
           </button>
-          <button className="reset-btn" onClick={() => { if (confirm('Hard reset?\nThis erases ALL progress including prestige upgrades!')) resetSave(); }}>
+          <button className="reset-btn" aria-label="Hard reset all progress" onClick={() => { if (confirm('Hard reset?\nThis erases ALL progress including prestige upgrades!')) resetSave(); }}>
             Reset
           </button>
         </div>
@@ -211,7 +211,7 @@ export function App() {
       {!hintsDismissed && state.totalTime < 30 && Object.keys(state.upgrades).length === 0 && (
         <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '4px 0', opacity: Math.max(0, 1 - state.totalTime / 30) }}>
           Click resources to gather | Buy upgrades to boost production | Space to mine
-          <span onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em' }} title="Dismiss hints">&times;</span>
+          <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
         </div>
       )}
       <EraTransition era={state.era} />
@@ -220,7 +220,7 @@ export function App() {
       {!hintsDismissed && state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
         <div style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '2px 0', position: 'relative' }}>
           Gather resources by clicking +1 buttons. Buy upgrades to automate production.
-          <span onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em' }} title="Dismiss hints">&times;</span>
+          <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
         </div>
       )}
 
@@ -231,7 +231,7 @@ export function App() {
           <EventLog state={state} />
         </div>
         <div className="right-column">
-          <div className="tab-bar">
+          <div className="tab-bar" role="tablist" aria-label="Game tabs">
             {tabs.map(tab => {
               let badge = 0;
               if (tab.id === 'upgrades') badge = affordableUpgrades;
@@ -250,14 +250,18 @@ export function App() {
                   className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
                   onClick={() => setActiveTab(tab.id)}
                   title={`Press ${tab.key}`}
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
+                  aria-controls={`tabpanel-${tab.id}`}
+                  id={`tab-${tab.id}`}
                 >
                   {tab.label}
-                  {(badge > 0 || badge === '!') && <span className="tab-badge">{badge}</span>}
+                  {(badge > 0 || badge === '!') && <span className="tab-badge" aria-label={`${badge} available`}>{badge}</span>}
                 </button>
               );
             })}
           </div>
-          <div className="tab-content">
+          <div className="tab-content" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
             {activeTab === 'upgrades' && (
               <UpgradePanel state={state} onUpdate={updateState} />
             )}

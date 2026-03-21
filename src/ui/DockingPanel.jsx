@@ -111,7 +111,7 @@ export function DockingPanel({ state, onUpdate }) {
           ))}
         </div>
       )}
-      <button className="mine-btn" onClick={handleDock} disabled={onCooldown}>
+      <button className="mine-btn" onClick={handleDock} disabled={onCooldown} aria-label={onCooldown ? `Docking cooldown: ${cooldownRemaining.toFixed(1)} seconds remaining` : 'Dock now. Press D key as shortcut.'}>
         {onCooldown ? `Wait ${cooldownRemaining.toFixed(1)}s` : 'Dock! (d)'}
       </button>
       <p className="mining-hint">

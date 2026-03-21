@@ -152,7 +152,7 @@ export function StatsPanel({ state }) {
         const showCodex = showCodexOverride !== null ? showCodexOverride : defaultOpen;
         return (
         <>
-          <h3 onClick={() => setShowCodexOverride(showCodex ? false : true)} style={{ cursor: 'pointer' }}>
+          <h3 onClick={() => setShowCodexOverride(showCodex ? false : true)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowCodexOverride(showCodex ? false : true); }}} tabIndex={0} role="button" aria-expanded={showCodex} style={{ cursor: 'pointer' }}>
             Codex ({discoveredLore.length}/{totalLore} discovered) {showCodex ? '(hide)' : '(show)'}
           </h3>
           {showCodex && (

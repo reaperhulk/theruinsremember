@@ -21,7 +21,7 @@ export function FactoryPanel({ state, onUpdate }) {
 
   return (
     <div className="panel factory-panel">
-      <h2>Factory ({pool} workers){efficient && fullCapacity ? ' — MAX' : efficient ? ' — +50%' : ''}</h2>
+      <h2>Factory ({pool} workers){efficient && fullCapacity ? ' — MAX' : efficient ? ' — +50%' : ''}{pool >= getMaxWorkers(state) && <span style={{ fontSize: '0.6em', color: '#888', marginLeft: '4px' }}>cap: {getMaxWorkers(state)}</span>}</h2>
       {factoryLore && <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#7799aa', margin: '0 0 4px' }}>{factoryLore}</p>}
       <div className="factory-info">
         <span>Workers: {available}/{pool} available</span>
@@ -47,10 +47,12 @@ export function FactoryPanel({ state, onUpdate }) {
                 <button
                   disabled={count <= 0}
                   onClick={() => onUpdate(s => allocateWorker(s, line.id, count - 1))}
+                  aria-label={`Remove worker from ${line.label}`}
                 >-</button>
                 <button
                   disabled={available <= 0}
                   onClick={() => onUpdate(s => allocateWorker(s, line.id, count + 1))}
+                  aria-label={`Add worker to ${line.label}`}
                 >+</button>
               </div>
             </div>
@@ -58,9 +60,9 @@ export function FactoryPanel({ state, onUpdate }) {
         })}
       </div>
       <p className="mining-hint">
-        {!efficient ? 'Fill all lines for +50%' : ''}
-        {efficient && !fullCapacity ? ' — use all workers for x2' : ''}
-        {fullCapacity ? ' — Maximum output!' : ''}
+        {!efficient ? 'Assign at least 1 worker to each line for +50% efficiency bonus' : ''}
+        {efficient && !fullCapacity ? `Assign all ${available} remaining worker${available !== 1 ? 's' : ''} for x2 full capacity bonus` : ''}
+        {fullCapacity ? `Maximum output! All ${pool} workers assigned (eff x${effMult.toFixed(1)})` : ''}
       </p>
     </div>
   );

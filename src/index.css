@@ -36,6 +36,26 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+/* Ensure SVG interactive elements show focus */
+g[role="button"]:focus-visible {
+  outline: 2px solid #7cb7ff;
+  outline-offset: 2px;
+}
+
+/* Accessible skip-link (hidden until focused) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #1a1a2e;
+  color: #8be9fd;
+  padding: 8px;
+  z-index: 100;
+}
+.skip-link:focus {
+  top: 0;
+}
+
 .game-container {
   max-width: 900px;
   margin: 0 auto;
@@ -471,6 +491,10 @@ canvas:hover {
   background: linear-gradient(135deg, #5533aa, #7744cc);
 }
 
+.prestige-btn:active {
+  transform: scale(0.97);
+}
+
 @keyframes prestige-glow {
   0%, 100% { box-shadow: 0 0 5px rgba(180, 100, 255, 0.3); }
   50% { box-shadow: 0 0 15px rgba(180, 100, 255, 0.6); }
@@ -490,6 +514,11 @@ canvas:hover {
 
 .reset-btn:hover {
   background: #5a3030;
+}
+
+.reset-btn:active {
+  background: #7a4040;
+  transform: scale(0.97);
 }
 
 /* Header title gradient */
@@ -739,6 +768,11 @@ canvas:hover {
   background: #2a5a2a;
 }
 
+.hack-btn:active {
+  background: #3a7a3a;
+  transform: scale(0.95);
+}
+
 .hack-reward {
   font-size: 0.75em;
   color: #66cc66;
@@ -920,9 +954,10 @@ canvas:hover {
   background: rgba(60, 20, 60, 0.5);
   border: 1px solid #6a3a6a;
   font-weight: bold;
-  font-size: 0.9em;
-  transition: transform 0.2s, box-shadow 0.2s;
+  font-size: 0.75em;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   cursor: default;
+  border-radius: 2px;
 }
 
 .weave-fragment:hover {
@@ -1081,6 +1116,11 @@ canvas:hover {
 
 .trade-btn:hover:not(:disabled) {
   background: #5533aa;
+}
+
+.trade-btn:active:not(:disabled) {
+  background: #7744cc;
+  transform: scale(0.97);
 }
 
 .trade-btn:disabled {
@@ -1745,7 +1785,7 @@ canvas:hover {
   }
 
   .upgrade-sort button {
-    min-height: 36px;
+    min-height: 44px;
   }
 
   .weave-fragment {
@@ -1784,6 +1824,12 @@ canvas:hover {
   .header-controls button {
     font-size: 0.75em;
     padding: 3px 6px;
+    min-height: 44px;
+  }
+
+  /* Colony even split, dock button on mobile */
+  .colony-panel .gather-btn {
+    min-height: 36px;
   }
 
   .era-stats {

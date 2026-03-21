@@ -81,6 +81,11 @@ export function ResourcePanel({ state, onUpdate }) {
               <div
                 className={`resource-era-header ${isOld ? 'old-era' : 'current-era'}`}
                 onClick={() => setCollapsed(c => ({ ...c, [era]: !c[era] }))}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCollapsed(c => ({ ...c, [era]: !c[era] })); }}}
+                tabIndex={0}
+                role="button"
+                aria-expanded={!isCollapsed}
+                aria-label={`${eraNames[era]} resources, ${isCollapsed ? 'collapsed' : 'expanded'}`}
               >
                 <span>{isCollapsed ? '>' : 'v'} {eraNames[era]}</span>
                 {isCollapsed && (
@@ -115,7 +120,7 @@ export function ResourcePanel({ state, onUpdate }) {
                   return (
                     <div key={r.id} className={`resource-row-wrapper`}>
                     <div className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0)) ? 'consuming' : ''}`} title={tooltip}>
-                      <span className="resource-name" style={{ cursor: 'pointer', textDecoration: expandedResource === r.id ? 'underline' : 'none', borderBottom: expandedResource === r.id ? 'none' : '1px dotted #556' }} onClick={() => setExpandedResource(expandedResource === r.id ? null : r.id)}>
+                      <span className="resource-name" style={{ cursor: 'pointer', textDecoration: expandedResource === r.id ? 'underline' : 'none', borderBottom: expandedResource === r.id ? 'none' : '1px dotted #556' }} onClick={() => setExpandedResource(expandedResource === r.id ? null : r.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedResource(expandedResource === r.id ? null : r.id); }}} tabIndex={0} role="button" aria-expanded={expandedResource === r.id}>
                         {r.def?.name || r.id}
                       </span>
                       <span className={`resource-amount ${r.cap > 0 && r.amount / r.cap > 0.9 ? 'near-cap' : ''}`}>
@@ -149,6 +154,7 @@ export function ResourcePanel({ state, onUpdate }) {
                         <button
                           className="gather-btn"
                           onClick={() => handleGather(r.id, r.rateMult > 1 ? r.rateMult : 1)}
+                          aria-label={`Gather ${r.def?.name || r.id}. +${r.rateMult > 1 ? formatNumber(r.rateMult) : '1'}`}
                         >
                           +{r.rateMult > 1 ? formatNumber(r.rateMult) : '1'}
                         </button>

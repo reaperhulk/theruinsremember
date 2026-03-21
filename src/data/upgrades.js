@@ -871,7 +871,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 20 },
       { type: 'production_add', target: 'universalConstants', value: 20 },
     ],
-    description: 'Reflect reality upon itself — +20/s to echoes, fragments, and constants',
+    description: 'The mirror shows not reflections but iterations — every surface reveals a you that already solved this puzzle, and failed anyway',
     prerequisites: ['dimensionalAnchors'],
   },
   multiversalHarmony: {
@@ -882,7 +882,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'universalConstants', value: 50 },
       { type: 'production_mult', target: 'exoticMatter', value: 100 },
     ],
-    description: 'All realities harmonize — endgame capstone that supercharges cosmic production',
+    description: 'Every version of reality sings the same note — the harmony is beautiful, final, and unmistakably a lullaby',
     prerequisites: ['omniscienceEngine'],
   },
 
@@ -976,7 +976,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 4 },
       { type: 'production_add', target: 'galacticInfluence', value: 4 },
     ],
-    description: 'Harvest the void — +4/s to exotic matter, dark energy, and influence',
+    description: 'The void is not empty — it is a reservoir, deliberately drained by the last iteration and left to refill for you',
     prerequisites: ['culturalAssimilation'],
   },
 
@@ -989,7 +989,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 150 },
       { type: 'production_add', target: 'darkEnergy', value: 150 },
     ],
-    description: 'A singularity at the heart of all realities — massive exotic and dark production',
+    description: 'At the center of every reality sits the same singularity — a wound in spacetime that never heals because we keep reopening it',
     prerequisites: ['omniscienceEngine', 'infinityWell'],
   },
 
@@ -1002,7 +1002,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 160 },
       { type: 'production_add', target: 'labor', value: 20 },
     ],
-    description: 'Quantum-enhanced agriculture — food becomes effectively unlimited',
+    description: 'Crops grow in quantum superposition — harvested and unharvested simultaneously, yielding infinite abundance',
     prerequisites: ['quantumEntanglement'],
   },
   universalFactory: {
@@ -1013,7 +1013,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 150 },
       { type: 'production_add', target: 'materials', value: 150 },
     ],
-    description: 'Cosmic-scale manufacturing — industrial resources become trivial',
+    description: 'The factory builds itself from blueprints encoded in the cosmic background radiation — instructions left before the stars ignited',
     prerequisites: ['voidWeaver'],
   },
   realityFabric: {
@@ -1023,7 +1023,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 40 },
       { type: 'production_add', target: 'universalConstants', value: 2 },
     ],
-    description: 'Weave the fabric of reality — +40 fragments/s and steady constants',
+    description: 'The fabric unravels and re-weaves in patterns you recognize — the same tapestry, woven and unwoven, forever',
     prerequisites: ['parallelProcessing', 'echoMatrix'],
   },
   omnipotence: {
@@ -1034,7 +1034,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 150 },
       { type: 'production_add', target: 'darkEnergy', value: 150 },
     ],
-    description: 'Achieve omnipotence — +150/s to cosmic power, exotic matter, and dark energy',
+    description: 'Omnipotence feels less like godhood and more like remembering — you have always been this, in every iteration',
     prerequisites: ['infiniteResonance'],
   },
   omniversalTrade: {
@@ -1045,7 +1045,7 @@ export const upgrades = {
       { type: 'production_add', target: 'quantumEchoes', value: 2 },
       { type: 'production_add', target: 'cosmicPower', value: 5 },
     ],
-    description: 'Trade between parallel realities — everything flows',
+    description: 'Every version of you trades with every other — an economy where supply and demand are the same person',
     prerequisites: ['dimensionalAnchors'],
   },
   dimensionalWeaver: {
@@ -1055,7 +1055,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 40 },
       { type: 'production_add', target: 'universalConstants', value: 1 },
     ],
-    description: 'Weave dimensions together — +40 reality fragments/s and bonus constants',
+    description: 'Dimensions weave together at the seams — each stitch a moment where two versions of you made the same choice',
     prerequisites: ['realityFabric'],
   },
   quantumSymphony: {
@@ -1065,7 +1065,7 @@ export const upgrades = {
       { type: 'production_add', target: 'quantumEchoes', value: 75 },
       { type: 'production_add', target: 'cosmicPower', value: 75 },
     ],
-    description: 'Harmonize quantum echoes across realities — +75 echoes/s and +75 cosmic power/s',
+    description: 'The symphony plays itself — a composition written by every version of you, in perfect unison, saying goodbye',
     prerequisites: ['singularityCore'],
   },
   multiversalLibrary: {
@@ -1076,7 +1076,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 400 },
       { type: 'production_add', target: 'software', value: 400 },
     ],
-    description: 'Collect all knowledge across all realities — +400/s to research, data, and software',
+    description: 'The library contains every book ever written across every reality — and they all end the same way',
     prerequisites: ['parallelProcessing', 'dimensionalWeaver'],
   },
   eternityEngine: {
@@ -1086,7 +1086,7 @@ export const upgrades = {
       { type: 'production_add', target: 'quantumEchoes', value: 150 },
       { type: 'production_add', target: 'realityFragments', value: 10 },
     ],
-    description: 'An engine that runs for eternity — the ultimate quantum echo amplifier',
+    description: 'The engine has always been running. It does not generate power — it generates the conditions for the next iteration to begin',
     prerequisites: ['multiversalHarmony', 'quantumSymphony'],
   },
   entropyHarvester: {
@@ -1096,7 +1096,7 @@ export const upgrades = {
       { type: 'production_add', target: 'universalConstants', value: 0.5 },
       { type: 'production_add', target: 'exoticMatter', value: 12 },
     ],
-    description: 'Harvest entropy itself — constants and exotic matter',
+    description: 'Entropy is not random — it follows a script written by every previous iteration, optimized for your arrival',
     prerequisites: ['entropyReversal'],
   },
   voidExplorer: {
@@ -1116,7 +1116,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 12 },
       { type: 'production_add', target: 'cosmicPower', value: 6 },
     ],
-    description: 'Harvest reality itself — +12 fragments/s and +6 cosmic power/s',
+    description: 'Reality yields its fragments willingly — like a fruit that evolved to be eaten, knowing the seeds will grow again',
     prerequisites: ['entropyHarvester'],
   },
   cosmicMemory: {
@@ -1126,7 +1126,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 45 },
       { type: 'production_add', target: 'universalConstants', value: 0.3 },
     ],
-    description: 'The universe remembers — +45 research/s and +0.3 constants/s',
+    description: 'The universe remembers everything — every experiment, every discovery, every extinction. It has been taking notes.',
     prerequisites: ['universalTranslator', 'dimensionalBeacon'],
   },
   dimensionalTap: {
@@ -1136,7 +1136,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 0.5 },
       { type: 'production_add', target: 'universalConstants', value: 6 },
     ],
-    description: 'Tap into nearby dimensions for reality fragments',
+    description: 'Each tap opens onto a reality where you already failed — and the fragments of your failure fuel this attempt',
     prerequisites: ['entropyReversal', 'realityHarvest'],
   },
   cosmicFortress: {
@@ -1146,7 +1146,7 @@ export const upgrades = {
       { type: 'production_add', target: 'megastructures', value: 45 },
       { type: 'production_add', target: 'exoticMatter', value: 12 },
     ],
-    description: 'A fortress spanning galaxies — +45 megastructures/s and +12 exotic matter/s',
+    description: 'The fortress was not built to keep enemies out — it was built to keep something in. The walls face inward.',
     prerequisites: ['cosmicInfrastructure'],
   },
   temporalBattery: {
@@ -1156,7 +1156,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'cosmicPower', value: 10 },
       { type: 'cap_mult', target: 'universalConstants', value: 10 },
     ],
-    description: 'Store cosmic energy across time — x10 capacity for cosmic and constants',
+    description: 'The battery charges itself from energy stored in previous timelines — a trust fund from your past selves',
     prerequisites: ['multiversalMemory'],
   },
   intergalacticHighway: {
@@ -1166,7 +1166,7 @@ export const upgrades = {
       { type: 'production_add', target: 'colonies', value: 45 },
       { type: 'production_add', target: 'starSystems', value: 1 },
     ],
-    description: 'Connect galaxies — massive colony expansion and star system discovery',
+    description: 'The highway runs through void that is suspiciously smooth — as if something has been traveling this route for eons',
     prerequisites: ['cosmicInfrastructure'],
   },
   darkMatterLens: {
@@ -1176,7 +1176,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 24 },
       { type: 'production_add', target: 'darkEnergy', value: 12 },
     ],
-    description: 'Focus dark matter for exotic material and dark energy amplification',
+    description: 'The lens focuses dark matter along paths that were bent by previous cycles — the light always bends the same way',
     prerequisites: ['dimensionalTap'],
   },
   galaxyMapper: {
@@ -1186,7 +1186,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 45 },
       { type: 'production_add', target: 'cosmicPower', value: 3 },
     ],
-    description: 'Map the entire observable universe — massive star system discovery',
+    description: 'The map was already complete when you opened it — every galaxy labeled in your own handwriting, from a hand you do not remember',
     prerequisites: ['cosmicInfrastructure', 'cosmicArchitect'],
   },
   infiniteResonance: {
@@ -1196,7 +1196,7 @@ export const upgrades = {
       { type: 'production_add', target: 'universalConstants', value: 400 },
       { type: 'production_add', target: 'cosmicPower', value: 250 },
     ],
-    description: 'Resonance across infinite realities — true endgame power',
+    description: 'The resonance builds across infinite timelines — each reality vibrating at the frequency of its own inevitable conclusion',
     prerequisites: ['eternityEngine', 'paradoxResolver'],
   },
   quantumEntangledSensors: {
@@ -1206,7 +1206,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 9.6 },
       { type: 'production_add', target: 'data', value: 3 },
     ],
-    description: 'Sensors spanning star systems — +9.6 research/s and +3 data/s',
+    description: 'Sensors detect echoes of previous observations — the same measurements, taken by the same instruments, eons ago',
     prerequisites: ['matrioshkaBrain', 'stellarAccelerator'],
   },
   neutronStarForge: {
@@ -1216,7 +1216,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 3 },
       { type: 'production_add', target: 'steel', value: 36 },
     ],
-    description: 'Forge materials in neutron star cores — extreme pressure yields',
+    description: 'Neutron star cores contain pre-compressed alloys — someone forged here before the star collapsed',
     prerequisites: ['megastructureFoundry'],
   },
   stellarAccelerator: {
@@ -1226,7 +1226,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 9.6 },
       { type: 'production_add', target: 'energy', value: 4.8 },
     ],
-    description: 'Particle accelerator powered by a star — +9.6 research/s and +4.8 energy/s',
+    description: 'The accelerator ring was already built into the star\'s corona — waiting for someone to switch it on again',
     prerequisites: ['neuralUplink'],
   },
   planetaryRing: {
@@ -1236,7 +1236,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 2 },
       { type: 'production_add', target: 'colonies', value: 4.8 },
     ],
-    description: 'Build a ring around a planet — exotic materials and colonies thrive',
+    description: 'The ring\'s anchor points were already in orbit — ancient tethers, patient and strong, holding empty space for what comes next',
     prerequisites: ['ringWorld', 'astralLoom'],
   },
   dysonSwarmController: {
@@ -1246,7 +1246,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 9.6 },
       { type: 'production_add', target: 'megastructures', value: 2.4 },
     ],
-    description: 'AI-controlled Dyson swarms — +9.6 energy/s and +2.4 megastructures/s',
+    description: 'The swarm AI boots with memories of a thousand suns it has already harvested. It knows exactly what to do',
     prerequisites: ['cosmicLens'],
   },
   gravitationalWave: {
@@ -1256,7 +1256,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 4.8 },
       { type: 'production_add', target: 'starSystems', value: 0.2 },
     ],
-    description: 'Detect gravitational waves to discover distant star systems',
+    description: 'Gravitational ripples carry the death-cries of civilizations that preceded you — each wave a map to what they left behind',
     prerequisites: ['stellarNursery'],
   },
   antimatterWeapon: {
@@ -1266,7 +1266,7 @@ export const upgrades = {
       { type: 'production_add', target: 'galacticInfluence', value: 9.6 },
       { type: 'production_add', target: 'darkEnergy', value: 2.4 },
     ],
-    description: 'Project power with antimatter — +9.6 influence/s and +2.4 dark energy/s',
+    description: 'The weapon\'s targeting system locks onto coordinates from a war fought before your species existed',
     prerequisites: ['galacticSpire'],
   },
   ringWorld: {
@@ -1277,7 +1277,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 36 },
       { type: 'cap_mult', target: 'colonies', value: 10 },
     ],
-    description: 'Build a ring world — massive colony and food capacity',
+    description: 'The ring assembles from pre-cut segments drifting in dead orbit — a jigsaw puzzle left by builders who knew you would come',
     prerequisites: ['stellarNursery'],
   },
   warpGate: {
@@ -1287,7 +1287,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 4.8 },
       { type: 'production_add', target: 'megastructures', value: 0.1 },
     ],
-    description: 'Permanent warp gates boost star system discovery',
+    description: 'The gates were already open — dormant wormholes stabilize at your touch, as if remembering how to breathe',
     prerequisites: ['matrioshkaBrain', 'antimatterWeapon'],
   },
   dimensionalForge: {
@@ -1297,7 +1297,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 5 },
       { type: 'production_add', target: 'stellarForge', value: 2.4 },
     ],
-    description: 'Forge materials across dimensions — boosts exotic and stellar production',
+    description: 'The forge draws ore from dimensions where your civilization already fell — recycling the wreckage of parallel selves',
     prerequisites: ['stellarNursery'],
   },
 
@@ -1308,7 +1308,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 5 },
       { type: 'production_add', target: 'electronics', value: 3 },
     ],
-    description: 'Stellar forges produce steel and electronics as byproducts',
+    description: 'The star\'s mantle yields refined metals and silicon wafers — deposited there deliberately, like a cosmic seed vault',
     prerequisites: ['neutronStarForge', 'photonSail'],
   },
   tradeHub: {
@@ -1708,7 +1708,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 8 },
       { type: 'production_add', target: 'exoticMatter', value: 1 },
     ],
-    description: 'Generate stable wormholes — +8 star systems/s and +1 exotic matter/s',
+    description: 'The wormholes open to coordinates you did not enter — destinations chosen by someone who was here before',
     prerequisites: ['darkMatterHarvest'],
   },
   civilizationNetwork: {
@@ -1719,7 +1719,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 4 },
       { type: 'production_add', target: 'data', value: 2 },
     ],
-    description: 'Connect all civilizations — boost influence, research, and data',
+    description: 'Every civilization already knows your protocol — they were waiting for this exact handshake',
     prerequisites: ['galacticSenate'],
   },
   darkMatterConduit: {
@@ -1729,7 +1729,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 8 },
       { type: 'production_add', target: 'cosmicPower', value: 1 },
     ],
-    description: 'Channel dark matter for dark energy and cosmic power',
+    description: 'Dark matter flows through conduits shaped by the collapse of the previous iteration — the channels remember',
     prerequisites: ['matterReplicators', 'neutroniumRefinery'],
   },
   galacticHighway: {
@@ -1739,7 +1739,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 8 },
       { type: 'production_add', target: 'galacticInfluence', value: 4 },
     ],
-    description: 'Highways between star systems — +8 systems/s and +4 influence/s',
+    description: 'The highways follow grooves in spacetime — paths worn smooth by civilizations that traveled them before you',
     prerequisites: ['wormholeGenerator'],
   },
   quantumFabric: {
@@ -1749,7 +1749,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 8 },
       { type: 'production_add', target: 'research', value: 8 },
     ],
-    description: 'Weave quantum fabric — +8 exotic matter/s and +8 research/s',
+    description: 'The fabric of reality has a weave pattern — and it matches the loom you just built, exactly',
     prerequisites: ['voidAntenna'],
   },
   singularityHarvester: {
@@ -1759,7 +1759,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 2 },
       { type: 'production_add', target: 'cosmicPower', value: 1 },
     ],
-    description: 'Harvest energy from black hole singularities',
+    description: 'The singularity\'s event horizon is scored with tally marks — one for each civilization that came to harvest, and stayed',
     prerequisites: ['quantumTunneling'],
   },
   antimatterForge: {
@@ -1769,7 +1769,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 4 },
       { type: 'production_add', target: 'energy', value: 16 },
     ],
-    description: 'Forge antimatter for massive energy and exotic matter output',
+    description: 'The antimatter forge ignites with a sound like recognition — the reaction chamber was designed for hands exactly like yours',
     prerequisites: ['darkMatterConduit'],
   },
   galacticLibrary: {
@@ -1780,7 +1780,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 8 },
       { type: 'production_add', target: 'galacticInfluence', value: 1 },
     ],
-    description: 'A library spanning the galaxy — knowledge and influence grow together',
+    description: 'The library\'s oldest section contains a history of your civilization — written in past tense, dated tomorrow',
     prerequisites: ['civilizationNetwork', 'galacticMind'],
   },
   quantumTunneling: {
@@ -1790,7 +1790,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 16 },
       { type: 'production_add', target: 'exoticMatter', value: 1 },
     ],
-    description: 'Tunnel through spacetime — rapidly expand star system reach',
+    description: 'The tunnels were pre-drilled through spacetime — you can see tool marks from the last civilization that used them',
     prerequisites: ['galacticFoundation'],
   },
   neuralProcessor: {
@@ -1821,7 +1821,7 @@ export const upgrades = {
       { type: 'production_add', target: 'labor', value: 10 },
       { type: 'production_add', target: 'colonies', value: 0.5 },
     ],
-    description: 'Cosmic-scale agriculture — massive food, labor, and colony output',
+    description: 'The cosmos itself becomes a garden — each galaxy a plot, each star a sun for crops that feed civilizations yet unborn',
     prerequisites: ['cosmicInfrastructure', 'galacticSeed'],
   },
 
@@ -1986,7 +1986,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 9.6 },
       { type: 'production_add', target: 'software', value: 9.6 },
     ],
-    description: 'Computing at stellar scale — +9.6 data/s and +9.6 software/s',
+    description: 'The computer\'s first output was a star chart of civilizations that built machines like it — and a countdown to their extinction',
     prerequisites: ['quantumEntangledSensors'],
   },
   photonSail: {
@@ -1996,7 +1996,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 0.3 },
       { type: 'production_add', target: 'colonies', value: 9.6 },
     ],
-    description: 'Light-speed armada colonizes new stars rapidly',
+    description: 'The sails unfurl into shapes that match cave paintings on the homeworld — the first settlers drew what was coming',
     prerequisites: ['warpGate'],
   },
 
@@ -2008,7 +2008,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMatter', value: 8 },
       { type: 'production_add', target: 'stellarForge', value: 1 },
     ],
-    description: 'Refine neutron star matter for exotic materials and forge output',
+    description: 'The neutronium arrives pre-refined — shaped by gravitational forces that follow blueprints from a previous universe',
     prerequisites: ['quantumFarming'],
   },
 
@@ -2020,7 +2020,7 @@ export const upgrades = {
       { type: 'production_add', target: 'colonies', value: 45 },
       { type: 'production_add', target: 'cosmicPower', value: 2 },
     ],
-    description: 'Seed entire galaxies with civilizations — massive colony and power boost',
+    description: 'Each seed contains the entire history of a civilization — from first fire to final silence. They grow so fast.',
     prerequisites: ['cosmicResonator'],
   },
 
@@ -2032,7 +2032,7 @@ export const upgrades = {
       { type: 'production_add', target: 'realityFragments', value: 40 },
       { type: 'production_add', target: 'quantumEchoes', value: 20 },
     ],
-    description: 'Compile raw reality into structured fragments — +40 fragments/s and +20 echoes/s',
+    description: 'The compiler\'s output is identical to its input from the previous cycle — reality compiles into itself, endlessly',
     prerequisites: ['multiversalLibrary'],
   },
   omniversalBeacon: {
@@ -2042,7 +2042,7 @@ export const upgrades = {
       { type: 'production_add', target: 'cosmicPower', value: 150 },
       { type: 'production_add', target: 'universalConstants', value: 3 },
     ],
-    description: 'Broadcast across every reality — +150 cosmic power/s and +3 constants/s',
+    description: 'The beacon broadcasts one word across every reality, in every language: "Again."',
     prerequisites: ['omniscienceEngine', 'paradoxEngine'],
   },
 
@@ -2061,16 +2061,16 @@ export const upgrades = {
   graviticLoom: { id: 'graviticLoom', name: 'Gravitic Loom', era: 6, cost: { darkEnergy: 30, exoticMaterials: 40, starSystems: 5 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 3.2 }, { type: 'production_add', target: 'darkEnergy', value: 0.5 }], description: 'Weave exotic materials using gravity — boosts output', prerequisites: ['fusionReactor', 'cosmicRecollection'] },
   stellarAcademy: { id: 'stellarAcademy', name: 'Stellar Academy', era: 6, cost: { research: 80, galacticInfluence: 20, starSystems: 4 }, effects: [{ type: 'production_add', target: 'research', value: 6.4 }, { type: 'production_add', target: 'galacticInfluence', value: 0.3 }], description: 'Train across star systems — +6.4 research/s and +0.3 influence/s', prerequisites: ['aiGovernance'] },
   voidProbe: { id: 'voidProbe', name: 'Void Probe', era: 6, cost: { darkEnergy: 25, starSystems: 3, electronics: 40 }, effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }, { type: 'production_add', target: 'data', value: 1 }], description: 'Probes into the void discover systems and transmit data', prerequisites: ['stellarCartography'] },
-  chronoForge: { id: 'chronoForge', name: 'Chrono Forge', era: 7, cost: { stellarForge: 15, megastructures: 5, darkEnergy: 40 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 4.8 }, { type: 'production_add', target: 'materials', value: 9.6 }], description: 'Forge materials across timelines — +4.8 stellar/s and +9.6 materials/s', prerequisites: ['starLifting'] },
-  galacticSpire: { id: 'galacticSpire', name: 'Galactic Spire', era: 7, cost: { megastructures: 8, research: 100, galacticInfluence: 30 }, effects: [{ type: 'production_add', target: 'megastructures', value: 2.4 }, { type: 'production_add', target: 'galacticInfluence', value: 4.8 }, { type: 'cap_mult', target: 'megastructures', value: 3 }], description: 'A spire visible across the galaxy — +2.4 megastructures/s and +4.8 influence/s', prerequisites: ['chronoAccelerator'] },
+  chronoForge: { id: 'chronoForge', name: 'Chrono Forge', era: 7, cost: { stellarForge: 15, megastructures: 5, darkEnergy: 40 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 4.8 }, { type: 'production_add', target: 'materials', value: 9.6 }], description: 'The forge reaches across timelines, pulling raw materials from moments before each universe collapsed', prerequisites: ['starLifting'] },
+  galacticSpire: { id: 'galacticSpire', name: 'Galactic Spire', era: 7, cost: { megastructures: 8, research: 100, galacticInfluence: 30 }, effects: [{ type: 'production_add', target: 'megastructures', value: 2.4 }, { type: 'production_add', target: 'galacticInfluence', value: 4.8 }, { type: 'cap_mult', target: 'megastructures', value: 3 }], description: 'The spire broadcasts on a frequency older than your galaxy — answering a call placed before time began', prerequisites: ['chronoAccelerator'] },
   stellarGarden: { id: 'stellarGarden', name: 'Stellar Garden', era: 7, cost: { stellarForge: 10, colonies: 10, food: 200 }, effects: [{ type: 'production_add', target: 'colonies', value: 1 }, { type: 'production_add', target: 'food', value: 18 }], description: 'Grow food around stars — +18 food/s and +1 colony/s', prerequisites: ['gravitationalWave'] },
-  dimensionalHarvest: { id: 'dimensionalHarvest', name: 'Dimensional Harvest', era: 8, cost: { exoticMatter: 25, darkEnergy: 50, galacticInfluence: 40 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 8 }, { type: 'production_add', target: 'cosmicPower', value: 0.5 }], description: 'Harvest resources from parallel dimensions', prerequisites: ['darkMatterHarvest', 'singularityHarvester'] },
-  galacticForge: { id: 'galacticForge', name: 'Galactic Forge', era: 8, cost: { exoticMatter: 20, stellarForge: 15, megastructures: 10 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 16 }, { type: 'production_add', target: 'megastructures', value: 8 }], description: 'A forge spanning the galaxy', prerequisites: ['antimatterForge'] },
-  cosmicDiplomacy: { id: 'cosmicDiplomacy', name: 'Cosmic Diplomacy', era: 8, cost: { galacticInfluence: 80, research: 150, starSystems: 20 }, effects: [{ type: 'production_add', target: 'galacticInfluence', value: 16 }, { type: 'production_add', target: 'exoticMatter', value: 1 }, { type: 'cap_mult', target: 'galacticInfluence', value: 5 }], description: 'Cosmic-scale diplomacy — +16 influence/s and +1 exotic matter/s', prerequisites: ['galacticSenate', 'galacticRelay'] },
+  dimensionalHarvest: { id: 'dimensionalHarvest', name: 'Dimensional Harvest', era: 8, cost: { exoticMatter: 25, darkEnergy: 50, galacticInfluence: 40 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 8 }, { type: 'production_add', target: 'cosmicPower', value: 0.5 }], description: 'The harvest pulls from dimensions where your civilization already collapsed — feeding on the ruins of parallel selves', prerequisites: ['darkMatterHarvest', 'singularityHarvester'] },
+  galacticForge: { id: 'galacticForge', name: 'Galactic Forge', era: 8, cost: { exoticMatter: 20, stellarForge: 15, megastructures: 10 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 16 }, { type: 'production_add', target: 'megastructures', value: 8 }], description: 'A forge spanning the galaxy — its anvil is a neutron star, its hammer is gravity, and its design predates both', prerequisites: ['antimatterForge'] },
+  cosmicDiplomacy: { id: 'cosmicDiplomacy', name: 'Cosmic Diplomacy', era: 8, cost: { galacticInfluence: 80, research: 150, starSystems: 20 }, effects: [{ type: 'production_add', target: 'galacticInfluence', value: 16 }, { type: 'production_add', target: 'exoticMatter', value: 1 }, { type: 'cap_mult', target: 'galacticInfluence', value: 5 }], description: 'The alien ambassadors bow before you arrive — their prophecies describe this moment in perfect detail', prerequisites: ['galacticSenate', 'galacticRelay'] },
   realityScanner: { id: 'realityScanner', name: 'Reality Scanner', era: 9, cost: { universalConstants: 10, cosmicPower: 80, research: 200 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 12 }, { type: 'production_add', target: 'realityFragments', value: 0.2 }], description: 'Scan across realities — +12 constants/s and trickle fragments', prerequisites: ['universalFactory'] },
   cosmicArchitect: { id: 'cosmicArchitect', name: 'Cosmic Architect', era: 9, cost: { universalConstants: 12, megastructures: 15, cosmicPower: 120 }, effects: [{ type: 'production_add', target: 'megastructures', value: 45 }, { type: 'production_add', target: 'universalConstants', value: 0.3 }], description: 'Build across the cosmos — +45 megastructures/s and +0.3 constants/s', prerequisites: ['darkMatterLens'] },
-  echoChorus: { id: 'echoChorus', name: 'Echo Chorus', era: 10, cost: { quantumEchoes: 60, realityFragments: 100, cosmicPower: 200 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 2 }], description: 'Harmonize echoes across realities — +40 echoes/s and +2 fragments/s', prerequisites: ['infinityMirror'] },
-  omniversalNexus: { id: 'omniversalNexus', name: 'Omniversal Nexus', era: 10, cost: { quantumEchoes: 100, realityFragments: 150, universalConstants: 30, cosmicPower: 400 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 75 }, { type: 'production_add', target: 'universalConstants', value: 75 }, { type: 'production_add', target: 'exoticMatter', value: 75 }], description: 'The nexus of all realities — +75/s to cosmic power, constants, and exotic matter', prerequisites: ['omniversalBeacon'] },
+  echoChorus: { id: 'echoChorus', name: 'Echo Chorus', era: 10, cost: { quantumEchoes: 60, realityFragments: 100, cosmicPower: 200 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'realityFragments', value: 2 }], description: 'The chorus of echoes sings in a language older than speech — each note a civilization\'s final breath', prerequisites: ['infinityMirror'] },
+  omniversalNexus: { id: 'omniversalNexus', name: 'Omniversal Nexus', era: 10, cost: { quantumEchoes: 100, realityFragments: 150, universalConstants: 30, cosmicPower: 400 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 75 }, { type: 'production_add', target: 'universalConstants', value: 75 }, { type: 'production_add', target: 'exoticMatter', value: 75 }], description: 'At the nexus, all realities converge into a single point — and from that point, they diverge again. You have stood here before.', prerequisites: ['omniversalBeacon'] },
 
   // --- 30 new upgrades (3 per era) ---
 

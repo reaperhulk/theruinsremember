@@ -40,7 +40,7 @@ export function StarChartPanel({ state, onUpdate }) {
         {stats.allConnected && <span style={{ color: '#ffdd44' }}>All Connected!</span>}
       </div>
       <div className="star-chart">
-        <svg viewBox="0 0 100 100" className="star-svg">
+        <svg viewBox="0 0 100 100" className="star-svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Star chart showing connected star systems">
           {routes.map((route, i) => {
             const from = systems.find(s => s.id === route.from);
             const to = systems.find(s => s.id === route.to);
@@ -65,10 +65,21 @@ export function StarChartPanel({ state, onUpdate }) {
             <g
               key={sys.id}
               onClick={() => handleSystemClick(sys.id)}
+              onTouchEnd={(e) => { e.preventDefault(); handleSystemClick(sys.id); }}
               onMouseEnter={() => setHovered(sys.id)}
               onMouseLeave={() => setHovered(null)}
               style={{ cursor: 'pointer' }}
+              role="button"
+              aria-label={`${sys.name}: ${bonusText}${isSelected ? ' (selected)' : ''}`}
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSystemClick(sys.id); } }}
             >
+              {/* Larger invisible hit area for touch */}
+              <circle
+                cx={sys.x * 100} cy={sys.y * 100}
+                r={6}
+                fill="transparent"
+              />
               <circle
                 cx={sys.x * 100} cy={sys.y * 100}
                 r={isSelected ? 3 : isHovered ? 2.5 : 2}
@@ -77,11 +88,13 @@ export function StarChartPanel({ state, onUpdate }) {
               <text
                 x={sys.x * 100} y={sys.y * 100 - 4}
                 fill="#aaddff" fontSize="3" textAnchor="middle"
+                style={{ pointerEvents: 'none' }}
               >{sys.name}</text>
               {(isHovered || isSelected) && (
                 <text
                   x={sys.x * 100} y={sys.y * 100 + 6}
                   fill="#ffeeaa" fontSize="2.5" textAnchor="middle"
+                  style={{ pointerEvents: 'none' }}
                 >{bonusText}</text>
               )}
             </g>
@@ -112,7 +125,7 @@ export function StarChartPanel({ state, onUpdate }) {
         </p>
       )}
       <p className="mining-hint">
-        Click two systems to create/remove routes (5 dark energy + 1 star system).
+        {selected ? 'Click another system to create a route, or same system to deselect.' : 'Click/tap two systems to create or remove routes (5 dark energy + 1 star system).'}
         {stats.hubSystems > 0 && ' Hub systems (2+ routes) get +50% bonus.'}
         {' '}Longer routes give more resources.
       </p>

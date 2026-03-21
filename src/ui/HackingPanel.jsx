@@ -87,7 +87,7 @@ export function HackingPanel({ state, onUpdate }) {
         <span>Hacks: {successes}</span>
         <span>Difficulty: {difficulty}</span>
       </div>
-      <div style={{ height: '6px', background: '#222', borderRadius: '3px', margin: '4px 0' }}>
+      <div style={{ height: '6px', background: '#222', borderRadius: '3px', margin: '4px 0' }} title={`Difficulty ${difficulty}/10 — longer sequences, less time to memorize`}>
         <div style={{
           height: '100%',
           width: `${(difficulty / 10) * 100}%`,
@@ -103,7 +103,7 @@ export function HackingPanel({ state, onUpdate }) {
               {lastResult === 'success' ? 'Hack successful! Data & software boosted!' : 'Hack failed...'}
             </div>
           )}
-          <button className="mine-btn" onClick={handleStart}>
+          <button className="mine-btn" onClick={handleStart} aria-label="Start a new hacking challenge">
             Start Hack
           </button>
         </div>
@@ -131,7 +131,7 @@ export function HackingPanel({ state, onUpdate }) {
           </div>
           <div className="hack-buttons">
             {SYMBOLS.map(sym => (
-              <button key={sym} className="hack-btn" onClick={() => handleSymbol(sym)}>
+              <button key={sym} className="hack-btn" onClick={() => handleSymbol(sym)} aria-label={`Enter symbol ${sym}`}>
                 {sym}
               </button>
             ))}
@@ -142,7 +142,7 @@ export function HackingPanel({ state, onUpdate }) {
           </div>
         </div>
       )}
-      <p className="mining-hint">Memorize the pattern, then enter it from memory</p>
+      <p className="mining-hint">Memorize the pattern, then enter it from memory | Keys: 0-3</p>
     </div>
   );
 }

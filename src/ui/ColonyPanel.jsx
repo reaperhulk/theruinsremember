@@ -43,7 +43,7 @@ export function ColonyPanel({ state, onUpdate }) {
       <div className="factory-info">
         <span>Colonies: {Math.floor(available)}/{Math.floor(maxColonies)} available</span>
         {maxColonies >= 3 && (
-          <button className="gather-btn" onClick={handleEvenSplit} style={{ fontSize: '0.7em', padding: '1px 6px' }}>
+          <button className="gather-btn" onClick={handleEvenSplit} style={{ fontSize: '0.7em', padding: '2px 8px' }} aria-label="Evenly split colonies across all focus types">
             Even Split
           </button>
         )}
@@ -70,10 +70,12 @@ export function ColonyPanel({ state, onUpdate }) {
                 <button
                   disabled={count <= 0}
                   onClick={() => onUpdate(s => assignColonies(s, focus.id, count - 1))}
+                  aria-label={`Remove colony from ${focus.label}`}
                 >-</button>
                 <button
                   disabled={available <= 0}
                   onClick={() => onUpdate(s => assignColonies(s, focus.id, count + 1))}
+                  aria-label={`Add colony to ${focus.label}`}
                 >+</button>
               </div>
             </div>

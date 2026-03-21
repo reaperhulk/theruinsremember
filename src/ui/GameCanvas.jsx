@@ -1022,9 +1022,11 @@ function drawEra8(ctx, w, h, t, state) {
     }
   }
 
-  // Shimmering particles (reality fragments)
+  // Shimmering particles (reality fragments) — count scales with exoticMatter
+  const emAmount = state?.resources?.exoticMatter?.amount || 0;
+  const particleCount = Math.min(60 + Math.floor(emAmount / 100), 120);
   const fragRng = seededRandom(888);
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < particleCount; i++) {
     const baseX = fragRng() * w;
     const baseY = fragRng() * h;
     const drift = fragRng() * Math.PI * 2;
@@ -1722,7 +1724,7 @@ function spawnParticles(particles, x, y, count, color, speed = 50) {
       x, y,
       vx: Math.cos(angle) * v,
       vy: Math.sin(angle) * v,
-      life: 0.5 + Math.random() * 0.5,
+      life: 0.6 + Math.random() * 0.6,
       born: performance.now() / 1000,
       color,
       size: 1 + Math.random() * 2,
@@ -1742,9 +1744,18 @@ function updateAndDrawParticles(ctx, particles, now) {
     p.x += p.vx * dt;
     p.y += p.vy * dt;
     p.vy += 30 * dt; // gravity
+    const currentSize = p.size * (1 - progress * 0.5);
+    // Trail: draw a faint afterimage behind the particle
+    if (progress < 0.7) {
+      const trailAlpha = alpha * 0.3;
+      ctx.fillStyle = p.color.replace('1)', `${trailAlpha})`);
+      ctx.beginPath();
+      ctx.arc(p.x - p.vx * dt * 2, p.y - p.vy * dt * 2, currentSize * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.fillStyle = p.color.replace('1)', `${alpha})`);
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size * (1 - progress * 0.5), 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
     ctx.fill();
     alive.push(p);
   }
@@ -1769,7 +1780,7 @@ export function GameCanvas({ state, onUpdate }) {
   const prevUpgradeCountRef = useRef(Object.keys(state.upgrades || {}).length);
   const bonusOrbRef = useRef(null); // { x, y, spawnTime, type, resource }
   const lastOrbTimeRef = useRef(performance.now() / 1000);
-  const nextOrbDelayRef = useRef(30 + Math.random() * 60); // 30-90s
+  const nextOrbDelayRef = useRef(20 + Math.random() * 40); // 30-90s
   const prevHackRef = useRef(state.hackSuccesses || 0);
   const prevDockRef = useRef(state.dockingPerfects || 0);
   const hackFlashRef = useRef(0); // timestamp of last hack flash
@@ -1841,7 +1852,7 @@ export function GameCanvas({ state, onUpdate }) {
 
         bonusOrbRef.current = null;
         lastOrbTimeRef.current = t;
-        nextOrbDelayRef.current = 30 + Math.random() * 60;
+        nextOrbDelayRef.current = 20 + Math.random() * 40;
         return;
       }
     }
@@ -2072,7 +2083,7 @@ export function GameCanvas({ state, onUpdate }) {
         if (orbAge > 8) {
           bonusOrbRef.current = null;
           lastOrbTimeRef.current = t;
-          nextOrbDelayRef.current = 30 + Math.random() * 60;
+          nextOrbDelayRef.current = 20 + Math.random() * 40;
         }
       }
 

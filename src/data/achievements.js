@@ -102,7 +102,7 @@ export const achievements = [
 
   // More depth
   { id: 'upgradeEmperor', name: 'Upgrade Emperor', description: 'Purchase 140 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 140, reward: 20 },
-  { id: 'eventWatcher', name: 'Event Watcher', description: 'Witness 50 events', check: s => (s.eventLog?.length || 0) >= 10 && s.totalTime > 600, reward: 2 },
+  { id: 'eventWatcher', name: 'Event Watcher', description: 'Play for 10 minutes with events active', check: s => s.era >= 2 && s.totalTime > 600, reward: 2 },
   { id: 'dockingMaster', name: 'Docking Master', description: 'Land 50 perfect docks', check: s => (s.dockingPerfects || 0) >= 50, reward: 5 },
 
   // Ultra endgame
@@ -117,7 +117,7 @@ export const achievements = [
   { id: 'speedrunEra7', name: 'Dyson Speedrun', description: 'Reach Era 7 in under 15 minutes', check: s => s.era >= 7 && (s.bestEraTimes?.[7] || Infinity) < 900, reward: 7 },
   { id: 'upgrade160', name: 'Upgrade Tyrant', description: 'Purchase 160 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 160, reward: 20 },
   { id: 'techScholar', name: 'Tech Scholar', description: 'Unlock 40 technologies', check: s => Object.keys(s.tech || {}).length >= 40, reward: 10 },
-  { id: 'eventSurvivor', name: 'Event Survivor', description: 'Witness 100 events', check: s => (s.eventLog?.length || 0) >= 20 && s.totalTime > 1200, reward: 5 },
+  { id: 'eventSurvivor', name: 'Event Survivor', description: 'Play for 20 minutes with events active', check: s => s.era >= 2 && s.totalTime > 1200, reward: 5 },
   { id: 'dockCombo10', name: 'Docking Legend', description: 'Reach a 10x docking combo', check: s => (s.dockingCombo || 0) >= 10, reward: 5 },
   { id: 'weaveCombo5', name: 'Reality Sculptor', description: 'Reach a 5x weave combo', check: s => (s.weaveCombo || 0) >= 5, reward: 5 },
   { id: 'prestigeGrandmaster', name: 'Prestige Grandmaster', description: 'Prestige 20 times', check: s => (s.prestigeCount || 0) >= 20, reward: 15 },
@@ -137,7 +137,7 @@ export const achievements = [
   { id: 'trade500', name: 'Trade Titan', description: 'Complete 500 trades', check: s => (s.totalTrades || 0) >= 500, reward: 15 },
   { id: 'gem5000', name: 'Gem Cosmos', description: 'Find 5000 gems', check: s => (s.totalGems || 0) >= 5000, reward: 20 },
   { id: 'prestigeAscendant', name: 'Prestige Ascendant', description: 'Prestige 50 times', check: s => (s.prestigeCount || 0) >= 50, reward: 25 },
-  { id: 'starNetwork15', name: 'Galactic Highway', description: 'Create 15 star routes', check: s => (s.starRoutes?.length || 0) >= 15, reward: 5 },
+  { id: 'starNetwork15', name: 'Galactic Highway', description: 'Create 7 star routes', check: s => (s.starRoutes?.length || 0) >= 7, reward: 5 },
   { id: 'repeatAddict50', name: 'Industrial Titan', description: 'Buy any repeatable upgrade 50 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 50), reward: 10 },
 
   // --- More achievements ---
@@ -151,7 +151,7 @@ export const achievements = [
   { id: 'trade1000', name: 'Trade Overlord', description: 'Complete 1000 trades', check: s => (s.totalTrades || 0) >= 1000, reward: 20 },
   { id: 'gem10000', name: 'Gem Eternal', description: 'Find 10000 gems', check: s => (s.totalGems || 0) >= 10000, reward: 25 },
   { id: 'prestigeTranscendent', name: 'Prestige Transcendent', description: 'Prestige 100 times', check: s => (s.prestigeCount || 0) >= 100, reward: 50 },
-  { id: 'starNetwork25', name: 'Cosmic Web', description: 'Create 25 star routes', check: s => (s.starRoutes?.length || 0) >= 25, reward: 10 },
+  { id: 'starNetwork25', name: 'Cosmic Web', description: 'Create 9 star routes', check: s => (s.starRoutes?.length || 0) >= 9, reward: 10 },
   { id: 'colonyOverlord', name: 'Colony Overlord', description: 'Assign 50+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 50; }, reward: 10 },
   { id: 'marathon72', name: 'Endurance', description: 'Play for 72 hours total', check: s => s.totalTime >= 259200, reward: 15 },
 
@@ -166,7 +166,7 @@ export const achievements = [
   { id: 'trade2000', name: 'Trade Emperor', description: 'Complete 2000 trades', check: s => (s.totalTrades || 0) >= 2000, reward: 25 },
   { id: 'repeatAddict100', name: 'Industrial God', description: 'Buy any repeatable upgrade 100 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 100), reward: 15 },
   { id: 'colonyGod', name: 'Colony God', description: 'Assign 100+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 100; }, reward: 15 },
-  { id: 'starNetwork50', name: 'Universal Highway', description: 'Create 50 star routes', check: s => (s.starRoutes?.length || 0) >= 50, reward: 15 },
+  { id: 'starNetwork50', name: 'Full Network', description: 'Create the maximum 10 star routes', check: s => (s.starRoutes?.length || 0) >= 10, reward: 15 },
   { id: 'prestigeEternal', name: 'Prestige Eternal', description: 'Prestige 200 times', check: s => (s.prestigeCount || 0) >= 200, reward: 100 },
 
   // --- 10 new achievements ---
@@ -201,9 +201,9 @@ export const achievements = [
   { id: 'speedrunEra9', name: 'Cosmic Speedrun', description: 'Reach Era 9 in under 25 minutes', check: s => s.era >= 9 && (s.bestEraTimes?.[9] || Infinity) < 1500, reward: 9 },
   { id: 'upgrade450', name: 'Upgrade Singularity', description: 'Purchase 450 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 450, reward: 70 },
   { id: 'techEnlightened', name: 'Tech Enlightened', description: 'Unlock 80 technologies', check: s => Object.keys(s.tech || {}).length >= 80, reward: 40 },
-  { id: 'hack500long', name: 'Phantom Hacker', description: 'Complete 500 hacks', check: s => (s.hackSuccesses || 0) >= 500, reward: 25 },
-  { id: 'docking500long', name: 'Void Pilot', description: 'Land 500 perfect docks', check: s => (s.dockingPerfects || 0) >= 500, reward: 25 },
-  { id: 'weave500long', name: 'Fabric Weaver', description: 'Complete 500 weaves', check: s => (s.totalWeaves || 0) >= 500, reward: 25 },
+  { id: 'hack750', name: 'Phantom Hacker', description: 'Complete 750 hacks', check: s => (s.hackSuccesses || 0) >= 750, reward: 25 },
+  { id: 'docking750', name: 'Void Pilot', description: 'Land 750 perfect docks', check: s => (s.dockingPerfects || 0) >= 750, reward: 25 },
+  { id: 'weave750', name: 'Fabric Weaver', description: 'Complete 750 weaves', check: s => (s.totalWeaves || 0) >= 750, reward: 25 },
   { id: 'gem50000', name: 'Gem Singularity', description: 'Find 50000 gems', check: s => (s.totalGems || 0) >= 50000, reward: 30 },
   { id: 'repeatAddict1000', name: 'Eternal Assembly', description: 'Buy any repeatable upgrade 1000 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 1000), reward: 30 },
 
@@ -244,14 +244,14 @@ export const achievements = [
   { id: 'weave2000', name: 'Weave Infinity', description: 'Complete 2000 weaves', check: s => (s.totalWeaves || 0) >= 2000, reward: 40 },
   { id: 'docking2000', name: 'Cosmic Admiral', description: 'Land 2000 perfect docks', check: s => (s.dockingPerfects || 0) >= 2000, reward: 40 },
   { id: 'trade25000', name: 'Omniversal Exchange', description: 'Complete 25000 trades', check: s => (s.totalTrades || 0) >= 25000, reward: 50 },
-  { id: 'gem25000v2', name: 'Gem Multiverse', description: 'Find 25000 gems across all runs', check: s => (s.totalGems || 0) >= 25000, reward: 35 },
+  { id: 'gem30000', name: 'Gem Multiverse', description: 'Find 30000 gems', check: s => (s.totalGems || 0) >= 30000, reward: 35 },
   { id: 'repeatAddict2000', name: 'Perpetual Machine', description: 'Buy any repeatable upgrade 2000 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 2000), reward: 35 },
-  { id: 'starNetwork100', name: 'Omniversal Web', description: 'Create 100 star routes', check: s => (s.starRoutes?.length || 0) >= 100, reward: 20 },
+  { id: 'starNetworkFull', name: 'Omniversal Web', description: 'Fill all 10 star route slots', check: s => (s.starRoutes?.length || 0) >= 10, reward: 20 },
   { id: 'marathon720', name: 'Month Runner', description: 'Play for 720 hours total', check: s => s.totalTime >= 2592000, reward: 30 },
 
   // Final push — 1000 content milestone
   { id: 'allEras', name: 'All Eras', description: 'Visit every era in a single run', check: s => s.era >= 10, reward: 10 },
-  { id: 'speedrunEra2', name: 'Quick Industrialist', description: 'Reach Era 2 in under 2 minutes', check: s => s.era >= 2 && (s.bestEraTimes?.[2] || Infinity) < 120, reward: 3 },
+  { id: 'speedrunEra2v2', name: 'Quick Industrialist', description: 'Reach Era 2 in under 100 seconds', check: s => s.era >= 2 && (s.bestEraTimes?.[2] || Infinity) < 100, reward: 4 },
   { id: 'gemStreak20', name: 'Hot Streak', description: 'Reach a mining streak of 20', check: s => (s.miningStreak || 0) >= 20, reward: 2 },
   { id: 'combo3dock', name: 'Triple Dock', description: 'Reach a 3x docking combo', check: s => (s.dockingCombo || 0) >= 3, reward: 2 },
   { id: 'firstWeave', name: 'First Weave', description: 'Complete your first reality weave', check: s => (s.totalWeaves || 0) >= 1, reward: 1 },
@@ -262,7 +262,7 @@ export const achievements = [
   { id: 'tenPrestigeUpgrades', name: 'Prestige Veteran', description: 'Buy 10 prestige upgrades', check: s => Object.keys(s.prestigeUpgrades || {}).length >= 10, reward: 5 },
   { id: 'resourceDiversifier', name: 'Resource Diversifier', description: 'Have 15 unlocked resources simultaneously', check: s => Object.values(s.resources || {}).filter(r => r.unlocked).length >= 15, reward: 3 },
   { id: 'upgradeSavant', name: 'Upgrade Savant', description: 'Purchase 250 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 250, reward: 15 },
-  { id: 'eventCollector', name: 'Event Collector', description: 'See 30 events in a single run', check: s => (s.eventLog?.length || 0) >= 8 && s.totalTime > 300, reward: 3 },
+  { id: 'eventCollector', name: 'Event Collector', description: 'Play for 5 minutes in Era 3+', check: s => s.era >= 3 && s.totalTime > 300, reward: 3 },
   { id: 'factoryMaxed', name: 'Factory Maxed', description: 'Assign 20+ factory workers', check: s => { const a = s.factoryAllocation || {}; return (a.steel||0) + (a.electronics||0) + (a.research||0) >= 20; }, reward: 5 },
   { id: 'thousandContent', name: 'Content Complete', description: 'You found the 1000th piece of content — the multiverse is truly infinite', check: s => s.era >= 10 && Object.keys(s.upgrades || {}).length >= 100, reward: 100 },
 
@@ -270,8 +270,8 @@ export const achievements = [
   { id: 'crossChainMaster', name: 'Cross-Chain Master', description: 'Purchase 180 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 180, reward: 20 },
   { id: 'deepChainExplorer', name: 'Deep Chain Explorer', description: 'Purchase 220 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 220, reward: 25 },
   { id: 'synergist', name: 'Synergist', description: 'Have 20+ unlocked resources simultaneously', check: s => Object.values(s.resources || {}).filter(r => r.unlocked).length >= 20, reward: 5 },
-  { id: 'eventVeteran', name: 'Event Veteran', description: 'Experience 200 events across all runs', check: s => (s.eventLog?.length || 0) >= 30 && s.totalTime > 3600, reward: 10 },
-  { id: 'factoryEmpire', name: 'Factory Empire', description: 'Assign 50+ factory workers', check: s => { const a = s.factoryAllocation || {}; return (a.steel||0) + (a.electronics||0) + (a.research||0) >= 50; }, reward: 10 },
+  { id: 'eventVeteran', name: 'Event Veteran', description: 'Play for 1 hour total', check: s => s.totalTime > 3600, reward: 10 },
+  { id: 'factoryEmpire', name: 'Factory Empire', description: 'Assign 30 factory workers (max capacity)', check: s => { const a = s.factoryAllocation || {}; return (a.steel||0) + (a.electronics||0) + (a.research||0) >= 30; }, reward: 10 },
   { id: 'cosmicCollector', name: 'Cosmic Collector', description: 'Have 1e12 of cosmic power, exotic matter, and dark energy at the same time', check: s => { const r = s.resources || {}; return (r.cosmicPower?.amount || 0) >= 1e12 && (r.exoticMatter?.amount || 0) >= 1e12 && (r.darkEnergy?.amount || 0) >= 1e12; }, reward: 15 },
 
   // --- Chain completion and cross-chain achievements ---
