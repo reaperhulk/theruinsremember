@@ -21,7 +21,7 @@ export function FactoryPanel({ state, onUpdate }) {
 
   return (
     <div className="panel factory-panel">
-      <h2>Factory ({pool} workers){efficient && fullCapacity ? ' — MAX' : efficient ? ' — +50%' : ''}{pool >= getMaxWorkers(state) && <span style={{ fontSize: '0.6em', color: '#888', marginLeft: '4px' }}>cap: {getMaxWorkers(state)}</span>}</h2>
+      <h2>Factory ({pool} workers){efficient && fullCapacity ? ', MAX' : efficient ? ', +50%' : ''}{pool >= getMaxWorkers(state) && <span style={{ fontSize: '0.6em', color: '#888', marginLeft: '4px' }}>cap: {getMaxWorkers(state)}</span>}</h2>
       {factoryLore && <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#7799aa', margin: '0 0 4px' }}>{factoryLore}</p>}
       <div className="factory-info">
         <span>Workers: {available}/{pool} available</span>

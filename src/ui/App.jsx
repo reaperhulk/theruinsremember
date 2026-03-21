@@ -26,8 +26,6 @@ import { ERA_COUNT, eraNames } from '../engine/eras.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
 import { canAfford } from '../engine/resources.js';
-import { upgrades as upgradeDefs } from '../data/upgrades.js';
-import { LORE_UPGRADE_IDS } from '../data/lore.js';
 import { formatNumber } from './format.js';
 
 const initialState = createInitialState();
@@ -211,18 +209,18 @@ export function App() {
       </header>
 
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
-      {!hintsDismissed && state.totalTime < 30 && Object.keys(state.upgrades).length === 0 && (
-        <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '4px 0', opacity: Math.max(0, 1 - state.totalTime / 30) }}>
-          Click resources to gather | Buy upgrades to boost production | Space to mine
+      {!hintsDismissed && state.totalTime < 60 && Object.keys(state.upgrades).length === 0 && (
+        <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.9em', color: '#c8a850', padding: '6px 0', opacity: Math.max(0.3, 1 - state.totalTime / 60) }}>
+          Click the +1 buttons to gather resources | Buy upgrades on the right | Press Space to mine
           <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
         </div>
       )}
       <EraTransition era={state.era} />
       <Toast state={state} />
       <EraProgress state={state} />
-      {!hintsDismissed && state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
-        <div style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '2px 0', position: 'relative' }}>
-          Click the space bar to mine! Buy upgrades to grow faster.
+      {!hintsDismissed && state.totalTime >= 60 && state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
+        <div style={{ textAlign: 'center', fontSize: '0.85em', color: '#998866', padding: '4px 0', position: 'relative' }}>
+          Press Space to mine for materials | Switch to Mini-Game tab (key 3) for more
           <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
         </div>
       )}
@@ -284,15 +282,10 @@ export function App() {
           </div>
         </div>
       </div>
-      <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#333', padding: '8px 0 4px' }}>
-        v1.0 — {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.tech || {}).length} tech | {Object.keys(state.achievements || {}).length} achievements | Era {state.era}
-        {(state.prestigeCount || 0) > 0 && ` | ${state.prestigeCount} prestige`}
-        {state.prestigeMultiplier > 1 && ` | x${formatNumber(state.prestigeMultiplier)}`}
-        {` | ${Math.floor(Object.keys(state.upgrades || {}).length / Object.keys(upgradeDefs).length * 100)}% complete`}
-        {(() => {
-          const found = LORE_UPGRADE_IDS.filter(id => state.upgrades?.[id]).length;
-          return found > 0 ? <span style={{ color: '#998866' }}>{` | Codex: ${found}/${LORE_UPGRADE_IDS.length}`}</span> : null;
-        })()}
+      <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#444', padding: '8px 0 4px' }}>
+        v1.0 — Era {state.era} | {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.achievements || {}).length} achievements
+        {(state.prestigeCount || 0) > 0 && ` | Cycle ${state.prestigeCount}`}
+        {state.prestigeMultiplier > 1 && ` (x${formatNumber(state.prestigeMultiplier)})`}
       </footer>
     </div>
   );

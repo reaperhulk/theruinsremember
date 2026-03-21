@@ -80,7 +80,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
       <div className="panel tech-panel">
         <h2>Technology (0 available){unlockedCount > 0 && (
           <span className="toggle-purchased" onClick={() => setShowUnlocked(!showUnlocked)}>
-            {showUnlocked ? ' (hide done)' : ` — ${unlockedCount} done`}
+            {showUnlocked ? ' (hide done)' : `, ${unlockedCount} done`}
           </span>
         )}</h2>
         {showUnlocked && unlocked.length > 0 && (
@@ -105,7 +105,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
     <div className="panel tech-panel">
       <h2>Technology{available.length > 0 ? ` (${available.length} available)` : ''}{unlockedCount > 0 && (
           <span className="toggle-purchased" onClick={() => setShowUnlocked(!showUnlocked)}>
-            {showUnlocked ? ' (hide done)' : ` — ${unlockedCount} done`}
+            {showUnlocked ? ' (hide done)' : `, ${unlockedCount} done`}
           </span>
         )}</h2>
       {showUnlocked && unlocked.length > 0 && (

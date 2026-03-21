@@ -206,7 +206,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
     <div className={`panel upgrade-panel${chainFlash ? ' chain-reaction-flash' : ''}`}>
       <h2>
         Upgrades{filteredAvailable.length > 0 ? ` (${affordableCount}/${filteredAvailable.length})` : ''}
-        {upcoming.length > 0 ? ` — ${upcoming.length} soon` : ''}
+        {upcoming.length > 0 ? `, ${upcoming.length} soon` : ''}
         {purchased.length > 0 && (
           <span
             className="toggle-purchased"

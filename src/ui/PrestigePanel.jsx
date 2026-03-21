@@ -27,7 +27,7 @@ export function PrestigePanel({ state, onUpdate }) {
 
   const cycleCount = state.prestigeCount || 0;
   const prestigeLore = cycleCount === 0
-    ? 'Something waits at the end of this path. You can feel it.'
+    ? 'Something waits at the end of this path. You can feel it pulling.'
     : cycleCount === 1
     ? 'You remember flashes of a previous life. The ruins make more sense now.'
     : cycleCount === 2
@@ -48,7 +48,7 @@ export function PrestigePanel({ state, onUpdate }) {
 
   return (
     <div className="panel prestige-panel">
-      <h2>Prestige{points > 0 ? ` (${points} pts)` : ''} — {shop.filter(u => u.owned).length}/{shop.length}</h2>
+      <h2>Prestige{points > 0 ? ` (${points} pts)` : ''} ({shop.filter(u => u.owned).length}/{shop.length} owned)</h2>
       <p className="text-lore" style={{ margin: '0 0 8px', textAlign: 'center' }}>
         {prestigeLore}
       </p>

@@ -5,7 +5,7 @@ import { resources as resourceDefs } from '../data/resources.js';
 const eraLore = {
   1: "The last ship breaks apart on entry. In the wreckage, you find metal fragments too precise to be natural. Someone was here before.",
   2: "The mines cut deep and strike something wrong — buried walls, ancient factories. They built all of this before you.",
-  3: "The old data cores still hum. You decode warnings in languages no one speaks. They knew what was coming.",
+  3: "The old data cores still hum. You decode warnings in languages no one speaks. They knew what was coming and built it anyway.",
   4: "The orbital debris field is not natural. Those are hulls up there — stations, ships, graves. All cold and waiting.",
   5: "Every world you reach has been touched. Terraformed biospheres gone feral. Cities swallowed by alien jungle.",
   6: "Ancient FTL beacons still pulse across the void. Star maps pointing to civilizations that burned out millennia ago.",
