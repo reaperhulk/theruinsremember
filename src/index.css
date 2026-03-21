@@ -541,6 +541,54 @@ canvas:hover {
 .era-9 .game-header h1 { background: linear-gradient(90deg, #4ac4a8, #78e8d0); -webkit-background-clip: text; background-clip: text; }
 .era-10 .game-header h1 { background: linear-gradient(90deg, #c44ac4, #e878e8); -webkit-background-clip: text; background-clip: text; }
 
+/* Era-specific panel tinting */
+.era-1 .panel { background: #141812; }
+.era-2 .panel { background: #161410; }
+.era-3 .panel { background: #101418; }
+.era-4 .panel { background: #121216; }
+.era-5 .panel { background: #141610; }
+.era-6 .panel { background: #0e1218; }
+.era-7 .panel { background: #181210; }
+.era-8 .panel { background: #14101a; }
+.era-9 .panel { background: #101816; }
+.era-10 .panel { background: #181018; }
+
+/* Era-specific panel header colors */
+.era-1 .panel h2 { color: #a0b868; }
+.era-2 .panel h2 { color: #c8a040; }
+.era-3 .panel h2 { color: #68a0c8; }
+.era-4 .panel h2 { color: #9090c0; }
+.era-5 .panel h2 { color: #b8b040; }
+.era-6 .panel h2 { color: #5888b8; }
+.era-7 .panel h2 { color: #d08030; }
+.era-8 .panel h2 { color: #9060b0; }
+.era-9 .panel h2 { color: #50b098; }
+.era-10 .panel h2 { color: #c050b0; }
+
+/* Era-specific affordable button borders */
+.era-1 .upgrade-btn.affordable, .era-1 .tech-btn.affordable { border-color: #6a9a44; }
+.era-2 .upgrade-btn.affordable, .era-2 .tech-btn.affordable { border-color: #aa8830; }
+.era-3 .upgrade-btn.affordable, .era-3 .tech-btn.affordable { border-color: #4488aa; }
+.era-4 .upgrade-btn.affordable, .era-4 .tech-btn.affordable { border-color: #7070aa; }
+.era-5 .upgrade-btn.affordable, .era-5 .tech-btn.affordable { border-color: #9a9a30; }
+.era-6 .upgrade-btn.affordable, .era-6 .tech-btn.affordable { border-color: #3870a0; }
+.era-7 .upgrade-btn.affordable, .era-7 .tech-btn.affordable { border-color: #b07020; }
+.era-8 .upgrade-btn.affordable, .era-8 .tech-btn.affordable { border-color: #8050a0; }
+.era-9 .upgrade-btn.affordable, .era-9 .tech-btn.affordable { border-color: #40a088; }
+.era-10 .upgrade-btn.affordable, .era-10 .tech-btn.affordable { border-color: #a040a0; }
+
+/* Era-specific active tab indicator */
+.era-1 .tab-btn.active { color: #a0b868; }
+.era-2 .tab-btn.active { color: #c8a040; }
+.era-3 .tab-btn.active { color: #68a0c8; }
+.era-4 .tab-btn.active { color: #9090c0; }
+.era-5 .tab-btn.active { color: #b8b040; }
+.era-6 .tab-btn.active { color: #5888b8; }
+.era-7 .tab-btn.active { color: #d08030; }
+.era-8 .tab-btn.active { color: #9060b0; }
+.era-9 .tab-btn.active { color: #50b098; }
+.era-10 .tab-btn.active { color: #c050b0; }
+
 /* Tech exclusion choice highlight */
 .tech-btn[title*="Choose one"] {
   border-left: 2px solid #ff8866;
@@ -1604,7 +1652,7 @@ canvas:hover {
 
 @keyframes affordable-pulse {
   0%, 100% { box-shadow: none; }
-  50% { box-shadow: 0 0 4px rgba(100, 200, 100, 0.15); }
+  50% { box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.05); }
 }
 
 /* Purchase flash — applied momentarily after buying */

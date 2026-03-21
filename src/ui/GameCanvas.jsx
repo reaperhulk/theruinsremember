@@ -50,6 +50,31 @@ function drawGlowCircle(ctx, x, y, r, color, glowR) {
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 
+const ruinLore = [
+  'A carved stone bears an inscription: "We built. We grew. We\u2014" The rest is worn away.',
+  'Beneath the rubble, a perfectly preserved gear. It fits your machines exactly.',
+  'A child\'s toy, made of alloys that shouldn\'t exist for another three eras.',
+  'Foundation stones with your colony\'s coordinates etched into them. Dated 40,000 years ago.',
+  'A mirror that shows a city where your camp stands. The streets match your planned layout.',
+  'Sealed jars containing seeds of every crop you\'ve planted. Already labeled.',
+  'A blueprint for a machine you haven\'t invented yet. The handwriting is yours.',
+  'A countdown timer, still running. It started before your species existed.',
+];
+
+const resourceColorMap = {
+  materials: 'rgba(180,140,100,1)', food: 'rgba(100,200,100,1)',
+  energy: 'rgba(255,220,50,1)', steel: 'rgba(150,170,190,1)',
+  electronics: 'rgba(100,200,255,1)', research: 'rgba(100,255,200,1)',
+  software: 'rgba(0,200,180,1)', data: 'rgba(80,180,255,1)',
+  rocketFuel: 'rgba(255,120,50,1)', orbitalInfra: 'rgba(180,180,220,1)',
+  exoticMaterials: 'rgba(200,150,255,1)', colonies: 'rgba(100,220,150,1)',
+  darkEnergy: 'rgba(120,80,200,1)', starSystems: 'rgba(180,200,255,1)',
+  galacticInfluence: 'rgba(100,220,255,1)', megastructures: 'rgba(200,180,100,1)',
+  stellarForge: 'rgba(255,180,80,1)', exoticMatter: 'rgba(220,100,255,1)',
+  cosmicPower: 'rgba(180,100,255,1)', universalConstants: 'rgba(200,220,255,1)',
+  realityFragments: 'rgba(255,150,200,1)', quantumEchoes: 'rgba(150,200,255,1)',
+};
+
 // --- Era 1: Planetfall ---
 function drawEra1(ctx, w, h, t, state) {
   // Sky gradient (day cycle)
@@ -256,6 +281,28 @@ function drawEra1(ctx, w, h, t, state) {
     ctx.lineTo(sx + legPhase * 2, groundY);
     ctx.stroke();
   }
+
+  // Production particles rising from buildings
+  if (buildings.length > 0) {
+    const prodRate = Object.values(state?.resources || {})
+      .filter(r => r.unlocked)
+      .reduce((sum, r) => sum + Math.max(0, (r.baseRate + r.rateAdd) * r.rateMult), 0);
+    const particleDensity = Math.min(Math.floor(prodRate / 5), 15);
+    const prodColors = ['rgba(100,200,100,', 'rgba(180,140,100,', 'rgba(255,220,100,'];
+    for (let i = 0; i < particleDensity; i++) {
+      const b = buildings[i % buildings.length];
+      const groundY = h * 0.72 + Math.sin(b.x * 0.02 + 4) * 12 + Math.sin(b.x * 0.04 + 1 + t * 0.1) * 4;
+      const bx = b.x + b.w / 2 + (Math.sin(t * 3 + i * 7.1) * 0.5) * 15;
+      const driftY = (t * 10 + i * 13.7) % 25;
+      const by = groundY - b.h - 5 - driftY;
+      const alpha = 0.15 + 0.2 * (1 - driftY / 25);
+      const colorBase = prodColors[i % prodColors.length];
+      ctx.fillStyle = `${colorBase}${alpha})`;
+      ctx.beginPath();
+      ctx.arc(bx, by, 1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
 }
 
 // --- Era 2: Industrialization ---
@@ -392,6 +439,28 @@ function drawEra2(ctx, w, h, t, state) {
     ctx.arc(0, 0, g.r * 0.2, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
+  }
+
+  // Production particles rising from factories
+  if (factories.length > 0) {
+    const prodRate = Object.values(state?.resources || {})
+      .filter(r => r.unlocked)
+      .reduce((sum, r) => sum + Math.max(0, (r.baseRate + r.rateAdd) * r.rateMult), 0);
+    const particleDensity = Math.min(Math.floor(prodRate / 5), 15);
+    const baseY = h * 0.65;
+    const prodColors = ['rgba(150,170,190,', 'rgba(100,200,255,', 'rgba(255,220,100,'];
+    for (let i = 0; i < particleDensity; i++) {
+      const f = factories[i % factories.length];
+      const fx = f.x + f.bw / 2 + (Math.sin(t * 2.5 + i * 5.3) * 0.5) * f.bw * 0.6;
+      const driftY = (t * 12 + i * 11.3) % 30;
+      const fy = baseY - f.bh - 5 - driftY;
+      const alpha = 0.15 + 0.2 * (1 - driftY / 30);
+      const colorBase = prodColors[i % prodColors.length];
+      ctx.fillStyle = `${colorBase}${alpha})`;
+      ctx.beginPath();
+      ctx.arc(fx, fy, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   // Smog overlay
@@ -1786,6 +1855,12 @@ export function GameCanvas({ state, onUpdate }) {
   const hackFlashRef = useRef(0); // timestamp of last hack flash
   const dockFlashRef = useRef(0); // timestamp of last dock flash
   const mouseRef = useRef({ x: 0, y: 0 }); // for parallax
+  const ruinsRef = useRef([]); // Array of { x, y, era, discovered, spawnTime }
+  const lastRuinsCheckRef = useRef(0);
+  const nextRuinDelayRef = useRef(45 + Math.random() * 75); // 45-120s
+  const depositsRef = useRef([]); // Array of { x, y, resourceId, amount, spawnTime, duration, color }
+  const lastDepositCheckRef = useRef(0);
+  const nextDepositDelayRef = useRef(20 + Math.random() * 20); // 20-40s
 
   const handleCanvasClick = useCallback((e) => {
     const canvas = canvasRef.current;
@@ -1853,6 +1928,64 @@ export function GameCanvas({ state, onUpdate }) {
         bonusOrbRef.current = null;
         lastOrbTimeRef.current = t;
         nextOrbDelayRef.current = 20 + Math.random() * 40;
+        return;
+      }
+    }
+
+    // Check ruins click
+    for (const ruin of ruinsRef.current) {
+      if (ruin.discovered) continue;
+      const rdx = cx - ruin.x;
+      const rdy = cy - ruin.y;
+      if (rdx * rdx + rdy * rdy <= 16 * 16) {
+        ruin.discovered = true;
+        spawnParticles(particlesRef.current, ruin.x, ruin.y, 15, 'rgba(200,170,100,1)', 60);
+        const loreText = ruinLore[Math.floor(Math.random() * ruinLore.length)];
+        floatingTextsRef.current.push({ x: ruin.x, y: ruin.y, label: 'Ancient Ruins!', startTime: performance.now() });
+        // Grant 15-30 seconds of a random unlocked resource's production
+        onUpdateRef.current(s => {
+          const unlockedResources = Object.entries(s.resources || {}).filter(([, r]) => r.unlocked);
+          if (unlockedResources.length === 0) return s;
+          const [resId] = unlockedResources[Math.floor(Math.random() * unlockedResources.length)];
+          const rate = getEffectiveRate(s, resId);
+          const bonusSeconds = 15 + Math.random() * 15;
+          const amount = Math.max(1, rate * bonusSeconds);
+          const cap = getEffectiveCap(s, resId);
+          const r = s.resources[resId];
+          const added = cap > 0 ? Math.min(amount, cap - r.amount) : amount;
+          const newResources = { ...s.resources, [resId]: { ...r, amount: r.amount + Math.max(0, added) } };
+          return {
+            ...s,
+            resources: newResources,
+            eventLog: [...(s.eventLog || []), {
+              message: loreText,
+              time: s.totalTime,
+              isLore: true,
+            }],
+          };
+        });
+        return;
+      }
+    }
+
+    // Check resource deposits click
+    for (let i = depositsRef.current.length - 1; i >= 0; i--) {
+      const dep = depositsRef.current[i];
+      const ddx = cx - dep.x;
+      const ddy = cy - dep.y;
+      if (ddx * ddx + ddy * ddy <= 14 * 14) {
+        spawnParticles(particlesRef.current, dep.x, dep.y, 12, dep.color || 'rgba(255,255,255,1)', 50);
+        const resLabel = dep.resourceId.replace(/([A-Z])/g, ' $1').trim();
+        floatingTextsRef.current.push({ x: dep.x, y: dep.y, label: `+${Math.floor(dep.amount)} ${resLabel}`, startTime: performance.now() });
+        onUpdateRef.current(s => {
+          const r = s.resources[dep.resourceId];
+          if (!r || !r.unlocked) return s;
+          const cap = getEffectiveCap(s, dep.resourceId);
+          const added = cap > 0 ? Math.min(dep.amount, cap - r.amount) : dep.amount;
+          if (added <= 0) return s;
+          return { ...s, resources: { ...s.resources, [dep.resourceId]: { ...r, amount: r.amount + added } } };
+        });
+        depositsRef.current.splice(i, 1);
         return;
       }
     }
@@ -2155,6 +2288,111 @@ export function GameCanvas({ state, onUpdate }) {
         rightGlow.addColorStop(1, 'transparent');
         ctx.fillStyle = rightGlow;
         ctx.fillRect(w - 20, 0, 20, h);
+        ctx.restore();
+      }
+
+      // --- Ruins system ---
+      // Spawn ruins periodically (max 3 undiscovered)
+      const undiscoveredRuins = ruinsRef.current.filter(r => !r.discovered);
+      if (undiscoveredRuins.length < 3 && (t - lastRuinsCheckRef.current) >= nextRuinDelayRef.current) {
+        lastRuinsCheckRef.current = t;
+        nextRuinDelayRef.current = 45 + Math.random() * 75;
+        ruinsRef.current.push({
+          x: 20 + Math.random() * (w - 40),
+          y: 20 + Math.random() * (h - 40),
+          era,
+          discovered: false,
+          spawnTime: t,
+        });
+      }
+      // Clean up discovered ruins
+      ruinsRef.current = ruinsRef.current.filter(r => !r.discovered);
+
+      // Draw undiscovered ruins
+      for (const ruin of ruinsRef.current) {
+        if (ruin.discovered) continue;
+        const ruinAge = t - ruin.spawnTime;
+        const shimmer = 0.4 + 0.2 * Math.sin(ruinAge * 1.5);
+        ctx.save();
+        ctx.globalAlpha = shimmer;
+        ctx.fillStyle = '#887766';
+        // Draw a small broken column shape
+        ctx.fillRect(ruin.x - 3, ruin.y - 8, 6, 12);
+        ctx.fillRect(ruin.x - 5, ruin.y - 10, 10, 3);
+        // Small rubble pieces
+        ctx.fillRect(ruin.x + 5, ruin.y + 1, 3, 2);
+        ctx.fillRect(ruin.x - 7, ruin.y + 2, 2, 3);
+        // Glow hint
+        ctx.strokeStyle = `rgba(200, 170, 100, ${shimmer * 0.3})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(ruin.x, ruin.y, 12, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // --- Resource deposits system ---
+      // Spawn deposits periodically
+      if ((t - lastDepositCheckRef.current) >= nextDepositDelayRef.current) {
+        lastDepositCheckRef.current = t;
+        nextDepositDelayRef.current = 20 + Math.random() * 20;
+        // Pick an era-appropriate resource
+        const eraDepositRes = {
+          1: ['materials', 'food', 'energy'],
+          2: ['steel', 'electronics', 'energy'],
+          3: ['software', 'data', 'research'],
+          4: ['research', 'rocketFuel', 'energy'],
+          5: ['research', 'energy', 'exoticMaterials'],
+          6: ['research', 'energy', 'software'],
+          7: ['research', 'energy', 'software'],
+          8: ['research', 'energy', 'software'],
+          9: ['research', 'energy', 'software'],
+          10: ['research', 'energy', 'software'],
+        };
+        const depResources = eraDepositRes[era] || ['energy'];
+        const depResId = depResources[Math.floor(Math.random() * depResources.length)];
+        const depRate = state ? getEffectiveRate(state, depResId) : 0;
+        const depAmount = Math.max(1, depRate * (3 + Math.random() * 2));
+        const depColor = resourceColorMap[depResId] || 'rgba(255,255,255,1)';
+        depositsRef.current.push({
+          x: 15 + Math.random() * (w - 30),
+          y: 15 + Math.random() * (h - 30),
+          resourceId: depResId,
+          amount: depAmount,
+          spawnTime: t,
+          duration: 15,
+          color: depColor,
+        });
+      }
+      // Expire old deposits
+      depositsRef.current = depositsRef.current.filter(d => (t - d.spawnTime) < d.duration);
+
+      // Draw resource deposits
+      for (const dep of depositsRef.current) {
+        const depAge = t - dep.spawnTime;
+        const fadeIn = Math.min(depAge / 0.5, 1);
+        const fadeOut = dep.duration - depAge < 3 ? (dep.duration - depAge) / 3 : 1;
+        const depAlpha = fadeIn * fadeOut;
+        const pulse = 0.6 + 0.4 * Math.sin(depAge * 3);
+        ctx.save();
+        ctx.globalAlpha = depAlpha * pulse;
+        // Glowing circle
+        const depGrad = ctx.createRadialGradient(dep.x, dep.y, 0, dep.x, dep.y, 10);
+        depGrad.addColorStop(0, dep.color.replace('1)', '0.8)'));
+        depGrad.addColorStop(0.6, dep.color.replace('1)', '0.3)'));
+        depGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = depGrad;
+        ctx.beginPath();
+        ctx.arc(dep.x, dep.y, 10, 0, Math.PI * 2);
+        ctx.fill();
+        // Resource letter
+        ctx.globalAlpha = depAlpha;
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 7px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const depLabel = dep.resourceId.charAt(0).toUpperCase();
+        ctx.fillText(depLabel, dep.x, dep.y);
         ctx.restore();
       }
 
