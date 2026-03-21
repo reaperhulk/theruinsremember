@@ -23,15 +23,15 @@ export function getNetRate(state, resourceId) {
   const grossRate = getEffectiveRate(state, resourceId);
   if (resourceId === 'food') {
     const laborRate = getEffectiveRate(state, 'labor');
-    return grossRate - laborRate * 0.3;
+    return grossRate - laborRate * 0.8;
   }
   if (resourceId === 'energy') {
     const elecRate = getEffectiveRate(state, 'electronics');
-    return grossRate - elecRate * 0.2;
+    return grossRate - elecRate * 0.3;
   }
   if (resourceId === 'rocketFuel' && state.era >= 4) {
     const orbRate = getEffectiveRate(state, 'orbitalInfra');
-    return grossRate - orbRate * 0.3;
+    return grossRate - orbRate * 0.6;
   }
   if (resourceId === 'exoticMaterials' && state.era >= 5) {
     const colonyRate = getEffectiveRate(state, 'colonies');
@@ -85,6 +85,7 @@ export function gather(state, resourceId, amount = 1) {
   };
 
   // Mechanic: canvasDataCache — 20% chance on any click to get 30s of data production
+  let dataMiningProc = false;
   if (state.upgrades?.dataMining && newResources.data?.unlocked) {
     if (Math.random() < 0.2) {
       const dataR = newResources.data;
@@ -97,6 +98,7 @@ export function gather(state, resourceId, amount = 1) {
           dataAmount = Math.max(dataR.amount, dataCap);
         }
         newResources = { ...newResources, data: { ...dataR, amount: dataAmount } };
+        dataMiningProc = true;
       }
     }
   }
@@ -117,7 +119,17 @@ export function gather(state, resourceId, amount = 1) {
     }
   }
 
-  return { ...state, resources: newResources };
+  let newState = { ...state, resources: newResources };
+  if (dataMiningProc) {
+    newState = {
+      ...newState,
+      eventLog: [...(newState.eventLog || []), {
+        message: 'Data cache found! Ancient databases yield data.',
+        time: newState.totalTime,
+      }].slice(-20),
+    };
+  }
+  return newState;
 }
 
 // Get effective cap for a resource

@@ -12,7 +12,7 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 // Resource consumption rates — high enough to create real tension
 const FOOD_PER_LABOR = 0.8;       // Food consumed per labor/s
-const ENERGY_PER_ELECTRONICS = 0.5; // Energy consumed per electronics/s
+const ENERGY_PER_ELECTRONICS = 0.3; // Energy consumed per electronics/s
 const FUEL_PER_ORBITAL = 0.6;     // Fuel consumed per orbitalInfra/s
 
 // Core game loop: advance state by dt seconds
@@ -239,7 +239,7 @@ export function tick(state, dt) {
   // Mechanic: upgradeCountBonus — +1% production per upgrade owned
   if (newState.upgrades?.communalEffort) {
     const upgradeCount = Object.keys(newState.upgrades).length;
-    const bonusFraction = upgradeCount * 0.01;
+    const bonusFraction = Math.min(0.5, upgradeCount * 0.005);
     for (const [id, r] of Object.entries(newState.resources)) {
       if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
         const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);

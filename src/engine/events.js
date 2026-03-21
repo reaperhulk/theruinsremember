@@ -90,7 +90,7 @@ function applyInstantEvent(state, event) {
       ...state.resources,
       [resourceId]: {
         ...r,
-        amount: r.amount + scaledAmount,
+        amount: Math.max(0, r.amount + scaledAmount),
       },
     },
   };
@@ -137,5 +137,5 @@ export function getTimedRateMultiplier(state, resourceId) {
       mult *= ae.effect.rateMultBonus;
     }
   }
-  return mult;
+  return Math.max(0.25, mult);
 }

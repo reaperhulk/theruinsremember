@@ -135,7 +135,14 @@ export function purchaseUpgrade(state, upgradeId) {
         burstResources[id] = { ...r, amount: Math.min(r.amount + burst, cap > 0 ? cap : Infinity) };
       }
     }
-    finalState = { ...finalState, resources: burstResources };
+    finalState = {
+      ...finalState,
+      resources: burstResources,
+      eventLog: [...(finalState.eventLog || []), {
+        message: 'Chain Reaction! Purchase triggers a burst of all resources.',
+        time: finalState.totalTime,
+      }].slice(-20),
+    };
   }
 
   return finalState;

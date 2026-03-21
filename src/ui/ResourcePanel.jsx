@@ -111,9 +111,9 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                   if (rb[r.id]) tooltipParts.push(`Star routes: +${rb[r.id].toFixed(1)}/s`);
                   if (state.prestigeMultiplier > 1) tooltipParts.push(`Prestige: x${state.prestigeMultiplier.toFixed(1)}`);
                   // Consumption info
-                  if (r.id === 'food' && r.rate > 0) tooltipParts.push(`Consumed by: labor (0.3/labor/s)`);
-                  if (r.id === 'energy') tooltipParts.push(`Consumed by: electronics (0.2/elec/s)`);
-                  if (r.id === 'rocketFuel' && state.era >= 4) tooltipParts.push(`Consumed by: orbital infra (0.3/orbital/s)`);
+                  if (r.id === 'food' && r.rate > 0) tooltipParts.push(`Consumed by: labor (0.8/labor/s)`);
+                  if (r.id === 'energy') tooltipParts.push(`Consumed by: electronics (0.3/elec/s)`);
+                  if (r.id === 'rocketFuel' && state.era >= 4) tooltipParts.push(`Consumed by: orbital infra (0.6/orbital/s)`);
                   tooltipParts.push(`Effective: ${formatNumber(r.rate)}/s`);
                   if (r.cap > 0) tooltipParts.push(`Cap: ${formatNumber(r.cap)}`);
                   const tooltip = tooltipParts.join('\n');
@@ -132,6 +132,9 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                         )}
                         {r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0 && (
                           <span className="text-danger" style={{ fontSize: '0.6em', marginLeft: '4px' }} title="Buy cap upgrades (Cap filter) to increase storage">FULL</span>
+                        )}
+                        {state.upgrades?.surplusExchange && r.cap > 0 && r.amount >= r.cap * 0.95 && (
+                          <span style={{ fontSize: '0.6em', color: '#88aa44', marginLeft: '4px' }} title="Surplus Exchange: overflow converting to lowest resource">&#x267B;</span>
                         )}
                       </span>
                       <span className="resource-rate">
@@ -184,13 +187,13 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                           {rb[r.id] > 0 && <div>Star routes: +{rb[r.id].toFixed(1)}/s</div>}
                           {prestigeMult > 1 && <div>Prestige: x{prestigeMult.toFixed(1)}</div>}
                           {r.id === 'food' && getEffectiveRate(state, 'labor') > 0 && (
-                            <div style={{ color: '#ff9966' }}>Consumed by: labor (0.3/labor/s)</div>
+                            <div style={{ color: '#ff9966' }}>Consumed by: labor (0.8/labor/s)</div>
                           )}
                           {r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0 && (
-                            <div style={{ color: '#ff9966' }}>Consumed by: electronics (0.2/elec/s)</div>
+                            <div style={{ color: '#ff9966' }}>Consumed by: electronics (0.3/elec/s)</div>
                           )}
                           {r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0 && (
-                            <div style={{ color: '#ff9966' }}>Consumed by: orbital infra (0.3/orbital/s)</div>
+                            <div style={{ color: '#ff9966' }}>Consumed by: orbital infra (0.6/orbital/s)</div>
                           )}
                           {r.id === 'exoticMaterials' && state.era >= 5 && state.resources.colonies?.unlocked && (
                             <div style={{ color: '#ff9966' }}>Consumed by: colonies (0.2/colony/s)</div>

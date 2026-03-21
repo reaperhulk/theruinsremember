@@ -6,7 +6,7 @@
 export const events = {
   // Era 1: Early discovery — hooks the player with a resource burst
   firstDiscovery: {
-    id: 'firstDiscovery', minEra: 1, type: 'instant', chance: 0.15,
+    id: 'firstDiscovery', name: 'Sealed Cache', minEra: 1, type: 'instant', chance: 0.15,
     description: 'While clearing rubble from the crash site, you find a sealed cache of supplies — someone left these here deliberately.',
     effects: [
       { type: 'resource', target: 'materials', value: 30 },
@@ -19,7 +19,7 @@ export const events = {
   viralApp: {
     id: 'viralApp',
     name: 'Viral App',
-    description: 'Your software goes viral — massive data surge!',
+    description: 'The code spreads through networks too fast — as if the infrastructure was designed to propagate exactly this pattern.',
     minEra: 3,
     type: 'instant',
     effect: { resourceId: 'data', amount: 30 },
@@ -27,7 +27,7 @@ export const events = {
   openSource: {
     id: 'openSource',
     name: 'Open Source Contribution',
-    description: 'The community contributes — software development accelerated!',
+    description: 'Anonymous contributors submit code that references functions not yet written — open source from a future that has already shipped.',
     minEra: 3,
     type: 'timed',
     duration: 35,
@@ -36,7 +36,7 @@ export const events = {
   hackathon: {
     id: 'hackathon',
     name: 'Hackathon',
-    description: 'A hackathon produces breakthrough code!',
+    description: 'Programmers work through the night and discover their solutions match code cached in precursor memory banks — debugging someone else\'s prophecy.',
     minEra: 3,
     type: 'instant',
     effect: { resourceId: 'software', amount: 20 },
@@ -46,7 +46,7 @@ export const events = {
   solarFlare: {
     id: 'solarFlare',
     name: 'Solar Flare',
-    description: 'A massive solar flare supercharges your energy collectors!',
+    description: 'The flare follows a pattern logged in precursor archives — predicted to the millisecond, thousands of years in advance.',
     minEra: 4,
     type: 'timed',
     duration: 30,
@@ -55,7 +55,7 @@ export const events = {
   asteroidDiscovery: {
     id: 'asteroidDiscovery',
     name: 'Asteroid Discovery',
-    description: 'Scouts discover a mineral-rich asteroid!',
+    description: 'The asteroid has been hollowed out and refilled with sorted minerals — a cache left by hands that knew exactly what you would need.',
     minEra: 4,
     type: 'instant',
     effect: { resourceId: 'exoticMaterials', amount: 50 },
@@ -98,7 +98,7 @@ export const events = {
   colonyPopSurge: {
     id: 'colonyPopSurge',
     name: 'Population Surge',
-    description: 'Population surge on colonies boosts production!',
+    description: 'Colony birth rates spike in sync across every settlement — as if responding to a signal no one consciously sent.',
     minEra: 5,
     type: 'timed',
     duration: 40,
@@ -146,7 +146,7 @@ export const events = {
   stellarForgeIgnition: {
     id: 'stellarForgeIgnition',
     name: 'Stellar Forge Ignition',
-    description: 'A forge reaches critical mass — stellar output surges!',
+    description: 'The forge reaches a critical threshold your predecessors called "remembering" — stellar matter flows as if guided by instinct.',
     minEra: 7,
     type: 'timed',
     duration: 40,
@@ -155,7 +155,7 @@ export const events = {
   megastructureBreakthrough: {
     id: 'megastructureBreakthrough',
     name: 'Megastructure Breakthrough',
-    description: 'Engineering breakthrough — free megastructure materials!',
+    description: 'Engineers find the answer in a dream — the same dream, reported independently by twelve teams on different worlds.',
     minEra: 7,
     type: 'instant',
     effect: { resourceId: 'megastructures', amount: 5 },
@@ -193,7 +193,7 @@ export const events = {
   universalFlux: {
     id: 'universalFlux',
     name: 'Universal Flux',
-    description: 'Physical constants fluctuate — you capture the energy!',
+    description: 'The constants shift to values that favor your technology — as if the universe is tuning itself to your specifications.',
     minEra: 9,
     type: 'instant',
     effect: { resourceId: 'universalConstants', amount: 30 },
@@ -203,7 +203,7 @@ export const events = {
   realityStorm: {
     id: 'realityStorm',
     name: 'Reality Storm',
-    description: 'A storm of realities collides — fragments everywhere!',
+    description: 'Realities collide and scatter fragments of themselves — each piece a memory from a version of you that chose differently.',
     minEra: 10,
     type: 'instant',
     effect: { resourceId: 'realityFragments', amount: 100 },
@@ -211,7 +211,7 @@ export const events = {
   quantumResonance: {
     id: 'quantumResonance',
     name: 'Quantum Resonance',
-    description: 'Parallel universes harmonize — echoes amplified!',
+    description: 'Parallel selves reach the same conclusion simultaneously — a billion minds think one thought, and the echoes multiply.',
     minEra: 10,
     type: 'timed',
     duration: 60,
@@ -221,7 +221,7 @@ export const events = {
   goldenAge: {
     id: 'goldenAge',
     name: 'Golden Age',
-    description: 'A golden age of prosperity — all production boosted!',
+    description: 'Prosperity arrives on schedule — the old calendars marked this season as \'the flowering\' in every cycle.',
     minEra: 2,
     type: 'timed',
     duration: 45,
@@ -230,7 +230,7 @@ export const events = {
   breakthroughResearch: {
     id: 'breakthroughResearch',
     name: 'Breakthrough Research',
-    description: 'A eureka moment accelerates research!',
+    description: 'Researchers find their breakthrough on a page already bookmarked — the answer was waiting for the question.',
     minEra: 2,
     type: 'timed',
     duration: 30,
@@ -239,7 +239,7 @@ export const events = {
   materialWindfall: {
     id: 'materialWindfall',
     name: 'Material Windfall',
-    description: 'A rich vein of materials discovered!',
+    description: 'Miners break through into a vein too pure to be natural — refined and waiting, like a pantry stocked before the guests arrive.',
     minEra: 2,
     type: 'instant',
     effect: { resourceId: 'materials', amount: 50 },
@@ -247,7 +247,7 @@ export const events = {
   energySurge: {
     id: 'energySurge',
     name: 'Energy Surge',
-    description: 'Power grid hits peak efficiency!',
+    description: 'The grid hums at a frequency that matches precursor power signatures — old conduits waking up.',
     minEra: 2,
     type: 'timed',
     duration: 25,
@@ -325,7 +325,7 @@ export const events = {
   volcanicEruption: {
     id: 'volcanicEruption',
     name: 'Volcanic Eruption',
-    description: 'A volcanic eruption exposes rare mineral deposits!',
+    description: 'The eruption follows fault lines that radiate from the central ruin — as if the volcano was designed to reveal what lies beneath.',
     minEra: 2,
     type: 'instant',
     effect: { resourceId: 'materials', amount: 60 },
@@ -333,7 +333,7 @@ export const events = {
   tradeCaravan: {
     id: 'tradeCaravan',
     name: 'Trade Caravan',
-    description: 'A merchant caravan arrives with surplus goods!',
+    description: 'Traders arrive following roads that were buried until today — the paths rose to the surface on schedule.',
     minEra: 2,
     type: 'instant',
     effect: { resourceId: 'food', amount: 40 },
@@ -1638,7 +1638,7 @@ export const events = {
   crisisQuake: {
     id: 'crisisQuake',
     name: 'Seismic Event',
-    description: 'Seismic activity from deep ruins! Material production disrupted for 20 seconds.',
+    description: 'Something shifts beneath the ruins — a structure deeper than any you built. The tremors feel deliberate, like a lock turning.',
     minEra: 3,
     type: 'timed',
     chance: 0.004,
@@ -1670,7 +1670,7 @@ export const events = {
   crisisColonyRevolt: {
     id: 'crisisColonyRevolt',
     name: 'Colony Revolt',
-    description: 'Colony uprising! Settlers demand autonomy. Colony output halved while negotiations proceed.',
+    description: 'Colonists unearth a precursor monument bearing their own names. Shaken, they demand answers before resuming work.',
     minEra: 5,
     type: 'timed',
     chance: 0.004,
@@ -1709,6 +1709,38 @@ export const events = {
       { type: 'resource', target: 'exoticMatter', value: -100 },
       { type: 'resource', target: 'galacticInfluence', value: -500 },
     ],
+  },
+
+  // Mechanic-themed lore events
+  loreOverclockPulse: {
+    id: 'loreOverclockPulse',
+    name: 'Resonant Pulse',
+    description: 'The ruins respond to your overclock pulses. For a moment, buried machines pulse in sync — a heartbeat from a civilization that never truly stopped.',
+    minEra: 3,
+    type: 'instant',
+    chance: 0.006,
+    effect: { resourceId: 'research', amount: 20 },
+    isLore: true,
+  },
+  loreScavengerWhisper: {
+    id: 'loreScavengerWhisper',
+    name: 'Guided Scavenge',
+    description: 'Your scavenger teams report the ruins seem to WANT to be found. Supplies appear where you need them, as if placed there moments before you arrived.',
+    minEra: 2,
+    type: 'instant',
+    chance: 0.006,
+    effect: { resourceId: 'materials', amount: 25 },
+    isLore: true,
+  },
+  loreWarpGrooves: {
+    id: 'loreWarpGrooves',
+    name: 'Spacetime Grooves',
+    description: 'Star routes trace the same paths the precursors used. The spacetime grooves make travel effortless — like water finding old channels worn smooth by a thousand floods.',
+    minEra: 6,
+    type: 'instant',
+    chance: 0.006,
+    effect: { resourceId: 'starSystems', amount: 5 },
+    isLore: true,
   },
 };
 

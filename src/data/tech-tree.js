@@ -172,7 +172,7 @@ export const techTree = {
     cost: { starSystems: 80, darkEnergy: 1000, research: 10000 },
     prerequisites: ['galacticCartography'],
     grantsEra: 7,
-    description: 'Harness entire stars as raw material — gateway to the Dyson Era',
+    description: 'Half-built Dyson scaffolding orbits every dead star you visit — someone was building this before',
   },
 
   // Era 7 → 8 (Dyson Era → Galactic)
@@ -188,7 +188,7 @@ export const techTree = {
     cost: { megastructures: 300, stellarForge: 1000, research: 800000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: 8,
-    description: 'Connect every star — a galaxy-spanning network of instant travel and communication',
+    description: 'The network was never offline — just dormant, waiting for someone to remember the access code',
   },
 
   // Era 8 → 9 (Galactic → Intergalactic)
@@ -229,7 +229,7 @@ export const techTree = {
     cost: { food: 30, materials: 15 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Advanced crop rotation and fertilization — +1 food/s',
+    description: 'Crop rotation patterns found carved into stone — the ancient soil remembers what grew here before',
     effects: [{ type: 'production_add', target: 'food', value: 1.0 }],
   },
   masonry: {
@@ -237,7 +237,7 @@ export const techTree = {
     cost: { materials: 25, labor: 15 },
     prerequisites: ['metallurgy'],
     grantsEra: null,
-    description: 'Precision stonework doubles materials and energy output',
+    description: 'The ruins show masonry joints too perfect for primitive tools — we copy what we cannot explain',
     effects: [{ type: 'production_mult', target: 'materials', value: 2 }, { type: 'production_mult', target: 'energy', value: 2 }],
   },
   massProduction: {
@@ -245,7 +245,7 @@ export const techTree = {
     cost: { steel: 80, electronics: 50, labor: 60 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
-    description: 'Assembly line mastery — x3 steel and x3 labor output',
+    description: 'The assembly line was already drawn on the factory floor — we just traced the lines and added machines',
     effects: [{ type: 'production_mult', target: 'steel', value: 3 }, { type: 'production_mult', target: 'labor', value: 3 }],
   },
   electricalGrid: {
@@ -253,7 +253,7 @@ export const techTree = {
     cost: { electronics: 60, steel: 50, energy: 60 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
-    description: 'Nationwide electrical grid — +2 energy/s and +2 electronics/s',
+    description: 'Buried conduits carry current without resistance — superconductors from an age that should not have known the word',
     effects: [{ type: 'production_add', target: 'energy', value: 2.0 }, { type: 'production_add', target: 'electronics', value: 2.0 }],
   },
   neuralInterfaces: {
