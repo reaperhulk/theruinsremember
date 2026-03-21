@@ -100,10 +100,10 @@ export function purchaseUpgrade(state, upgradeId) {
   // Non-repeatable: can't buy again
   if (!isRepeatable && state.upgrades[upgradeId]) return null;
 
-  // Check prerequisites
-  for (const prereq of def.prerequisites) {
-    if (!state.upgrades[prereq]) return null;
-  }
+  // Check prerequisites (quantumTunneling allows skipping 1 unmet prereq)
+  const unmetPrereqs = def.prerequisites.filter(p => !state.upgrades[p]);
+  const hasQT = state.prestigeUpgrades?.quantumTunneling;
+  if (unmetPrereqs.length > (hasQT ? 1 : 0)) return null;
 
   // Get actual cost (scaled for repeatables, with prestige discounts)
   const cost = getUpgradeCost(state, upgradeId);
@@ -146,10 +146,10 @@ export function getAvailableUpgrades(state) {
     if (def.era > state.era) return false;
     // Non-repeatable: hide if purchased
     if (!def.repeatable && state.upgrades[def.id]) return false;
-    // Check prerequisites
-    for (const prereq of def.prerequisites) {
-      if (!state.upgrades[prereq]) return false;
-    }
+    // Check prerequisites (quantumTunneling allows skipping 1 unmet prereq)
+    const unmetPrereqs = def.prerequisites.filter(p => !state.upgrades[p]);
+    const hasQT = state.prestigeUpgrades?.quantumTunneling;
+    if (unmetPrereqs.length > (hasQT ? 1 : 0)) return false;
     // Check milestone requirements
     if (def.requireGems && (state.totalGems || 0) < def.requireGems) return false;
     if (def.requireTrades && (state.totalTrades || 0) < def.requireTrades) return false;

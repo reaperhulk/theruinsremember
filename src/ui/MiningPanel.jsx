@@ -24,7 +24,7 @@ export function MiningPanel({ state, onUpdate }) {
         result.eventLog = [...(result.eventLog || []), {
           message: `Gem found! +${formatNumber(gained)} materials!`,
           time: result.totalTime,
-        }].slice(-10);
+        }].slice(-20);
       }
       return result;
     });

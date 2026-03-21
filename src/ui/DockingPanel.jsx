@@ -1,8 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { attemptDock, getDockingInfo, getIndicatorPosition } from '../engine/docking.js';
+import { resources as resourceDefs } from '../data/resources.js';
+import { formatNumber } from './format.js';
 
 export function DockingPanel({ state, onUpdate }) {
   const [lastResult, setLastResult] = useState(null);
+  const [lastReward, setLastReward] = useState(null);
   const [position, setPosition] = useState(0);
   const [comboFlash, setComboFlash] = useState(false);
   const prevComboRef = useRef(state.dockingCombo || 0);
@@ -39,13 +42,44 @@ export function DockingPanel({ state, onUpdate }) {
   const cooldownRemaining = Math.max(0, 2 - (state.totalTime - lastDock));
   const onCooldown = cooldownRemaining > 0;
 
-  const handleDock = () => {
+  const handleDock = useCallback(() => {
     onUpdate(s => {
+      const before = {};
+      for (const [id, r] of Object.entries(s.resources)) {
+        before[id] = r.amount || 0;
+      }
       const { state: newState, result } = attemptDock(s, position);
-      if (result !== 'cooldown') setLastResult(result);
+      if (result !== 'cooldown') {
+        setLastResult(result);
+        if (result !== 'miss') {
+          const gained = {};
+          for (const [id, r] of Object.entries(newState.resources)) {
+            const diff = (r.amount || 0) - (before[id] || 0);
+            if (diff > 0.001) gained[id] = diff;
+          }
+          if (Object.keys(gained).length > 0) {
+            setLastReward(gained);
+            setTimeout(() => setLastReward(null), 2000);
+          }
+        } else {
+          setLastReward(null);
+        }
+      }
       return newState;
     });
-  };
+  }, [onUpdate, position]);
+
+  // Keyboard shortcut: Enter or 'd' to dock
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'Enter' || e.key === 'd' || e.key === 'D') {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        handleDock();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleDock]);
 
   const zoneLeft = (info.zoneCenter - info.zoneSize / 2) * 100;
   const zoneWidth = info.zoneSize * 100;
@@ -70,8 +104,15 @@ export function DockingPanel({ state, onUpdate }) {
           {lastResult === 'perfect' ? 'PERFECT DOCK!' : lastResult === 'good' ? 'Good dock!' : 'Missed... combo reset!'}
         </div>
       )}
+      {lastReward && (
+        <div className="dock-reward" style={{ fontSize: '0.8em', color: '#88dd88', margin: '4px 0' }}>
+          Gained: {Object.entries(lastReward).map(([id, amount], i) => (
+            <span key={id}>{i > 0 ? ', ' : ''}{resourceDefs[id]?.name || id} +{formatNumber(amount)}</span>
+          ))}
+        </div>
+      )}
       <button className="mine-btn" onClick={handleDock} disabled={onCooldown}>
-        {onCooldown ? `Wait ${cooldownRemaining.toFixed(1)}s` : 'Dock!'}
+        {onCooldown ? `Wait ${cooldownRemaining.toFixed(1)}s` : 'Dock! (d)'}
       </button>
       <p className="mining-hint">
         Hit green zone for fuel+infra | Perfect for exotic too | Combo up to x2

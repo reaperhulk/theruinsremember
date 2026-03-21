@@ -13,11 +13,12 @@ export function checkForEvent(state, dt, roll = Math.random()) {
 
   // Event Magnet prestige upgrade: 50% more events
   const hasEventMagnet = state.prestigeUpgrades && state.prestigeUpgrades.eventMagnet;
-  // Temporal Echo prestige upgrade: additional 50% more events (stacks with Event Magnet)
+  // Temporal Echo prestige upgrade: scales with prestige count (1.25x per prestige, capped at 3x)
   const hasTemporalEcho = state.prestigeUpgrades && state.prestigeUpgrades.temporalEcho;
+  const echoBonus = hasTemporalEcho ? Math.min(3, 1 + 0.25 * (state.prestigeCount || 1)) : 1;
   let eventChance = BASE_EVENT_CHANCE;
   if (hasEventMagnet) eventChance *= 1.5;
-  if (hasTemporalEcho) eventChance *= 1.5;
+  eventChance *= echoBonus;
 
   // Probability scales with dt so faster/slower ticks behave consistently
   const chance = 1 - Math.pow(1 - eventChance, dt);
@@ -97,7 +98,8 @@ function applyInstantEvent(state, event) {
 
 function applyTimedEvent(state, event) {
   const activeEffects = state.activeEffects || [];
-  const endsAt = state.totalTime + event.duration;
+  const startedAt = state.totalTime;
+  const endsAt = startedAt + event.duration;
 
   // For events with an effects array, convert to the internal effect format
   const effect = event.effect || (event.effects && event.effects.length > 0
@@ -108,7 +110,7 @@ function applyTimedEvent(state, event) {
     ...state,
     activeEffects: [
       ...activeEffects,
-      { id: event.id, endsAt, effect, description: event.description },
+      { id: event.id, startedAt, endsAt, effect, description: event.description },
     ],
   };
 }

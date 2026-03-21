@@ -67,6 +67,8 @@ export function getColonyBonus(state) {
 
   // Era scaling: colony bonuses increase with era
   const eraScale = 1 + (state.era - 5) * 0.5; // x1 at era 5, x3.5 at era 10
+  const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
+  const savantMult = hasSavant ? 1.5 : 1;
 
   const bonus = {};
   for (const focus of FOCUS_TYPES) {
@@ -74,7 +76,7 @@ export function getColonyBonus(state) {
     if (count > 0) {
       const focusBonus = FOCUS_BONUSES[focus];
       for (const [resource, rate] of Object.entries(focusBonus)) {
-        bonus[resource] = (bonus[resource] || 0) + count * rate * focusMult * eraScale;
+        bonus[resource] = (bonus[resource] || 0) + count * rate * focusMult * eraScale * savantMult;
       }
     }
   }

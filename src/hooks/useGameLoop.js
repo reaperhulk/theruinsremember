@@ -35,8 +35,9 @@ export function useGameLoop(initialState) {
         const elapsed = (now - parsed.lastSaved) / 1000;
         const migrated = migrateState(parsed);
         if (elapsed > 10) {
-          // Cap offline time at 24 hours
-          const offlineDt = Math.min(elapsed, 86400);
+          // Cap offline time at 24 hours (infinitePatience removes the cap)
+          const maxOffline = (parsed.prestigeUpgrades?.infinitePatience) ? Infinity : 86400;
+          const offlineDt = Math.min(elapsed, maxOffline);
           const before = migrated;
 
           // Process offline in chunks for proper event/achievement checking

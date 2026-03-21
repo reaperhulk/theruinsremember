@@ -57,6 +57,8 @@ export function attemptDock(state, position) {
   const comboMult = 1 + Math.min(combo, 5) * 0.2; // max x2 at 5 combo
   const hasDockingPro = state.prestigeUpgrades && state.prestigeUpgrades.dockingPro;
   const dockPrestigeMult = hasDockingPro ? 2 : 1;
+  const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
+  const savantMult = hasSavant ? 1.5 : 1;
 
   // Era scaling: later eras give proportionally more docking rewards
   const eraScale = Math.pow(1.5, Math.max(0, state.era - 4));
@@ -66,7 +68,7 @@ export function attemptDock(state, position) {
   for (const [resourceId, amount] of Object.entries(rewards)) {
     const r = newResources[resourceId];
     if (r && r.unlocked) {
-      const scaled = amount * state.prestigeMultiplier * comboMult * dockPrestigeMult * eraScale;
+      const scaled = amount * state.prestigeMultiplier * comboMult * dockPrestigeMult * eraScale * savantMult;
       newResources[resourceId] = { ...r, amount: r.amount + scaled };
     }
   }

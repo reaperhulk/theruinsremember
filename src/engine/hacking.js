@@ -49,9 +49,12 @@ export function submitHack(state, playerSequence) {
     const duration = hasHackMaster ? BONUS_DURATION * 2 : BONUS_DURATION;
     // Era scaling: hacks give bigger bonuses in later eras
     const eraScale = 1 + (state.era - 3) * 0.3;
-    const scaledMult = challenge.multiplier * Math.max(1, eraScale);
+    const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
+    const savantMult = hasSavant ? 1.5 : 1;
+    const scaledMult = challenge.multiplier * Math.max(1, eraScale) * savantMult;
     const effect = {
       id: `hack_${state.totalTime}`,
+      startedAt: state.totalTime,
       endsAt: state.totalTime + duration,
       description: `Hack Success: x${scaledMult.toFixed(1)} data & software`,
       effects: [

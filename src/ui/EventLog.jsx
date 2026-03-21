@@ -6,13 +6,11 @@ function formatTimeAgo(eventTime, currentTime) {
   return `${Math.floor(diff / 3600)}h ago`;
 }
 
-function getEventStyle(message) {
+function getEventStyle(entry) {
+  const message = typeof entry === 'string' ? entry : entry?.message;
   if (!message) return { icon: '*', color: '#888' };
+  if (entry?.isLore) return { icon: '\u270E', color: '#bb88ff' };
   if (message.startsWith('Achievement')) return { icon: '\u2605', color: '#66cc66' };
-  if (message.includes('ruins') || message.includes('ancient') || message.includes('Precursor') ||
-      message.includes('Ghost') || message.includes('derelict') || message.includes('Strange') ||
-      message.includes('buried') || message.includes('sealed') || message.includes('holographic'))
-    return { icon: '\u270E', color: '#bb88ff' };
   if (message.startsWith('ERA') || message.includes('era'))
     return { icon: '\u2191', color: '#ffcc44' };
   if (message.includes('Gem') || message.includes('gem'))
@@ -36,7 +34,8 @@ export function EventLog({ state }) {
         <div className="active-effects">
           {activeEffects.map((effect, i) => {
             const remaining = Math.max(0, effect.endsAt - state.totalTime);
-            const progress = remaining / 60; // assume max 60s
+            const duration = effect.duration || (effect.startedAt ? (effect.endsAt - effect.startedAt) : 60);
+            const progress = remaining / Math.max(duration, 1);
             return (
               <div key={i} className="active-effect">
                 <span className="effect-icon">*</span>
@@ -52,7 +51,7 @@ export function EventLog({ state }) {
       )}
       <div className="event-log">
         {log.slice(-8).reverse().map((entry, i) => {
-          const style = getEventStyle(entry.message);
+          const style = getEventStyle(entry);
           return (
             <div key={i} className="event-entry" style={{ opacity: 1 - i * 0.1 }}>
               <span style={{ color: style.color, marginRight: '4px', fontSize: '0.9em' }}>{style.icon}</span>

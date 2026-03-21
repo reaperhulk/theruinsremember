@@ -1838,3 +1838,12 @@ canvas:hover {
   0% { border-color: var(--weave-flash-color, #88dd88); box-shadow: 0 0 12px var(--weave-flash-color, #88dd88); }
   100% { border-color: #333; box-shadow: none; }
 }
+
+.resource-row.new-resource {
+  animation: new-resource-glow 2s ease-out;
+}
+
+@keyframes new-resource-glow {
+  0% { background: rgba(100, 200, 100, 0.25); }
+  100% { background: transparent; }
+}

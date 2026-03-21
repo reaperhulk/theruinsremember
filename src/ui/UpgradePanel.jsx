@@ -5,12 +5,9 @@ import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 import { formatNumber } from './format.js';
+import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
-const LORE_UPGRADE_IDS = new Set([
-  'precursorBeacon', 'deadStarAtlas', 'hollowDyson', 'echoBlueprint',
-  'galacticOssuary', 'convergenceCodex', 'universalTombstone',
-  'inevitabilityEngine', 'recursionScar', 'finalIteration',
-]);
+const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 
 function resourceName(id) {
   return resourceDefs[id]?.name || id;
@@ -141,7 +138,7 @@ export function UpgradePanel({ state, onUpdate }) {
           </span>
         )}
       </h2>
-      {filteredAvailable.some(u => LORE_UPGRADE_IDS.has(u.id)) && (
+      {filteredAvailable.some(u => LORE_UPGRADE_ID_SET.has(u.id)) && (
         <div className="text-hint" style={{ color: '#bb88ff', marginBottom: '4px' }}>
           Purple border = story upgrades — collected in Stats → Codex
         </div>
@@ -206,7 +203,7 @@ export function UpgradePanel({ state, onUpdate }) {
           return (
             <div key={upgrade.id} className="upgrade-row">
             <button
-              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''} ${LORE_UPGRADE_IDS.has(upgrade.id) ? 'lore-upgrade' : ''}`}
+              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''} ${LORE_UPGRADE_ID_SET.has(upgrade.id) ? 'lore-upgrade' : ''}`}
               disabled={!affordable}
               onClick={() => handlePurchase(upgrade.id)}
               title={`${upgrade.description}\nEffects: ${formatEffects(upgrade.effects)}`}
@@ -218,7 +215,7 @@ export function UpgradePanel({ state, onUpdate }) {
                 {upgrade.repeatable && <span className="repeatable-badge">repeatable</span>}
               </div>
               <div className="upgrade-cost"><CostDisplay cost={cost} state={state} /></div>
-              <div className="upgrade-desc" style={LORE_UPGRADE_IDS.has(upgrade.id) ? { color: '#998866', fontStyle: 'italic' } : undefined}>{upgrade.description}</div>
+              <div className="upgrade-desc" style={LORE_UPGRADE_ID_SET.has(upgrade.id) ? { color: '#998866', fontStyle: 'italic' } : undefined}>{upgrade.description}</div>
               <div className="upgrade-effects">
                 {upgrade.effects.map((e, i) => {
                   let label = '';

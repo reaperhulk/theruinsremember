@@ -127,7 +127,8 @@ export function tick(state, dt) {
       eventLog: [...(afterEvent.eventLog || []), {
         message: `${event.name}: ${event.description}`,
         time: afterEvent.totalTime,
-      }].slice(-10),
+        ...(event.isLore ? { isLore: true } : {}),
+      }].slice(-20),
     };
   } else {
     newState = afterEvent;
@@ -159,17 +160,17 @@ export function tick(state, dt) {
     }
   }
 
-  // Track total production for stats (every 30 ticks to reduce overhead)
-  if (newState.totalTicks % 30 === 0) {
+  // Track total production for stats
+  {
     let totalProduced = newState.totalResourcesProduced || 0;
-    for (const [id, rate] of Object.entries(rates)) {
-      if (rate > 0 && newState.resources[id]?.unlocked) totalProduced += rate * dt * 30;
-    }
-    // Track peak production rate
     const totalRate = Object.entries(rates).reduce((sum, [id, rate]) => {
       return sum + (rate > 0 && newState.resources[id]?.unlocked ? rate : 0);
     }, 0);
-    const peakRate = Math.max(newState.peakProductionRate || 0, totalRate);
+    totalProduced += totalRate * dt;
+    // Track peak production rate (every 30 ticks to reduce overhead)
+    const peakRate = newState.totalTicks % 30 === 0
+      ? Math.max(newState.peakProductionRate || 0, totalRate)
+      : (newState.peakProductionRate || 0);
     newState = { ...newState, totalResourcesProduced: totalProduced, peakProductionRate: peakRate };
   }
 
@@ -183,7 +184,7 @@ export function tick(state, dt) {
       eventLog: [...(newState.eventLog || []), {
         message: `ERA ${nextEra}: ${eraLabels[nextEra] || 'Unknown'} — New resources and upgrades unlocked!`,
         time: newState.totalTime,
-      }].slice(-10),
+      }].slice(-20),
     };
   }
 
@@ -229,7 +230,7 @@ export function tick(state, dt) {
             message: `Achievement: ${a.name} — ${a.description} (+${a.reward} prestige pts)`,
             time: afterAchievements.totalTime,
           })),
-        ].slice(-10),
+        ].slice(-20),
       };
     } else {
       newState = afterAchievements;
@@ -246,7 +247,7 @@ export function tick(state, dt) {
       eventLog: [...(newState.eventLog || []), {
         message: 'THE FINAL TRUTH: The ruins were yours. The cycle is you. And it begins again.',
         time: newState.totalTime,
-      }].slice(-10),
+      }].slice(-20),
     };
   }
 

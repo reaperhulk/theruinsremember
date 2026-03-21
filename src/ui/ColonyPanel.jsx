@@ -22,8 +22,9 @@ export function ColonyPanel({ state, onUpdate }) {
   const handleEvenSplit = () => {
     if (maxColonies < 3) return;
     const each = Math.floor(maxColonies / 3);
+    const remainder = maxColonies - each * 3;
     onUpdate(s => {
-      let st = assignColonies(s, 'growth', each);
+      let st = assignColonies(s, 'growth', each + remainder);
       st = st ? assignColonies(st, 'science', each) : s;
       st = st ? assignColonies(st, 'industry', each) : s;
       return st;
@@ -84,9 +85,12 @@ export function ColonyPanel({ state, onUpdate }) {
           Bonus: {Object.entries(bonus).map(([r, v]) => `${resourceName(r)} +${v.toFixed(1)}`).join(', ')}
         </div>
       )}
-      {strategy.type !== 'none' && (
-        <div className="colony-bonus" style={{ color: strategy.type === 'specialized' ? '#ffdd44' : strategy.type === 'diversified' ? '#88ccff' : '#888' }}>
-          Strategy: {strategy.type} (x{strategy.mult})
+      {totalAssigned > 0 && (
+        <div className="colony-bonus" style={{ color: strategy.type === 'specialized' ? '#ffdd44' : strategy.type === 'diversified' ? '#88ccff' : '#ff9966' }}>
+          {strategy.type === 'specialized' && `Strategy: Specialized (x2) — All colonies in one focus`}
+          {strategy.type === 'diversified' && `Strategy: Diversified (x1.25) — Colonies in all 3 focuses`}
+          {strategy.type === 'mixed' && `Strategy: Mixed — No bonus! Specialize or diversify`}
+          {strategy.type === 'none' && `Assign colonies to earn bonuses`}
         </div>
       )}
       {state.era >= 6 && (

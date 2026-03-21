@@ -29,22 +29,24 @@ export function TradingPanel({ state, onUpdate }) {
         eventLog: [...(result.eventLog || []), {
           message: `Traded ${formatNumber(Math.floor(cost))} ${fromDef.name} for ${formatNumber(amount)} ${toDef.name}`,
           time: result.totalTime,
-        }].slice(-10),
+        }].slice(-20),
       };
     });
   };
 
   // Quick trade suggestions — resources you have plenty of → resources you need
   const quickTrades = [];
+  const abundanceThreshold = 100 * Math.pow(10, Math.max(0, state.era - 2));
+  const needThreshold = 50 * Math.pow(10, Math.max(0, state.era - 2));
   const sortedByAmount = unlocked
     .map(r => ({ ...r, amount: state.resources[r.id]?.amount || 0, cap: state.resources[r.id]?.capMult || 1 }))
-    .filter(r => r.amount > 100)
+    .filter(r => r.amount > abundanceThreshold)
     .sort((a, b) => b.amount - a.amount);
 
   if (sortedByAmount.length >= 2) {
     const richest = sortedByAmount[0];
     const neediest = unlocked
-      .filter(r => r.id !== richest.id && (state.resources[r.id]?.amount || 0) < 50)
+      .filter(r => r.id !== richest.id && (state.resources[r.id]?.amount || 0) < needThreshold)
       .slice(0, 2);
     for (const need of neediest) {
       const r = getTradeRatio(richest.id, need.id);
@@ -74,7 +76,7 @@ export function TradingPanel({ state, onUpdate }) {
                     eventLog: [...(result.eventLog || []), {
                       message: `Quick traded ${Math.floor(getCost)} ${qt.from.def.name} → ${tradeAmount} ${qt.to.def.name}`,
                       time: result.totalTime,
-                    }].slice(-10),
+                    }].slice(-20),
                   };
                 })}
               >

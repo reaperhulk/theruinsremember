@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
 import { getEffectiveRate, getEffectiveCap, getNetRate, gather } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
@@ -12,6 +12,8 @@ export function ResourcePanel({ state, onUpdate }) {
   const [autoCollapse, setAutoCollapse] = useState(true);
   const [floats, setFloats] = useState([]);
   const [expandedResource, setExpandedResource] = useState(null);
+  const seenResourcesRef = useRef(new Set());
+  const [newResources, setNewResources] = useState(new Set());
 
   const handleGather = useCallback((resourceId, amount) => {
     onUpdate(s => gather(s, resourceId));
@@ -19,6 +21,31 @@ export function ResourcePanel({ state, onUpdate }) {
     setFloats(f => [...f, { id, text: `+${amount > 1 ? formatNumber(amount) : '1'}`, resourceId }]);
     setTimeout(() => setFloats(f => f.filter(fl => fl.id !== id)), 800);
   }, [onUpdate]);
+
+  // Track newly appearing resources
+  useEffect(() => {
+    const currentIds = Object.entries(state.resources)
+      .filter(([, r]) => r.unlocked)
+      .map(([id]) => id);
+    const fresh = new Set();
+    for (const id of currentIds) {
+      if (!seenResourcesRef.current.has(id)) {
+        fresh.add(id);
+        seenResourcesRef.current.add(id);
+      }
+    }
+    if (fresh.size > 0) {
+      setNewResources(prev => new Set([...prev, ...fresh]));
+      // Clear "new" status after animation completes
+      setTimeout(() => {
+        setNewResources(prev => {
+          const next = new Set(prev);
+          for (const id of fresh) next.delete(id);
+          return next;
+        });
+      }, 2000);
+    }
+  }, [state.resources]);
 
   const unlockedResources = Object.entries(state.resources)
     .filter(([, r]) => r.unlocked)
@@ -81,13 +108,13 @@ export function ResourcePanel({ state, onUpdate }) {
                   // Consumption info
                   if (r.id === 'food' && r.rate > 0) tooltipParts.push(`Consumed by: labor (0.3/labor/s)`);
                   if (r.id === 'energy') tooltipParts.push(`Consumed by: electronics (0.2/elec/s)`);
-                  if (r.id === 'rocketFuel' && state.era >= 4) tooltipParts.push(`Consumed by: orbital infra (0.5/orbital/s)`);
+                  if (r.id === 'rocketFuel' && state.era >= 4) tooltipParts.push(`Consumed by: orbital infra (0.3/orbital/s)`);
                   tooltipParts.push(`Effective: ${formatNumber(r.rate)}/s`);
                   if (r.cap > 0) tooltipParts.push(`Cap: ${formatNumber(r.cap)}`);
                   const tooltip = tooltipParts.join('\n');
                   return (
                     <div key={r.id} className={`resource-row-wrapper`}>
-                    <div className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0)) ? 'consuming' : ''}`} title={tooltip}>
+                    <div className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0)) ? 'consuming' : ''}`} title={tooltip}>
                       <span className="resource-name" style={{ cursor: 'pointer', textDecoration: expandedResource === r.id ? 'underline' : 'none', borderBottom: expandedResource === r.id ? 'none' : '1px dotted #556' }} onClick={() => setExpandedResource(expandedResource === r.id ? null : r.id)}>
                         {r.def?.name || r.id}
                       </span>

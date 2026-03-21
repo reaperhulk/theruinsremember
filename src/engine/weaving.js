@@ -45,15 +45,21 @@ export function getWeavingStats(state) {
 export function drawFragment(state, roll = Math.random()) {
   if (state.era < 8) return { state: null, fragment: null };
 
-  // Check cost
+  // Master Weaver prestige upgrade: halve fragment draw cost
+  const cost = {};
   for (const [resourceId, amount] of Object.entries(WEAVE_COST)) {
+    cost[resourceId] = (state.prestigeUpgrades?.masterWeaver) ? Math.ceil(amount / 2) : amount;
+  }
+
+  // Check cost
+  for (const [resourceId, amount] of Object.entries(cost)) {
     const r = state.resources[resourceId];
     if (!r || r.amount < amount) return { state: null, fragment: null };
   }
 
   // Spend cost
   const newResources = { ...state.resources };
-  for (const [resourceId, amount] of Object.entries(WEAVE_COST)) {
+  for (const [resourceId, amount] of Object.entries(cost)) {
     newResources[resourceId] = {
       ...newResources[resourceId],
       amount: newResources[resourceId].amount - amount,
@@ -126,9 +132,12 @@ export function resolveWeave(state) {
   // Apply bonus as timed effect (era-scaled)
   const bonus = TYPE_BONUSES[matchType];
   const eraScale = 1 + (state.era - 8) * 0.5; // x1 at era 8, x2 at era 10
-  const effectMult = bonus.mult * comboMult * Math.max(1, eraScale);
+  const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
+  const savantMult = hasSavant ? 1.5 : 1;
+  const effectMult = bonus.mult * comboMult * Math.max(1, eraScale) * savantMult;
   const effect = {
     id: `weave_${matchType}_${state.totalTime}`,
+    startedAt: state.totalTime,
     endsAt: state.totalTime + BONUS_DURATION,
     description: `Reality Weave: x${effectMult.toFixed(1)} ${bonus.resource}`,
     effect: { resourceId: bonus.resource, rateMultBonus: effectMult },

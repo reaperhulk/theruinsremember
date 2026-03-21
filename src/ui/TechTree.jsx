@@ -57,6 +57,7 @@ function getAffordProgress(state, cost) {
 
 export function TechTree({ state, onUpdate }) {
   const [flashId, setFlashId] = useState(null);
+  const [showUnlocked, setShowUnlocked] = useState(false);
   const flashTimerRef = useRef(null);
   const available = getAvailableTech(state);
   const unlocked = Object.keys(state.tech || {});
@@ -72,10 +73,29 @@ export function TechTree({ state, onUpdate }) {
   // Show unlocked techs count
   const unlockedCount = unlocked.length;
 
+  const affordableTechs = available.filter(t => canAfford(state, t.cost));
+
   if (available.length === 0) {
     return (
       <div className="panel tech-panel">
-        <h2>Technology (0 available){unlockedCount > 0 ? ` — ${unlockedCount} done` : ''}</h2>
+        <h2>Technology (0 available){unlockedCount > 0 && (
+          <span className="toggle-purchased" onClick={() => setShowUnlocked(!showUnlocked)}>
+            {showUnlocked ? ' (hide done)' : ` — ${unlockedCount} done`}
+          </span>
+        )}</h2>
+        {showUnlocked && unlocked.length > 0 && (
+          <div className="purchased-list">
+            {unlocked.map(id => {
+              const tech = techTree[id];
+              return tech ? (
+                <div key={id} className="purchased-upgrade">
+                  <span className="purchased-name">{tech.name}</span>
+                  <span className="purchased-desc">{tech.description}</span>
+                </div>
+              ) : null;
+            })}
+          </div>
+        )}
         <p className="empty-message">No research available</p>
       </div>
     );
@@ -83,7 +103,39 @@ export function TechTree({ state, onUpdate }) {
 
   return (
     <div className="panel tech-panel">
-      <h2>Technology{available.length > 0 ? ` (${available.length} available)` : ''}{unlockedCount > 0 ? ` — ${unlockedCount} done` : ''}</h2>
+      <h2>Technology{available.length > 0 ? ` (${available.length} available)` : ''}{unlockedCount > 0 && (
+          <span className="toggle-purchased" onClick={() => setShowUnlocked(!showUnlocked)}>
+            {showUnlocked ? ' (hide done)' : ` — ${unlockedCount} done`}
+          </span>
+        )}</h2>
+      {showUnlocked && unlocked.length > 0 && (
+        <div className="purchased-list">
+          {unlocked.map(id => {
+            const tech = techTree[id];
+            return tech ? (
+              <div key={id} className="purchased-upgrade">
+                <span className="purchased-name">{tech.name}</span>
+                <span className="purchased-desc">{tech.description}</span>
+              </div>
+            ) : null;
+          })}
+        </div>
+      )}
+      {affordableTechs.length >= 2 && (
+        <button
+          className="buy-all-btn"
+          onClick={() => onUpdate(s => {
+            let current = s;
+            for (const tech of available.filter(t => canAfford(current, t.cost))) {
+              const next = unlockTech(current, tech.id);
+              if (next) current = next;
+            }
+            return current;
+          })}
+        >
+          Research All Affordable ({affordableTechs.length})
+        </button>
+      )}
       <div className="tech-list">
         {available.sort((a, b) => (b.grantsEra ? 1 : 0) - (a.grantsEra ? 1 : 0)).map(tech => {
           const affordable = canAfford(state, tech.cost);

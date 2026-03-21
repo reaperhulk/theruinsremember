@@ -6,12 +6,7 @@ import { getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { formatTime, formatNumber } from './format.js';
-
-const LORE_UPGRADE_IDS = [
-  'precursorBeacon', 'deadStarAtlas', 'hollowDyson', 'echoBlueprint',
-  'galacticOssuary', 'convergenceCodex', 'universalTombstone', 'inevitabilityEngine',
-  'recursionScar', 'finalIteration',
-];
+import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
 export function StatsPanel({ state }) {
   const [showCodexOverride, setShowCodexOverride] = useState(null);
@@ -25,14 +20,7 @@ export function StatsPanel({ state }) {
     .map(id => upgradeDefs[id])
     .filter(Boolean);
   // Lore events from event log
-  const loreEvents = (state.eventLog || [])
-    .filter(e => e.message && (
-      e.message.includes('ruins') || e.message.includes('ancient') || e.message.includes('Precursor') ||
-      e.message.includes('Ghost') || e.message.includes('derelict') || e.message.includes('Strange') ||
-      e.message.includes('buried') || e.message.includes('sealed') || e.message.includes('holographic') ||
-      e.message.includes('tally') || e.message.includes('star map') || e.message.includes('photograph') ||
-      e.message.includes('foundation') || e.message.includes('geometric') || e.message.includes('wreckage')
-    ));
+  const loreEvents = (state.eventLog || []).filter(e => e.isLore);
 
   return (
     <div className="panel stats-panel">
@@ -46,12 +34,10 @@ export function StatsPanel({ state }) {
           <span>Play Time</span>
           <span>{formatTime(state.totalTime)}</span>
         </div>
-        {state.bestEraTimes && state.bestEraTimes[state.era] && (
-          <div className="stat-row">
-            <span>Time in Era</span>
-            <span>{formatTime(state.totalTime - state.bestEraTimes[state.era])}</span>
-          </div>
-        )}
+        <div className="stat-row">
+          <span>Time in Era</span>
+          <span>{formatTime(Math.max(0, (state.totalTime || 0) - (state.eraStartTime || 0)))}</span>
+        </div>
         <div className="stat-row">
           <span>Era Upgrades</span>
           <span>{countEraUpgrades(state, state.era)}</span>

@@ -105,6 +105,8 @@ export function getRouteBonus(state) {
   if (state.era < 6) return {};
   const routes = getRoutes(state);
   const bonus = {};
+  const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
+  const savantMult = hasSavant ? 1.5 : 1;
 
   // Count connections per system for network bonus
   const connections = {};
@@ -135,7 +137,7 @@ export function getRouteBonus(state) {
 
     // Each route gives half the combined bonus, scaled by distance and network
     for (const [resource, amount] of Object.entries(combined)) {
-      bonus[resource] = (bonus[resource] || 0) + amount * 0.5 * distMult * networkMult;
+      bonus[resource] = (bonus[resource] || 0) + amount * 0.5 * distMult * networkMult * savantMult;
     }
   }
 

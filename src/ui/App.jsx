@@ -27,6 +27,7 @@ import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
 import { canAfford } from '../engine/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
+import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
 const initialState = createInitialState();
 
@@ -123,7 +124,7 @@ export function App() {
           newState.eventLog = [...(newState.eventLog || []), {
             message: 'Gem found! Massive material bonus!',
             time: newState.totalTime,
-          }].slice(-10);
+          }].slice(-20);
         }
         return newState;
       });
@@ -281,9 +282,8 @@ export function App() {
         {state.prestigeMultiplier > 1 && ` | x${state.prestigeMultiplier.toFixed(1)}`}
         {` | ${Math.floor(Object.keys(state.upgrades || {}).length / Object.keys(upgradeDefs).length * 100)}% complete`}
         {(() => {
-          const LORE_IDS = ['precursorBeacon', 'deadStarAtlas', 'hollowDyson', 'echoBlueprint', 'galacticOssuary', 'convergenceCodex', 'universalTombstone', 'inevitabilityEngine', 'recursionScar', 'finalIteration'];
-          const found = LORE_IDS.filter(id => state.upgrades?.[id]).length;
-          return found > 0 ? <span style={{ color: '#998866' }}>{` | Codex: ${found}/${LORE_IDS.length}`}</span> : null;
+          const found = LORE_UPGRADE_IDS.filter(id => state.upgrades?.[id]).length;
+          return found > 0 ? <span style={{ color: '#998866' }}>{` | Codex: ${found}/${LORE_UPGRADE_IDS.length}`}</span> : null;
         })()}
       </footer>
     </div>
