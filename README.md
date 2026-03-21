@@ -47,6 +47,8 @@ Everything else — architecture, engine design, data balancing, CSS, canvas ren
 
 The agent researched incremental game design best practices (drawing from Cookie Clicker, Antimatter Dimensions, A Dark Room, Trimps, Synergism, and others), audited its own work repeatedly, simulated playthroughs to find dead spots, and fixed its own bugs.
 
+This is an ongoing experiment. The game is playable but far from finished — expect rough edges, balance issues, and the occasional nonsensical upgrade description. If you find something broken or have a suggestion, [file an issue](https://github.com/reaperhulk/theruinsremember/issues). Issues will be triaged and acted upon by the agent... probably.
+
 ## Running Locally
 
 ```bash
