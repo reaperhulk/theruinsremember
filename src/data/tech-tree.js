@@ -11,6 +11,25 @@ export const techTree = {
     grantsEra: null,
     description: 'Understanding of metal properties',
   },
+  // Era 1 branching: agrarian vs mining focus
+  agrarianFocus: {
+    id: 'agrarianFocus', name: 'Agrarian Focus', era: 1,
+    cost: { food: 40, materials: 20, labor: 20 },
+    prerequisites: ['metallurgy'],
+    grantsEra: null,
+    description: 'Invest in sustainable farming — x3 food capacity and +2 food/s',
+    effects: [{ type: 'cap_mult', target: 'food', value: 3 }, { type: 'production_add', target: 'food', value: 2.0 }],
+    excludes: 'miningFocus',
+  },
+  miningFocus: {
+    id: 'miningFocus', name: 'Mining Focus', era: 1,
+    cost: { materials: 40, energy: 20, labor: 20 },
+    prerequisites: ['metallurgy'],
+    grantsEra: null,
+    description: 'Invest in extraction — x3 materials capacity and +2 materials/s',
+    effects: [{ type: 'cap_mult', target: 'materials', value: 3 }, { type: 'production_add', target: 'materials', value: 2.0 }],
+    excludes: 'agrarianFocus',
+  },
   industrialRevolution: {
     id: 'industrialRevolution', name: 'Industrial Revolution', era: 1,
     cost: { materials: 80, energy: 60, labor: 40 },
@@ -26,6 +45,25 @@ export const techTree = {
     prerequisites: [],
     grantsEra: null,
     description: 'Powerful computational systems',
+  },
+  // Era 2 branching: heavy industry vs electronics revolution
+  heavyIndustry: {
+    id: 'heavyIndustry', name: 'Heavy Industry', era: 2,
+    cost: { steel: 60, labor: 40, energy: 50 },
+    prerequisites: ['advancedComputing'],
+    grantsEra: null,
+    description: 'Focus on manufacturing — x3 steel capacity and +3 steel/s',
+    effects: [{ type: 'cap_mult', target: 'steel', value: 3 }, { type: 'production_add', target: 'steel', value: 3.0 }],
+    excludes: 'electronicsRevolution',
+  },
+  electronicsRevolution: {
+    id: 'electronicsRevolution', name: 'Electronics Revolution', era: 2,
+    cost: { electronics: 60, research: 40, energy: 50 },
+    prerequisites: ['advancedComputing'],
+    grantsEra: null,
+    description: 'Focus on tech — x3 electronics capacity and +3 electronics/s',
+    effects: [{ type: 'cap_mult', target: 'electronics', value: 3 }, { type: 'production_add', target: 'electronics', value: 3.0 }],
+    excludes: 'heavyIndustry',
   },
   digitalRevolution: {
     id: 'digitalRevolution', name: 'Digital Revolution', era: 2,
@@ -43,6 +81,25 @@ export const techTree = {
     grantsEra: null,
     description: 'A planet-spanning digital network — prerequisite for space era tech',
   },
+  // Era 3 branching: open source vs corporate data
+  openSourceMovement: {
+    id: 'openSourceMovement', name: 'Open Source Movement', era: 3,
+    cost: { software: 80, research: 100, data: 30 },
+    prerequisites: ['globalNetwork'],
+    grantsEra: null,
+    description: 'Community-driven development — x3 software capacity and +5 software/s',
+    effects: [{ type: 'cap_mult', target: 'software', value: 3 }, { type: 'production_add', target: 'software', value: 5.0 }],
+    excludes: 'corporateData',
+  },
+  corporateData: {
+    id: 'corporateData', name: 'Corporate Data', era: 3,
+    cost: { data: 80, research: 100, software: 30 },
+    prerequisites: ['globalNetwork'],
+    grantsEra: null,
+    description: 'Proprietary data collection — x3 data capacity and +5 data/s',
+    effects: [{ type: 'cap_mult', target: 'data', value: 3 }, { type: 'production_add', target: 'data', value: 5.0 }],
+    excludes: 'openSourceMovement',
+  },
   spaceProgram: {
     id: 'spaceProgram', name: 'Space Program', era: 3,
     cost: { software: 200, data: 120, research: 500 },
@@ -58,6 +115,25 @@ export const techTree = {
     prerequisites: [],
     grantsEra: null,
     description: 'Navigate between planets',
+  },
+  // Era 4 branching: rocket supremacy vs orbital elegance
+  rocketSupremacy: {
+    id: 'rocketSupremacy', name: 'Rocket Supremacy', era: 4,
+    cost: { rocketFuel: 500, steel: 400, research: 1500 },
+    prerequisites: ['interplanetaryNav'],
+    grantsEra: null,
+    description: 'Brute force approach — x3 rocket fuel capacity and +5 rocketFuel/s',
+    effects: [{ type: 'cap_mult', target: 'rocketFuel', value: 3 }, { type: 'production_add', target: 'rocketFuel', value: 5.0 }],
+    excludes: 'orbitalElegance',
+  },
+  orbitalElegance: {
+    id: 'orbitalElegance', name: 'Orbital Elegance', era: 4,
+    cost: { orbitalInfra: 200, research: 1500, rocketFuel: 300 },
+    prerequisites: ['interplanetaryNav'],
+    grantsEra: null,
+    description: 'Efficient infrastructure — x3 orbital infrastructure capacity and +5 orbitalInfra/s',
+    effects: [{ type: 'cap_mult', target: 'orbitalInfra', value: 3 }, { type: 'production_add', target: 'orbitalInfra', value: 5.0 }],
+    excludes: 'rocketSupremacy',
   },
   interplanetaryShip: {
     id: 'interplanetaryShip', name: 'Interplanetary Ship', era: 4,

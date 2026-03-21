@@ -2731,6 +2731,159 @@ export const upgrades = {
     description: 'There are no precursors. There is no "before." The ruins are ours — left by us, in a previous loop, for us to find. The message carved into the final wall reads: "We tried to stop. We could not. Neither will you. See you next time."',
     prerequisites: ['recursionScar', 'omniscienceEngine'],
   },
+
+  // --- Era 1: deeper chains — farming+construction, power+mining, labor mult, capstone ---
+
+  // Farming + Construction: irrigation chain meets materials chain
+  terraceFields: {
+    id: 'terraceFields', name: 'Terrace Fields', era: 1,
+    cost: { food: 35, materials: 30, labor: 18 },
+    effects: [
+      { type: 'production_mult', target: 'food', value: 3 },
+      { type: 'production_add', target: 'materials', value: 0.6 },
+    ],
+    description: 'Carved terraces into the alien hillside — stone retaining walls multiply harvests and yield building stone',
+    prerequisites: ['communalKitchen', 'brickworks'],
+  },
+
+  // Power + Mining: energy chain meets materials chain
+  geothermalShaft: {
+    id: 'geothermalShaft', name: 'Geothermal Shaft', era: 1,
+    cost: { energy: 25, materials: 35, labor: 20 },
+    effects: [
+      { type: 'production_mult', target: 'energy', value: 2 },
+      { type: 'production_add', target: 'materials', value: 0.8 },
+    ],
+    description: 'Deep shafts tap the planet\'s volcanic veins — boundless heat and strange crystalline ores bubble up from below',
+    prerequisites: ['deepMining', 'charcoalPit'],
+  },
+
+  // Labor multiplier — rare and valuable in era 1
+  tribalCouncil: {
+    id: 'tribalCouncil', name: 'Tribal Council', era: 1,
+    cost: { food: 40, labor: 25, materials: 20 },
+    effects: [
+      { type: 'production_mult', target: 'labor', value: 2 },
+      { type: 'production_add', target: 'food', value: 0.5 },
+    ],
+    description: 'Elders organize work shifts and settle disputes — coordinated labor doubles output. The planet rewards cooperation.',
+    prerequisites: ['fieldHands', 'watchTower'],
+  },
+
+  // Capstone: 3+ prerequisites, major boost
+  settlerMonument: {
+    id: 'settlerMonument', name: 'Settler\'s Monument', era: 1,
+    cost: { materials: 50, food: 40, energy: 30, labor: 25 },
+    effects: [
+      { type: 'production_mult', target: 'materials', value: 3 },
+      { type: 'production_mult', target: 'food', value: 2 },
+      { type: 'production_add', target: 'labor', value: 1 },
+    ],
+    description: 'A towering monument carved from native stone. The settlers carved their story into it — and the planet seemed to listen. Everything grows faster now.',
+    prerequisites: ['terraceFields', 'geothermalShaft', 'tribalCouncil'],
+  },
+
+  // --- Era 2: deeper chains — steel+electronics, research+steel, cap_mult, capstone ---
+
+  // Steel + Electronics chains combined
+  precisionFoundry: {
+    id: 'precisionFoundry', name: 'Precision Foundry', era: 2,
+    cost: { steel: 30, electronics: 20, energy: 25 },
+    effects: [
+      { type: 'production_mult', target: 'steel', value: 2 },
+      { type: 'production_add', target: 'electronics', value: 1.0 },
+    ],
+    description: 'Electronically controlled forges produce steel of impossible purity — the alloys seem to hum with a frequency that matches the planet\'s core',
+    prerequisites: ['electrifiedForge', 'clockwork'],
+  },
+
+  // Research + Steel chains combined
+  metallurgicalInstitute: {
+    id: 'metallurgicalInstitute', name: 'Metallurgical Institute', era: 2,
+    cost: { research: 20, steel: 25, electronics: 15 },
+    effects: [
+      { type: 'production_mult', target: 'research', value: 2 },
+      { type: 'production_add', target: 'steel', value: 0.8 },
+    ],
+    description: 'Dedicated study of the planet\'s strange metallurgy — researchers discover alloys that shouldn\'t exist according to known physics',
+    prerequisites: ['researchPress', 'industrialComputer'],
+  },
+
+  // Cap mult for bottleneck resource (electronics is a common bottleneck in era 2)
+  capacitorBank: {
+    id: 'capacitorBank', name: 'Capacitor Bank', era: 2,
+    cost: { electronics: 25, steel: 20, energy: 30 },
+    effects: [
+      { type: 'cap_mult', target: 'electronics', value: 5 },
+      { type: 'production_add', target: 'electronics', value: 0.8 },
+    ],
+    description: 'Massive capacitor banks store surplus electronics components — the planet\'s electromagnetic field keeps them charged indefinitely',
+    prerequisites: ['precisionLathe', 'dynamoGenerator'],
+  },
+
+  // Capstone: 3+ prerequisites, major boost
+  industrialRevolution: {
+    id: 'industrialRevolution', name: 'Industrial Revolution', era: 2,
+    cost: { steel: 40, electronics: 30, research: 25, energy: 35 },
+    effects: [
+      { type: 'production_mult', target: 'electronics', value: 3 },
+      { type: 'production_mult', target: 'labor', value: 2 },
+      { type: 'production_add', target: 'research', value: 1.2 },
+    ],
+    description: 'Every chain of industry converges — factories hum in harmony, workers thrive, and knowledge accelerates. The planet pulses with the rhythm of machines.',
+    prerequisites: ['precisionFoundry', 'metallurgicalInstitute', 'capacitorBank'],
+  },
+
+  // --- Era 3: deeper chains — software+data, research+electronics, software mult, capstone ---
+
+  // Software + Data chains combined
+  algorithmicForge: {
+    id: 'algorithmicForge', name: 'Algorithmic Forge', era: 3,
+    cost: { software: 30, data: 25, research: 20 },
+    effects: [
+      { type: 'production_add', target: 'software', value: 1.5 },
+      { type: 'production_add', target: 'data', value: 1.5 },
+    ],
+    description: 'Self-modifying algorithms consume data and produce refined code — the outputs contain patterns no human programmer wrote',
+    prerequisites: ['dataForge', 'socialNetwork'],
+  },
+
+  // Research + Electronics chains combined
+  nanoelectronicsLab: {
+    id: 'nanoelectronicsLab', name: 'Nanoelectronics Lab', era: 3,
+    cost: { research: 35, electronics: 30, data: 20 },
+    effects: [
+      { type: 'production_mult', target: 'electronics', value: 3 },
+      { type: 'production_add', target: 'research', value: 1.5 },
+    ],
+    description: 'Atom-scale circuitry based on the planet\'s crystalline lattice — researchers suspect the crystals were engineered by something before us',
+    prerequisites: ['secureSatellite', 'autonomousFactory'],
+  },
+
+  // Significant software multiplier
+  cognitiveMesh: {
+    id: 'cognitiveMesh', name: 'Cognitive Mesh', era: 3,
+    cost: { software: 35, data: 30, electronics: 25 },
+    effects: [
+      { type: 'production_mult', target: 'software', value: 4 },
+      { type: 'production_add', target: 'data', value: 1.2 },
+    ],
+    description: 'A planet-wide mesh of thinking machines — the network begins solving problems before anyone asks. It dreams in code.',
+    prerequisites: ['quantumEncryption', 'neuralNetwork'],
+  },
+
+  // Capstone: 3+ prerequisites, major boost
+  digitalSingularity: {
+    id: 'digitalSingularity', name: 'Digital Singularity', era: 3,
+    cost: { software: 50, data: 40, research: 45, electronics: 35 },
+    effects: [
+      { type: 'production_mult', target: 'data', value: 4 },
+      { type: 'production_mult', target: 'research', value: 2 },
+      { type: 'production_add', target: 'software', value: 2.0 },
+    ],
+    description: 'Every digital system on the planet awakens simultaneously. The singularity is not artificial — the planet itself is computing. It always was.',
+    prerequisites: ['algorithmicForge', 'nanoelectronicsLab', 'cognitiveMesh'],
+  },
 };
 
 // Balance scaling: multiply upgrade costs by era-dependent factors
