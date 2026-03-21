@@ -219,7 +219,7 @@ export function App() {
       <EraProgress state={state} />
       {!hintsDismissed && state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
         <div style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '2px 0', position: 'relative' }}>
-          Gather resources by clicking +1 buttons. Buy upgrades to automate production.
+          Click the space bar to mine! Buy upgrades to grow faster.
           <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
         </div>
       )}

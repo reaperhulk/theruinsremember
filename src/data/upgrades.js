@@ -3070,6 +3070,78 @@ export const upgrades = {
     description: 'Every thread converges. Every echo resolves. The final truth assembles itself from the ruins of a thousand timelines: you are the universe experiencing itself, again and again, forever. There is no ending. There is only the next beginning.',
     prerequisites: ['echoForge', 'realityCompiler'],
   },
+
+  // --- Mechanic upgrades: change HOW you play, not just production numbers ---
+
+  // Era 1 mechanics
+  scavengerInstinct: {
+    id: 'scavengerInstinct', name: 'Scavenger Instinct', era: 1,
+    cost: { labor: 25, materials: 20, food: 15 },
+    effects: [{ type: 'production_add', target: 'materials', value: 0.5 }],
+    description: 'Every click on any resource also scavenges +1 of every other unlocked resource',
+    prerequisites: ['tools', 'housing'],
+    mechanic: 'clickAll',
+  },
+  surplusExchange: {
+    id: 'surplusExchange', name: 'Surplus Exchange', era: 1,
+    cost: { food: 30, materials: 25, labor: 20 },
+    effects: [{ type: 'production_add', target: 'food', value: 0.5 }],
+    description: 'Resources at cap slowly convert to the resource you have least of — nothing goes to waste',
+    prerequisites: ['storehouse', 'animalHusbandry'],
+    mechanic: 'surplusConvert',
+  },
+  communalEffort: {
+    id: 'communalEffort', name: 'Communal Effort', era: 1,
+    cost: { labor: 30, food: 20, energy: 15 },
+    effects: [{ type: 'production_mult', target: 'labor', value: 1.5 }],
+    description: 'Workers inspire each other. The more upgrade types you own, the faster everything produces (+1% per upgrade)',
+    prerequisites: ['housing', 'expandWorkforce'],
+    mechanic: 'upgradeCountBonus',
+  },
+
+  // Era 2 mechanics
+  overclockProtocol: {
+    id: 'overclockProtocol', name: 'Overclock Protocol', era: 2,
+    cost: { electronics: 30, energy: 40, steel: 20 },
+    effects: [{ type: 'production_add', target: 'electronics', value: 1.0 }],
+    description: 'Push machines past their limits. All production doubles for 10 seconds every 60 seconds, then returns to normal',
+    prerequisites: ['assemblyLines', 'powerGrid'],
+    mechanic: 'productionPulse',
+  },
+  resourcePipeline: {
+    id: 'resourcePipeline', name: 'Resource Pipeline', era: 2,
+    cost: { steel: 40, electronics: 25, research: 20 },
+    effects: [{ type: 'production_add', target: 'research', value: 0.8 }],
+    description: 'Connect all resource streams. Whenever a resource hits its cap, overflow converts to research at 10% efficiency',
+    prerequisites: ['computingLab', 'steelForge'],
+    mechanic: 'capOverflow',
+  },
+  chainReaction: {
+    id: 'chainReaction', name: 'Chain Reaction', era: 2,
+    cost: { research: 30, electronics: 20, energy: 30 },
+    effects: [{ type: 'production_add', target: 'research', value: 1.0 }],
+    description: 'Every upgrade purchased triggers a small burst of all resources',
+    prerequisites: ['computingLab'],
+    mechanic: 'purchaseBurst',
+  },
+
+  // Era 3 mechanics
+  recursiveOptimizer: {
+    id: 'recursiveOptimizer', name: 'Recursive Optimizer', era: 3,
+    cost: { software: 60, data: 40, research: 80 },
+    effects: [{ type: 'production_mult', target: 'software', value: 1.5 }],
+    description: 'Software optimizes its own production. Each era you advance multiplies all production by an additional 1.1x',
+    prerequisites: ['aiResearch', 'openSource'],
+    mechanic: 'eraCompounding',
+  },
+  dataMining: {
+    id: 'dataMining', name: 'Data Mining', era: 3,
+    cost: { data: 50, software: 30, electronics: 40 },
+    effects: [{ type: 'production_add', target: 'data', value: 1.5 }],
+    description: 'Mine the ruins\' ancient databases. Clicking the canvas has a 20% chance to find a data cache worth 30 seconds of production',
+    prerequisites: ['cloudComputing', 'cyberSecurity'],
+    mechanic: 'canvasDataCache',
+  },
 };
 
 // Balance scaling: multiply upgrade costs by era-dependent factors

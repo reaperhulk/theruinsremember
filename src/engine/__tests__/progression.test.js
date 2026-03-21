@@ -153,8 +153,8 @@ describe('progression integration', () => {
 
     // Tick 10 seconds
     state = tick(state, 10);
-    // Food has baseRate 0.5, so should gain ~5
-    expect(state.resources.food.amount).toBeCloseTo(initialFood + 5, 0);
+    // Food has baseRate 1.5, so should gain ~15
+    expect(state.resources.food.amount).toBeCloseTo(initialFood + 15, 0);
   });
 
   it('events fire in era 3+', () => {

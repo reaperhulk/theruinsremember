@@ -5,10 +5,10 @@ import { createInitialState } from '../state.js';
 describe('tick', () => {
   it('advances resources by their production rates', () => {
     const state = createInitialState();
-    // Food has baseRate 0.5, rateMult 1
+    // Food has baseRate 1.5, rateMult 1
     const before = state.resources.food.amount;
     const after = tick(state, 1);
-    expect(after.resources.food.amount).toBeCloseTo(before + 0.5, 5);
+    expect(after.resources.food.amount).toBeCloseTo(before + 1.5, 5);
   });
 
   it('enforces resource caps on production', () => {
@@ -38,7 +38,7 @@ describe('tick', () => {
     const state = createInitialState();
     state.prestigeMultiplier = 3;
     const after = tick(state, 1);
-    // Food: baseRate 0.5 * rateMult 1 * prestige 3 = 1.5/s
-    expect(after.resources.food.amount).toBeCloseTo(1.5, 5);
+    // Food: baseRate 1.5 * rateMult 1 * prestige 3 = 4.5/s
+    expect(after.resources.food.amount).toBeCloseTo(4.5, 5);
   });
 });

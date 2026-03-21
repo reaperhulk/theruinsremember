@@ -117,11 +117,28 @@ export function purchaseUpgrade(state, upgradeId) {
 
   const newValue = isRepeatable ? purchaseCount + 1 : true;
 
-  return {
+  let finalState = {
     ...afterEffects,
     upgrades: { ...afterEffects.upgrades, [upgradeId]: newValue },
     lastUpgradeTime: afterEffects.totalTime || 0,
   };
+
+  // Mechanic: purchaseBurst — every upgrade purchase triggers a burst of all resources
+  if (finalState.upgrades?.chainReaction) {
+    const burstResources = { ...finalState.resources };
+    for (const [id, r] of Object.entries(burstResources)) {
+      if (!r.unlocked) continue;
+      const rate = (r.baseRate + r.rateAdd) * r.rateMult * (finalState.prestigeMultiplier || 1);
+      if (rate > 0) {
+        const burst = rate * 5; // 5 seconds worth of production
+        const cap = r.baseCap > 0 ? r.baseCap * r.capMult : Infinity;
+        burstResources[id] = { ...r, amount: Math.min(r.amount + burst, cap > 0 ? cap : Infinity) };
+      }
+    }
+    finalState = { ...finalState, resources: burstResources };
+  }
+
+  return finalState;
 }
 
 // Buy as many of a repeatable upgrade as affordable. Returns new state or null.

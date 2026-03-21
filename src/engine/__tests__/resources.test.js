@@ -6,9 +6,9 @@ describe('resources', () => {
   describe('getEffectiveRate', () => {
     it('returns base rate for era 1 resources', () => {
       const state = createInitialState();
-      expect(getEffectiveRate(state, 'food')).toBeCloseTo(0.5, 5);
-      expect(getEffectiveRate(state, 'materials')).toBeCloseTo(0.2, 5);
-      expect(getEffectiveRate(state, 'energy')).toBeCloseTo(0.1, 5);
+      expect(getEffectiveRate(state, 'food')).toBeCloseTo(1.5, 5);
+      expect(getEffectiveRate(state, 'materials')).toBeCloseTo(0.8, 5);
+      expect(getEffectiveRate(state, 'energy')).toBeCloseTo(0.5, 5);
     });
 
     it('returns 0 for locked resources', () => {
@@ -20,8 +20,8 @@ describe('resources', () => {
       const state = createInitialState();
       state.resources.food.rateMult = 2;
       state.resources.food.rateAdd = 1;
-      // (baseRate 0.5 + rateAdd 1) * rateMult 2 * prestige 1 = 3
-      expect(getEffectiveRate(state, 'food')).toBeCloseTo(3, 5);
+      // (baseRate 1.5 + rateAdd 1) * rateMult 2 * prestige 1 = 5
+      expect(getEffectiveRate(state, 'food')).toBeCloseTo(5, 5);
     });
   });
 
@@ -29,7 +29,7 @@ describe('resources', () => {
     it('returns rates for all resources', () => {
       const state = createInitialState();
       const rates = calculateProduction(state);
-      expect(rates.food).toBeCloseTo(0.5, 5);
+      expect(rates.food).toBeCloseTo(1.5, 5);
       expect(rates.steel).toBe(0); // locked
     });
   });

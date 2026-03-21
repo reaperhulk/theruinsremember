@@ -71,7 +71,7 @@ export function spend(state, cost) {
 export function gather(state, resourceId, amount = 1) {
   const r = state.resources[resourceId];
   if (!r || !r.unlocked) return state;
-  const eraScale = 1 + (state.era - 1) * 0.5;
+  const eraScale = 1 + (state.era - 1) * 1.0;
   const gathered = amount * r.rateMult * state.prestigeMultiplier * eraScale;
   const cap = getEffectiveCap(state, resourceId);
   let newAmount = r.amount + gathered;
@@ -79,13 +79,45 @@ export function gather(state, resourceId, amount = 1) {
   if (cap > 0 && newAmount > cap) {
     newAmount = Math.max(r.amount, cap); // don't reduce if already over
   }
-  return {
-    ...state,
-    resources: {
-      ...state.resources,
-      [resourceId]: { ...r, amount: newAmount },
-    },
+  let newResources = {
+    ...state.resources,
+    [resourceId]: { ...r, amount: newAmount },
   };
+
+  // Mechanic: canvasDataCache — 20% chance on any click to get 30s of data production
+  if (state.upgrades?.dataMining && newResources.data?.unlocked) {
+    if (Math.random() < 0.2) {
+      const dataR = newResources.data;
+      const dataRate = (dataR.baseRate + dataR.rateAdd) * dataR.rateMult * (state.prestigeMultiplier || 1);
+      if (dataRate > 0) {
+        const dataCap = getEffectiveCap({ ...state, resources: newResources }, 'data');
+        const burst = dataRate * 30;
+        let dataAmount = dataR.amount + burst;
+        if (dataCap > 0 && dataAmount > dataCap) {
+          dataAmount = Math.max(dataR.amount, dataCap);
+        }
+        newResources = { ...newResources, data: { ...dataR, amount: dataAmount } };
+      }
+    }
+  }
+
+  // Mechanic: clickAll — clicking any resource also gives +1 to all others
+  if (state.upgrades?.scavengerInstinct) {
+    for (const [otherId, otherR] of Object.entries(state.resources)) {
+      if (otherId !== resourceId && otherR.unlocked) {
+        const otherCap = getEffectiveCap({ ...state, resources: newResources }, otherId);
+        const bonus = 1 * (otherR.rateMult || 1) * (state.prestigeMultiplier || 1);
+        const cur = newResources[otherId] || otherR;
+        let otherAmount = cur.amount + bonus;
+        if (otherCap > 0 && otherAmount > otherCap) {
+          otherAmount = Math.max(cur.amount, otherCap);
+        }
+        newResources = { ...newResources, [otherId]: { ...cur, amount: otherAmount } };
+      }
+    }
+  }
+
+  return { ...state, resources: newResources };
 }
 
 // Get effective cap for a resource

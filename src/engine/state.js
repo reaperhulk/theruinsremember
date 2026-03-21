@@ -15,7 +15,7 @@ export function createInitialState() {
   }
 
   // Start with some labor
-  resourceState.labor.amount = 5;
+  resourceState.labor.amount = 10;
 
   return {
     era: 1,

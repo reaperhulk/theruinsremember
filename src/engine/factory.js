@@ -52,7 +52,7 @@ export function allocateWorker(state, line, count) {
 }
 
 // Calculate production bonus from factory allocation.
-// Each worker on a line gives +0.3/s to that resource.
+// Each worker on a line gives a per-worker bonus that scales with era.
 // Efficiency bonus: when all lines have at least 1 worker, +50% output.
 export function getFactoryBonus(state) {
   if (state.era < 2) return {};
@@ -67,11 +67,16 @@ export function getFactoryBonus(state) {
   const maxWorkers = getMaxWorkers(state);
   const pool = getWorkerPool(state);
   const fullCapacity = totalAssigned >= pool && pool >= 3 ? 2 : 1;
+  // Era scaling: base rate per worker increases with era
+  const eraScale = 1 + (state.era - 2) * 0.5; // x1 at era 2, x1.5 at era 3, ... x5 at era 10
   const bonus = {};
   for (const line of LINES) {
     const workers = alloc[line] || 0;
     if (workers > 0) {
-      bonus[line] = workers * 0.3 * efficiencyMult * prestigeMult * fullCapacity;
+      // Scale with the resource's production multiplier so factory stays relevant
+      const r = state.resources[line];
+      const resourceMult = r ? (r.rateMult || 1) : 1;
+      bonus[line] = workers * 0.3 * eraScale * resourceMult * efficiencyMult * prestigeMult * fullCapacity;
     }
   }
   return bonus;

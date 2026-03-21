@@ -10,10 +10,10 @@ import { checkComboReset } from './weaving.js';
 import { purchaseUpgrade, getUpgradeCost } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
-// Resource consumption rates
-const FOOD_PER_LABOR = 0.3;       // Food consumed per labor/s
-const ENERGY_PER_ELECTRONICS = 0.2; // Energy consumed per electronics/s
-const FUEL_PER_ORBITAL = 0.3;     // Fuel consumed per orbitalInfra/s
+// Resource consumption rates — high enough to create real tension
+const FOOD_PER_LABOR = 0.8;       // Food consumed per labor/s
+const ENERGY_PER_ELECTRONICS = 0.5; // Energy consumed per electronics/s
+const FUEL_PER_ORBITAL = 0.6;     // Fuel consumed per orbitalInfra/s
 
 // Core game loop: advance state by dt seconds
 export function tick(state, dt) {
@@ -203,6 +203,102 @@ export function tick(state, dt) {
     for (const [id, r] of Object.entries(newState.resources)) {
       if (r.unlocked) {
         newState = gather(newState, id, 1);
+      }
+    }
+  }
+
+  // Mechanic: surplusConvert — resources at cap trickle to lowest resource
+  if (newState.upgrades?.surplusExchange) {
+    const unlocked = Object.entries(newState.resources).filter(([, r]) => r.unlocked);
+    const lowest = unlocked.reduce((min, [id, r]) => {
+      const cap = getEffectiveCap(newState, id);
+      const pct = cap > 0 ? r.amount / cap : 1;
+      return pct < min.pct ? { id, pct } : min;
+    }, { id: null, pct: 1 });
+
+    if (lowest.id) {
+      let converted = 0;
+      for (const [id, r] of unlocked) {
+        const cap = getEffectiveCap(newState, id);
+        if (cap > 0 && r.amount >= cap * 0.95 && id !== lowest.id) {
+          const overflow = r.amount - cap * 0.9;
+          if (overflow > 0) {
+            const transfer = overflow * 0.05 * dt;
+            newState = { ...newState, resources: { ...newState.resources, [id]: { ...newState.resources[id], amount: newState.resources[id].amount - transfer } } };
+            converted += transfer;
+          }
+        }
+      }
+      if (converted > 0) {
+        const lr = newState.resources[lowest.id];
+        newState = { ...newState, resources: { ...newState.resources, [lowest.id]: { ...lr, amount: lr.amount + converted * 0.5 } } };
+      }
+    }
+  }
+
+  // Mechanic: upgradeCountBonus — +1% production per upgrade owned
+  if (newState.upgrades?.communalEffort) {
+    const upgradeCount = Object.keys(newState.upgrades).length;
+    const bonusFraction = upgradeCount * 0.01;
+    for (const [id, r] of Object.entries(newState.resources)) {
+      if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
+        const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+        const bonus = rate * bonusFraction * dt;
+        const cap = getEffectiveCap(newState, id);
+        const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
+        newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
+      }
+    }
+  }
+
+  // Mechanic: productionPulse — double production for 10s every 60s
+  if (newState.upgrades?.overclockProtocol) {
+    const cyclePos = (newState.totalTime || 0) % 60;
+    if (cyclePos < 10) {
+      for (const [id, r] of Object.entries(newState.resources)) {
+        if (r.unlocked) {
+          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+          if (rate > 0) {
+            const cap = getEffectiveCap(newState, id);
+            const bonus = rate * dt;
+            newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: Math.min(r.amount + bonus, cap > 0 ? cap : Infinity) } } };
+          }
+        }
+      }
+    }
+  }
+
+  // Mechanic: capOverflow — capped resources overflow to research
+  if (newState.upgrades?.resourcePipeline && newState.resources.research?.unlocked) {
+    let totalOverflow = 0;
+    for (const [id, r] of Object.entries(newState.resources)) {
+      if (id === 'research' || !r.unlocked) continue;
+      const cap = getEffectiveCap(newState, id);
+      if (cap > 0 && r.amount >= cap) {
+        const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+        totalOverflow += rate * dt * 0.1;
+      }
+    }
+    if (totalOverflow > 0) {
+      const rr = newState.resources.research;
+      const rCap = getEffectiveCap(newState, 'research');
+      newState = { ...newState, resources: { ...newState.resources, research: { ...rr, amount: Math.min(rr.amount + totalOverflow, rCap > 0 ? rCap : Infinity) } } };
+    }
+  }
+
+  // Mechanic: eraCompounding — each era multiplies production by 1.1x
+  if (newState.upgrades?.recursiveOptimizer) {
+    const eraBonus = Math.pow(1.1, (newState.era || 1) - 1);
+    if (eraBonus > 1) {
+      const bonusFraction = (eraBonus - 1); // extra fraction on top of base
+      for (const [id, r] of Object.entries(newState.resources)) {
+        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
+          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+          const bonus = rate * bonusFraction * dt;
+          const cap = getEffectiveCap(newState, id);
+          const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
+          newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
+        }
       }
     }
   }

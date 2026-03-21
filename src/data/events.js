@@ -4,6 +4,17 @@
 //   type: 'timed'   — temporary effect with a duration (seconds)
 
 export const events = {
+  // Era 1: Early discovery — hooks the player with a resource burst
+  firstDiscovery: {
+    id: 'firstDiscovery', minEra: 1, type: 'instant', chance: 0.15,
+    description: 'While clearing rubble from the crash site, you find a sealed cache of supplies — someone left these here deliberately.',
+    effects: [
+      { type: 'resource', target: 'materials', value: 30 },
+      { type: 'resource', target: 'food', value: 20 },
+      { type: 'resource', target: 'energy', value: 15 },
+    ],
+    isLore: true,
+  },
   // Era 3: Digital Age
   viralApp: {
     id: 'viralApp',
@@ -1601,6 +1612,60 @@ export const events = {
     type: 'timed',
     duration: 30,
     effect: { resourceId: 'all', rateMultBonus: 2 },
+  },
+  // --- Crisis Events: negative effects that create tension ---
+  crisisFamine: {
+    id: 'crisisFamine',
+    name: 'Blight',
+    description: 'Blight strikes the food supply! Production halved for 30 seconds. The ancient soil fights back.',
+    minEra: 2,
+    type: 'timed',
+    chance: 0.005,
+    duration: 30,
+    effect: { resourceId: 'food', rateMultBonus: 0.5 },
+  },
+  crisisPowerSurge: {
+    id: 'crisisPowerSurge',
+    name: 'Power Surge',
+    description: 'A power surge from the buried grid destroys stored electronics! The old systems are unstable.',
+    minEra: 2,
+    type: 'instant',
+    chance: 0.005,
+    effects: [
+      { type: 'resource', target: 'electronics', value: -100 },
+    ],
+  },
+  crisisQuake: {
+    id: 'crisisQuake',
+    name: 'Seismic Event',
+    description: 'Seismic activity from deep ruins! Material production disrupted for 20 seconds.',
+    minEra: 3,
+    type: 'timed',
+    chance: 0.004,
+    duration: 20,
+    effect: { resourceId: 'materials', rateMultBonus: 0.3 },
+  },
+  crisisDataCorruption: {
+    id: 'crisisDataCorruption',
+    name: 'Data Corruption',
+    description: 'Ancient malware activates in the recovered systems! Data and software corrupted.',
+    minEra: 3,
+    type: 'instant',
+    chance: 0.004,
+    effects: [
+      { type: 'resource', target: 'data', value: -50 },
+      { type: 'resource', target: 'software', value: -30 },
+    ],
+  },
+  crisisFuelLeak: {
+    id: 'crisisFuelLeak',
+    name: 'Fuel Leak',
+    description: 'A fuel line ruptures along an ancient fault. Fuel production cut to a third.',
+    minEra: 4,
+    type: 'timed',
+    chance: 0.004,
+    duration: 25,
+    effect: { resourceId: 'rocketFuel', rateMultBonus: 0.33 },
   },
 };
 

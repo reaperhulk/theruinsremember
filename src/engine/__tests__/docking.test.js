@@ -35,8 +35,9 @@ describe('docking', () => {
     const zone = getTargetZone(state);
     const { state: after, result } = attemptDock(state, zone);
     expect(result).toBe('perfect');
-    // combo=1 → comboMult=1.2, rewards: 8*1.2=9.6, 3*1.2=3.6, 1*1.2=1.2
-    expect(after.resources.rocketFuel.amount).toBeCloseTo(9.6);
+    // effectiveFuelRate=max(1,0)=1, combo=1 → comboMult=1.2
+    // perfect: rocketFuel=15*1.2=18, orbitalInfra=(3+0)*1.2=3.6, exoticMaterials=max(1,0)=1*1.2=1.2
+    expect(after.resources.rocketFuel.amount).toBeCloseTo(18);
     expect(after.resources.orbitalInfra.amount).toBeCloseTo(3.6);
     expect(after.resources.exoticMaterials.amount).toBeCloseTo(1.2);
     expect(after.dockingPerfects).toBe(1);
@@ -48,8 +49,8 @@ describe('docking', () => {
     // Offset from center but within zone
     const { state: after, result } = attemptDock(state, zone + 0.08);
     expect(result).toBe('good');
-    // combo=1 → comboMult=1.2, reward: 3*1.2=3.6
-    expect(after.resources.rocketFuel.amount).toBeCloseTo(3.6);
+    // effectiveFuelRate=1, combo=1 → comboMult=1.2, reward: 5*1.2=6
+    expect(after.resources.rocketFuel.amount).toBeCloseTo(6);
     expect(after.dockingSuccesses).toBe(1);
   });
 

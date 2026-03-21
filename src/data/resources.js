@@ -4,9 +4,9 @@
 export const resources = {
   // Era 1: Planetfall — caps high enough for era 2+ scaled costs
   labor: { id: 'labor', name: 'Labor', era: 1, baseCap: 2000, baseRate: 0, description: 'Manual workforce' },
-  food: { id: 'food', name: 'Food', era: 1, baseCap: 5000, baseRate: 0.5, description: 'Sustenance for settlers' },
-  materials: { id: 'materials', name: 'Materials', era: 1, baseCap: 5000, baseRate: 0.2, description: 'Raw building materials' },
-  energy: { id: 'energy', name: 'Energy', era: 1, baseCap: 5000, baseRate: 0.1, description: 'Power supply' },
+  food: { id: 'food', name: 'Food', era: 1, baseCap: 5000, baseRate: 1.5, description: 'Sustenance for settlers' },
+  materials: { id: 'materials', name: 'Materials', era: 1, baseCap: 5000, baseRate: 0.8, description: 'Raw building materials' },
+  energy: { id: 'energy', name: 'Energy', era: 1, baseCap: 5000, baseRate: 0.5, description: 'Power supply' },
 
   // Era 2: Industrialization
   steel: { id: 'steel', name: 'Steel', era: 2, baseCap: 5000, baseRate: 0, description: 'Refined metal alloy' },

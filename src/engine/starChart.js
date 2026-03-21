@@ -135,9 +135,11 @@ export function getRouteBonus(state) {
       combined[resource] = (combined[resource] || 0) + amount;
     }
 
-    // Each route gives half the combined bonus, scaled by distance and network
+    // Each route gives half the combined bonus, scaled by distance, network, and resource multiplier
     for (const [resource, amount] of Object.entries(combined)) {
-      bonus[resource] = (bonus[resource] || 0) + amount * 0.5 * distMult * networkMult * savantMult;
+      const r = state.resources[resource];
+      const resourceMult = r ? (r.rateMult || 1) : 1;
+      bonus[resource] = (bonus[resource] || 0) + amount * 0.5 * distMult * networkMult * resourceMult * savantMult;
     }
   }
 

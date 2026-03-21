@@ -76,7 +76,10 @@ export function getColonyBonus(state) {
     if (count > 0) {
       const focusBonus = FOCUS_BONUSES[focus];
       for (const [resource, rate] of Object.entries(focusBonus)) {
-        bonus[resource] = (bonus[resource] || 0) + count * rate * focusMult * eraScale * savantMult;
+        // Scale with the resource's production multiplier so colonies stay relevant
+        const r = state.resources[resource];
+        const resourceMult = r ? (r.rateMult || 1) : 1;
+        bonus[resource] = (bonus[resource] || 0) + count * rate * resourceMult * focusMult * eraScale * savantMult;
       }
     }
   }

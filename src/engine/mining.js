@@ -23,6 +23,19 @@ export function mine(state, roll = Math.random()) {
   const r = state.resources.materials;
   if (!r || !r.unlocked) return { state, foundGem: false };
 
+  // First mine is always a big hit
+  if ((state.miningStreak || 0) === 0 && (state.totalGems || 0) === 0) {
+    const firstMineAmount = 20; // Big burst to hook the player
+    return {
+      state: {
+        ...state,
+        resources: { ...state.resources, materials: { ...r, amount: r.amount + firstMineAmount } },
+        miningStreak: 1,
+      },
+      foundGem: false,
+    };
+  }
+
   const chance = getGemChance(state);
   const foundGem = roll < chance;
 
@@ -34,7 +47,10 @@ export function mine(state, roll = Math.random()) {
   const eraScale = 1 + (state.era - 1) * 0.5; // x1 at era 1, x5.5 at era 10
   const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
   const savantMult = hasSavant ? 1.5 : 1;
-  const baseGather = 1 * r.rateMult * state.prestigeMultiplier * eraScale * savantMult;
+  // Scale with the resource's full production rate so mining stays relevant
+  const fullRate = ((r.baseRate || 0) + (r.rateAdd || 0)) * (r.rateMult || 1) * (state.prestigeMultiplier || 1);
+  const rateScale = Math.max(1, fullRate); // minimum 1 so early mining still works
+  const baseGather = rateScale * eraScale * savantMult;
   const gathered = foundGem ? baseGather * GEM_MULTIPLIER * gemQuality : baseGather;
 
   const newState = {

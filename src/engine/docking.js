@@ -6,10 +6,8 @@ const ZONE_SIZE = 0.2;       // 20% of the bar is the target zone
 const PERFECT_ZONE = 0.05;   // 5% center for perfect dock
 const BASE_SPEED = 1.5;      // cycles per second at era 4
 
-// Resource rewards for docking
+// Resource rewards for docking — now calculated dynamically based on production rates
 const REWARD_MISS = {};
-const REWARD_GOOD = { rocketFuel: 3, orbitalInfra: 1 };
-const REWARD_PERFECT = { rocketFuel: 8, orbitalInfra: 3, exoticMaterials: 1 };
 const COOLDOWN = 2; // seconds between dock attempts
 
 // Calculate indicator position (0-1) based on time.
@@ -39,16 +37,32 @@ export function attemptDock(state, position) {
   const distFromCenter = Math.abs(position - zoneCenter);
 
   let result;
-  let rewards;
 
   if (distFromCenter <= PERFECT_ZONE / 2) {
     result = 'perfect';
-    rewards = REWARD_PERFECT;
   } else if (distFromCenter <= ZONE_SIZE / 2) {
     result = 'good';
-    rewards = REWARD_GOOD;
   } else {
     result = 'miss';
+  }
+
+  // Calculate dynamic rewards based on current production rates
+  const fuelRes = state.resources?.rocketFuel;
+  const fuelRate = fuelRes ? ((fuelRes.baseRate || 0) + (fuelRes.rateAdd || 0)) * (fuelRes.rateMult || 1) : 1;
+  const effectiveFuelRate = Math.max(1, fuelRate); // minimum 1 so rewards are never zero
+  let rewards;
+  if (result === 'perfect') {
+    rewards = {
+      rocketFuel: effectiveFuelRate * 15,
+      orbitalInfra: 3 + Math.floor(effectiveFuelRate * 0.5),
+      exoticMaterials: Math.max(1, Math.floor(effectiveFuelRate * 0.2)),
+    };
+  } else if (result === 'good') {
+    rewards = {
+      rocketFuel: effectiveFuelRate * 5,
+      orbitalInfra: 1 + Math.floor(effectiveFuelRate * 0.2),
+    };
+  } else {
     rewards = REWARD_MISS;
   }
 
