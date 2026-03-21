@@ -6,9 +6,21 @@ export function PrestigePanel({ state, onUpdate }) {
   const points = state.prestigePoints || 0;
   const bestTimes = state.bestEraTimes || {};
 
+  const cycleCount = state.prestigeCount || 0;
+  const prestigeLore = cycleCount === 0
+    ? 'The pattern repeats. Every civilization reaches this point. Will you break the cycle — or begin it again?'
+    : cycleCount === 1
+    ? 'You remember flashes of a previous life. The ruins make more sense now.'
+    : cycleCount < 5
+    ? `Cycle ${cycleCount + 1}. Each iteration reveals more of the truth. The ruins remember you.`
+    : `Cycle ${cycleCount + 1}. You have walked this path ${cycleCount} times. The universe barely notices.`;
+
   return (
     <div className="panel prestige-panel">
       <h2>Prestige{points > 0 ? ` (${points} pts)` : ''} — {shop.filter(u => u.owned).length}/{shop.length}</h2>
+      <p style={{ fontSize: '0.8em', color: '#998866', fontStyle: 'italic', margin: '0 0 8px', textAlign: 'center' }}>
+        {prestigeLore}
+      </p>
       <div className="prestige-info">
         <div className="stat-row">
           <span>Prestige Points:</span>
@@ -24,7 +36,7 @@ export function PrestigePanel({ state, onUpdate }) {
         </div>
         <div className="stat-row">
           <span>Next Prestige:</span>
-          <span>+{summary.points} pts, x{summary.bonus.toFixed(1)} → total x{summary.newMultiplier.toFixed(1)}{state.era < 10 ? ' (Era 10 needed)' : ''}</span>
+          <span>+{summary.points} pts, x{summary.bonus.toFixed(1)} → total x{summary.newMultiplier.toFixed(1)}{state.era < 7 ? ' (Era 7+ needed)' : ''}</span>
         </div>
       </div>
 
