@@ -232,13 +232,10 @@ export function App() {
               let badge = 0;
               if (tab.id === 'upgrades') badge = affordableUpgrades;
               if (tab.id === 'tech') badge = affordableTech;
-              if (tab.id === 'mini') {
-                const miniCount = 1 + (state.era >= 2 ? 1 : 0) + (state.era >= 3 ? 1 : 0) + (state.era >= 4 ? 1 : 0) + (state.era >= 5 ? 1 : 0) + (state.era >= 6 ? 1 : 0) + (state.era >= 8 ? 1 : 0);
-                badge = activeEffectCount || miniCount;
-              }
+              if (tab.id === 'mini') badge = activeEffectCount;
               if (tab.id === 'prestige') badge = state.prestigePoints || 0;
-              if (tab.id === 'trading') badge = state.totalTrades || 0;
-              if (tab.id === 'stats') badge = Object.keys(state.achievements || {}).length || 0;
+              if (tab.id === 'trading') badge = 0; // no badge — total trades not actionable
+              if (tab.id === 'stats') badge = 0; // no badge — achievement count not actionable
               return (
                 <button
                   key={tab.id}

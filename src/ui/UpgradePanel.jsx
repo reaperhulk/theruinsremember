@@ -247,7 +247,7 @@ export function UpgradePanel({ state, onUpdate }) {
                     />
                     {eta < Infinity && eta > 0 && (
                       <span className="upgrade-eta" style={{ position: 'absolute', right: '4px', top: '0', fontSize: '0.7em', color: '#888', lineHeight: '8px' }}>
-                        ~{eta < 60 ? `${Math.ceil(eta)}s` : eta < 3600 ? `${Math.ceil(eta / 60)}m` : `${Math.floor(eta / 3600)}h`}
+                        {eta > 600 ? 'long wait' : `~${eta < 60 ? `${Math.ceil(eta)}s` : `${Math.ceil(eta / 60)}m`}`}
                       </span>
                     )}
                   </div>
@@ -271,16 +271,30 @@ export function UpgradePanel({ state, onUpdate }) {
       {upcoming.length > 0 && (
         <div className="upcoming-section">
           <div className="upcoming-header">Coming Soon</div>
-          {upcoming.map(u => (
-            <div key={u.id} className="upcoming-upgrade">
-              <span className="upcoming-name">{u.name}</span>
-              <span className="upcoming-desc">
-                {u.missingPrereq ? (
-                  <span style={{ color: '#ffcc44', fontWeight: 'bold' }}>Buy {u.missingPrereq} first</span>
-                ) : u.description}
-              </span>
-            </div>
-          ))}
+          {upcoming.map(u => {
+            // Build prereq chain display: show path to this upgrade
+            const missingId = u.prerequisites.find(p => !state.upgrades[p]);
+            const missingDef = missingId ? upgradeDefs[missingId] : null;
+            // Check if the missing prereq itself has unmet prereqs (2-step chain)
+            const grandparentMissing = missingDef
+              ? missingDef.prerequisites.find(p => !state.upgrades[p])
+              : null;
+            const grandparentName = grandparentMissing ? (upgradeDefs[grandparentMissing]?.name || grandparentMissing) : null;
+            return (
+              <div key={u.id} className="upcoming-upgrade">
+                <span className="upcoming-name">{u.name}</span>
+                <span className="upcoming-desc">
+                  {u.missingPrereq ? (
+                    <span style={{ color: '#ffcc44', fontWeight: 'bold' }}>
+                      {grandparentName
+                        ? `${grandparentName} \u2192 ${u.missingPrereq} \u2192 this`
+                        : `Buy ${u.missingPrereq} first`}
+                    </span>
+                  ) : u.description}
+                </span>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

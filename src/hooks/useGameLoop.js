@@ -59,7 +59,13 @@ export function useGameLoop(initialState) {
             }
           }
           // Store offline report (will be shown by UI)
-          setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains }), 100);
+          // For large offline periods, show processing indicator briefly
+          if (chunks > 100) {
+            setOfflineReport({ elapsed: offlineDt, processing: true, gains: {} });
+            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains }), 300);
+          } else {
+            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains }), 100);
+          }
           return after;
         }
         return migrated;

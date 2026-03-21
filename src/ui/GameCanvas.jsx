@@ -1,8 +1,12 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { mine } from '../engine/mining.js';
 import { gather, getEffectiveCap, getEffectiveRate } from '../engine/resources.js';
+import { countEraUpgrades, getMinUpgradesForEra } from '../engine/eras.js';
 
 // --- Shared Helpers ---
+
+// Module-level parallax offset (set per frame by the canvas component)
+let _parallaxX = 0, _parallaxY = 0;
 
 // Deterministic pseudo-random from seed
 function seededRandom(seed) {
@@ -15,11 +19,17 @@ function seededRandom(seed) {
 
 function drawStarField(ctx, w, h, count, seed, twinkleT) {
   const rng = seededRandom(seed);
+  const px = _parallaxX * 4;
+  const py = _parallaxY * 3;
   for (let i = 0; i < count; i++) {
-    const x = rng() * w;
-    const y = rng() * h;
+    const baseX = rng() * w;
+    const baseY = rng() * h;
     const baseSize = rng() * 1.5 + 0.5;
+    const depth = 0.5 + rng() * 0.5; // parallax depth layer
+    const x = baseX + px * depth;
+    const y = baseY + py * depth;
     const brightness = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(twinkleT * (1 + rng() * 2) + rng() * 6.28));
+    if (x < -5 || x > w + 5 || y < -5 || y > h + 5) continue;
     ctx.fillStyle = `rgba(255,255,255,${brightness})`;
     ctx.beginPath();
     ctx.arc(x, y, baseSize, 0, Math.PI * 2);
@@ -805,12 +815,14 @@ function drawEra6(ctx, w, h, t, state) {
     }
   }
 
-  // Glowing key system nodes
+  // Glowing key system nodes — size scales with galactic influence
+  const giAmount = state?.resources?.galacticInfluence?.amount || 0;
+  const nodeScale = 1 + Math.min(giAmount / 500, 1.5);
   for (const n of sectorNodes) {
     const pulse = 0.5 + 0.5 * Math.sin(t * 2 + n.x);
     ctx.fillStyle = `rgba(100,220,255,${0.3 + pulse * 0.5})`;
     ctx.beginPath();
-    ctx.arc(n.x, n.y, 2 + pulse, 0, Math.PI * 2);
+    ctx.arc(n.x, n.y, (2 + pulse) * nodeScale, 0, Math.PI * 2);
     ctx.fill();
   }
 }
@@ -1073,16 +1085,18 @@ function drawIntergalactic(ctx, w, h, t, state) {
     nodes.push({ x: nodeRng() * w, y: nodeRng() * h, size: 3 + nodeRng() * 8 });
   }
 
-  // Draw filaments between nearby nodes
+  // Draw filaments between nearby nodes — brightness scales with cosmicPower
+  const cpAmount = state?.resources?.cosmicPower?.amount || 0;
+  const filamentBoost = 1 + Math.min(cpAmount / 200, 3);
   for (let i = 0; i < nodes.length; i++) {
     for (let j = i + 1; j < nodes.length; j++) {
       const dx = nodes[i].x - nodes[j].x;
       const dy = nodes[i].y - nodes[j].y;
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < w * 0.4) {
-        const alpha = (1 - dist / (w * 0.4)) * 0.12;
+        const alpha = (1 - dist / (w * 0.4)) * 0.12 * filamentBoost;
         const pulse = 0.5 + 0.5 * Math.sin(t * 0.5 + i + j);
-        ctx.strokeStyle = `rgba(100,60,200,${alpha * pulse})`;
+        ctx.strokeStyle = `rgba(100,60,200,${Math.min(alpha * pulse, 0.8)})`;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(nodes[i].x, nodes[i].y);
@@ -1161,9 +1175,11 @@ function drawMultiverse(ctx, w, h, t, state) {
     }
   }
 
-  // Reality bubbles — each is a "universe"
+  // Reality bubbles — each is a "universe", count scales with realityFragments
+  const rfAmount = state?.resources?.realityFragments?.amount || 0;
+  const bubbleCount = Math.min(3 + Math.floor(rfAmount / 50), 12);
   const bubbleRng = seededRandom(1010);
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < bubbleCount; i++) {
     const bx = bubbleRng() * w;
     const by = bubbleRng() * h;
     const br = 10 + bubbleRng() * 25;
@@ -1335,16 +1351,19 @@ function drawDysonEra(ctx, w, h, t, state) {
 
   const cx = w * 0.5, cy = h * 0.5;
 
-  // Star at center (being enclosed)
-  const starR = 12;
-  const starGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, starR * 3);
-  starGrd.addColorStop(0, 'rgba(255, 220, 100, 1)');
-  starGrd.addColorStop(0.3, 'rgba(255, 180, 50, 0.6)');
-  starGrd.addColorStop(0.7, 'rgba(255, 100, 20, 0.2)');
+  // Star at center (being enclosed) — glow scales with stellarForge production
+  const sfRate = state ? ((state.resources?.stellarForge?.baseRate || 0) + (state.resources?.stellarForge?.rateAdd || 0)) * (state.resources?.stellarForge?.rateMult || 1) : 0;
+  const forgeGlow = Math.min(1, sfRate * 0.08);
+  const starR = 12 + forgeGlow * 6;
+  const glowRadius = starR * (3 + forgeGlow * 2);
+  const starGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
+  starGrd.addColorStop(0, `rgba(255, 220, 100, ${0.8 + forgeGlow * 0.2})`);
+  starGrd.addColorStop(0.3, `rgba(255, 180, 50, ${0.4 + forgeGlow * 0.3})`);
+  starGrd.addColorStop(0.7, `rgba(255, 100, 20, ${0.1 + forgeGlow * 0.15})`);
   starGrd.addColorStop(1, 'rgba(255, 50, 0, 0)');
   ctx.fillStyle = starGrd;
   ctx.beginPath();
-  ctx.arc(cx, cy, starR * 3, 0, Math.PI * 2);
+  ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2);
   ctx.fill();
 
   // Dyson sphere rings (multiple rotating rings around the star)
@@ -1616,7 +1635,8 @@ function drawFloatingTexts(ctx, floatingTexts) {
 function drawEraProgress(ctx, w, h, state) {
   if (!state) return;
   const era = state.era || 1;
-  const upgradeCount = Object.keys(state.upgrades || {}).length;
+  const eraUpgrades = countEraUpgrades(state, era);
+  const minNeeded = getMinUpgradesForEra(era);
   const barW = w * 0.6;
   const barH = 6;
   const barX = (w - barW) / 2;
@@ -1628,8 +1648,8 @@ function drawEraProgress(ctx, w, h, state) {
   ctx.fillStyle = 'rgba(255,255,255,0.1)';
   ctx.fillRect(barX, barY, barW, barH);
 
-  // Fill — use total upgrades as rough progress
-  const progress = Math.min(upgradeCount / (era * 15), 1);
+  // Fill — use era-specific upgrade count vs minimum needed
+  const progress = Math.min(eraUpgrades / minNeeded, 1);
   ctx.fillStyle = progress >= 1 ? '#44aa44' : '#aaaa44';
   ctx.fillRect(barX, barY, barW * progress, barH);
 
@@ -1637,7 +1657,7 @@ function drawEraProgress(ctx, w, h, state) {
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
   ctx.font = '8px monospace';
   ctx.textAlign = 'center';
-  ctx.fillText(`${upgradeCount} upgrades`, w / 2, barY - 2);
+  ctx.fillText(`${eraUpgrades}/${minNeeded} era upgrades`, w / 2, barY - 2);
 
   ctx.restore();
 }
@@ -1699,6 +1719,11 @@ export function GameCanvas({ state, onUpdate }) {
   const bonusOrbRef = useRef(null); // { x, y, spawnTime, type, resource }
   const lastOrbTimeRef = useRef(performance.now() / 1000);
   const nextOrbDelayRef = useRef(30 + Math.random() * 60); // 30-90s
+  const prevHackRef = useRef(state.hackSuccesses || 0);
+  const prevDockRef = useRef(state.dockingPerfects || 0);
+  const hackFlashRef = useRef(0); // timestamp of last hack flash
+  const dockFlashRef = useRef(0); // timestamp of last dock flash
+  const mouseRef = useRef({ x: 0, y: 0 }); // for parallax
 
   const handleCanvasClick = useCallback((e) => {
     const canvas = canvasRef.current;
@@ -1837,6 +1862,10 @@ export function GameCanvas({ state, onUpdate }) {
       const era = eraRef.current;
 
       ctx.clearRect(0, 0, w, h);
+
+      // Update parallax offset from mouse position
+      _parallaxX = mouseRef.current.x;
+      _parallaxY = mouseRef.current.y;
 
       // Era mapping: 1=Planetfall, 2=Industrialization, 3=Digital Age,
       // 4=Space Age, 5=Solar System, 6=Interstellar, 7=Dyson Era,
@@ -2041,6 +2070,46 @@ export function GameCanvas({ state, onUpdate }) {
         prevEraRef.current = currentEra;
       }
 
+      // Detect hack success and docking perfect increases — spawn visual effects
+      const curHacks = stateRef.current.hackSuccesses || 0;
+      if (curHacks > prevHackRef.current) {
+        hackFlashRef.current = t;
+        prevHackRef.current = curHacks;
+      }
+      const curDocks = stateRef.current.dockingPerfects || 0;
+      if (curDocks > prevDockRef.current) {
+        dockFlashRef.current = t;
+        spawnParticles(particlesRef.current, w * 0.5, h * 0.3, 8, 'rgba(100,200,255,1)', 50);
+        prevDockRef.current = curDocks;
+      }
+
+      // Hack success: green data streams flash for 0.6s
+      const hackAge = t - hackFlashRef.current;
+      if (hackAge < 0.6) {
+        const alpha = (0.6 - hackAge) / 0.6 * 0.3;
+        ctx.strokeStyle = `rgba(0, 255, 120, ${alpha})`;
+        ctx.lineWidth = 1;
+        for (let s = 0; s < 5; s++) {
+          const sx = (s * 61 + 20) % w;
+          ctx.beginPath();
+          ctx.moveTo(sx, 0);
+          ctx.lineTo(sx + (Math.sin(t * 8 + s) * 10), h);
+          ctx.stroke();
+        }
+      }
+
+      // Dock perfect: brief white ring flash for 0.4s
+      const dockAge = t - dockFlashRef.current;
+      if (dockAge < 0.4) {
+        const alpha = (0.4 - dockAge) / 0.4 * 0.5;
+        const ringR = 20 + dockAge * 120;
+        ctx.strokeStyle = `rgba(100, 200, 255, ${alpha})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(w * 0.5, h * 0.5, ringR, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
       // Draw particles
       updateAndDrawParticles(ctx, particlesRef.current, now);
 
@@ -2057,6 +2126,16 @@ export function GameCanvas({ state, onUpdate }) {
     return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
+  const handleMouseMove = useCallback((e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    mouseRef.current = {
+      x: (e.clientX - rect.left) / rect.width - 0.5,
+      y: (e.clientY - rect.top) / rect.height - 0.5,
+    };
+  }, []);
+
   return (
     <div className="panel canvas-panel">
       <canvas
@@ -2064,6 +2143,7 @@ export function GameCanvas({ state, onUpdate }) {
         width={280}
         height={180}
         onClick={handleCanvasClick}
+        onMouseMove={handleMouseMove}
         style={{ cursor: 'pointer' }}
       />
     </div>

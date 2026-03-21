@@ -423,7 +423,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 1 },
       { type: 'production_mult', target: 'materials', value: 5 },
     ],
-    description: 'Mine the asteroid belt for resources',
+    description: 'The asteroid belt is scored with drill marks older than your civilization. You mine where others mined before.',
     prerequisites: ['zeroGManufacturing'],
   },
   outerColony: {
@@ -460,7 +460,7 @@ export const upgrades = {
     id: 'terraforming', name: 'Terraforming', era: 5,
     cost: { exoticMaterials: 60, research: 150, energy: 200, food: 250 },
     effects: [{ type: 'production_add', target: 'colonies', value: 1.0 }],
-    description: 'Make other worlds habitable',
+    description: 'The atmosphere generators match blueprints found in the ruins, down to the serial numbers. Someone terraformed these worlds before.',
     prerequisites: ['asteroidMining'],
   },
   orbitalHabitat: {
@@ -528,21 +528,21 @@ export const upgrades = {
     id: 'warpDrive', name: 'Warp Drive', era: 6,
     cost: { darkEnergy: 60, research: 250, exoticMaterials: 120, steel: 1000 },
     effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }],
-    description: 'Travel between stars',
+    description: 'The warp equations were scratched into the walls of the oldest ruin. Whoever wrote them knew exactly where you would go.',
     prerequisites: ['fusionPower'],
   },
   stellarCartography: {
     id: 'stellarCartography', name: 'Stellar Cartography', era: 6,
     cost: { starSystems: 3, research: 60, data: 30 },
     effects: [{ type: 'production_mult', target: 'starSystems', value: 3 }],
-    description: 'Map the stars to discover systems faster',
+    description: 'Your cartographers map the stars and find every system already catalogued in the precursor database. The charts are perfect. The annotations say "again."',
     prerequisites: ['warpDrive'],
   },
   dysonSwarms: {
     id: 'dysonSwarms', name: 'Dyson Swarms', era: 6,
     cost: { starSystems: 15, exoticMaterials: 200, energy: 500, labor: 500 },
     effects: [{ type: 'production_mult', target: 'energy', value: 50 }],
-    description: 'Harvest stellar energy',
+    description: 'The swarm assembles itself from ancient debris orbiting dead stars. The collectors remember their purpose.',
     prerequisites: ['warpDrive'],
   },
   colonialFleet: {
@@ -593,7 +593,7 @@ export const upgrades = {
       { type: 'production_add', target: 'megastructures', value: 0.1 },
       { type: 'production_mult', target: 'energy', value: 20 },
     ],
-    description: 'Enclose a star to harvest its full energy output',
+    description: 'The framework was already there -- dormant scaffolding around a dying star, waiting for someone to finish what was started.',
     prerequisites: ['aiGovernance', 'stellarForgePrototype'],
   },
   starLifting: {
@@ -603,7 +603,7 @@ export const upgrades = {
       { type: 'production_add', target: 'stellarForge', value: 0.3 },
       { type: 'production_mult', target: 'materials', value: 10 },
     ],
-    description: 'Extract matter directly from stars',
+    description: 'You reach into a star and pull out its iron heart. The technique feels natural, as if your hands have done this a thousand times before.',
     prerequisites: ['dysonSphere'],
   },
   stellarNursery: {
@@ -613,7 +613,7 @@ export const upgrades = {
       { type: 'production_add', target: 'stellarForge', value: 4.8 },
       { type: 'production_add', target: 'exoticMaterials', value: 2 },
     ],
-    description: 'Cultivate new stars for exotic material harvesting',
+    description: 'You ignite stellar nurseries in nebulae that bear the chemical signatures of previous ignitions. The stars remember being born before.',
     prerequisites: ['starLifting'],
   },
   megastructureFoundry: {
@@ -675,7 +675,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'starSystems', value: 10 },
       { type: 'production_add', target: 'exoticMatter', value: 0.5 },
     ],
-    description: 'Instant travel across the galaxy',
+    description: 'The wormholes were already threaded through spacetime, collapsed but intact. You are not building a network. You are reopening one.',
     prerequisites: ['matrioshkaBrain', 'neuronStar'],
   },
   darkMatterHarvest: {
@@ -685,14 +685,14 @@ export const upgrades = {
       { type: 'production_mult', target: 'exoticMatter', value: 3 },
       { type: 'production_mult', target: 'darkEnergy', value: 5 },
     ],
-    description: 'Harvest dark matter from galactic filaments',
+    description: 'The filaments pulse when your harvesters approach, as though anticipating the touch. Dark matter flows like it has always flowed here.',
     prerequisites: ['wormholeNetwork'],
   },
   galacticSenate: {
     id: 'galacticSenate', name: 'Galactic Senate', era: 8,
     cost: { galacticInfluence: 500, starSystems: 100, research: 800, materials: 5000 },
     effects: [{ type: 'production_mult', target: 'galacticInfluence', value: 5 }],
-    description: 'Unite civilizations under one government',
+    description: 'Every species you contact already has a word for this moment. Their prophecies describe you perfectly. They have been waiting.',
     prerequisites: ['wormholeNetwork'],
   },
   culturalAssimilation: {
@@ -702,7 +702,7 @@ export const upgrades = {
       { type: 'production_add', target: 'galacticInfluence', value: 8 },
       { type: 'production_add', target: 'colonies', value: 16 },
     ],
-    description: 'Unified culture accelerates expansion and influence',
+    description: 'A billion worlds adopt a single tongue. It sounds identical to the language carved in the oldest ruins on your homeworld.',
     prerequisites: ['galacticSenate'],
   },
   replicatorArray: {
@@ -741,7 +741,7 @@ export const upgrades = {
       { type: 'unlock_resource', target: 'cosmicPower', value: 1 },
       { type: 'production_add', target: 'cosmicPower', value: 0.5 },
     ],
-    description: 'Create matter from energy — gateway to intergalactic expansion',
+    description: 'Matter from nothing. The replicators hum a frequency that matches the background radiation exactly. The universe already knew this song.',
     prerequisites: ['galacticSenate'],
   },
 
@@ -750,7 +750,7 @@ export const upgrades = {
     id: 'galaxySeeding', name: 'Galaxy Seeding', era: 9,
     cost: { cosmicPower: 300, exoticMatter: 250, galacticInfluence: 600, steel: 5000 },
     effects: [{ type: 'production_mult', target: 'cosmicPower', value: 5 }],
-    description: 'Seed new galaxies with life',
+    description: 'You scatter life across virgin galaxies and find, in every one, fossils of civilizations that were already there. You are not the seed. You are the soil.',
     prerequisites: ['matterReplicators', 'galacticAcademy'],
   },
   cosmicInfrastructure: {

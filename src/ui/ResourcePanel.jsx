@@ -99,7 +99,7 @@ export function ResourcePanel({ state, onUpdate }) {
                           </span>
                         )}
                         {r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0 && (
-                          <span className="text-danger" style={{ fontSize: '0.6em', marginLeft: '4px' }}>FULL</span>
+                          <span className="text-danger" style={{ fontSize: '0.6em', marginLeft: '4px' }} title="Buy cap upgrades (Cap filter) to increase storage">FULL</span>
                         )}
                       </span>
                       <span className="resource-rate">
@@ -150,6 +150,21 @@ export function ResourcePanel({ state, onUpdate }) {
                           {cb[r.id] > 0 && <div>Colonies: +{cb[r.id].toFixed(1)}/s</div>}
                           {rb[r.id] > 0 && <div>Star routes: +{rb[r.id].toFixed(1)}/s</div>}
                           {prestigeMult > 1 && <div>Prestige: x{prestigeMult.toFixed(1)}</div>}
+                          {r.id === 'food' && getEffectiveRate(state, 'labor') > 0 && (
+                            <div style={{ color: '#ff9966' }}>Consumed by: labor (0.3/labor/s)</div>
+                          )}
+                          {r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0 && (
+                            <div style={{ color: '#ff9966' }}>Consumed by: electronics (0.2/elec/s)</div>
+                          )}
+                          {r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0 && (
+                            <div style={{ color: '#ff9966' }}>Consumed by: orbital infra (0.3/orbital/s)</div>
+                          )}
+                          {r.id === 'exoticMaterials' && state.era >= 5 && state.resources.colonies?.unlocked && (
+                            <div style={{ color: '#ff9966' }}>Consumed by: colonies (0.2/colony/s)</div>
+                          )}
+                          {r.id === 'stellarForge' && state.era >= 7 && state.resources.megastructures?.unlocked && (
+                            <div style={{ color: '#ff9966' }}>Consumed by: megastructures (0.3/mega/s)</div>
+                          )}
                           <div style={{ color: '#88dd88' }}>Effective: {formatNumber(r.rate)}/s{net !== r.rate ? ` (net: ${formatNumber(net)}/s)` : ''}</div>
                           {cap > 0 && <div>Cap: {formatNumber(cap)} ({pctFull}% full)</div>}
                         </div>

@@ -30,9 +30,16 @@ export function MiningPanel({ state, onUpdate }) {
     });
   };
 
+  const miningLore = state.era >= 5
+    ? 'You mine where others mined before.'
+    : state.era >= 3
+    ? 'The veins lead deeper. The ore is already refined.'
+    : null;
+
   return (
     <div className="panel mining-panel">
       <h2>Mining{gems > 0 ? ` (${gems} gems)` : ''}{autoMine && <span style={{ fontSize: '0.6em', color: '#88ff88' }}> [AUTO]</span>}</h2>
+      {miningLore && <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#7799aa', margin: '0 0 4px' }}>{miningLore}</p>}
       <div className="mining-info">
         <span>Chance: {chance.toFixed(0)}%</span>
         <span>Streak: {streak}</span>

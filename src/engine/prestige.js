@@ -18,7 +18,8 @@ export function calculatePrestigeBonus(state) {
   }
 
   // Cap prestige bonus to prevent runaway multiplier growth
-  return Math.min(bonus, 10);
+  // 15x allows first prestige to feel meaningful while still capping exponential growth
+  return Math.min(bonus, 15);
 }
 
 // Calculate prestige points earned from current run

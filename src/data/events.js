@@ -79,7 +79,7 @@ export const events = {
   cometCapture: {
     id: 'cometCapture',
     name: 'Comet Capture',
-    description: 'A passing comet is captured — massive fuel reserves!',
+    description: 'The comet\'s trajectory was too perfect -- it fell directly into your fuel processors, as if aimed. The ice inside contained isotopes that don\'t occur naturally.',
     minEra: 5,
     type: 'instant',
     effect: { resourceId: 'rocketFuel', amount: 150 },
@@ -98,7 +98,7 @@ export const events = {
   stellarHarvest: {
     id: 'stellarHarvest',
     name: 'Stellar Harvest',
-    description: 'A star yields exceptional forge output!',
+    description: 'The star shudders and releases a cache of pre-refined metals from its corona. As if it had been storing them. As if it knew you were coming.',
     minEra: 7,
     type: 'timed',
     duration: 40,
@@ -107,7 +107,7 @@ export const events = {
   megastructureBreakthrough: {
     id: 'megastructureBreakthrough',
     name: 'Megastructure Breakthrough',
-    description: 'Engineers discover a more efficient construction method!',
+    description: 'Engineers disassemble a ruin and find the construction technique inside, preserved like a lesson left for them specifically.',
     minEra: 7,
     type: 'instant',
     effect: { resourceId: 'megastructures', amount: 5 },
@@ -116,7 +116,7 @@ export const events = {
   darkMatterSurge: {
     id: 'darkMatterSurge',
     name: 'Dark Matter Surge',
-    description: 'A dark matter wave passes through your territory!',
+    description: 'A dark matter wavefront sweeps through your territory on a schedule that matches ancient timing logs found in the precursor archives.',
     minEra: 6,
     type: 'timed',
     duration: 45,
@@ -125,7 +125,7 @@ export const events = {
   stellarNursery: {
     id: 'stellarNursery',
     name: 'Stellar Nursery',
-    description: 'A star-forming region yields new colonizable systems!',
+    description: 'A stellar nursery blooms with fresh systems. Each newborn star has a companion planet with breathable air and soil that has been tilled before.',
     minEra: 6,
     type: 'instant',
     effect: { resourceId: 'starSystems', amount: 5 },
@@ -154,7 +154,7 @@ export const events = {
   cosmicWindfall: {
     id: 'cosmicWindfall',
     name: 'Cosmic Windfall',
-    description: 'A rift opens, showering the area with exotic matter!',
+    description: 'A rift tears open in exactly the coordinates predicted by a ruin inscription dated to the previous cycle. Exotic matter pours through like an offering.',
     minEra: 8,
     type: 'instant',
     effect: { resourceId: 'exoticMatter', amount: 75 },
@@ -162,7 +162,7 @@ export const events = {
   diplomaticVictory: {
     id: 'diplomaticVictory',
     name: 'Diplomatic Victory',
-    description: 'Your diplomats win over a new sector — influence surges!',
+    description: 'Your diplomats arrive to find the sector already flying flags that bear your insignia. They have been expecting you for centuries.',
     minEra: 8,
     type: 'timed',
     duration: 60,
@@ -173,7 +173,7 @@ export const events = {
   voidEcho: {
     id: 'voidEcho',
     name: 'Void Echo',
-    description: 'A resonance from the void amplifies cosmic power!',
+    description: 'A resonance hums from the intergalactic void -- a harmonic that matches the frequency of your civilization\'s power grid exactly. The void remembers you.',
     minEra: 9,
     type: 'timed',
     duration: 50,

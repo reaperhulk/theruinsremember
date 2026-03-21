@@ -41,17 +41,33 @@ export function Toast({ state }) {
       }
     }
 
-    // New event
+    // New events — batch achievements if 3+ arrive at once
     const currentEvents = state.eventLog?.length || 0;
     if (currentEvents > prevEventsRef.current && state.eventLog?.length > 0) {
-      const latest = state.eventLog[state.eventLog.length - 1];
-      if (latest && !latest.message.startsWith('Gem')) {
-        const isAchievement = latest.message.startsWith('Achievement');
-        const isEra = latest.message.startsWith('ERA');
+      const newCount = currentEvents - prevEventsRef.current;
+      const newEvents = state.eventLog.slice(-newCount);
+      const achievements = newEvents.filter(e => e.message.startsWith('Achievement'));
+      const nonAchievements = newEvents.filter(e => !e.message.startsWith('Achievement') && !e.message.startsWith('Gem'));
+
+      // Batch achievements if 3+ at once
+      if (achievements.length >= 3) {
         newToasts.push({
           id: ++idRef.current,
-          text: latest.message,
-          type: isAchievement ? 'achievement' : isEra ? 'era' : 'event',
+          text: `${achievements.length} achievements earned!`,
+          type: 'achievement',
+        });
+      } else {
+        for (const a of achievements) {
+          newToasts.push({ id: ++idRef.current, text: a.message, type: 'achievement' });
+        }
+      }
+
+      for (const e of nonAchievements) {
+        const isEra = e.message.startsWith('ERA');
+        newToasts.push({
+          id: ++idRef.current,
+          text: e.message,
+          type: isEra ? 'era' : 'event',
         });
       }
     }

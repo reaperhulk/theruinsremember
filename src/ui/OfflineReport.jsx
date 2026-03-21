@@ -8,6 +8,18 @@ function resourceName(id) {
 export function OfflineReport({ report, onDismiss }) {
   if (!report) return null;
 
+  // Show brief loading state for large offline periods
+  if (report.processing) {
+    return (
+      <div className="offline-overlay">
+        <div className="offline-report">
+          <h2>Processing Offline Progress...</h2>
+          <p className="offline-time" style={{ textAlign: 'center', color: '#aaa' }}>Calculating {formatTime(report.elapsed)} of production...</p>
+        </div>
+      </div>
+    );
+  }
+
   const gains = Object.entries(report.gains).filter(([, v]) => v > 0.1);
 
   return (
