@@ -8,11 +8,14 @@ export function DockingPanel({ state, onUpdate }) {
   const prevComboRef = useRef(state.dockingCombo || 0);
   const animRef = useRef(null);
   const startTimeRef = useRef(performance.now());
+  const eraRef = useRef(state.era);
+
+  useEffect(() => { eraRef.current = state.era; }, [state.era]);
 
   useEffect(() => {
     const animate = (now) => {
       const elapsed = (now - startTimeRef.current) / 1000;
-      setPosition(getIndicatorPosition(elapsed, state.era));
+      setPosition(getIndicatorPosition(elapsed, eraRef.current));
       animRef.current = requestAnimationFrame(animate);
     };
     animRef.current = requestAnimationFrame(animate);

@@ -29,6 +29,13 @@ body {
   background: #555;
 }
 
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid #7cb7ff;
+  outline-offset: 2px;
+}
+
 .game-container {
   max-width: 900px;
   margin: 0 auto;
@@ -1501,22 +1508,6 @@ canvas:hover {
   50% { text-shadow: 0 0 30px rgba(139, 233, 253, 0.8), 0 0 60px rgba(139, 233, 253, 0.5), 0 0 80px rgba(139, 233, 253, 0.2); }
 }
 
-/* Mine button flash on gem find */
-.mine-btn:active {
-  background: #5a8a5a;
-  transform: scale(0.98);
-}
-
-/* Smooth number transitions */
-.resource-amount {
-  transition: color 0.2s ease;
-  font-variant-numeric: tabular-nums;
-}
-
-.resource-amount.near-cap {
-  color: #ff8844;
-}
-
 .cap-indicator {
   font-size: 0.8em;
   color: #888;
@@ -1560,12 +1551,6 @@ canvas:hover {
 .upgrade-btn.lore-upgrade {
   border-left: 3px solid #bb88ff;
   background: linear-gradient(90deg, rgba(187, 136, 255, 0.08), transparent);
-}
-
-/* Resource amount smooth transitions */
-.resource-amount {
-  transition: color 0.3s ease;
-  font-variant-numeric: tabular-nums;
 }
 
 .resource-amount.increasing {

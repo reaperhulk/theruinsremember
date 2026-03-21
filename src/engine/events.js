@@ -53,6 +53,28 @@ export function applyEvent(state, event) {
 }
 
 function applyInstantEvent(state, event) {
+  // Support multi-effect events via an `effects` array
+  if (event.effects) {
+    let s = state;
+    for (const fx of event.effects) {
+      const r = s.resources[fx.target];
+      if (!r) continue;
+      const eraScale = 1 + (s.era - 1) * 0.5;
+      const scaledAmount = fx.value * eraScale * s.prestigeMultiplier;
+      s = {
+        ...s,
+        resources: {
+          ...s.resources,
+          [fx.target]: {
+            ...r,
+            amount: Math.max(0, r.amount + scaledAmount),
+          },
+        },
+      };
+    }
+    return s;
+  }
+
   const { resourceId, amount } = event.effect;
   const r = state.resources[resourceId];
   if (!r) return state;
@@ -77,11 +99,16 @@ function applyTimedEvent(state, event) {
   const activeEffects = state.activeEffects || [];
   const endsAt = state.totalTime + event.duration;
 
+  // For events with an effects array, convert to the internal effect format
+  const effect = event.effect || (event.effects && event.effects.length > 0
+    ? { resourceId: event.effects[0].target, rateMultBonus: event.effects[0].value }
+    : {});
+
   return {
     ...state,
     activeEffects: [
       ...activeEffects,
-      { id: event.id, endsAt, effect: event.effect, description: event.description },
+      { id: event.id, endsAt, effect, description: event.description },
     ],
   };
 }
@@ -102,7 +129,9 @@ export function getTimedRateMultiplier(state, resourceId) {
   const activeEffects = state.activeEffects || [];
   let mult = 1;
   for (const ae of activeEffects) {
-    if (ae.effect.resourceId === resourceId && ae.effect.rateMultBonus) {
+    // Support 'all' target that multiplies every resource
+    const matches = ae.effect.resourceId === resourceId || ae.effect.resourceId === 'all';
+    if (matches && ae.effect.rateMultBonus) {
       mult *= ae.effect.rateMultBonus;
     }
   }

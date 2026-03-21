@@ -116,19 +116,19 @@ export const upgrades = {
     cost: { steel: 15, energy: 20, food: 25 },
     effects: [
       { type: 'production_mult', target: 'steel', value: 3 },
-      { type: 'production_add', target: 'electronics', value: 0.5 },
+      { type: 'production_add', target: 'electronics', value: 1.5 },
     ],
-    description: 'Mass production of steel and electronics',
+    description: 'Mass production of steel and electronics (+1.5 electronics/s)',
     prerequisites: ['foundry'],
   },
   steelForge: {
     id: 'steelForge', name: 'Steel Forge', era: 2,
     cost: { steel: 12, materials: 20, labor: 15 },
     effects: [
-      { type: 'production_add', target: 'electronics', value: 0.8 },
+      { type: 'production_add', target: 'electronics', value: 1.2 },
       { type: 'production_add', target: 'steel', value: 0.5 },
     ],
-    description: 'A dedicated steel forge boosts steel output and produces basic electronics',
+    description: 'A dedicated steel forge boosts steel output and produces electronics (+1.2/s)',
     prerequisites: ['foundry'],
   },
   ironWorks: {
@@ -151,8 +151,8 @@ export const upgrades = {
   computingLab: {
     id: 'computingLab', name: 'Computing Lab', era: 2,
     cost: { electronics: 30, energy: 40, food: 50 },
-    effects: [{ type: 'production_add', target: 'research', value: 1.0 }],
-    description: 'Begin scientific research — steady research output',
+    effects: [{ type: 'production_add', target: 'research', value: 1.5 }],
+    description: 'Begin scientific research — strong research output (+1.5/s)',
     prerequisites: ['assemblyLines'],
   },
   automation: {
@@ -197,7 +197,7 @@ export const upgrades = {
   // Era 3: Digital Age
   internet: {
     id: 'internet', name: 'Internet', era: 3,
-    cost: { electronics: 80, research: 60 },
+    cost: { electronics: 50, research: 40 },
     effects: [{ type: 'production_add', target: 'software', value: 1.5 }],
     description: 'Global communication network enables rapid software development',
     prerequisites: ['computingLab'],
@@ -2570,9 +2570,21 @@ export const upgrades = {
   orbitalFuelSynthesis: { id: 'orbitalFuelSynthesis', name: 'Orbital Fuel Synthesis', era: 4, cost: { orbitalInfra: 12, rocketFuel: 20, research: 25 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 0.8 }, { type: 'production_add', target: 'orbitalInfra', value: 1.0 }], description: 'Synthesize fuel in orbit — orbital and fuel chains merge', prerequisites: ['spaceStation', 'deepSpaceProbe'] },
   telescopeNetwork: { id: 'telescopeNetwork', name: 'Telescope Network', era: 4, cost: { electronics: 25, research: 30, orbitalInfra: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'data', value: 0.6 }], description: 'Linked orbital telescopes merge observation and satellite data', prerequisites: ['orbitalTelescope', 'satelliteNetwork'] },
 
+  // Era 4: deeper upgrade chains and cross-era connections
+  orbitalFoundry: { id: 'orbitalFoundry', name: 'Orbital Foundry', era: 4, cost: { rocketFuel: 30, steel: 50, electronics: 40 }, effects: [{ type: 'production_mult', target: 'steel', value: 2 }, { type: 'production_add', target: 'orbitalInfra', value: 1.5 }], description: 'Zero-gravity smelting produces impossibly pure alloys — the old foundries pale in comparison.', prerequisites: ['spaceStation', 'advancedMaterials'] },
+  missionArchive: { id: 'missionArchive', name: 'Mission Archive', era: 4, cost: { data: 60, research: 80, rocketFuel: 20 }, effects: [{ type: 'production_mult', target: 'data', value: 3 }, { type: 'production_add', target: 'research', value: 2.0 }], description: 'Decades of mission data reveal patterns — the orbital debris is arranged with mathematical precision.', prerequisites: ['deepSpaceProbe', 'orbitalTelescope'] },
+  fuelNexus: { id: 'fuelNexus', name: 'Fuel Nexus', era: 4, cost: { rocketFuel: 40, energy: 80, steel: 60 }, effects: [{ type: 'production_mult', target: 'rocketFuel', value: 2 }, { type: 'cap_mult', target: 'rocketFuel', value: 3 }], description: 'A network of fuel depots ensures steady supply — the ancient fuel lines mirror our own design.', prerequisites: ['reusableRockets', 'nuclearReactor'] },
+  spaceAgeCapstone: { id: 'spaceAgeCapstone', name: 'Space Age Capstone', era: 4, cost: { orbitalInfra: 50, rocketFuel: 60, research: 100 }, effects: [{ type: 'production_mult_all', value: 1.3 }, { type: 'cap_mult', target: 'orbitalInfra', value: 3 }], description: 'Integrating all orbital systems reveals a chilling truth — the previous civilization had this exact configuration.', prerequisites: ['orbitalFoundry', 'missionArchive', 'fuelNexus'] },
+
   // Era 5: cross-link colony and exotic material chains
   colonyRefinery: { id: 'colonyRefinery', name: 'Colony Refinery', era: 5, cost: { colonies: 5, exoticMaterials: 25, energy: 50 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 0.8 }, { type: 'production_add', target: 'colonies', value: 0.5 }], description: 'Colonial refineries process exotic materials — colony and material chains merge', prerequisites: ['outerColony', 'solarCollector'] },
   fusionMiningRig: { id: 'fusionMiningRig', name: 'Fusion Mining Rig', era: 5, cost: { rocketFuel: 50, exoticMaterials: 30, research: 60 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 1.2 }, { type: 'production_add', target: 'energy', value: 3 }], description: 'Fusion-powered mining rigs extract exotic materials with enormous energy output', prerequisites: ['asteroidMining', 'gravityWell'] },
+
+  // Era 5: deeper upgrade chains and cross-era connections
+  xenobotany: { id: 'xenobotany', name: 'Xenobotany', era: 5, cost: { colonies: 15, exoticMaterials: 30, food: 100 }, effects: [{ type: 'production_mult', target: 'colonies', value: 2 }, { type: 'production_add', target: 'food', value: 3.0 }], description: 'Alien plant life responds to our agriculture — as if it was designed for human cultivation.', prerequisites: ['terraforming', 'geneticEngineering'] },
+  exoticSynthesizer: { id: 'exoticSynthesizer', name: 'Exotic Synthesizer', era: 5, cost: { exoticMaterials: 40, energy: 100, steel: 80 }, effects: [{ type: 'production_mult', target: 'exoticMaterials', value: 3 }, { type: 'production_add', target: 'materials', value: 5.0 }], description: 'Processing exotic materials with conventional methods works perfectly — too perfectly.', prerequisites: ['asteroidMining', 'colonyRefinery'] },
+  solarSurvey: { id: 'solarSurvey', name: 'Stellar Cartography', era: 5, cost: { research: 120, data: 60, exoticMaterials: 20 }, effects: [{ type: 'production_mult', target: 'research', value: 2 }, { type: 'cap_mult', target: 'exoticMaterials', value: 3 }], description: 'Mapping the solar system reveals ancient navigation beacons at every Lagrange point.', prerequisites: ['nanofabricator', 'outerColony'] },
+  solarAgeCapstone: { id: 'solarAgeCapstone', name: 'Solar Age Capstone', era: 5, cost: { colonies: 30, exoticMaterials: 60, research: 150 }, effects: [{ type: 'production_mult_all', value: 1.5 }, { type: 'cap_mult', target: 'colonies', value: 5 }], description: 'The solar system was seeded — engineered to support exactly this sequence of development.', prerequisites: ['xenobotany', 'exoticSynthesizer', 'solarSurvey'] },
 
   // Era 6: cross-link star system and dark energy chains
   darkStarProbe: { id: 'darkStarProbe', name: 'Dark Star Probe', era: 6, cost: { darkEnergy: 30, starSystems: 8, research: 80 }, effects: [{ type: 'production_add', target: 'starSystems', value: 1.2 }, { type: 'production_add', target: 'darkEnergy', value: 0.8 }], description: 'Probes powered by dark energy discover new star systems faster', prerequisites: ['stellarCartography', 'nebulaMining'] },

@@ -62,11 +62,11 @@ export function StatsPanel({ state }) {
         </div>
         <div className="stat-row">
           <span>Upgrades</span>
-          <span>{Object.keys(state.upgrades).length}</span>
+          <span>{Object.keys(state.upgrades || {}).length}</span>
         </div>
         <div className="stat-row">
           <span>Technologies</span>
-          <span>{Object.keys(state.tech).length}</span>
+          <span>{Object.keys(state.tech || {}).length}</span>
         </div>
         <div className="stat-row">
           <span>Gems Found</span>
@@ -106,7 +106,7 @@ export function StatsPanel({ state }) {
         </div>
         <div className="stat-row">
           <span>Production Mult</span>
-          <span>x{state.prestigeMultiplier.toFixed(1)}</span>
+          <span>x{(state.prestigeMultiplier || 1).toFixed(1)}</span>
         </div>
         {(state.totalResourcesProduced || 0) > 0 && (
           <div className="stat-row">

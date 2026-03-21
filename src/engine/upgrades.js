@@ -105,10 +105,8 @@ export function purchaseUpgrade(state, upgradeId) {
     if (!state.upgrades[prereq]) return null;
   }
 
-  // Get actual cost (scaled for repeatables)
-  const cost = isRepeatable
-    ? getScaledCost(def.cost, def.costScale || 1.5, purchaseCount)
-    : def.cost;
+  // Get actual cost (scaled for repeatables, with prestige discounts)
+  const cost = getUpgradeCost(state, upgradeId);
 
   // Check and spend cost
   const afterSpend = spend(state, cost);
