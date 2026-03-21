@@ -1,14 +1,38 @@
+import { useState } from 'react';
 import { eraNames, countEraUpgrades } from '../engine/eras.js';
 import { getPrestigeSummary } from '../engine/prestige.js';
 import { getAchievementList } from '../engine/achievements.js';
 import { getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
+import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { formatTime, formatNumber } from './format.js';
 
+const LORE_UPGRADE_IDS = [
+  'precursorBeacon', 'deadStarAtlas', 'hollowDyson', 'echoBlueprint',
+  'galacticOssuary', 'convergenceCodex', 'universalTombstone', 'inevitabilityEngine',
+  'recursionScar', 'finalIteration',
+];
+
 export function StatsPanel({ state }) {
+  const [showCodex, setShowCodex] = useState(false);
   const achievementList = getAchievementList(state);
   const earnedCount = achievementList.filter(a => a.earned).length;
   const summary = getPrestigeSummary(state);
+
+  // Lore codex — discovered lore upgrades
+  const discoveredLore = LORE_UPGRADE_IDS
+    .filter(id => state.upgrades?.[id])
+    .map(id => upgradeDefs[id])
+    .filter(Boolean);
+  // Lore events from event log
+  const loreEvents = (state.eventLog || [])
+    .filter(e => e.message && (
+      e.message.includes('ruins') || e.message.includes('ancient') || e.message.includes('Precursor') ||
+      e.message.includes('Ghost') || e.message.includes('derelict') || e.message.includes('Strange') ||
+      e.message.includes('buried') || e.message.includes('sealed') || e.message.includes('holographic') ||
+      e.message.includes('tally') || e.message.includes('star map') || e.message.includes('photograph') ||
+      e.message.includes('foundation') || e.message.includes('geometric') || e.message.includes('wreckage')
+    ));
 
   return (
     <div className="panel stats-panel">
@@ -125,6 +149,34 @@ export function StatsPanel({ state }) {
             </div>
           ))}
       </div>
+
+      {(discoveredLore.length > 0 || loreEvents.length > 0) && (
+        <>
+          <h3 onClick={() => setShowCodex(!showCodex)} style={{ cursor: 'pointer' }}>
+            Codex {showCodex ? '(hide)' : `(${discoveredLore.length + loreEvents.length} entries)`}
+          </h3>
+          {showCodex && (
+            <div className="achievement-list" style={{ marginBottom: '8px' }}>
+              {discoveredLore.map(u => (
+                <div key={u.id} className="achievement earned" style={{ borderLeft: '2px solid #bb88ff' }}>
+                  <span className="achievement-name">{u.name}</span>
+                  <span className="achievement-desc" style={{ color: '#ccaa88', fontStyle: 'italic' }}>{u.description}</span>
+                </div>
+              ))}
+              {loreEvents.slice(-10).map((e, i) => (
+                <div key={i} className="achievement earned" style={{ borderLeft: '2px solid #888866' }}>
+                  <span className="achievement-desc" style={{ color: '#aa9977', fontStyle: 'italic' }}>{e.message}</span>
+                </div>
+              ))}
+              {discoveredLore.length === 0 && loreEvents.length > 0 && (
+                <div style={{ fontSize: '0.7em', color: '#666', marginTop: '4px' }}>
+                  Purchase lore upgrades to uncover the full story...
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
 
       <h3>Achievements ({earnedCount}/{achievementList.length} — {achievementList.filter(a => a.earned).reduce((s, a) => s + (a.reward || 0), 0)} pts earned)</h3>
       <div className="achievement-progress-bar">

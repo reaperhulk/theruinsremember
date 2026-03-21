@@ -2,6 +2,8 @@
 // Each achievement: { id, name, description, check: (state) => boolean, reward }
 // reward: number of prestige points granted on first completion
 
+import { upgrades } from './upgrades.js';
+
 export const achievements = [
   // Mining achievements
   { id: 'firstGem', name: 'Lucky Strike', description: 'Find your first gem', check: s => (s.totalGems || 0) >= 1, reward: 1 },
