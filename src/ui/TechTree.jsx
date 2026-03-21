@@ -18,8 +18,9 @@ function CostDisplay({ cost, state }) {
         return (
           <span key={id}>
             {i > 0 && ', '}
-            <span style={{ color: enough ? '#88cc88' : '#ff8888' }}>
+            <span style={{ color: enough ? '#88cc88' : '#ff6666', fontWeight: enough ? 'normal' : 'bold' }}>
               {resourceName(id)}: {formatNumber(amount)}
+              {!enough && <span style={{ fontWeight: 'normal', fontSize: '0.85em', color: '#cc8888' }}> ({formatNumber(have)})</span>}
             </span>
           </span>
         );
@@ -72,7 +73,7 @@ export function TechTree({ state, onUpdate }) {
   if (available.length === 0) {
     return (
       <div className="panel tech-panel">
-        <h2>Technology{unlockedCount > 0 ? ` — ${unlockedCount} done` : ''}</h2>
+        <h2>Technology (0 available){unlockedCount > 0 ? ` — ${unlockedCount} done` : ''}</h2>
         <p className="empty-message">No research available</p>
       </div>
     );

@@ -38,7 +38,7 @@ export function ColonyPanel({ state, onUpdate }) {
 
   return (
     <div className="panel colony-panel">
-      <h2>Colonies{maxColonies > 0 ? ` (${formatNumber(maxColonies)}${strategy.type !== 'none' ? ` ${strategy.type}` : ''})` : ''}</h2>
+      <h2>Colonies ({formatNumber(maxColonies)}){strategy.type !== 'none' ? ` — ${strategy.type}` : ''}</h2>
       <div className="factory-info">
         <span>Colonies: {formatNumber(available)}/{formatNumber(maxColonies)} available</span>
         {maxColonies >= 3 && (

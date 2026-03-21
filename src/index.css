@@ -284,13 +284,10 @@ input:focus-visible {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 4px;
-  animation: upcoming-fade 3s ease-in-out infinite;
+  /* static styling — no animation, avoids distracting pulse */
 }
 
-@keyframes upcoming-fade {
-  0%, 100% { color: #666; }
-  50% { color: #888; }
-}
+/* upcoming-fade animation removed — was purely decorative */
 
 .upcoming-upgrade {
   display: flex;

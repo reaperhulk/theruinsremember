@@ -120,6 +120,61 @@ function drawEra1(ctx, w, h, t) {
     ctx.fillRect(b.x + b.w / 2 - 2, groundY - b.h + 5, 4, 4);
   }
 
+  // Wrecked ship hull in background (half-buried)
+  const wreckX = w * 0.7;
+  const wreckGroundY = h * 0.68 + Math.sin(wreckX * 0.02 + 4) * 12;
+  ctx.fillStyle = '#8a8a9a';
+  ctx.beginPath();
+  ctx.ellipse(wreckX, wreckGroundY, 28, 10, -0.15, 0, Math.PI);
+  ctx.fill();
+  ctx.fillStyle = '#6a6a7a';
+  ctx.beginPath();
+  ctx.ellipse(wreckX, wreckGroundY, 28, 10, -0.15, Math.PI, Math.PI * 2);
+  ctx.fill();
+  // Hull detail lines
+  ctx.strokeStyle = '#5a5a6a';
+  ctx.lineWidth = 0.8;
+  for (let i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.moveTo(wreckX - 20 + i * 12, wreckGroundY - 6);
+    ctx.lineTo(wreckX - 18 + i * 12, wreckGroundY + 2);
+    ctx.stroke();
+  }
+  // Broken antenna sticking out
+  ctx.strokeStyle = '#aaa';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(wreckX + 10, wreckGroundY - 8);
+  ctx.lineTo(wreckX + 16, wreckGroundY - 22);
+  ctx.lineTo(wreckX + 20, wreckGroundY - 20);
+  ctx.stroke();
+
+  // Birds in the sky
+  for (let i = 0; i < 4; i++) {
+    const bx = ((t * (8 + i * 4) + i * 70) % (w + 60)) - 30;
+    const by = 30 + i * 12 + Math.sin(t * 1.5 + i) * 3;
+    ctx.strokeStyle = `rgba(30,30,30,${0.3 + i * 0.08})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(bx - 4, by + 2);
+    ctx.quadraticCurveTo(bx - 2, by - 2, bx, by);
+    ctx.quadraticCurveTo(bx + 2, by - 2, bx + 4, by + 2);
+    ctx.stroke();
+  }
+
+  // Smoke wisps from crash site
+  for (let p = 0; p < 5; p++) {
+    const age = ((t * 0.4 + p * 0.6) % 3);
+    const smokeX = wreckX + Math.sin(age * 1.5 + p) * (age * 4);
+    const smokeY = wreckGroundY - 8 - age * 18;
+    const size = 2 + age * 3;
+    const alpha = Math.max(0, 0.25 - age * 0.08);
+    ctx.fillStyle = `rgba(120,120,130,${alpha})`;
+    ctx.beginPath();
+    ctx.arc(smokeX, smokeY, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   // Settlers walking
   for (let i = 0; i < 6; i++) {
     const sx = ((t * (15 + i * 5) + i * 50) % (w + 20)) - 10;
@@ -235,6 +290,43 @@ function drawEra2(ctx, w, h, t) {
     const bx = ((i * 50 + t * 30) % (w + 20)) - 10;
     ctx.fillStyle = '#a08050';
     ctx.fillRect(bx, beltY - 6, 8, 6);
+  }
+
+  // Animated gears on factory exteriors
+  const gearPositions = [
+    { x: 60, y: h * 0.65 - 8, r: 6 },
+    { x: 155, y: h * 0.65 - 12, r: 8 },
+    { x: 235, y: h * 0.65 - 6, r: 5 },
+  ];
+  for (const g of gearPositions) {
+    const teeth = g.r > 6 ? 8 : 6;
+    const angle = t * 1.5 * (g.r > 6 ? 1 : -1.4);
+    ctx.save();
+    ctx.translate(g.x, g.y);
+    ctx.rotate(angle);
+    // Gear body
+    ctx.fillStyle = '#777';
+    ctx.beginPath();
+    ctx.arc(0, 0, g.r * 0.65, 0, Math.PI * 2);
+    ctx.fill();
+    // Gear teeth
+    for (let i = 0; i < teeth; i++) {
+      const a = (i / teeth) * Math.PI * 2;
+      ctx.fillStyle = '#888';
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a - 0.2) * g.r * 0.55, Math.sin(a - 0.2) * g.r * 0.55);
+      ctx.lineTo(Math.cos(a - 0.15) * g.r, Math.sin(a - 0.15) * g.r);
+      ctx.lineTo(Math.cos(a + 0.15) * g.r, Math.sin(a + 0.15) * g.r);
+      ctx.lineTo(Math.cos(a + 0.2) * g.r * 0.55, Math.sin(a + 0.2) * g.r * 0.55);
+      ctx.closePath();
+      ctx.fill();
+    }
+    // Center hole
+    ctx.fillStyle = '#444';
+    ctx.beginPath();
+    ctx.arc(0, 0, g.r * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 
   // Smog overlay

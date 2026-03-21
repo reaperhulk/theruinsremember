@@ -192,6 +192,11 @@ export function App() {
       <EraTransition era={state.era} />
       <Toast state={state} />
       <EraProgress state={state} />
+      {state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
+        <div style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '2px 0' }}>
+          Gather resources by clicking +1 buttons. Buy upgrades to automate production.
+        </div>
+      )}
 
       <div className="game-layout">
         <div className="left-column">

@@ -54,7 +54,7 @@ export function TradingPanel({ state, onUpdate }) {
 
   return (
     <div className="panel trading-panel">
-      <h2>Trading{(state.totalTrades || 0) > 0 ? ` (${state.totalTrades} trades)` : ''}</h2>
+      <h2>Trading ({state.totalTrades || 0} trades)</h2>
       {quickTrades.length > 0 && (
         <div className="trade-quick" style={{ marginBottom: '8px' }}>
           <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '4px' }}>Quick trades:</div>

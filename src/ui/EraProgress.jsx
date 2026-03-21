@@ -102,6 +102,11 @@ export function EraProgress({ state }) {
     <div className="panel era-panel">
       <h2>Era {state.era}: {currentEra} {eraCompletion >= 100 && '(complete)'}</h2>
       <p style={{ fontSize: '0.8em', color: '#998866', fontStyle: 'italic', margin: '0 0 4px' }}>{loreHint}</p>
+      {eraUpgradeCount === 0 && state.totalTime < 120 && (
+        <p style={{ fontSize: '0.75em', color: '#666', marginTop: '2px' }}>
+          Tip: Click the +1 buttons to gather resources, then buy upgrades on the right
+        </p>
+      )}
       {!isMaxEra && !upgradesMet && (
         <p className="era-hint">
           Buy {minUpgrades - eraUpgradeCount} more upgrades, then research ★ tech to advance

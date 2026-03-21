@@ -25,8 +25,9 @@ function CostDisplay({ cost, state }) {
         return (
           <span key={id}>
             {i > 0 && ', '}
-            <span style={{ color: enough ? '#88cc88' : '#ff8888' }}>
+            <span style={{ color: enough ? '#88cc88' : '#ff6666', fontWeight: enough ? 'normal' : 'bold' }}>
               {resourceName(id)}: {formatNumber(amount)}
+              {!enough && <span style={{ fontWeight: 'normal', fontSize: '0.85em', color: '#cc8888' }}> ({formatNumber(have)})</span>}
             </span>
           </span>
         );
@@ -122,7 +123,8 @@ export function UpgradePanel({ state, onUpdate }) {
   return (
     <div className="panel upgrade-panel">
       <h2>
-        Upgrades{filteredAvailable.length > 0 ? ` (${filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length}/${filteredAvailable.length})` : ''}{upcoming.length > 0 ? ` — ${upcoming.length} soon` : ''}
+        Upgrades{filteredAvailable.length > 0 ? ` (${filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length}/${filteredAvailable.length})` : ''}
+        {upcoming.length > 0 ? ` — ${upcoming.length} soon` : ''}
         {purchased.length > 0 && (
           <span
             className="toggle-purchased"

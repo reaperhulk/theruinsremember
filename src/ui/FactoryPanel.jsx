@@ -17,7 +17,7 @@ export function FactoryPanel({ state, onUpdate }) {
 
   return (
     <div className="panel factory-panel">
-      <h2>Factory{efficient && fullCapacity ? ' (MAX)' : efficient ? ' (+50%)' : ''} — {pool} workers</h2>
+      <h2>Factory ({pool} workers){efficient && fullCapacity ? ' — MAX' : efficient ? ' — +50%' : ''}</h2>
       <div className="factory-info">
         <span>Workers: {available}/{pool} available</span>
         {efficient && <span style={{ color: '#88ff88' }}>+50%</span>}
