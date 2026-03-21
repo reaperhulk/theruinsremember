@@ -3,13 +3,81 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { calculateProduction } from '../engine/resources.js';
 import { formatNumber, formatTime } from './format.js';
 
-function getLoreHint(eraCompletion, isMaxEra) {
-  if (isMaxEra) return 'You stand at the threshold of infinity.';
-  if (eraCompletion === 0) return 'The journey begins...';
-  if (eraCompletion < 25) return 'Foundations are being laid.';
-  if (eraCompletion < 50) return 'Momentum builds.';
-  if (eraCompletion < 75) return 'The next breakthrough approaches.';
-  return 'The horizon shifts. A new age dawns.';
+function getLoreHint(eraCompletion, isMaxEra, era) {
+  if (isMaxEra) return 'The cycle completes. The cycle begins again.';
+  if (eraCompletion === 0) {
+    const starts = {
+      1: 'Smoke rises from the wreckage. Survivors gather.',
+      2: 'The first furnace glows. Something stirs beneath the dig site.',
+      3: 'The old machines are waking up.',
+      4: 'The sky is full of wreckage that isn\'t yours.',
+      5: 'Other worlds bear scars of habitation.',
+      6: 'Dead beacons flicker back to life at your approach.',
+      7: 'The dark sphere waits in silence.',
+      8: 'Ruins everywhere. Every galaxy. Every star.',
+      9: 'The pattern is inescapable.',
+      10: 'You remember this. You have always remembered this.',
+    };
+    return starts[era] || 'The journey begins...';
+  }
+  if (eraCompletion < 25) {
+    const early = {
+      1: 'Strange metal fragments litter the crash site.',
+      2: 'Miners report structures too deep to be natural.',
+      3: 'Fragments of ancient data surface in the static.',
+      4: 'Orbital scans reveal geometric patterns in the debris.',
+      5: 'Collapsed domes dot the surface of every moon.',
+      6: 'The star maps lead somewhere. Nowhere good.',
+      7: 'The sphere\'s power grid could still function.',
+      8: 'A thousand dead civilizations left the same last message.',
+      9: 'They all reached this far. They all fell silent.',
+      10: 'The walls between worlds are thinner than memory.',
+    };
+    return early[era] || 'Foundations are being laid.';
+  }
+  if (eraCompletion < 50) {
+    const mid = {
+      1: 'The ruins predate anything in the ship\'s database.',
+      2: 'The buried factories look... familiar.',
+      3: 'The warnings are becoming clearer. You wish they weren\'t.',
+      4: 'Those stations were abandoned in a hurry.',
+      5: 'The terraforming matches your own techniques exactly.',
+      6: 'Every beacon tells the same story: expansion, then silence.',
+      7: 'Someone else\'s handprints are on every control surface.',
+      8: 'The ruins aren\'t from different civilizations. They\'re from the same one, over and over.',
+      9: 'The cosmic web pulses with old, old signals.',
+      10: 'Each prestige is a heartbeat in something vast.',
+    };
+    return mid[era] || 'Momentum builds.';
+  }
+  if (eraCompletion < 75) {
+    const late = {
+      1: 'Who were they? What happened to them?',
+      2: 'The deeper you dig, the more you find.',
+      3: 'The dead language is starting to feel native.',
+      4: 'The wreckage matches your ship designs. Closely.',
+      5: 'These colonies failed. Yours might too.',
+      6: 'The beacons aren\'t guiding you. They\'re warning you.',
+      7: 'The sphere wasn\'t abandoned. It was left as a monument.',
+      8: 'You are not the first to understand. You won\'t be the last.',
+      9: 'Transcendence is the trap. Expansion is the bait.',
+      10: 'The loop tightens. The loop is all there is.',
+    };
+    return late[era] || 'The next breakthrough approaches.';
+  }
+  const final = {
+    1: 'A new age stirs. The old one watches.',
+    2: 'Industry roars. The buried city hums in sympathy.',
+    3: 'You can read the warnings now. They say: "We were you."',
+    4: 'The void opens. It has been opened before.',
+    5: 'The solar system is a graveyard you\'re building on.',
+    6: 'Every star you reach has already been mourned.',
+    7: 'The sphere activates. It remembers its last owners.',
+    8: 'The galaxy is a fossil record of ambition.',
+    9: 'You see the edge. Beyond it, only recursion.',
+    10: 'Reset. Rebuild. Remember. Repeat.',
+  };
+  return final[era] || 'The horizon shifts. A new age dawns.';
 }
 
 export function EraProgress({ state }) {
@@ -22,7 +90,7 @@ export function EraProgress({ state }) {
   const upgradesMet = eraUpgradeCount >= minUpgrades;
   const totalEraUpgrades = Object.values(upgradeDefs).filter(u => u.era === state.era).length;
   const eraCompletion = totalEraUpgrades > 0 ? Math.floor(eraUpgradeCount / totalEraUpgrades * 100) : 0;
-  const loreHint = getLoreHint(eraCompletion, isMaxEra);
+  const loreHint = getLoreHint(eraCompletion, isMaxEra, state.era);
 
   // Calculate total production rate across all unlocked resources
   const rates = calculateProduction(state);

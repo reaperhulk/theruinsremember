@@ -1394,6 +1394,58 @@ export const events = {
 
   // Era 10
   realityEchoStorm: { id: 'realityEchoStorm', name: 'Reality Echo Storm', description: 'A storm of echoing realities creates a torrent of fragments and echoes!', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'realityFragments', rateMultBonus: 18 } },
+
+  // --- Lore Discovery Events ---
+
+  // Era 1: Planetfall
+  loreMetalFragments: { id: 'loreMetalFragments', name: 'Strange Metal Fragments', description: 'Scavengers find metal shards in the crash debris — too precise, too old. These aren\'t from your ship.', minEra: 1, type: 'instant', effect: { resourceId: 'materials', amount: 15 } },
+  loreBuriedFoundation: { id: 'loreBuriedFoundation', name: 'Buried Foundation', description: 'Digging a latrine, a settler hits stone — cut stone, laid in perfect rows, under millennia of soil.', minEra: 1, type: 'instant', effect: { resourceId: 'materials', amount: 20 } },
+  loreEerieSignal: { id: 'loreEerieSignal', name: 'Eerie Signal', description: 'The comms array picks up a repeating signal from deep underground. It matches no known encoding.', minEra: 1, type: 'instant', effect: { resourceId: 'energy', amount: 10 } },
+
+  // Era 2: Industrialization
+  loreBuriedMachine: { id: 'loreBuriedMachine', name: 'Buried Machine', description: 'Miners breach a sealed chamber. Inside: a machine, intact, its purpose unknowable. It looks like it was mass-produced.', minEra: 2, type: 'instant', effect: { resourceId: 'steel', amount: 30 } },
+  loreAncientFactory: { id: 'loreAncientFactory', name: 'Ancient Factory Floor', description: 'An excavation reveals a factory floor stretching for kilometers. The assembly lines mirror your own designs.', minEra: 2, type: 'instant', effect: { resourceId: 'research', amount: 40 } },
+  loreFamiliarBlueprint: { id: 'loreFamiliarBlueprint', name: 'Familiar Blueprint', description: 'Engineers recover a schematic from the ruins. It\'s for a furnace. Your furnace. The same one you just built.', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 3 } },
+
+  // Era 3: Digital Age
+  loreAncientDataCore: { id: 'loreAncientDataCore', name: 'Ancient Data Core', description: 'A data core surfaces from the ruins, still powered after eons. The file structure is hauntingly familiar.', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 25 } },
+  loreDeadLanguageWarning: { id: 'loreDeadLanguageWarning', name: 'Dead Language Warning', description: 'Linguists crack the ancient script. The first decoded phrase: "DO NOT REPEAT OUR MISTAKES."', minEra: 3, type: 'instant', effect: { resourceId: 'research', amount: 50 } },
+  loreGoldenAgeRecords: { id: 'loreGoldenAgeRecords', name: 'Golden Age Records', description: 'Archives describe a golden age — limitless energy, perfect health, infinite ambition. Then the records simply stop.', minEra: 3, type: 'timed', duration: 30, effect: { resourceId: 'software', rateMultBonus: 3 } },
+
+  // Era 4: Space Age
+  loreOrbitalGraveyard: { id: 'loreOrbitalGraveyard', name: 'Orbital Graveyard', description: 'The debris field resolves on sensors: thousands of ships, all facing outward, as if fleeing something below.', minEra: 4, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 10 } },
+  loreGhostStation: { id: 'loreGhostStation', name: 'Ghost Station', description: 'A derelict station drifts in high orbit. Life support still cycles. No bodies. No logs. Just empty halls and running machines.', minEra: 4, type: 'instant', effect: { resourceId: 'research', amount: 80 } },
+  loreFamiliarHulls: { id: 'loreFamiliarHulls', name: 'Familiar Hulls', description: 'The wreckage uses the same alloy ratios as your own ships. The design language is unmistakable. These were your people.', minEra: 4, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 60 } },
+
+  // Era 5: Solar System
+  loreTerraformedRuins: { id: 'loreTerraformedRuins', name: 'Terraformed Ruins', description: 'Mars has breathable air in its deepest valleys. Someone terraformed it, long ago. The atmosphere is reverting.', minEra: 5, type: 'instant', effect: { resourceId: 'colonies', amount: 5 } },
+  loreFeralBiosphere: { id: 'loreFeralBiosphere', name: 'Feral Biosphere', description: 'Europa\'s subsurface ocean teems with engineered life gone wild. The genetic markers are unmistakably human-derived.', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 30 } },
+  loreAbandonedColony: { id: 'loreAbandonedColony', name: 'Abandoned Colony', description: 'Titan\'s colony domes are intact but empty. Dinner plates still set on tables. Whatever happened, it happened fast.', minEra: 5, type: 'timed', duration: 35, effect: { resourceId: 'colonies', rateMultBonus: 3 } },
+
+  // Era 6: Interstellar
+  loreAncientBeacon: { id: 'loreAncientBeacon', name: 'Ancient FTL Beacon', description: 'The beacon has been pulsing for ten thousand years. Its message, once decoded: coordinates. Hundreds of dead worlds.', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 8 } },
+  loreDeadCivilization: { id: 'loreDeadCivilization', name: 'Dead Civilization', description: 'You reach a star system marked on the ancient maps. Cities of glass, silent and perfect. Population: zero.', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 40 } },
+  loreStarMapNetwork: { id: 'loreStarMapNetwork', name: 'Star Map Network', description: 'The beacons form a network — a map of every civilization that ever rose and fell. Your star is on it. Marked "active."', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 4 } },
+
+  // Era 7: Dyson Era
+  loreDarkDyson: { id: 'loreDarkDyson', name: 'The Dark Sphere', description: 'The Dyson sphere is older than your sun. Its builders left no name, no record — only this impossible monument to ambition.', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 20 } },
+  loreIdenticalDesign: { id: 'loreIdenticalDesign', name: 'Identical Design', description: 'Your engineers overlay their Dyson blueprints on the ancient sphere. A perfect match. They hadn\'t shared their plans with anyone.', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 8 } },
+  loreSphereWhispers: { id: 'loreSphereWhispers', name: 'Sphere Whispers', description: 'Deep in the sphere\'s core, sensors detect faint EM patterns. Not random noise — structured, repetitive. Like a heartbeat, or a countdown.', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'stellarForge', rateMultBonus: 5 } },
+
+  // Era 8: Galactic
+  loreRuinsSpanGalaxies: { id: 'loreRuinsSpanGalaxies', name: 'Galactic Ruins', description: 'The ruins aren\'t scattered — they\'re layered. Civilization after civilization, building on the bones of the last. You are the newest layer.', minEra: 8, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 100 } },
+  loreAllCivilizations: { id: 'loreAllCivilizations', name: 'Universal Pattern', description: 'Carbon-based, silicon-based, plasma-based — it doesn\'t matter. Every species that achieves spaceflight follows the same path. Every single one.', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 50 } },
+  loreLastMessage: { id: 'loreLastMessage', name: 'The Last Message', description: 'A billion-year-old transmission, preserved in exotic matter: "We thought we were different. We thought we could break the cycle."', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'exoticMatter', rateMultBonus: 4 } },
+
+  // Era 9: Intergalactic
+  lorePatternClarity: { id: 'lorePatternClarity', name: 'The Pattern', description: 'Expand. Transcend. Collapse. Reset. The cosmic web itself is shaped by it — a trillion cycles of ambition and ash.', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 200 } },
+  loreNoExceptions: { id: 'loreNoExceptions', name: 'No Exceptions', description: 'Your scientists search for a single civilization that survived past this point. After mapping ten billion galaxies, they find none.', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 15 } },
+  loreFinalUnderstanding: { id: 'loreFinalUnderstanding', name: 'Final Understanding', description: 'The universe isn\'t hostile. It\'s a machine — designed to produce civilizations, harvest their knowledge, and start again.', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'cosmicPower', rateMultBonus: 5 } },
+
+  // Era 10: Multiverse
+  loreCycleRevealed: { id: 'loreCycleRevealed', name: 'The Cycle Revealed', description: 'Prestige. The word surfaces from the oldest archives, from every reality simultaneously. They all called it the same thing.', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 300 } },
+  loreYouveBeenHereBefore: { id: 'loreYouveBeenHereBefore', name: 'You\'ve Been Here Before', description: 'A reality fragment resolves into a memory: you, sitting here, making the same choices. The fragment is from the future.', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 100 } },
+  loreTheLoopItself: { id: 'loreTheLoopItself', name: 'The Loop Itself', description: 'There is no escape. There was never meant to be. The loop is the point — the universe dreaming itself awake, over and over, forever.', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'realityFragments', rateMultBonus: 8 } },
 };
 
 // Get events eligible for the current era

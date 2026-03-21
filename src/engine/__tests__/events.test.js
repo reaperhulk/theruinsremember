@@ -11,8 +11,10 @@ function makeState(overrides = {}) {
 
 describe('events', () => {
   describe('getEligibleEvents', () => {
-    it('returns no events for era 1', () => {
-      expect(getEligibleEvents(1)).toHaveLength(0);
+    it('returns lore events for era 1', () => {
+      const eligible = getEligibleEvents(1);
+      expect(eligible.length).toBeGreaterThan(0);
+      expect(eligible.every(e => e.minEra <= 1)).toBe(true);
     });
 
     it('returns era 2 events at era 2', () => {

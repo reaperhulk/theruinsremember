@@ -81,27 +81,24 @@ describe('prestige', () => {
   });
 
   describe('prestige points', () => {
+    it('gives no points before era 7', () => {
+      const state = createInitialState();
+      state.era = 6;
+      expect(calculatePrestigePoints(state)).toBe(0);
+    });
+
     it('calculates points based on era reached', () => {
       const state = createInitialState();
       state.era = 7;
-      // Points: max(0, 7-5) = 2
-      expect(calculatePrestigePoints(state)).toBe(2);
+      // Era 7 = 1 point
+      expect(calculatePrestigePoints(state)).toBe(1);
     });
 
-    it('gives bonus points for era 10', () => {
+    it('gives escalating points for deep eras', () => {
       const state = createInitialState();
       state.era = 10;
-      // Points: (10-5) + 2 bonus = 7
-      expect(calculatePrestigePoints(state)).toBe(7);
-    });
-
-    it('gives bonus for many upgrades', () => {
-      const state = createInitialState();
-      state.era = 6;
-      state.upgrades = {};
-      for (let i = 0; i < 15; i++) state.upgrades[`u${i}`] = true;
-      // Points: (6-5) + floor(15/10) = 1 + 1 = 2
-      expect(calculatePrestigePoints(state)).toBe(2);
+      // Era 7=1, 8=+2, 9=+3, 10=+5 = 11
+      expect(calculatePrestigePoints(state)).toBe(11);
     });
   });
 

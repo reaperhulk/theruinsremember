@@ -305,7 +305,7 @@ export const techTree = {
   },
   voidMastery: {
     id: 'voidMastery', name: 'Void Mastery', era: 9,
-    cost: { cosmicPower: 80000, universalConstants: 80, darkEnergy: 200000 },
+    cost: { cosmicPower: 80000, universalConstants: 80, darkEnergy: 100000 },
     prerequisites: ['multidimensionalMath'],
     grantsEra: null,
     description: 'Master the void — x5 cosmic power and dark energy',
@@ -469,7 +469,7 @@ export const techTree = {
   microprocessorDesign: { id: 'microprocessorDesign', name: 'Microprocessor Design', era: 2, cost: { electronics: 45, research: 30, steel: 35 }, prerequisites: ['advancedComputing'], grantsEra: null, description: 'Design efficient chips — boosted research and electronics', effects: [{ type: 'production_add', target: 'research', value: 4.0 }, { type: 'production_add', target: 'electronics', value: 2.0 }] },
   swarmIntelligence: { id: 'swarmIntelligence', name: 'Swarm Intelligence', era: 3, cost: { software: 40, data: 25, research: 50 }, prerequisites: ['globalNetwork'], grantsEra: null, description: 'Networked AI swarms — boosted software and research', effects: [{ type: 'production_add', target: 'software', value: 6.0 }, { type: 'production_add', target: 'research', value: 3.0 }] },
   stellarMetallurgy: { id: 'stellarMetallurgy', name: 'Stellar Metallurgy', era: 7, cost: { stellarForge: 20, megastructures: 8, research: 350000 }, prerequisites: ['galacticAscendancy'], grantsEra: null, description: 'Forge metals in stars — boosted stellarForge and materials', effects: [{ type: 'production_add', target: 'stellarForge', value: 100.0 }, { type: 'production_add', target: 'materials', value: 50.0 }] },
-  cosmicResonance: { id: 'cosmicResonance', name: 'Cosmic Resonance', era: 9, cost: { cosmicPower: 60000, universalConstants: 50, darkEnergy: 150000 }, prerequisites: ['realityScience'], grantsEra: null, description: 'Resonate with cosmic frequencies — boosted cosmicPower and universalConstants', effects: [{ type: 'production_add', target: 'cosmicPower', value: 400.0 }, { type: 'production_add', target: 'universalConstants', value: 400.0 }] },
+  cosmicResonance: { id: 'cosmicResonance', name: 'Cosmic Resonance', era: 9, cost: { cosmicPower: 60000, universalConstants: 50, darkEnergy: 100000 }, prerequisites: ['realityScience'], grantsEra: null, description: 'Resonate with cosmic frequencies — boosted cosmicPower and universalConstants', effects: [{ type: 'production_add', target: 'cosmicPower', value: 400.0 }, { type: 'production_add', target: 'universalConstants', value: 400.0 }] },
   omniversalSynthesis: { id: 'omniversalSynthesis', name: 'Omniversal Synthesis', era: 10, cost: { quantumEchoes: 300, realityFragments: 1000, universalConstants: 200 }, prerequisites: ['omniversalAwareness'], grantsEra: null, description: 'Synthesize resources across realities — boosted all multiverse resources', effects: [{ type: 'production_add', target: 'quantumEchoes', value: 2000.0 }, { type: 'production_add', target: 'realityFragments', value: 2000.0 }, { type: 'production_add', target: 'universalConstants', value: 2000.0 }] },
 
   // --- 7 new optional tech nodes ---

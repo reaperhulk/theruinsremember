@@ -21,17 +21,27 @@ export function calculatePrestigeBonus(state) {
 }
 
 // Calculate prestige points earned from current run
+// Prestige should feel meaningful — only worth doing from era 7+
+// Points scale with depth reached, not breadth consumed
 export function calculatePrestigePoints(state) {
-  // Base: 1 point per era reached beyond 5
-  let points = Math.max(0, state.era - 5);
-  // Bonus point for reaching era 10
-  if (state.era >= 10) points += 2;
-  // Bonus for upgrades owned (1 point per 10 upgrades)
-  points += Math.floor(Object.keys(state.upgrades).length / 10);
-  // Bonus for mini-game activity
-  points += Math.floor((state.hackSuccesses || 0) / 20);
-  points += Math.floor((state.dockingPerfects || 0) / 15);
-  points += Math.floor((state.totalWeaves || 0) / 10);
+  // No points until era 7 — prestige is a late-game mechanic
+  if (state.era < 7) return 0;
+  // Base: escalating points for deep eras
+  let points = 0;
+  if (state.era >= 7) points += 1;
+  if (state.era >= 8) points += 2;
+  if (state.era >= 9) points += 3;
+  if (state.era >= 10) points += 5;  // 11 total for reaching era 10
+  // Bonus for era 10 upgrade completion (rewards thorough play)
+  const era10Upgrades = Object.keys(state.upgrades).filter(id => {
+    const def = upgradeDefs[id];
+    return def && def.era === 10;
+  }).length;
+  points += Math.floor(era10Upgrades / 5); // 1 point per 5 era-10 upgrades
+  // Small bonus for mini-game mastery (deep engagement reward)
+  points += Math.floor((state.hackSuccesses || 0) / 50);
+  points += Math.floor((state.dockingPerfects || 0) / 30);
+  points += Math.floor((state.totalWeaves || 0) / 25);
   return points;
 }
 
