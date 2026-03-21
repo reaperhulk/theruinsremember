@@ -7,7 +7,7 @@ function pickHint(options, era, totalTime) {
   const arr = options[era];
   if (!arr) return null;
   if (typeof arr === 'string') return arr;
-  return arr[Math.floor(totalTime) % arr.length];
+  return arr[Math.floor(totalTime / 30) % arr.length];
 }
 
 function getLoreHint(eraCompletion, isMaxEra, era, totalTime) {
