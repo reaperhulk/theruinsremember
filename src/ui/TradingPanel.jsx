@@ -103,10 +103,8 @@ export function TradingPanel({ state, onUpdate }) {
             min="1"
             value={amount}
             onChange={e => setAmount(Math.max(1, parseInt(e.target.value) || 1))}
+            style={{ width: '60px' }}
           />
-        </div>
-        <div className="trade-row">
-          <label>Of:</label>
           <select value={toId} onChange={e => setToId(e.target.value)}>
             <option value="">Select...</option>
             {unlocked.filter(r => r.id !== fromId).map(r => (

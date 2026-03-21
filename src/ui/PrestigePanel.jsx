@@ -20,7 +20,7 @@ export function PrestigePanel({ state, onUpdate }) {
 
   const cycleCount = state.prestigeCount || 0;
   const prestigeLore = cycleCount === 0
-    ? 'The pattern repeats...'
+    ? 'Something waits at the end of this path. You can feel it.'
     : cycleCount === 1
     ? 'You remember flashes of a previous life. The ruins make more sense now.'
     : cycleCount === 2
@@ -63,7 +63,7 @@ export function PrestigePanel({ state, onUpdate }) {
         </div>
         <div className="stat-row">
           <span>Next Prestige:</span>
-          <span>+{summary.points} pts, x{summary.bonus.toFixed(1)} → total x{summary.newMultiplier.toFixed(1)}{state.era < 7 ? ' (Era 7+ needed)' : ''}</span>
+          <span>+{summary.points} pts, x{summary.bonus.toFixed(1)} → total x{summary.newMultiplier.toFixed(1)}{state.era < 7 ? ' (points start at Era 7)' : state.era < 10 ? ' (prestige at Era 10)' : ''}</span>
         </div>
       </div>
 

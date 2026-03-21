@@ -26,6 +26,7 @@ import { ERA_COUNT, eraNames } from '../engine/eras.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
 import { canAfford } from '../engine/resources.js';
+import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 const initialState = createInitialState();
 
@@ -78,6 +79,8 @@ export function App() {
     const tabs = getAvailableTabs(state.era);
     const tabByKey = tabs.find(t => t.key === e.key);
     if (tabByKey) {
+      // Don't switch tabs on 0-3 keys during hack challenge
+      if (state.hackChallenge && ['0','1','2','3'].includes(e.key)) return;
       setActiveTab(tabByKey.id);
       return;
     }
@@ -198,7 +201,10 @@ export function App() {
               let badge = 0;
               if (tab.id === 'upgrades') badge = affordableUpgrades;
               if (tab.id === 'tech') badge = affordableTech;
-              if (tab.id === 'mini') badge = activeEffectCount;
+              if (tab.id === 'mini') {
+                const miniCount = 1 + (state.era >= 2 ? 1 : 0) + (state.era >= 3 ? 1 : 0) + (state.era >= 4 ? 1 : 0) + (state.era >= 5 ? 1 : 0) + (state.era >= 6 ? 1 : 0) + (state.era >= 8 ? 1 : 0);
+                badge = activeEffectCount || miniCount;
+              }
               if (tab.id === 'prestige') badge = state.prestigePoints || 0;
               if (tab.id === 'trading') badge = state.totalTrades || 0;
               if (tab.id === 'stats') badge = Object.keys(state.achievements || {}).length || 0;
@@ -238,7 +244,7 @@ export function App() {
       <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#333', padding: '8px 0 4px' }}>
         v1.0 — {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.tech || {}).length} tech | {Object.keys(state.achievements || {}).length} achievements | Era {state.era}
         {state.prestigeMultiplier > 1 && ` | x${state.prestigeMultiplier.toFixed(1)}`}
-        {` | ${Math.floor(Object.keys(state.upgrades || {}).length / 550 * 100)}% complete`}
+        {` | ${Math.floor(Object.keys(state.upgrades || {}).length / Object.keys(upgradeDefs).length * 100)}% complete`}
       </footer>
     </div>
   );

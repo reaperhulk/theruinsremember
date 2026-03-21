@@ -141,7 +141,7 @@ export function TechTree({ state, onUpdate }) {
                   fontWeight: 'bold',
                   fontSize: '0.85em',
                 }}>
-                  ⚠ Choose one: {tech.name} OR {techTree[tech.excludes]?.name || tech.excludes}
+                  ⚠ Choose one (permanent choice): {tech.name} OR {techTree[tech.excludes]?.name || tech.excludes}
                 </div>
               )}
               {!affordable && (() => {

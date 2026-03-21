@@ -51,11 +51,12 @@ export function EraTransition({ era }) {
       setVisible(true);
       setFadingOut(false);
 
-      fadeTimerRef.current = setTimeout(() => setFadingOut(true), 3000);
+      const displayTime = 3000 + era * 500;
+      fadeTimerRef.current = setTimeout(() => setFadingOut(true), displayTime - 1000);
       hideTimerRef.current = setTimeout(() => {
         setVisible(false);
         setFadingOut(false);
-      }, 4000);
+      }, displayTime);
 
       return () => {
         if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);

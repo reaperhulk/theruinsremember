@@ -96,6 +96,9 @@ export function ResourcePanel({ state, onUpdate }) {
                             /{formatNumber(r.cap)}
                           </span>
                         )}
+                        {r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0 && (
+                          <span style={{ fontSize: '0.6em', color: '#ff6644', marginLeft: '4px' }}>FULL</span>
+                        )}
                       </span>
                       <span className="resource-rate">
                         {r.rate > 0 ? (() => {

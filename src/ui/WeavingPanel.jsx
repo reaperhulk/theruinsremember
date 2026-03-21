@@ -64,7 +64,7 @@ export function WeavingPanel({ state, onUpdate }) {
       <div className="weave-grid">
         {grid.map((f, i) => (
           <span key={i} className="weave-fragment" style={{ color: TYPE_COLORS[f] }} title={f}>
-            {f === 'chaos' ? '*' : f.charAt(0).toUpperCase()}
+            {f === 'chaos' ? '***' : f === 'temporal' ? 'TMP' : f === 'spatial' ? 'SPC' : f === 'causal' ? 'CSL' : 'QNT'}
           </span>
         ))}
         {grid.length === 0 && <span className="empty-message">Draw fragments to begin</span>}
@@ -107,7 +107,7 @@ export function WeavingPanel({ state, onUpdate }) {
           </button>
         )}
       </div>
-      <p className="mining-hint">Draw 3 matching (chaos * = wild) | Combos boost multiplier | 120s timeout</p>
+      <p className="mining-hint">TMP=Temporal SPC=Spatial CSL=Causal QNT=Quantum ***=Chaos(wild) | 3 match to weave | Combos boost | 120s timeout</p>
     </div>
   );
 }

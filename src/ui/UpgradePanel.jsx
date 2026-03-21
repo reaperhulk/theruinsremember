@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades } from '../engine/upgrades.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
+import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 import { formatNumber } from './format.js';
 
@@ -146,10 +147,11 @@ export function UpgradePanel({ state, onUpdate }) {
       )}
       {(() => {
         const affordableNonRepeatable = filteredAvailable.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
-        return affordableNonRepeatable.length >= 3 && (
+        return available.length > 0 && (
           <button
             className="gather-btn"
             style={{ width: '100%', marginBottom: '4px', padding: '4px', fontSize: '0.8em' }}
+            disabled={affordableNonRepeatable.length === 0}
             onClick={() => onUpdate(s => {
               let current = s;
               for (const u of affordableNonRepeatable) {
@@ -159,11 +161,11 @@ export function UpgradePanel({ state, onUpdate }) {
               return current;
             })}
           >
-            Buy All Affordable ({affordableNonRepeatable.length})
+            {affordableNonRepeatable.length > 0 ? `Buy All Affordable (${affordableNonRepeatable.length})` : 'No affordable upgrades'}
           </button>
         );
       })()}
-      {available.length > 4 && (
+      {available.length > 0 && (
         <div className="upgrade-sort">
           <button className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>All</button>
           <button className={sortBy === 'affordable' ? 'active' : ''} onClick={() => setSortBy('affordable')}>Can Buy</button>
@@ -217,6 +219,12 @@ export function UpgradePanel({ state, onUpdate }) {
                   return <span key={i} className={cls}>{label}</span>;
                 })}
               </div>
+              {(() => {
+                const enablesCount = Object.values(upgradeDefs).filter(u =>
+                  u.prerequisites.includes(upgrade.id) && !state.upgrades[u.id]
+                ).length;
+                return enablesCount > 0 ? <div style={{ fontSize: '0.7em', color: '#88ccaa' }}>Enables {enablesCount} upgrade{enablesCount > 1 ? 's' : ''}</div> : null;
+              })()}
               {!affordable && (() => {
                 const eta = getTimeToAfford(state, cost);
                 return (

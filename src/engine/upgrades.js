@@ -154,6 +154,9 @@ export function getAvailableUpgrades(state) {
     if (def.requireTrades && (state.totalTrades || 0) < def.requireTrades) return false;
     if (def.requirePrestige && (state.prestigeCount || 0) < def.requirePrestige) return false;
     return true;
+  }).sort((a, b) => {
+    if (a.era !== b.era) return a.era - b.era;
+    return a.id.localeCompare(b.id);
   });
 }
 

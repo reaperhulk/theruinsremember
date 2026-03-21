@@ -1273,7 +1273,7 @@ canvas:hover {
 
 @keyframes badge-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.7; }
 }
 
 .tab-content {
@@ -1569,7 +1569,7 @@ canvas:hover {
 
 @keyframes affordable-pulse {
   0%, 100% { box-shadow: none; }
-  50% { box-shadow: 0 0 8px rgba(100, 200, 100, 0.3); }
+  50% { box-shadow: 0 0 4px rgba(100, 200, 100, 0.15); }
 }
 
 /* Purchase flash — applied momentarily after buying */
@@ -1718,9 +1718,18 @@ canvas:hover {
     padding: 8px;
   }
 
+  .tab-bar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+
   .tab-btn {
     padding: 8px 2px;
     font-size: 0.7em;
+    white-space: nowrap;
+    min-width: 0;
   }
 
   .mine-btn,
