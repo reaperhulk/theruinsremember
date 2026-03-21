@@ -1667,6 +1667,49 @@ export const events = {
     duration: 25,
     effect: { resourceId: 'rocketFuel', rateMultBonus: 0.33 },
   },
+  crisisColonyRevolt: {
+    id: 'crisisColonyRevolt',
+    name: 'Colony Revolt',
+    description: 'Colony uprising! Settlers demand autonomy. Colony output halved while negotiations proceed.',
+    minEra: 5,
+    type: 'timed',
+    chance: 0.004,
+    duration: 30,
+    effect: { resourceId: 'colonies', rateMultBonus: 0.5 },
+  },
+  crisisWarpInstability: {
+    id: 'crisisWarpInstability',
+    name: 'Warp Instability',
+    description: 'Warp field collapse tears through dark energy reserves! The ancient beacons warned of this.',
+    minEra: 6,
+    type: 'instant',
+    chance: 0.004,
+    effects: [
+      { type: 'resource', target: 'darkEnergy', value: -200 },
+    ],
+  },
+  crisisStellarFlare: {
+    id: 'crisisStellarFlare',
+    name: 'Stellar Flare',
+    description: 'The Dyson sphere channels a stellar flare directly at your systems. Forge output critically reduced.',
+    minEra: 7,
+    type: 'timed',
+    chance: 0.003,
+    duration: 20,
+    effect: { resourceId: 'stellarForge', rateMultBonus: 0.25 },
+  },
+  crisisRealityGlitch: {
+    id: 'crisisRealityGlitch',
+    name: 'Reality Glitch',
+    description: 'Reality stutters. For a moment, everything that exists simply... doesn\'t. Resources scattered across dimensions.',
+    minEra: 8,
+    type: 'instant',
+    chance: 0.003,
+    effects: [
+      { type: 'resource', target: 'exoticMatter', value: -100 },
+      { type: 'resource', target: 'galacticInfluence', value: -500 },
+    ],
+  },
 };
 
 // Get events eligible for the current era

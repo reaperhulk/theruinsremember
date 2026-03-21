@@ -303,6 +303,46 @@ export function tick(state, dt) {
     }
   }
 
+  // miniGameSynergy: +10% per mini-game interacted with
+  if (newState.upgrades?.orbitalResonance) {
+    let miniCount = 0;
+    if ((newState.totalGems || 0) > 0) miniCount++;
+    if ((newState.factoryAllocation?.steel || 0) > 0 || (newState.factoryAllocation?.electronics || 0) > 0) miniCount++;
+    if ((newState.hackSuccesses || 0) > 0) miniCount++;
+    if ((newState.dockingAttempts || 0) > 0) miniCount++;
+    if ((newState.colonyAssignments?.growth || 0) > 0 || (newState.colonyAssignments?.science || 0) > 0) miniCount++;
+    if ((newState.starRoutes?.length || 0) > 0) miniCount++;
+    if ((newState.totalWeaves || 0) > 0) miniCount++;
+
+    if (miniCount > 0) {
+      const bonus = miniCount * 0.10;
+      for (const [id, r] of Object.entries(newState.resources)) {
+        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
+          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+          const extra = rate * bonus * dt;
+          const cap = getEffectiveCap(newState, id);
+          newState.resources[id] = { ...r, amount: Math.min(r.amount + extra, cap > 0 ? cap : Infinity) };
+        }
+      }
+    }
+  }
+
+  // routeBonus: +3% per star route
+  if (newState.upgrades?.warpEcho) {
+    const routes = newState.starRoutes?.length || 0;
+    if (routes > 0) {
+      const bonus = routes * 0.03;
+      for (const [id, r] of Object.entries(newState.resources)) {
+        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
+          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+          const extra = rate * bonus * dt;
+          const cap = getEffectiveCap(newState, id);
+          newState.resources[id] = { ...r, amount: Math.min(r.amount + extra, cap > 0 ? cap : Infinity) };
+        }
+      }
+    }
+  }
+
   // Check achievements (every 60 ticks to reduce overhead)
   if (newState.totalTicks % 60 === 0) {
     const { state: afterAchievements, newAchievements } = checkAchievements(newState);

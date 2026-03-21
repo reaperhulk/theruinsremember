@@ -87,20 +87,33 @@ export function attemptDock(state, position) {
     }
   }
 
+  const newState = {
+    ...state,
+    resources: newResources,
+    lastDockTime: state.totalTime,
+    dockingCombo: combo,
+    dockingAttempts: (state.dockingAttempts || 0) + 1,
+    dockingSuccesses: result !== 'miss'
+      ? (state.dockingSuccesses || 0) + 1
+      : (state.dockingSuccesses || 0),
+    dockingPerfects: result === 'perfect'
+      ? (state.dockingPerfects || 0) + 1
+      : (state.dockingPerfects || 0),
+  };
+
+  // Launch window: perfect docks add a 5% production boost for 30 seconds
+  if (result === 'perfect' && state.upgrades?.launchWindow) {
+    newState.activeEffects = [...(newState.activeEffects || []), {
+      id: 'dockingBoost',
+      description: 'Docking Precision: +5% all production',
+      endsAt: (newState.totalTime || 0) + 30,
+      startedAt: newState.totalTime || 0,
+      effect: { resourceId: 'all', rateMultBonus: 1.05 },
+    }];
+  }
+
   return {
-    state: {
-      ...state,
-      resources: newResources,
-      lastDockTime: state.totalTime,
-      dockingCombo: combo,
-      dockingAttempts: (state.dockingAttempts || 0) + 1,
-      dockingSuccesses: result !== 'miss'
-        ? (state.dockingSuccesses || 0) + 1
-        : (state.dockingSuccesses || 0),
-      dockingPerfects: result === 'perfect'
-        ? (state.dockingPerfects || 0) + 1
-        : (state.dockingPerfects || 0),
-    },
+    state: newState,
     result,
   };
 }

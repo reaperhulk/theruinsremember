@@ -54,11 +54,12 @@ export function allocateWorker(state, line, count) {
 // Calculate production bonus from factory allocation.
 // Each worker on a line gives a per-worker bonus that scales with era.
 // Efficiency bonus: when all lines have at least 1 worker, +50% output.
+// Critical mass: all 3 lines active = additional 2x (total 3x when all lines filled).
 export function getFactoryBonus(state) {
   if (state.era < 2) return {};
   const alloc = getAllocation(state);
   const allFilled = LINES.every(line => (alloc[line] || 0) > 0);
-  const efficiencyMult = allFilled ? 1.5 : 1;
+  const efficiencyMult = allFilled ? 3 : 1;
   const hasFactoryExpert = state.prestigeUpgrades && state.prestigeUpgrades.factoryExpert;
   const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
   const prestigeMult = (hasFactoryExpert ? 2 : 1) * (hasSavant ? 1.5 : 1);

@@ -603,16 +603,17 @@ function drawEra4(ctx, w, h, t, state) {
   ctx.arc(cx, cy, 12, 0, Math.PI * 2);
   ctx.fill();
 
-  // Planets with orbit trails
+  // Planets with orbit trails — speed scales with player progress
+  const prodScale = state ? Math.min(2, 1 + Object.keys(state.upgrades || {}).length * 0.01) : 1;
   const planets = [
-    { r: 26, size: 2, color: '#bbb', speed: 2.5, name: 'mercury' },
-    { r: 35, size: 3, color: '#e8c870', speed: 1.6, name: 'venus' },
-    { r: 46, size: 3.5, color: '#4488cc', speed: 1.0, name: 'earth', hasColony: true },
-    { r: 57, size: 3, color: '#cc6633', speed: 0.7, name: 'mars', hasColony: true },
-    { r: 78, size: 7, color: '#d4a050', speed: 0.3, name: 'jupiter' },
-    { r: 95, size: 6, color: '#c8b060', speed: 0.18, name: 'saturn', rings: true },
-    { r: 108, size: 4, color: '#88bbcc', speed: 0.1, name: 'uranus' },
-    { r: 120, size: 3.8, color: '#4466cc', speed: 0.06, name: 'neptune' },
+    { r: 26, size: 2, color: '#bbb', speed: 2.5 * prodScale, name: 'mercury' },
+    { r: 35, size: 3, color: '#e8c870', speed: 1.6 * prodScale, name: 'venus' },
+    { r: 46, size: 3.5, color: '#4488cc', speed: 1.0 * prodScale, name: 'earth', hasColony: true },
+    { r: 57, size: 3, color: '#cc6633', speed: 0.7 * prodScale, name: 'mars', hasColony: true },
+    { r: 78, size: 7, color: '#d4a050', speed: 0.3 * prodScale, name: 'jupiter' },
+    { r: 95, size: 6, color: '#c8b060', speed: 0.18 * prodScale, name: 'saturn', rings: true },
+    { r: 108, size: 4, color: '#88bbcc', speed: 0.1 * prodScale, name: 'uranus' },
+    { r: 120, size: 3.8, color: '#4466cc', speed: 0.06 * prodScale, name: 'neptune' },
   ];
 
   // Orbit lines
@@ -1341,11 +1342,16 @@ function drawMultiverse(ctx, w, h, t, state) {
   }
 
   // Central nexus — the convergence point of all realities
+  // Pulse speed scales with total production rate, suggesting the cycle accelerates
+  const totalProd = state ? Object.values(state.resources || {})
+    .filter(r => r.unlocked)
+    .reduce((sum, r) => sum + Math.max(0, (r.baseRate + r.rateAdd) * r.rateMult), 0) : 0;
+  const nexusPulseSpeed = 1 + Math.min(3, totalProd * 0.005); // 1x to 4x speed
   const cx = w * 0.5, cy = h * 0.5;
   for (let ring = 0; ring < 6; ring++) {
     const rr = 8 + ring * 7;
-    const ringSpeed = (ring % 2 === 0 ? 1 : -1) * (1 + ring * 0.3);
-    const hue = (ring * 60 + t * 30) % 360;
+    const ringSpeed = (ring % 2 === 0 ? 1 : -1) * (1 + ring * 0.3) * nexusPulseSpeed;
+    const hue = (ring * 60 + t * 30 * nexusPulseSpeed) % 360;
     ctx.strokeStyle = `hsla(${hue},80%,65%,${0.2 - ring * 0.025})`;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -1353,9 +1359,9 @@ function drawMultiverse(ctx, w, h, t, state) {
     ctx.stroke();
   }
 
-  // Nexus core
+  // Nexus core — pulses faster with production
   const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 12);
-  coreGrad.addColorStop(0, `rgba(255,255,255,${0.5 + 0.3 * Math.sin(t * 3)})`);
+  coreGrad.addColorStop(0, `rgba(255,255,255,${0.5 + 0.3 * Math.sin(t * 3 * nexusPulseSpeed)})`);
   coreGrad.addColorStop(0.5, `rgba(200,100,255,0.2)`);
   coreGrad.addColorStop(1, 'transparent');
   ctx.fillStyle = coreGrad;
@@ -1488,12 +1494,16 @@ function drawDysonEra(ctx, w, h, t, state) {
   ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2);
   ctx.fill();
 
-  // Dyson sphere rings (multiple rotating rings around the star)
-  for (let i = 0; i < 5; i++) {
+  // Dyson sphere rings — count and completeness scale with upgrades
+  const completion = state ? Math.min(1, Object.keys(state.upgrades || {}).length / 50) : 0;
+  const arcCount = Math.floor(completion * 8) + 2;
+  for (let i = 0; i < arcCount; i++) {
     const ringR = starR + 15 + i * 8;
     const angle = t * (0.2 + i * 0.15) + i * 1.25;
     const tilt = 0.2 + i * 0.15;
     const pulse = 0.5 + 0.3 * Math.sin(t * 2 + i);
+    // Later rings are partial arcs based on completion
+    const arcSpan = i < 2 ? Math.PI * 2 : Math.PI * 2 * Math.min(1, completion * 1.5);
 
     ctx.save();
     ctx.translate(cx, cy);
@@ -1502,13 +1512,15 @@ function drawDysonEra(ctx, w, h, t, state) {
     ctx.strokeStyle = `rgba(255, 200, 50, ${0.2 + pulse * 0.3})`;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.arc(0, 0, ringR, 0, Math.PI * 2);
+    ctx.arc(0, 0, ringR, 0, arcSpan);
     ctx.stroke();
 
     // Collector panels on ring
     const panelCount = 4 + i * 2;
-    for (let j = 0; j < panelCount; j++) {
+    const visiblePanels = i < 2 ? panelCount : Math.ceil(panelCount * completion);
+    for (let j = 0; j < visiblePanels; j++) {
       const pa = (j / panelCount) * Math.PI * 2;
+      if (pa > arcSpan) break;
       const px = Math.cos(pa) * ringR;
       const py = Math.sin(pa) * ringR;
       ctx.fillStyle = `rgba(100, 200, 255, ${0.3 + pulse * 0.4})`;
@@ -2364,8 +2376,32 @@ export function GameCanvas({ state, onUpdate }) {
           color: depColor,
         });
       }
-      // Expire old deposits
-      depositsRef.current = depositsRef.current.filter(d => (t - d.spawnTime) < d.duration);
+      // Auto-deposit: collect deposits automatically if stellarHarvester owned
+      if (stateRef.current?.upgrades?.stellarHarvester) {
+        for (const dep of depositsRef.current) {
+          if (dep.collected) continue;
+          const age = t - dep.spawnTime;
+          // Auto-collect after 5 seconds
+          if (age > 5) {
+            dep.collected = true;
+            // Apply reward
+            onUpdateRef.current(s => {
+              const r = s.resources[dep.resourceId];
+              if (!r?.unlocked) return null;
+              const cap = getEffectiveCap(s, dep.resourceId);
+              return {
+                ...s,
+                resources: { ...s.resources, [dep.resourceId]: { ...r, amount: Math.min(r.amount + dep.amount, cap > 0 ? cap : Infinity) } },
+              };
+            });
+            spawnParticles(particlesRef.current, dep.x, dep.y, 5, resourceColorMap[dep.resourceId] || 'rgba(200,200,200,1)');
+            floatingTextsRef.current.push({ x: dep.x, y: dep.y, label: `+${Math.floor(dep.amount)} (auto)`, startTime: performance.now() });
+          }
+        }
+      }
+
+      // Expire old deposits (also remove collected ones)
+      depositsRef.current = depositsRef.current.filter(d => !d.collected && (t - d.spawnTime) < d.duration);
 
       // Draw resource deposits
       for (const dep of depositsRef.current) {

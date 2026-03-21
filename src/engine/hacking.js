@@ -63,14 +63,28 @@ export function submitHack(state, playerSequence) {
       ],
     };
 
+    const newState = {
+      ...state,
+      hackChallenge: null,
+      hackDifficulty: (state.hackDifficulty || 0) + 1,
+      hackSuccesses: (state.hackSuccesses || 0) + 1,
+      activeEffects: [...(state.activeEffects || []), effect],
+    };
+
+    // Forge Memory: successful hacks permanently increase a random resource's multiplier by 1%
+    if (state.upgrades?.forgeMemory) {
+      const unlockedIds = Object.entries(newState.resources)
+        .filter(([, r]) => r.unlocked && (r.baseRate + r.rateAdd) > 0)
+        .map(([id]) => id);
+      if (unlockedIds.length > 0) {
+        const targetId = unlockedIds[Math.floor(Math.random() * unlockedIds.length)];
+        const r = newState.resources[targetId];
+        newState.resources = { ...newState.resources, [targetId]: { ...r, rateMult: r.rateMult * 1.01 } };
+      }
+    }
+
     return {
-      state: {
-        ...state,
-        hackChallenge: null,
-        hackDifficulty: (state.hackDifficulty || 0) + 1,
-        hackSuccesses: (state.hackSuccesses || 0) + 1,
-        activeEffects: [...(state.activeEffects || []), effect],
-      },
+      state: newState,
       success: true,
     };
   }

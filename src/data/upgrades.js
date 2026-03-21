@@ -3142,6 +3142,64 @@ export const upgrades = {
     prerequisites: ['cloudComputing', 'cyberSecurity'],
     mechanic: 'canvasDataCache',
   },
+
+  // --- Mechanic-changing upgrades for eras 4-7 ---
+
+  // Era 4
+  orbitalResonance: {
+    id: 'orbitalResonance', name: 'Orbital Resonance', era: 4,
+    cost: { rocketFuel: 40, orbitalInfra: 20, research: 60 },
+    effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.0 }],
+    description: 'Orbital platforms amplify each other. Each mini-game you\'ve interacted with adds +10% to all production.',
+    prerequisites: ['spaceStation', 'orbitalTelescope'],
+    mechanic: 'miniGameSynergy',
+  },
+  launchWindow: {
+    id: 'launchWindow', name: 'Launch Window', era: 4,
+    cost: { rocketFuel: 30, data: 40, software: 30 },
+    effects: [{ type: 'production_add', target: 'rocketFuel', value: 1.5 }],
+    description: 'Optimal timing. Docking mini-game perfects now boost ALL production by 5% for 30 seconds.',
+    prerequisites: ['deepSpaceProbe', 'missionControl'],
+    mechanic: 'dockingBoost',
+  },
+
+  // Era 5
+  terraformSync: {
+    id: 'terraformSync', name: 'Terraform Sync', era: 5,
+    cost: { colonies: 10, exoticMaterials: 25, research: 80 },
+    effects: [{ type: 'production_add', target: 'colonies', value: 0.5 }],
+    description: 'Colony output feeds back into production. Colony assignments directly multiply their target resources by 1.5x.',
+    prerequisites: ['terraforming', 'geneticEngineering'],
+    mechanic: 'colonyMultiplier',
+  },
+  stellarHarvester: {
+    id: 'stellarHarvester', name: 'Stellar Harvester', era: 5,
+    cost: { exoticMaterials: 30, energy: 100, research: 60 },
+    effects: [{ type: 'production_add', target: 'exoticMaterials', value: 1.0 }],
+    description: 'Automatically harvest clicked canvas deposits. Resource deposits are gathered every 5 seconds without clicking.',
+    prerequisites: ['asteroidMining', 'fuelRefinery'],
+    mechanic: 'autoDeposit',
+  },
+
+  // Era 6
+  warpEcho: {
+    id: 'warpEcho', name: 'Warp Echo', era: 6,
+    cost: { starSystems: 8, darkEnergy: 30, research: 100 },
+    effects: [{ type: 'production_add', target: 'darkEnergy', value: 2.0 }],
+    description: 'Star chart routes generate passive production even when inactive. Each route adds +3% to all production.',
+    prerequisites: ['warpDrive', 'stellarCartography'],
+    mechanic: 'routeBonus',
+  },
+
+  // Era 7
+  forgeMemory: {
+    id: 'forgeMemory', name: 'Forge Memory', era: 7,
+    cost: { megastructures: 20, stellarForge: 50, research: 200 },
+    effects: [{ type: 'production_add', target: 'stellarForge', value: 3.0 }],
+    description: 'The forge remembers its purpose from the last cycle. Hacking successes now permanently increase a random resource multiplier by 1%.',
+    prerequisites: ['dysonSphere', 'starLifting'],
+    mechanic: 'hackPermanentBoost',
+  },
 };
 
 // Balance scaling: multiply upgrade costs by era-dependent factors
