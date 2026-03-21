@@ -554,6 +554,22 @@ function drawEra4(ctx, w, h, t, state) {
       ctx.arc(px, py - p.size - 3, 1.5, 0, Math.PI * 2);
       ctx.fill();
     }
+
+    // Colony dots on planets when colony count > 10
+    const colonyCount = state.resources?.colonies?.amount || 0;
+    if (colonyCount > 10) {
+      const dotsPerPlanet = Math.min(6, Math.floor(colonyCount / 20));
+      for (let d = 0; d < dotsPerPlanet; d++) {
+        const dotAngle = (d / dotsPerPlanet) * Math.PI * 2 + t * 0.5;
+        const dotR = p.size * 0.6;
+        const dx = px + Math.cos(dotAngle) * dotR;
+        const dy = py + Math.sin(dotAngle) * dotR;
+        ctx.fillStyle = `rgba(0,255,200,${0.3 + 0.3 * Math.sin(t * 2 + d)})`;
+        ctx.beginPath();
+        ctx.arc(dx, dy, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
   }
 }
 
@@ -648,6 +664,29 @@ function drawEra5(ctx, w, h, t, state) {
       ctx.beginPath();
       ctx.arc(px, py, 1.2, 0, Math.PI * 2);
       ctx.fill();
+    }
+  }
+
+  // Draw star route lines based on player's star routes
+  const routeCount = state.starRoutes?.length || 0;
+  if (routeCount > 0) {
+    const routeRng = seededRandom(1337);
+    const routesToDraw = Math.min(routeCount, 15);
+    for (let r = 0; r < routesToDraw; r++) {
+      const fromIdx = Math.floor(routeRng() * systems.length);
+      const toIdx = Math.floor(routeRng() * systems.length);
+      if (fromIdx === toIdx) continue;
+      const from = systems[fromIdx];
+      const to = systems[toIdx];
+      const pulse = 0.1 + 0.15 * Math.sin(t * 1.5 + r * 0.7);
+      ctx.strokeStyle = `rgba(200,150,255,${pulse})`;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
   }
 

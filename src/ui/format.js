@@ -2,6 +2,8 @@
 // Handles numbers up to 10^33+ with short suffixes
 
 export function formatNumber(n) {
+  if (n !== n) return '0'; // NaN guard
+  if (n === 0) return '0';
   if (!isFinite(n)) return 'Infinity';
   if (n < 0) return '-' + formatNumber(-n);
   if (n >= 1e63) return n.toExponential(1);             // beyond vigintillion, use scientific

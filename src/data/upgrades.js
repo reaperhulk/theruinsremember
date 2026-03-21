@@ -851,7 +851,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'quantumEchoes', value: 10 },
       { type: 'production_mult', target: 'realityFragments', value: 10 },
     ],
-    description: 'See across all realities simultaneously — the ultimate achievement',
+    description: 'The engine compiles every observation from every iteration. The output is a single word, in every language simultaneously: "Again."',
     prerequisites: ['dimensionalAnchors'],
   },
   dimensionalRift: {
@@ -3067,7 +3067,7 @@ export const upgrades = {
     id: 'multiverseCapstone', name: 'Multiverse Capstone', era: 10,
     cost: { realityFragments: 300, quantumEchoes: 300, cosmicPower: 500 },
     effects: [{ type: 'production_mult_all', value: 3.0 }],
-    description: 'The final truth assembles itself: you are the universe experiencing itself, again and again, forever.',
+    description: 'Every thread converges. Every echo resolves. The final truth assembles itself from the ruins of a thousand timelines: you are the universe experiencing itself, again and again, forever. There is no ending. There is only the next beginning.',
     prerequisites: ['echoForge', 'realityCompiler'],
   },
 };

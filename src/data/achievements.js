@@ -377,4 +377,22 @@ export const achievements = [
   { id: 'allMiniGames', name: 'All Mini-Games', description: 'Have activity in all 7 mini-games', check: s => (s.totalGems || 0) > 0 && (s.hackSuccesses || 0) > 0 && (s.dockingPerfects || 0) > 0 && (s.totalWeaves || 0) > 0 && (s.starRoutes?.length || 0) > 0 && Object.values(s.colonyAssignments || {}).some(v => v > 0) && Object.values(s.factoryAllocation || {}).some(v => v > 0), reward: 10 },
   { id: 'comboKing', name: 'Combo King', description: 'Reach 3x dock combo AND 2x weave combo', check: s => (s.dockingCombo || 0) >= 3 && (s.weaveCombo || 0) >= 2, reward: 5 },
   { id: 'grandMiner', name: 'Grand Miner', description: 'Find 1500 gems', check: s => (s.totalGems || 0) >= 1500, reward: 10 },
+
+  // The ultimate endgame achievement
+  { id: 'theFinalTruth', name: 'The Final Truth', description: 'You understand now. The ruins were yours. The cycle is you. And it begins again.', check: s => {
+    return s.era >= 10 &&
+      s.upgrades?.recursionScar &&
+      s.upgrades?.finalIteration &&
+      Object.keys(s.prestigeUpgrades || {}).length >= 25;
+  }, reward: 100 },
+
+  // Game complete flag achievement
+  { id: 'gameComplete', name: 'Cycle Complete', description: 'You have seen everything. You have done everything. And yet... the button calls to you.', check: s => {
+    return s.era >= 10 &&
+      s.upgrades?.recursionScar &&
+      s.upgrades?.finalIteration &&
+      s.upgrades?.multiverseCapstone &&
+      Object.keys(s.prestigeUpgrades || {}).length >= 25 &&
+      (s.prestigeCount || 0) >= 1;
+  }, reward: 200 },
 ];

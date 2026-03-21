@@ -174,6 +174,44 @@ export function performPrestige(state) {
     }
   }
 
+  // Prestige count milestones
+  if (newState.prestigeCount >= 3) {
+    newState.autoGather = true;
+  }
+  if (newState.prestigeCount >= 5) {
+    // Auto-purchase era 1 upgrades (same as fastStart but from milestone)
+    if (!hasPrestigeUpgrade(state, 'fastStart')) {
+      const era1Ups = Object.values(upgradeDefs).filter(u => u.era === 1 && !u.repeatable && !u.requireGems && !u.requireTrades && !u.requirePrestige);
+      for (const u of era1Ups) {
+        if (newState.upgrades[u.id]) continue;
+        newState.upgrades[u.id] = true;
+        for (const effect of u.effects) {
+          const target = newState.resources[effect.target];
+          if (!target) continue;
+          switch (effect.type) {
+            case 'production_mult':
+              newState.resources[effect.target] = { ...target, rateMult: target.rateMult * effect.value };
+              break;
+            case 'production_add':
+              newState.resources[effect.target] = { ...target, rateAdd: target.rateAdd + effect.value };
+              break;
+            case 'unlock_resource':
+              newState.resources[effect.target] = { ...target, unlocked: true };
+              break;
+            case 'cap_mult':
+              newState.resources[effect.target] = { ...target, capMult: target.capMult * effect.value };
+              break;
+          }
+        }
+      }
+    }
+  }
+  if (newState.prestigeCount >= 10) {
+    for (const id of Object.keys(newState.resources)) {
+      newState.resources[id] = { ...newState.resources[id], amount: newState.resources[id].amount * 2 };
+    }
+  }
+
   // Persist achievements across prestige
   newState.achievements = state.achievements || {};
 

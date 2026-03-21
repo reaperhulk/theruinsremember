@@ -1,4 +1,4 @@
-import { calculateProduction, getEffectiveCap } from './resources.js';
+import { calculateProduction, getEffectiveCap, gather } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
 import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
 import { getFactoryBonus } from './factory.js';
@@ -7,6 +7,8 @@ import { getRouteBonus } from './starChart.js';
 import { mine } from './mining.js';
 import { checkAchievements } from './achievements.js';
 import { checkComboReset } from './weaving.js';
+import { purchaseUpgrade, getUpgradeCost } from './upgrades.js';
+import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 // Resource consumption rates
 const FOOD_PER_LABOR = 0.3;       // Food consumed per labor/s
@@ -185,6 +187,36 @@ export function tick(state, dt) {
     };
   }
 
+  // Auto-purchase earlier era upgrades when in era 5+
+  if (newState.era >= 5 && newState.totalTicks % 60 === 0) {
+    const autoPurchaseEra = Math.max(1, newState.era - 3); // Auto-buy eras 1-2 when in era 5, 1-3 when in era 6, etc.
+    for (const def of Object.values(upgradeDefs)) {
+      if (def.era > autoPurchaseEra) continue;
+      if (def.repeatable) continue;
+      if (newState.upgrades[def.id]) continue;
+      // Check prerequisites
+      if (def.prerequisites.some(p => !newState.upgrades[p])) continue;
+      // Check affordability using getUpgradeCost
+      const cost = getUpgradeCost(newState, def.id);
+      if (!cost) continue;
+      const result = purchaseUpgrade(newState, def.id);
+      if (result) {
+        newState = result;
+        break; // One per tick to avoid lag
+      }
+    }
+  }
+
+  // Auto-gather (prestige milestone: 3+ prestiges)
+  if (newState.autoGather && newState.totalTicks % 20 === 0) {
+    // Gather each unlocked resource once
+    for (const [id, r] of Object.entries(newState.resources)) {
+      if (r.unlocked) {
+        newState = gather(newState, id, 1);
+      }
+    }
+  }
+
   // Check achievements (every 60 ticks to reduce overhead)
   if (newState.totalTicks % 60 === 0) {
     const { state: afterAchievements, newAchievements } = checkAchievements(newState);
@@ -202,6 +234,20 @@ export function tick(state, dt) {
     } else {
       newState = afterAchievements;
     }
+  }
+
+  // Check game completion
+  if (!newState.gameComplete && newState.era >= 10 &&
+      newState.upgrades?.recursionScar && newState.upgrades?.finalIteration &&
+      Object.keys(newState.prestigeUpgrades || {}).length >= 25) {
+    newState = {
+      ...newState,
+      gameComplete: true,
+      eventLog: [...(newState.eventLog || []), {
+        message: 'THE FINAL TRUTH: The ruins were yours. The cycle is you. And it begins again.',
+        time: newState.totalTime,
+      }].slice(-10),
+    };
   }
 
   return newState;

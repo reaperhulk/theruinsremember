@@ -21,7 +21,7 @@ import { PrestigePanel } from './PrestigePanel.jsx';
 import { EraTransition } from './EraTransition.jsx';
 import { Toast } from './Toast.jsx';
 import { OfflineReport } from './OfflineReport.jsx';
-import { performPrestige, calculatePrestigeBonus } from '../engine/prestige.js';
+import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, getPrestigeSummary } from '../engine/prestige.js';
 import { ERA_COUNT, eraNames } from '../engine/eras.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
@@ -74,7 +74,26 @@ export function App() {
 
   const handlePrestige = () => {
     if (state.era < ERA_COUNT) return;
-    if (!confirm(`Prestige for x${prestigeBonus.toFixed(1)} multiplier?\n\nYou keep: prestige upgrades, achievements\nYou lose: all resources, upgrades, tech, era progress\n\nNew multiplier: x${(state.prestigeMultiplier * prestigeBonus).toFixed(1)}`)) return;
+    const summary = getPrestigeSummary(state);
+    const msg = [
+      '--- The Cycle Ends. The Cycle Begins. ---',
+      '',
+      `Prestige Bonus: x${summary.bonus.toFixed(1)}`,
+      `Multiplier: x${summary.currentMultiplier.toFixed(1)} → x${summary.newMultiplier.toFixed(1)}`,
+      `Prestige Points Earned: +${summary.points}`,
+      `Total Points After: ${summary.totalPoints}`,
+      `Prestige Count: #${summary.prestigeCount}`,
+      '',
+      'KEPT: Achievements, prestige upgrades, multiplier, lifetime stats',
+      'LOST: All resources, upgrades, tech, era progress, mini-game state',
+      '',
+      summary.prestigeCount >= 3 ? '(Milestone: auto-gather unlocked)' : '',
+      summary.prestigeCount >= 5 ? '(Milestone: era 1 upgrades auto-purchased)' : '',
+      summary.prestigeCount >= 10 ? '(Milestone: starting resources doubled)' : '',
+      '',
+      '"We tried to stop. We could not. Neither will you."',
+    ].filter(Boolean).join('\n');
+    if (!confirm(msg)) return;
     updateState(s => performPrestige(s));
   };
 
