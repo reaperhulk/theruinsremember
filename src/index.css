@@ -1966,6 +1966,15 @@ canvas:hover {
   border: 1px solid rgba(212, 168, 64, 0.3);
 }
 
+/* Chain Reaction flash — brief golden flash on upgrade panel */
+.upgrade-panel.chain-reaction-flash {
+  animation: chain-flash 0.6s ease-out;
+}
+@keyframes chain-flash {
+  0% { box-shadow: 0 0 12px rgba(212, 168, 64, 0.5); border-color: #d4a840; }
+  100% { box-shadow: none; border-color: inherit; }
+}
+
 /* Crisis event flash */
 .game-container.crisis-flash {
   animation: crisis-flash 0.8s ease;

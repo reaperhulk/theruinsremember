@@ -67,8 +67,10 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
 
   const eras = Object.keys(byEra).map(Number).sort((a, b) => a - b);
 
+  const overclockActive = state.upgrades?.overclockProtocol && ((state.totalTime || 0) % 60) < 10;
+
   return (
-    <div className="panel resource-panel">
+    <div className="panel resource-panel" style={overclockActive ? { borderColor: '#cc9933', boxShadow: '0 0 8px rgba(204, 153, 51, 0.3)' } : undefined}>
       <h2>Resources ({unlockedResources.length} unlocked)</h2>
       {eras.map(era => {
         const isOld = era < state.era;

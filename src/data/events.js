@@ -1632,7 +1632,7 @@ export const events = {
     type: 'instant',
     chance: 0.005,
     effects: [
-      { type: 'resource', target: 'electronics', value: -100 },
+      { type: 'resource_percent', target: 'electronics', value: -0.15 },
     ],
   },
   crisisQuake: {
@@ -1653,8 +1653,8 @@ export const events = {
     type: 'instant',
     chance: 0.004,
     effects: [
-      { type: 'resource', target: 'data', value: -50 },
-      { type: 'resource', target: 'software', value: -30 },
+      { type: 'resource_percent', target: 'data', value: -0.10 },
+      { type: 'resource_percent', target: 'software', value: -0.10 },
     ],
   },
   crisisFuelLeak: {
@@ -1685,7 +1685,7 @@ export const events = {
     type: 'instant',
     chance: 0.004,
     effects: [
-      { type: 'resource', target: 'darkEnergy', value: -200 },
+      { type: 'resource_percent', target: 'darkEnergy', value: -0.15 },
     ],
   },
   crisisStellarFlare: {
@@ -1706,8 +1706,8 @@ export const events = {
     type: 'instant',
     chance: 0.003,
     effects: [
-      { type: 'resource', target: 'exoticMatter', value: -100 },
-      { type: 'resource', target: 'galacticInfluence', value: -500 },
+      { type: 'resource_percent', target: 'exoticMatter', value: -0.10 },
+      { type: 'resource_percent', target: 'galacticInfluence', value: -0.10 },
     ],
   },
 

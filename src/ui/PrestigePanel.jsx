@@ -79,42 +79,60 @@ export function PrestigePanel({ state, onUpdate }) {
         </div>
       </div>
 
-      <div className="upgrade-progress-bar" style={{ margin: '4px 0 8px' }}>
-        <div className="upgrade-progress-fill" style={{ width: `${Math.floor(shop.filter(u => u.owned).length / shop.length * 100)}%`, background: 'linear-gradient(90deg, #8844cc, #cc44aa)' }} />
-      </div>
-      <h3>Upgrades ({shop.filter(u => u.owned).length}/{shop.length})</h3>
-      <div className="prestige-shop">
-        {[...shop].sort((a, b) => {
-          // Owned first, then by cost ascending
-          if (a.owned !== b.owned) return a.owned ? 1 : -1;
-          return (a.cost || 0) - (b.cost || 0);
-        }).map(u => (
-          <button
-            key={u.id}
-            className={`upgrade-btn ${u.owned ? 'purchased' : u.locked ? 'locked' : u.affordable ? 'affordable' : 'too-expensive'}`}
-            disabled={u.owned || !u.affordable || u.locked}
-            onClick={() => onUpdate(s => purchasePrestigeUpgrade(s, u.id))}
-            title={u.description}
-            style={!u.owned && !u.affordable ? { opacity: u.locked ? 0.4 : 0.65 } : {}}
-          >
-            <div className="upgrade-name">
-              {u.name}
-              {u.owned && ' [OWNED]'}
-            </div>
-            <div className="upgrade-cost">
-              {u.cost} points
-              {!u.owned && !u.affordable && !u.locked && points > 0 && ` (${Math.floor(points / u.cost * 100)}% — need ${u.cost - points} more)`}
-            </div>
-            <div className="upgrade-desc">{u.description}</div>
-            {u.locked && <div className="upgrade-desc" style={{ color: '#ff8888' }}>Requires: {u.requiresName}</div>}
-            {!u.owned && !u.locked && !u.affordable && (
-              <div className="upgrade-progress-bar">
-                <div className={`upgrade-progress-fill ${points / u.cost > 0.8 ? 'almost' : ''}`} style={{ width: `${Math.min(Math.floor(points / u.cost * 100), 100)}%` }} />
-              </div>
-            )}
-          </button>
-        ))}
-      </div>
+      {state.era < 7 && (state.prestigeCount || 0) === 0 && (
+        <div style={{ padding: '12px', color: '#888', textAlign: 'center' }}>
+          <p style={{ marginBottom: '8px', color: '#998866', fontStyle: 'italic' }}>
+            "Every civilization reaches the end. Every civilization starts again."
+          </p>
+          <p style={{ fontSize: '0.85em', marginBottom: '4px' }}>
+            Prestige becomes available at Era 7. Reset your progress to gain a permanent production multiplier and prestige points to spend on powerful upgrades.
+          </p>
+          <p style={{ fontSize: '0.8em', color: '#666' }}>
+            Everything you learn carries forward. The ruins will remember.
+          </p>
+        </div>
+      )}
+
+      {(state.era >= 7 || (state.prestigeCount || 0) > 0) && (
+        <>
+          <div className="upgrade-progress-bar" style={{ margin: '4px 0 8px' }}>
+            <div className="upgrade-progress-fill" style={{ width: `${Math.floor(shop.filter(u => u.owned).length / shop.length * 100)}%`, background: 'linear-gradient(90deg, #8844cc, #cc44aa)' }} />
+          </div>
+          <h3>Upgrades ({shop.filter(u => u.owned).length}/{shop.length})</h3>
+          <div className="prestige-shop">
+            {[...shop].sort((a, b) => {
+              // Owned first, then by cost ascending
+              if (a.owned !== b.owned) return a.owned ? 1 : -1;
+              return (a.cost || 0) - (b.cost || 0);
+            }).map(u => (
+              <button
+                key={u.id}
+                className={`upgrade-btn ${u.owned ? 'purchased' : u.locked ? 'locked' : u.affordable ? 'affordable' : 'too-expensive'}`}
+                disabled={u.owned || !u.affordable || u.locked}
+                onClick={() => onUpdate(s => purchasePrestigeUpgrade(s, u.id))}
+                title={u.description}
+                style={!u.owned && !u.affordable ? { opacity: u.locked ? 0.4 : 0.65 } : {}}
+              >
+                <div className="upgrade-name">
+                  {u.name}
+                  {u.owned && ' [OWNED]'}
+                </div>
+                <div className="upgrade-cost">
+                  {u.cost} points
+                  {!u.owned && !u.affordable && !u.locked && points > 0 && ` (${Math.floor(points / u.cost * 100)}% — need ${u.cost - points} more)`}
+                </div>
+                <div className="upgrade-desc">{u.description}</div>
+                {u.locked && <div className="upgrade-desc" style={{ color: '#ff8888' }}>Requires: {u.requiresName}</div>}
+                {!u.owned && !u.locked && !u.affordable && (
+                  <div className="upgrade-progress-bar">
+                    <div className={`upgrade-progress-fill ${points / u.cost > 0.8 ? 'almost' : ''}`} style={{ width: `${Math.min(Math.floor(points / u.cost * 100), 100)}%` }} />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       <h3>Milestones</h3>
       <div className="stats-grid">

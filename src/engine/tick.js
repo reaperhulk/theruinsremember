@@ -343,6 +343,53 @@ export function tick(state, dt) {
     }
   }
 
+  // Mechanic: prestigeAccumulator — +5% production per prestige run completed
+  if (newState.upgrades?.galacticMemory) {
+    const prestigeBonus = (newState.prestigeCount || 0) * 0.05;
+    if (prestigeBonus > 0) {
+      for (const [id, r] of Object.entries(newState.resources)) {
+        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
+          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+          const bonus = rate * prestigeBonus * dt;
+          const cap = getEffectiveCap(newState, id);
+          const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
+          newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
+        }
+      }
+    }
+  }
+
+  // Mechanic: diversityBonus — 1.05^count multiplier per unlocked resource type
+  if (newState.upgrades?.echoMultiplier) {
+    const unlockedCount = Object.values(newState.resources).filter(r => r.unlocked).length;
+    const diversityMult = Math.pow(1.05, unlockedCount) - 1;
+    if (diversityMult > 0) {
+      for (const [id, r] of Object.entries(newState.resources)) {
+        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
+          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+          const bonus = rate * diversityMult * dt;
+          const cap = getEffectiveCap(newState, id);
+          const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
+          newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
+        }
+      }
+    }
+  }
+
+  // Mechanic: compoundingTick — production compounds slightly each tick
+  if (newState.upgrades?.infiniteLoop) {
+    const compoundBonus = 1 + 0.001 * dt;
+    for (const [id, r] of Object.entries(newState.resources)) {
+      if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
+        const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+        const bonus = rate * (compoundBonus - 1) * dt;
+        const cap = getEffectiveCap(newState, id);
+        const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
+        newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
+      }
+    }
+  }
+
   // Check achievements (every 60 ticks to reduce overhead)
   if (newState.totalTicks % 60 === 0) {
     const { state: afterAchievements, newAchievements } = checkAchievements(newState);

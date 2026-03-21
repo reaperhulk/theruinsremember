@@ -60,18 +60,32 @@ function applyInstantEvent(state, event) {
     for (const fx of event.effects) {
       const r = s.resources[fx.target];
       if (!r) continue;
-      const eraScale = 1 + (s.era - 1) * 0.5;
-      const scaledAmount = fx.value * eraScale * s.prestigeMultiplier;
-      s = {
-        ...s,
-        resources: {
-          ...s.resources,
-          [fx.target]: {
-            ...r,
-            amount: Math.max(0, r.amount + scaledAmount),
+
+      if (fx.type === 'resource_percent') {
+        // Remove a percentage of current amount — scales naturally with progress
+        const current = r.amount || 0;
+        const loss = current * Math.abs(fx.value);
+        s = {
+          ...s,
+          resources: {
+            ...s.resources,
+            [fx.target]: { ...r, amount: Math.max(0, current - loss) },
           },
-        },
-      };
+        };
+      } else {
+        const eraScale = 1 + (s.era - 1) * 0.5;
+        const scaledAmount = fx.value * eraScale * s.prestigeMultiplier;
+        s = {
+          ...s,
+          resources: {
+            ...s.resources,
+            [fx.target]: {
+              ...r,
+              amount: Math.max(0, r.amount + scaledAmount),
+            },
+          },
+        };
+      }
     }
     return s;
   }
@@ -137,5 +151,12 @@ export function getTimedRateMultiplier(state, resourceId) {
       mult *= ae.effect.rateMultBonus;
     }
   }
-  return Math.max(0.25, mult);
+  mult = Math.max(0.25, mult);
+
+  // Mechanic: crisisInversion — if owned and mult < 1, invert it (capped at 4x)
+  if (state.upgrades?.entropySiphon && mult < 1) {
+    mult = Math.min(4, 1 / mult);
+  }
+
+  return mult;
 }

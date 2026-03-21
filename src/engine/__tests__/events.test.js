@@ -190,6 +190,7 @@ describe('events', () => {
       for (const e of crisisEvents) {
         const hasNegative = (e.effects?.some(eff =>
           (eff.type === 'resource' && eff.value < 0) ||
+          (eff.type === 'resource_percent' && eff.value < 0) ||
           (eff.type === 'resource_mult' && eff.value < 1)
         )) || (e.effect?.rateMultBonus !== undefined && e.effect.rateMultBonus < 1);
         expect(hasNegative).toBe(true);

@@ -9,6 +9,27 @@ import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
 const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 
+const mechanicDescriptions = {
+  clickAll: 'Clicking any resource gives +1 to all others',
+  surplusConvert: 'Capped resources trickle to your lowest resource',
+  upgradeCountBonus: '+0.5% production per upgrade owned (max 50%)',
+  productionPulse: 'All production doubles for 10s every 60s',
+  capOverflow: 'Capped resources overflow to research',
+  purchaseBurst: 'Buying upgrades grants 5s of all resources',
+  eraCompounding: '1.1x multiplier per era (compounds)',
+  canvasDataCache: '20% chance on click to find data cache',
+  miniGameSynergy: '+10% production per mini-game used',
+  dockingBoost: 'Perfect docks boost all production 5% for 30s',
+  colonyMultiplier: 'Colony focus multiplies target resources 1.5x',
+  autoDeposit: 'Canvas deposits auto-collected after 5s',
+  routeBonus: '+3% production per star route',
+  hackPermanentBoost: 'Hack successes permanently +1% a random resource',
+  prestigeAccumulator: '+5% production per prestige run completed',
+  crisisInversion: 'Crisis events boost production instead of reducing it',
+  diversityBonus: '1.05x per unlocked resource type',
+  compoundingTick: 'Production compounds slightly each tick',
+};
+
 function resourceName(id) {
   return resourceDefs[id]?.name || id;
 }
@@ -80,11 +101,22 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const [sortBy, setSortBy] = useState('default');
   const [filterType, setFilterType] = useState('all');
   const [flashId, setFlashId] = useState(null);
+  const [chainFlash, setChainFlash] = useState(false);
   const flashTimerRef = useRef(null);
+  const chainTimerRef = useRef(null);
 
   const handlePurchase = useCallback((upgradeId) => {
     setFlashId(upgradeId);
-    onUpdate(s => purchaseUpgrade(s, upgradeId));
+    onUpdate(s => {
+      const result = purchaseUpgrade(s, upgradeId);
+      // Chain Reaction flash when purchaseBurst fires
+      if (result && result.upgrades?.chainReaction) {
+        setChainFlash(true);
+        clearTimeout(chainTimerRef.current);
+        chainTimerRef.current = setTimeout(() => setChainFlash(false), 600);
+      }
+      return result;
+    });
     clearTimeout(flashTimerRef.current);
     flashTimerRef.current = setTimeout(() => setFlashId(null), 400);
   }, [onUpdate]);
@@ -137,7 +169,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   }, [state.upgrades]);
 
   return (
-    <div className="panel upgrade-panel">
+    <div className={`panel upgrade-panel${chainFlash ? ' chain-reaction-flash' : ''}`}>
       <h2>
         Upgrades{filteredAvailable.length > 0 ? ` (${affordableCount}/${filteredAvailable.length})` : ''}
         {upcoming.length > 0 ? ` — ${upcoming.length} soon` : ''}
@@ -242,7 +274,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                   }
                   return <span key={i} className={cls}>{label}</span>;
                 })}
-                {isMechanic && <span className="effect-tag effect-mechanic">MECHANIC</span>}
+                {isMechanic && <span className="effect-tag effect-mechanic" title={mechanicDescriptions[upgrade.mechanic] || 'Special mechanic'}>MECHANIC</span>}
               </div>
               {enablesCountMap[upgrade.id] > 0 && (
                 <div className="text-hint" style={{ color: '#88ccaa' }}>Enables {enablesCountMap[upgrade.id]} upgrade{enablesCountMap[upgrade.id] > 1 ? 's' : ''}</div>
