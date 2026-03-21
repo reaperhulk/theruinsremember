@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
+import { getEffectiveCap } from '../engine/resources.js';
 import { formatNumber } from './format.js';
 
 const MILESTONES = [100, 1000, 10000, 100000, 1000000, 10000000, 100000000];
@@ -10,6 +11,7 @@ export function Toast({ state }) {
   const prevGemsRef = useRef(state.totalGems || 0);
   const prevEventsRef = useRef(state.eventLog?.length || 0);
   const milestonesHitRef = useRef({});
+  const capWarningsRef = useRef({});
   const idRef = useRef(0);
 
   useEffect(() => {
@@ -38,6 +40,21 @@ export function Toast({ state }) {
           const name = resourceDefs[id]?.name || id;
           newToasts.push({ id: ++idRef.current, text: `${name} reached ${formatNumber(m)}!`, type: 'milestone' });
         }
+      }
+    }
+
+    // Resource cap warnings (once per resource)
+    for (const [id, r] of Object.entries(state.resources)) {
+      if (!r.unlocked) continue;
+      const cap = getEffectiveCap(state, id);
+      if (cap > 0 && r.amount >= cap * 0.99 && !capWarningsRef.current[id]) {
+        capWarningsRef.current[id] = true;
+        const name = resourceDefs[id]?.name || id;
+        newToasts.push({ id: ++idRef.current, text: `${name} storage is full! Buy cap upgrades.`, type: 'milestone' });
+      }
+      // Reset warning if below 80% so it can trigger again after player upgrades cap
+      if (cap > 0 && r.amount < cap * 0.8) {
+        capWarningsRef.current[id] = false;
       }
     }
 

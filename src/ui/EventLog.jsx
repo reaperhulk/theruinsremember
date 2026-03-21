@@ -6,6 +6,23 @@ function formatTimeAgo(eventTime, currentTime) {
   return `${Math.floor(diff / 3600)}h ago`;
 }
 
+function getEventStyle(message) {
+  if (!message) return { icon: '*', color: '#888' };
+  if (message.startsWith('Achievement')) return { icon: '\u2605', color: '#66cc66' };
+  if (message.includes('ruins') || message.includes('ancient') || message.includes('Precursor') ||
+      message.includes('Ghost') || message.includes('derelict') || message.includes('Strange') ||
+      message.includes('buried') || message.includes('sealed') || message.includes('holographic'))
+    return { icon: '\u270E', color: '#bb88ff' };
+  if (message.startsWith('ERA') || message.includes('era'))
+    return { icon: '\u2191', color: '#ffcc44' };
+  if (message.includes('Gem') || message.includes('gem'))
+    return { icon: '\u25C6', color: '#ffdd44' };
+  if (message.includes('boost') || message.includes('surge') || message.includes('Frenzy') ||
+      message.includes('Lucky') || message.includes('Burst') || message.includes('bonus'))
+    return { icon: '\u26A1', color: '#88bbff' };
+  return { icon: '\u25CF', color: '#888' };
+}
+
 export function EventLog({ state }) {
   const log = state.eventLog || [];
   const activeEffects = state.activeEffects || [];
@@ -34,12 +51,16 @@ export function EventLog({ state }) {
         </div>
       )}
       <div className="event-log">
-        {log.slice(-8).reverse().map((entry, i) => (
-          <div key={i} className="event-entry" style={{ opacity: 1 - i * 0.1 }}>
-            <span className="event-time">{formatTimeAgo(entry.time, state.totalTime)}</span>
-            <span className="event-message">{entry.message}</span>
-          </div>
-        ))}
+        {log.slice(-8).reverse().map((entry, i) => {
+          const style = getEventStyle(entry.message);
+          return (
+            <div key={i} className="event-entry" style={{ opacity: 1 - i * 0.1 }}>
+              <span style={{ color: style.color, marginRight: '4px', fontSize: '0.9em' }}>{style.icon}</span>
+              <span className="event-time">{formatTimeAgo(entry.time, state.totalTime)}</span>
+              <span className="event-message" style={{ color: style.color !== '#888' ? style.color : undefined }}>{entry.message}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

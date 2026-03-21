@@ -77,7 +77,11 @@ export function PrestigePanel({ state, onUpdate }) {
       </div>
       <h3>Upgrades ({shop.filter(u => u.owned).length}/{shop.length})</h3>
       <div className="prestige-shop">
-        {shop.map(u => (
+        {[...shop].sort((a, b) => {
+          // Owned first, then by cost ascending
+          if (a.owned !== b.owned) return a.owned ? 1 : -1;
+          return (a.cost || 0) - (b.cost || 0);
+        }).map(u => (
           <button
             key={u.id}
             className={`upgrade-btn ${u.owned ? 'purchased' : u.locked ? 'locked' : u.affordable ? 'affordable' : 'too-expensive'}`}

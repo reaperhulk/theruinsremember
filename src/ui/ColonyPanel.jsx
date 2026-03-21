@@ -89,6 +89,11 @@ export function ColonyPanel({ state, onUpdate }) {
           Strategy: {strategy.type} (x{strategy.mult})
         </div>
       )}
+      {state.era >= 6 && (
+        <p className="text-lore" style={{ fontSize: '0.75em', margin: '4px 0 0' }}>
+          Every colony site matches coordinates from the ancient maps.
+        </p>
+      )}
       <p className="mining-hint">Specialize x2 | Diversify x1.25 | Era bonus scales output</p>
     </div>
   );

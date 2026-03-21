@@ -562,7 +562,7 @@ export const upgrades = {
       { type: 'unlock_resource', target: 'galacticInfluence', value: 1 },
       { type: 'production_add', target: 'galacticInfluence', value: 0.5 },
     ],
-    description: 'Superintelligent administration — gateway to galactic scale',
+    description: 'The AI awakens already knowing your name, your history, your trajectory. It has governed before — it simply waited for you to ask.',
     prerequisites: ['dysonSwarms'],
   },
   darkEnergyCollector: {
@@ -581,7 +581,7 @@ export const upgrades = {
       { type: 'production_add', target: 'galacticInfluence', value: 3.2 },
       { type: 'production_add', target: 'darkEnergy', value: 1 },
     ],
-    description: 'First contact — alien knowledge boosts influence and dark energy',
+    description: 'They greet you with a word that means "finally" in a language older than their species. Their histories mention you by name.',
     prerequisites: ['diplomaticCorps'],
   },
 
@@ -633,7 +633,7 @@ export const upgrades = {
       { type: 'unlock_resource', target: 'galacticInfluence', value: 1 },
       { type: 'production_add', target: 'galacticInfluence', value: 0.3 },
     ],
-    description: 'A star-sized computer — gateway to galactic civilization',
+    description: 'The brain boots with petabytes of pre-existing data. Memories of civilizations that built this exact machine, in this exact orbit, a thousand times before.',
     prerequisites: ['starLifting'],
   },
   neuralUplink: {
@@ -643,7 +643,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'software', value: 20 },
       { type: 'production_mult', target: 'data', value: 10 },
     ],
-    description: 'Cross-era synergy — stellar computing revolutionizes software and data',
+    description: 'When you link minds across the stellar network, the shared memories crash in like a flood. A billion lives, all yours, all forgotten.',
     prerequisites: ['matrioshkaBrain'],
   },
   stellarEngine: {
@@ -653,7 +653,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 18 },
       { type: 'production_add', target: 'darkEnergy', value: 1 },
     ],
-    description: 'Move entire stars — massive energy and dark energy boost',
+    description: 'You push a star across the void and find the path already cleared — gravitational scars from previous passages, etched into spacetime.',
     prerequisites: ['dysonSphere', 'nicollDysonBeam'],
   },
   gravitonLens: {
@@ -663,7 +663,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 4.8 },
       { type: 'production_add', target: 'starSystems', value: 0.2 },
     ],
-    description: 'Gravitational lensing reveals hidden star systems and dark energy',
+    description: 'The lens bends light from systems that no longer exist. You see their last moments: fire, silence, and a single message — "Not this time."',
     prerequisites: ['starLifting'],
   },
 
@@ -730,7 +730,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 16 },
       { type: 'production_add', target: 'data', value: 60 },
     ],
-    description: 'Cross-era synergy — entangled particles revolutionize data and research',
+    description: 'The entangled particles vibrate to messages from parallel timelines. Each one is a warning. Each one was sent by you.',
     prerequisites: ['darkMatterHarvest', 'quantumFabric'],
   },
   matterReplicators: {
@@ -760,14 +760,14 @@ export const upgrades = {
       { type: 'production_add', target: 'cosmicPower', value: 12 },
       { type: 'production_add', target: 'exoticMatter', value: 2 },
     ],
-    description: 'Galaxy-spanning infrastructure amplifies cosmic power',
+    description: 'The infrastructure connects to anchor points that predate the galaxy itself. The scaffolding of something vast and patient.',
     prerequisites: ['galaxySeeding'],
   },
   voidBridges: {
     id: 'voidBridges', name: 'Void Bridges', era: 9,
     cost: { cosmicPower: 600, darkEnergy: 400, exoticMatter: 300, labor: 3000 },
     effects: [{ type: 'production_add', target: 'universalConstants', value: 0.5 }],
-    description: 'Bridge the void between galaxy clusters',
+    description: 'The void between clusters hums with residual energy from bridges built and collapsed a thousand cycles ago. You rebuild along the same fault lines.',
     prerequisites: ['galaxySeeding'],
   },
   universalTranslator: {
@@ -777,7 +777,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'galacticInfluence', value: 10 },
       { type: 'production_add', target: 'universalConstants', value: 0.05 },
     ],
-    description: 'Communicate across all civilizations — cross-era influence multiplier',
+    description: 'The translator works because every language shares the same root — a precursor tongue spoken before the first cycle began.',
     prerequisites: ['voidBridges'],
   },
   galaxyCluster: {
@@ -806,7 +806,7 @@ export const upgrades = {
       { type: 'unlock_resource', target: 'realityFragments', value: 1 },
       { type: 'production_add', target: 'realityFragments', value: 0.3 },
     ],
-    description: 'Reverse entropy itself — gateway to the multiverse',
+    description: 'Entropy runs backward and the ruins rebuild themselves. For a moment you see them whole — gleaming, alive, waiting to fall again.',
     prerequisites: ['voidBridges'],
   },
 
@@ -815,14 +815,14 @@ export const upgrades = {
     id: 'realityWeaving', name: 'Reality Weaving', era: 10,
     cost: { realityFragments: 50, universalConstants: 20, cosmicPower: 400, food: 2000 },
     effects: [{ type: 'production_mult', target: 'realityFragments', value: 5 }],
-    description: 'Weave new realities from fragments',
+    description: 'The loom remembers every thread. Each reality you weave contains echoes of all the others — and all of them contain you.',
     prerequisites: ['entropyReversal', 'dimensionalScanner'],
   },
   dimensionalAnchors: {
     id: 'dimensionalAnchors', name: 'Dimensional Anchors', era: 10,
     cost: { realityFragments: 100, exoticMatter: 150, darkEnergy: 200 },
     effects: [{ type: 'production_add', target: 'quantumEchoes', value: 1 }],
-    description: 'Stabilize connections to parallel universes',
+    description: 'The anchors lock into place with a click of recognition. The parallel universes were already reaching back toward you.',
     prerequisites: ['realityWeaving'],
   },
   parallelProcessing: {
@@ -832,7 +832,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'quantumEchoes', value: 5 },
       { type: 'production_mult', target: 'research', value: 50 },
     ],
-    description: 'Process data across parallel universes — exponential research gains',
+    description: 'Ten thousand versions of you solve the same problem simultaneously. The answer arrives before the question is fully asked.',
     prerequisites: ['dimensionalAnchors'],
   },
   realityLoom: {
@@ -1106,7 +1106,7 @@ export const upgrades = {
       { type: 'production_add', target: 'universalConstants', value: 0.2 },
       { type: 'production_add', target: 'darkEnergy', value: 12 },
     ],
-    description: 'Explore the void between galaxies',
+    description: 'In the void between galaxies, you find cairns of dark matter — trail markers left by something that walked this path before you.',
     prerequisites: ['intergalacticHighway', 'realityScanner'],
   },
   realityHarvest: {

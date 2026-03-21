@@ -120,6 +120,7 @@ export function purchaseUpgrade(state, upgradeId) {
   return {
     ...afterEffects,
     upgrades: { ...afterEffects.upgrades, [upgradeId]: newValue },
+    lastUpgradeTime: afterEffects.totalTime || 0,
   };
 }
 

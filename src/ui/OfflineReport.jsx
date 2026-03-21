@@ -26,6 +26,9 @@ export function OfflineReport({ report, onDismiss }) {
     <div className="offline-overlay" onClick={onDismiss}>
       <div className="offline-report" onClick={e => e.stopPropagation()}>
         <h2>Welcome Back!</h2>
+        <p className="text-lore" style={{ fontSize: '0.8em', margin: '0 0 6px', textAlign: 'center' }}>
+          The ruins waited patiently for your return.
+        </p>
         <p className="offline-time">You were away for {formatTime(report.elapsed)}</p>
         {gains.length > 0 && (
           <>

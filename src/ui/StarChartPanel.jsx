@@ -106,6 +106,11 @@ export function StarChartPanel({ state, onUpdate }) {
           </span>
         </div>
       )}
+      {routes.length > 3 && (
+        <p className="text-lore" style={{ fontSize: '0.75em', margin: '4px 0 0' }}>
+          The routes trace paths already worn into spacetime.
+        </p>
+      )}
       <p className="mining-hint">
         Click two systems to create/remove routes (5 dark energy + 1 star system).
         {stats.hubSystems > 0 && ' Hub systems (2+ routes) get +50% bonus.'}

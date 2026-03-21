@@ -122,9 +122,17 @@ export function useGameLoop(initialState) {
       localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
     }, SAVE_INTERVAL);
 
+    // Save on tab close / page unload
+    const handleBeforeUnload = () => {
+      const toSave = { ...stateRef.current, lastSaved: Date.now() };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
       cancelAnimationFrame(rafRef.current);
       clearInterval(saveTimerRef.current);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
       // Save on unmount
       const toSave = { ...stateRef.current, lastSaved: Date.now() };
       localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));

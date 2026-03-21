@@ -108,6 +108,14 @@ export function StatsPanel({ state }) {
           <span>Production Mult</span>
           <span>x{(state.prestigeMultiplier || 1).toFixed(1)}</span>
         </div>
+        {state.lastUpgradeTime > 0 && (
+          <div className="stat-row">
+            <span>Since Last Upgrade</span>
+            <span style={{ color: (state.totalTime - state.lastUpgradeTime) > 120 ? '#ffaa44' : '#888' }}>
+              {formatTime(state.totalTime - state.lastUpgradeTime)}
+            </span>
+          </div>
+        )}
         {(state.totalResourcesProduced || 0) > 0 && (
           <div className="stat-row">
             <span>Total Produced</span>

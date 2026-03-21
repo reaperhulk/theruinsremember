@@ -419,6 +419,16 @@ input:focus-visible {
   color: #ffcc00;
 }
 
+.era-gate-tech {
+  border: 2px solid #cc9900 !important;
+  box-shadow: 0 0 6px rgba(204, 153, 0, 0.3);
+  background: linear-gradient(135deg, #1a2845, #2a2820) !important;
+}
+
+.era-gate-tech:hover:not(:disabled) {
+  box-shadow: 0 0 10px rgba(204, 153, 0, 0.5);
+}
+
 .tech-prereqs {
   font-size: 0.7em;
   color: #666;

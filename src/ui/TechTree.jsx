@@ -97,7 +97,7 @@ export function TechTree({ state, onUpdate }) {
           return (
             <button
               key={tech.id}
-              className={`tech-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === tech.id ? (tech.grantsEra ? 'breakthrough-flash' : 'purchase-flash') : ''}`}
+              className={`tech-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === tech.id ? (tech.grantsEra ? 'breakthrough-flash' : 'purchase-flash') : ''} ${tech.grantsEra ? 'era-gate-tech' : ''}`}
               disabled={!affordable}
               onClick={() => handleUnlock(tech.id)}
               title={tech.description}

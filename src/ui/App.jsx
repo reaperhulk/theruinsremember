@@ -233,7 +233,11 @@ export function App() {
               if (tab.id === 'upgrades') badge = affordableUpgrades;
               if (tab.id === 'tech') badge = affordableTech;
               if (tab.id === 'mini') badge = activeEffectCount;
-              if (tab.id === 'prestige') badge = state.prestigePoints || 0;
+              if (tab.id === 'prestige') {
+                badge = state.prestigePoints || 0;
+                // Show notification dot when prestige is available
+                if (state.era >= ERA_COUNT && badge === 0) badge = '!';
+              }
               if (tab.id === 'trading') badge = 0; // no badge — total trades not actionable
               if (tab.id === 'stats') badge = 0; // no badge — achievement count not actionable
               return (
@@ -244,7 +248,7 @@ export function App() {
                   title={`Press ${tab.key}`}
                 >
                   {tab.label}
-                  {badge > 0 && <span className="tab-badge">{badge}</span>}
+                  {(badge > 0 || badge === '!') && <span className="tab-badge">{badge}</span>}
                 </button>
               );
             })}
@@ -273,6 +277,11 @@ export function App() {
         v1.0 — {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.tech || {}).length} tech | {Object.keys(state.achievements || {}).length} achievements | Era {state.era}
         {state.prestigeMultiplier > 1 && ` | x${state.prestigeMultiplier.toFixed(1)}`}
         {` | ${Math.floor(Object.keys(state.upgrades || {}).length / Object.keys(upgradeDefs).length * 100)}% complete`}
+        {(() => {
+          const LORE_IDS = ['precursorBeacon', 'deadStarAtlas', 'hollowDyson', 'echoBlueprint', 'galacticOssuary', 'convergenceCodex', 'universalTombstone', 'inevitabilityEngine', 'recursionScar', 'finalIteration'];
+          const found = LORE_IDS.filter(id => state.upgrades?.[id]).length;
+          return found > 0 ? <span style={{ color: '#998866' }}>{` | Codex: ${found}/${LORE_IDS.length}`}</span> : null;
+        })()}
       </footer>
     </div>
   );

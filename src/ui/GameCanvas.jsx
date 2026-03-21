@@ -175,6 +175,49 @@ function drawEra1(ctx, w, h, t, state) {
     ctx.stroke();
   }
 
+  // Weather system — rain transitions to snow as era 2 approaches
+  const eraUpgradeCount = Object.keys(state?.upgrades || {}).length;
+  const industrialProgress = Math.min(eraUpgradeCount / 8, 1); // 0=natural, 1=polluted
+  const weatherCycle = (Math.sin(t * 0.05) + 1) / 2; // 0-1 slow cycle
+  if (weatherCycle > 0.6) { // weather appears ~40% of the time
+    const weatherIntensity = (weatherCycle - 0.6) / 0.4;
+    const isSnow = industrialProgress > 0.6;
+    const dropCount = Math.floor(weatherIntensity * 30);
+    const rng = seededRandom(Math.floor(t * 2));
+    for (let i = 0; i < dropCount; i++) {
+      const dx = rng() * w;
+      const dy = ((rng() * h + t * (isSnow ? 20 : 120)) % (h + 10)) - 5;
+      if (isSnow) {
+        // Snow — slow falling dots
+        ctx.fillStyle = `rgba(220,230,240,${0.3 + rng() * 0.3})`;
+        ctx.beginPath();
+        ctx.arc(dx + Math.sin(t * 0.8 + i) * 3, dy, 1 + rng(), 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Rain — fast falling lines
+        ctx.strokeStyle = `rgba(150,180,220,${0.15 + rng() * 0.15})`;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(dx, dy);
+        ctx.lineTo(dx - 1, dy + 5 + rng() * 3);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Animated grass/plants swaying at bottom
+  for (let gx = 0; gx < w; gx += 4) {
+    const groundY = h * 0.74 + Math.sin(gx * 0.02 + 4) * 12 + Math.sin(gx * 0.04 + 1 + t * 0.1) * 4;
+    const sway = Math.sin(t * 1.5 + gx * 0.15) * 3;
+    const grassH = 6 + Math.sin(gx * 0.7) * 3;
+    ctx.strokeStyle = `rgba(80,${140 + Math.floor(Math.sin(gx) * 20)},60,0.6)`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(gx, groundY);
+    ctx.quadraticCurveTo(gx + sway * 0.5, groundY - grassH * 0.6, gx + sway, groundY - grassH);
+    ctx.stroke();
+  }
+
   // Smoke wisps from crash site
   for (let p = 0; p < 5; p++) {
     const age = ((t * 0.4 + p * 0.6) % 3);
@@ -236,6 +279,10 @@ function drawEra2(ctx, w, h, t, state) {
   ctx.fillStyle = groundGrad;
   ctx.fillRect(0, h * 0.65, w, h * 0.35);
 
+  // Steel production rate affects smoke thickness
+  const steelRate = state ? ((state.resources?.steel?.baseRate || 0) + (state.resources?.steel?.rateAdd || 0)) * (state.resources?.steel?.rateMult || 1) : 0;
+  const smokeDensity = Math.min(1, steelRate * 0.15);
+
   // Factories — scale with upgrade count
   const factoryCount = Math.min(Math.floor(Object.keys(state?.upgrades || {}).length / 10) + 1, 6);
   const allFactories = [
@@ -274,13 +321,14 @@ function drawEra2(ctx, w, h, t, state) {
       ctx.fillStyle = '#555';
       ctx.fillRect(sx - 3, baseY - f.bh - 20, 6, 22);
 
-      // Smoke particles rising
-      for (let p = 0; p < 8; p++) {
+      // Smoke particles rising — thickness scales with steel production
+      const smokeCount = Math.floor(4 + smokeDensity * 8);
+      for (let p = 0; p < smokeCount; p++) {
         const age = ((t * 0.8 + p * 0.3 + s + f.x * 0.01) % 2.5);
         const py = baseY - f.bh - 22 - age * 30;
         const px = sx + Math.sin(age * 2 + s) * (age * 6);
-        const size = 3 + age * 4;
-        const alpha = Math.max(0, 0.4 - age * 0.16);
+        const size = (3 + age * 4) * (0.6 + smokeDensity * 0.6);
+        const alpha = Math.max(0, (0.3 + smokeDensity * 0.2) - age * 0.14);
         ctx.fillStyle = `rgba(150,140,130,${alpha})`;
         ctx.beginPath();
         ctx.arc(px, py, size, 0, Math.PI * 2);
@@ -1164,6 +1212,9 @@ function drawMultiverse(ctx, w, h, t, state) {
     ctx.fillRect(ox - 20, oy - 20, w + 40, h + 40);
   }
 
+  // Distant stars visible through reality tears
+  drawStarField(ctx, w, h, 25, 1010, t);
+
   // Quantum interference pattern
   for (let x = 0; x < w; x += 4) {
     const wave1 = Math.sin(x * 0.05 + t * 2) * 0.5;
@@ -1843,8 +1894,16 @@ export function GameCanvas({ state, onUpdate }) {
         materials: 'rgba(180,140,100,1)', food: 'rgba(100,200,100,1)',
         energy: 'rgba(255,220,50,1)', steel: 'rgba(150,170,190,1)',
         electronics: 'rgba(100,200,255,1)', research: 'rgba(100,255,200,1)',
+        software: 'rgba(0,200,180,1)', data: 'rgba(80,180,255,1)',
+        rocketFuel: 'rgba(255,120,50,1)', orbitalInfra: 'rgba(180,180,220,1)',
+        exoticMaterials: 'rgba(200,150,255,1)', colonies: 'rgba(100,220,150,1)',
+        darkEnergy: 'rgba(120,80,200,1)', starSystems: 'rgba(180,200,255,1)',
+        galacticInfluence: 'rgba(100,220,255,1)', megastructures: 'rgba(200,180,100,1)',
+        stellarForge: 'rgba(255,180,80,1)', exoticMatter: 'rgba(220,100,255,1)',
+        cosmicPower: 'rgba(180,100,255,1)', universalConstants: 'rgba(200,220,255,1)',
+        realityFragments: 'rgba(255,150,200,1)', quantumEchoes: 'rgba(150,200,255,1)',
       };
-      spawnParticles(particlesRef.current, cx, cy, 5, resourceColors[el.resource] || 'rgba(255,255,255,1)', 30);
+      spawnParticles(particlesRef.current, cx, cy, 8, resourceColors[el.resource] || 'rgba(255,255,255,1)', 40);
       onUpdateRef.current(s => gather(s, el.resource, el.amount));
       return;
     }
@@ -1885,6 +1944,14 @@ export function GameCanvas({ state, onUpdate }) {
         default: drawEra1(ctx, w, h, t, state); break;
       }
 
+      // Vignette effect — darken edges for cinematic feel
+      const vigGrad = ctx.createRadialGradient(w/2, h/2, w*0.25, w/2, h/2, w*0.7);
+      vigGrad.addColorStop(0, 'transparent');
+      vigGrad.addColorStop(0.7, 'transparent');
+      vigGrad.addColorStop(1, 'rgba(0,0,0,0.35)');
+      ctx.fillStyle = vigGrad;
+      ctx.fillRect(0, 0, w, h);
+
       // Clickable element hint glows
       const clickableEls = getClickableElements(era, w, h, t);
       for (const el of clickableEls) {
@@ -1902,8 +1969,22 @@ export function GameCanvas({ state, onUpdate }) {
         .reduce((sum, r) => sum + Math.max(0, (r.baseRate + r.rateAdd) * r.rateMult), 0);
       const glowIntensity = Math.min(totalRate / 100, 1) * 0.15;
       if (glowIntensity > 0.01) {
+        // Era-themed glow colors
+        const eraGlowColors = {
+          1: '200, 180, 100',  // warm amber
+          2: '200, 180, 100',  // warm amber
+          3: '100, 200, 180',  // blue-green
+          4: '100, 200, 180',  // blue-green
+          5: '180, 100, 255',  // purple
+          6: '180, 100, 255',  // purple
+          7: '255, 150, 80',   // red-orange
+          8: '255, 150, 80',   // red-orange
+          9: '255, 240, 200',  // white-gold
+          10: '255, 240, 200', // white-gold
+        };
+        const glowRGB = eraGlowColors[era] || '100, 255, 100';
         const glow = ctx.createRadialGradient(w/2, h/2, w*0.2, w/2, h/2, w*0.6);
-        glow.addColorStop(0, `rgba(100, 255, 100, ${glowIntensity})`);
+        glow.addColorStop(0, `rgba(${glowRGB}, ${glowIntensity})`);
         glow.addColorStop(1, 'transparent');
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, w, h);
@@ -2005,9 +2086,18 @@ export function GameCanvas({ state, onUpdate }) {
 
         ctx.save();
         ctx.globalAlpha = fade * pulse;
+        // Era-themed orb colors
+        const orbColors = {
+          1: ['#e8c860', '#c09830'], 2: ['#e8c860', '#c09830'],
+          3: ['#60c8e8', '#3098c0'], 4: ['#60c8e8', '#3098c0'],
+          5: ['#c080ff', '#9050cc'], 6: ['#c080ff', '#9050cc'],
+          7: ['#ff9060', '#cc6030'], 8: ['#ff9060', '#cc6030'],
+          9: ['#fff0c0', '#e8d080'], 10: ['#fff0c0', '#e8d080'],
+        };
+        const [orbInner, orbOuter] = orbColors[era] || ['#ffdd44', '#ffaa22'];
         const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, r);
-        grad.addColorStop(0, '#ffdd44');
-        grad.addColorStop(0.5, '#ffaa22');
+        grad.addColorStop(0, orbInner);
+        grad.addColorStop(0.5, orbOuter);
         grad.addColorStop(1, 'transparent');
         ctx.fillStyle = grad;
         ctx.beginPath();
@@ -2020,6 +2110,40 @@ export function GameCanvas({ state, onUpdate }) {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('\u2605', orb.x, orb.y);
+        ctx.restore();
+
+        // Screen-edge glow to draw attention
+        ctx.save();
+        const edgeAlpha = fade * (0.08 + 0.04 * Math.sin(age * 3));
+        const edgeColor = orbInner || '#ffdd44';
+        // Parse hex to rgb for edge glow
+        const er2 = parseInt(edgeColor.slice(1,3), 16) || 255;
+        const eg2 = parseInt(edgeColor.slice(3,5), 16) || 221;
+        const eb2 = parseInt(edgeColor.slice(5,7), 16) || 68;
+        // Top edge
+        const topGlow = ctx.createLinearGradient(0, 0, 0, 20);
+        topGlow.addColorStop(0, `rgba(${er2},${eg2},${eb2},${edgeAlpha})`);
+        topGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = topGlow;
+        ctx.fillRect(0, 0, w, 20);
+        // Bottom edge
+        const botGlow = ctx.createLinearGradient(0, h, 0, h - 20);
+        botGlow.addColorStop(0, `rgba(${er2},${eg2},${eb2},${edgeAlpha})`);
+        botGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = botGlow;
+        ctx.fillRect(0, h - 20, w, 20);
+        // Left edge
+        const leftGlow = ctx.createLinearGradient(0, 0, 20, 0);
+        leftGlow.addColorStop(0, `rgba(${er2},${eg2},${eb2},${edgeAlpha})`);
+        leftGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = leftGlow;
+        ctx.fillRect(0, 0, 20, h);
+        // Right edge
+        const rightGlow = ctx.createLinearGradient(w, 0, w - 20, 0);
+        rightGlow.addColorStop(0, `rgba(${er2},${eg2},${eb2},${edgeAlpha})`);
+        rightGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = rightGlow;
+        ctx.fillRect(w - 20, 0, 20, h);
         ctx.restore();
       }
 

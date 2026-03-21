@@ -216,7 +216,7 @@ export function UpgradePanel({ state, onUpdate }) {
                 {upgrade.repeatable && <span className="repeatable-badge">repeatable</span>}
               </div>
               <div className="upgrade-cost"><CostDisplay cost={cost} state={state} /></div>
-              <div className="upgrade-desc">{upgrade.description}</div>
+              <div className="upgrade-desc" style={LORE_UPGRADE_IDS.has(upgrade.id) ? { color: '#998866', fontStyle: 'italic' } : undefined}>{upgrade.description}</div>
               <div className="upgrade-effects">
                 {upgrade.effects.map((e, i) => {
                   let label = '';
