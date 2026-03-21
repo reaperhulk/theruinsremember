@@ -7,6 +7,7 @@ const MILESTONES = [100, 1000, 10000, 100000, 1000000, 10000000, 100000000];
 
 export function Toast({ state }) {
   const [toasts, setToasts] = useState([]);
+  const toastTimerRef = useRef(null);
   const prevEraRef = useRef(state.era);
   const prevGemsRef = useRef(state.totalGems || 0);
   const prevEventsRef = useRef(state.eventLog?.length || 0);
@@ -93,7 +94,8 @@ export function Toast({ state }) {
     if (newToasts.length > 0) {
       setToasts(prev => [...prev, ...newToasts].slice(-5));
       const ids = newToasts.map(t => t.id);
-      setTimeout(() => {
+      clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = setTimeout(() => {
         setToasts(prev => prev.filter(t => !ids.includes(t.id)));
       }, 4000);
     }

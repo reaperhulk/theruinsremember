@@ -84,9 +84,9 @@ export const events = {
     type: 'instant',
     effect: { resourceId: 'rocketFuel', amount: 150 },
   },
-  colonyBoom: {
-    id: 'colonyBoom',
-    name: 'Colony Boom',
+  colonyPopSurge: {
+    id: 'colonyPopSurge',
+    name: 'Population Surge',
     description: 'Population surge on colonies boosts production!',
     minEra: 5,
     type: 'timed',
@@ -104,10 +104,10 @@ export const events = {
     duration: 40,
     effect: { resourceId: 'stellarForge', rateMultBonus: 4 },
   },
-  megastructureBreakthrough: {
-    id: 'megastructureBreakthrough',
-    name: 'Megastructure Breakthrough',
-    description: 'Engineers disassemble a ruin and find the construction technique inside, preserved like a lesson left for them specifically.',
+  megastructureRuinDiscovery: {
+    id: 'megastructureRuinDiscovery',
+    name: 'Ruin Discovery',
+    description: 'Engineers disassemble a ruin and find construction techniques preserved like a lesson left for them.',
     minEra: 7,
     type: 'instant',
     effect: { resourceId: 'megastructures', amount: 5 },
@@ -125,10 +125,10 @@ export const events = {
   stellarNursery: {
     id: 'stellarNursery',
     name: 'Stellar Nursery',
-    description: 'A stellar nursery blooms with fresh systems. Each newborn star has a companion planet with breathable air and soil that has been tilled before.',
+    description: 'A stellar nursery blooms. Each newborn star has a planet with breathable air and tilled soil.',
     minEra: 6,
     type: 'instant',
-    effect: { resourceId: 'starSystems', amount: 5 },
+    effect: { resourceId: 'starSystems', amount: 15 },
   },
 
   // Era 7: Dyson Era
@@ -185,7 +185,7 @@ export const events = {
     description: 'Physical constants fluctuate — you capture the energy!',
     minEra: 9,
     type: 'instant',
-    effect: { resourceId: 'universalConstants', amount: 10 },
+    effect: { resourceId: 'universalConstants', amount: 30 },
   },
 
   // Era 10: Multiverse
@@ -342,7 +342,7 @@ export const events = {
     description: 'A debris field yields salvageable orbital components!',
     minEra: 4,
     type: 'instant',
-    effect: { resourceId: 'orbitalInfra', amount: 15 },
+    effect: { resourceId: 'orbitalInfra', amount: 35 },
   },
   ionStorm: {
     id: 'ionStorm',
@@ -479,7 +479,7 @@ export const events = {
     description: 'Discover an ancient orbital cache!',
     minEra: 4,
     type: 'instant',
-    effect: { resourceId: 'orbitalInfra', amount: 10 },
+    effect: { resourceId: 'orbitalInfra', amount: 30 },
   },
   galacticConference: {
     id: 'galacticConference',
@@ -606,7 +606,7 @@ export const events = {
     description: 'A quantum event creates quantum echoes from nothing!',
     minEra: 10,
     type: 'instant',
-    effect: { resourceId: 'quantumEchoes', amount: 50 },
+    effect: { resourceId: 'quantumEchoes', amount: 150 },
   },
   electricalStorm: {
     id: 'electricalStorm',
@@ -701,7 +701,7 @@ export const events = {
     description: 'Exotic particles rain from a collapsing dimension!',
     minEra: 8,
     type: 'instant',
-    effect: { resourceId: 'exoticMatter', amount: 40 },
+    effect: { resourceId: 'exoticMatter', amount: 100 },
   },
   steelBoom: {
     id: 'steelBoom',
@@ -1072,7 +1072,7 @@ export const events = {
   // --- 16 new events ---
 
   // Era 2
-  inventorsFair: { id: 'inventorsFair', name: 'Inventors Fair', description: 'Brilliant minds gather — electronics production accelerated!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'electronics', rateMultBonus: 4 } },
+  inventorsGathering: { id: 'inventorsGathering', name: 'Inventors Gathering', description: 'Brilliant minds gather — electronics production accelerated!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'electronics', rateMultBonus: 4 } },
   floodPlainBounty: { id: 'floodPlainBounty', name: 'Flood Plain Bounty', description: 'Fertile floodplains yield an enormous harvest!', minEra: 2, type: 'instant', effect: { resourceId: 'food', amount: 70 } },
 
   // Era 3
@@ -1152,10 +1152,10 @@ export const events = {
   cloudBurst: { id: 'cloudBurst', name: 'Cloud Burst', description: 'Cloud infrastructure overperforms — data flood!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 45 } },
 
   // Era 4
-  gravityLensing: { id: 'gravityLensing', name: 'Gravity Lensing Event', description: 'A gravitational lens reveals hidden orbital paths!', minEra: 4, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 20 } },
+  gravityLensOrbital: { id: 'gravityLensOrbital', name: 'Gravity Lens Discovery', description: 'A gravitational lens reveals hidden orbital paths!', minEra: 4, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 20 } },
 
   // Era 5
-  fusionIgnition: { id: 'fusionIgnition', name: 'Fusion Ignition', description: 'Sustained fusion reaction achieved — energy output explodes!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'energy', rateMultBonus: 6 } },
+  sustainedFusion: { id: 'sustainedFusion', name: 'Sustained Fusion', description: 'Sustained fusion reaction achieved — energy output explodes!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'energy', rateMultBonus: 6 } },
   exoplanetDiscovery: { id: 'exoplanetDiscovery', name: 'Exoplanet Discovery', description: 'A habitable exoplanet discovered — colony rush!', minEra: 5, type: 'instant', effect: { resourceId: 'colonies', amount: 8 } },
 
   // Era 6
@@ -1170,11 +1170,11 @@ export const events = {
   darkMatterTide: { id: 'darkMatterTide', name: 'Dark Matter Tide', description: 'A tide of dark matter washes through your sector!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
 
   // Era 9
-  voidWhisper: { id: 'voidWhisper', name: 'Void Whisper', description: 'Whispers from the void reveal hidden constants!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 20 } },
+  voidMurmur: { id: 'voidMurmur', name: 'Void Murmur', description: 'Deep murmurs from the void crystallize into universal constants!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 25 } },
 
   // Era 10
   paradoxWave: { id: 'paradoxWave', name: 'Paradox Wave', description: 'A wave of paradoxes resolves into pure quantum echoes!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 80 } },
-  realityFracture: { id: 'realityFracture', name: 'Reality Fracture', description: 'Reality fractures and reforms — fragments rain down!', minEra: 10, type: 'timed', duration: 45, effect: { resourceId: 'realityFragments', rateMultBonus: 12 } },
+  realityShatter: { id: 'realityShatter', name: 'Reality Shatter', description: 'Reality shatters and reforms — fragments rain down!', minEra: 10, type: 'timed', duration: 45, effect: { resourceId: 'realityFragments', rateMultBonus: 12 } },
 
   // --- 18 new events ---
 
@@ -1195,7 +1195,7 @@ export const events = {
   antimatterCache: { id: 'antimatterCache', name: 'Antimatter Cache', description: 'A natural antimatter cache provides enormous fuel reserves!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'rocketFuel', rateMultBonus: 6 } },
 
   // Era 6
-  firstContact: { id: 'firstContact', name: 'First Contact', description: 'Peaceful alien contact boosts galactic influence!', minEra: 6, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 30 } },
+  firstContact: { id: 'firstContact', name: 'First Contact', description: 'Peaceful alien contact boosts galactic influence!', minEra: 6, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 80 } },
   hyperlaneDiscovery: { id: 'hyperlaneDiscovery', name: 'Hyperlane Discovery', description: 'A natural hyperlane is mapped — star system access surges!', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
 
   // Era 7
@@ -1294,7 +1294,7 @@ export const events = {
   solarMaximum: { id: 'solarMaximum', name: 'Solar Maximum', description: 'The sun reaches peak activity — energy floods your collectors!', minEra: 5, type: 'timed', duration: 45, effect: { resourceId: 'energy', rateMultBonus: 8 } },
   interstellarCurrent: { id: 'interstellarCurrent', name: 'Interstellar Current', description: 'A current of dark energy sweeps through the sector!', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 80 } },
   galacticHarmonics: { id: 'galacticHarmonics', name: 'Galactic Harmonics', description: 'Stellar vibrations produce exotic materials!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 30 } },
-  cosmicDawn: { id: 'cosmicDawn', name: 'Cosmic Dawn', description: 'A new cosmic age begins — all production surges!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
+  cosmicEpoch: { id: 'cosmicEpoch', name: 'Cosmic Epoch', description: 'A new cosmic age begins — exotic matter production surges!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
   entropyShift: { id: 'entropyShift', name: 'Entropy Shift', description: 'Entropy momentarily reverses — universal constants crystallize!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 25 } },
   multiversalEcho: { id: 'multiversalEcho', name: 'Multiversal Echo', description: 'An echo from every reality simultaneously — massive fragment surge!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 800 } },
   dimensionalCollapse: { id: 'dimensionalCollapse', name: 'Dimensional Collapse', description: 'A dimension collapses — quantum echoes scatter everywhere!', minEra: 10, type: 'timed', duration: 40, effect: { resourceId: 'quantumEchoes', rateMultBonus: 20 } },
@@ -1380,7 +1380,7 @@ export const events = {
   colonyFederationPact: { id: 'colonyFederationPact', name: 'Colony Federation Pact', description: 'Colonies form a federation — expansion accelerates dramatically!', minEra: 5, type: 'timed', duration: 45, effect: { resourceId: 'colonies', rateMultBonus: 6 } },
 
   // Era 6
-  darkEnergyWell: { id: 'darkEnergyWell', name: 'Dark Energy Well', description: 'A natural dark energy well is tapped — production surges!', minEra: 6, type: 'timed', duration: 50, effect: { resourceId: 'darkEnergy', rateMultBonus: 8 } },
+  darkEnergyGeyser: { id: 'darkEnergyGeyser', name: 'Dark Energy Geyser', description: 'A natural dark energy geyser is tapped — production surges!', minEra: 6, type: 'timed', duration: 50, effect: { resourceId: 'darkEnergy', rateMultBonus: 8 } },
   starSystemCascade: { id: 'starSystemCascade', name: 'Star System Cascade', description: 'A cascade of gravitational interactions reveals hidden star systems!', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 20 } },
 
   // Era 7

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { getAvailableTech, unlockTech } from '../engine/tech.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { techTree } from '../data/tech-tree.js';
@@ -57,6 +57,7 @@ function getAffordProgress(state, cost) {
 
 export function TechTree({ state, onUpdate }) {
   const [flashId, setFlashId] = useState(null);
+  const flashTimerRef = useRef(null);
   const available = getAvailableTech(state);
   const unlocked = Object.keys(state.tech || {});
 
@@ -64,7 +65,8 @@ export function TechTree({ state, onUpdate }) {
     setFlashId(techId);
     onUpdate(s => unlockTech(s, techId));
     const tech = techTree[techId];
-    setTimeout(() => setFlashId(null), tech?.grantsEra ? 800 : 400);
+    clearTimeout(flashTimerRef.current);
+    flashTimerRef.current = setTimeout(() => setFlashId(null), tech?.grantsEra ? 800 : 400);
   }, [onUpdate]);
 
   // Show unlocked techs count
@@ -152,7 +154,7 @@ export function TechTree({ state, onUpdate }) {
                     <div className="upgrade-progress-fill" style={{ width: `${Math.floor(progress * 100)}%` }} />
                     {eta < Infinity && eta > 0 && (
                       <span style={{ position: 'absolute', right: '4px', top: '0', fontSize: '0.7em', color: '#888', lineHeight: '8px' }}>
-                        ~{eta < 60 ? `${Math.ceil(eta)}s` : eta < 3600 ? `${Math.ceil(eta / 60)}m` : `${Math.floor(eta / 3600)}h`}
+                        ~{eta < 60 ? `${Math.round(eta / 5) * 5 || 5}s` : eta < 3600 ? `${Math.ceil(eta / 60)}m` : `${Math.floor(eta / 3600)}h`}
                       </span>
                     )}
                   </div>

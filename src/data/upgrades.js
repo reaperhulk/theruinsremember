@@ -25,14 +25,14 @@ export const upgrades = {
     id: 'basicPower', name: 'Basic Power', era: 1,
     cost: { labor: 20, materials: 15 },
     effects: [{ type: 'production_mult', target: 'energy', value: 3 }],
-    description: 'The river bends at exact right angles — too perfect to be natural. You harness its flow',
+    description: 'The river bends at exact right angles — too perfect to be natural. Harness its flow',
     prerequisites: [],
   },
   housing: {
     id: 'housing', name: 'Housing', era: 1,
     cost: { materials: 20, food: 15 },
     effects: [{ type: 'production_add', target: 'labor', value: 1 }],
-    description: 'Foundation stones fit together without mortar — an old trick from a world you half-remember',
+    description: 'Stones fit together without mortar — an old trick from a world you half-remember',
     prerequisites: ['tools'],
   },
   expandWorkforce: {
@@ -51,7 +51,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'food', value: 2 },
       { type: 'cap_mult', target: 'materials', value: 2 },
     ],
-    description: 'You find a buried vault with climate-controlled chambers — someone built these before the crash',
+    description: 'A buried vault with climate-controlled chambers — built long before the crash',
     prerequisites: ['tools'],
   },
   foundry: {
@@ -73,7 +73,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
       { type: 'production_add', target: 'energy', value: 0.5 },
     ],
-    description: 'The crash site yields precision instruments — whoever built them understood materials you have no name for',
+    description: 'Precision instruments from the crash — materials you have no name for',
     prerequisites: ['foundry'],
   },
   gemPolisher: {
@@ -118,7 +118,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'steel', value: 3 },
       { type: 'production_add', target: 'electronics', value: 1.5 },
     ],
-    description: 'The assembly pattern comes naturally, as if encoded in genetic memory — hands move before minds understand',
+    description: 'Assembly encoded in genetic memory — hands move before minds understand',
     prerequisites: ['foundry'],
   },
   steelForge: {
@@ -128,7 +128,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 1.2 },
       { type: 'production_add', target: 'steel', value: 0.5 },
     ],
-    description: 'The forge temperature was scratched into the wall in a script no one can read — but the numbers work perfectly',
+    description: 'Forge temperature scratched into the wall in a script no one can read — but the numbers work',
     prerequisites: ['foundry'],
   },
   ironWorks: {
@@ -162,7 +162,7 @@ export const upgrades = {
       { type: 'production_add', target: 'labor', value: 2 },
       { type: 'production_add', target: 'materials', value: 0.5 },
     ],
-    description: 'Machines replace manual labor — automated resource gathering',
+    description: 'Automated machines replace workers — +2 labor/s and +0.5 materials/s',
     prerequisites: ['printingPress'],
   },
   steamTurbine: {
@@ -172,7 +172,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.8 },
       { type: 'production_add', target: 'steel', value: 0.8 },
     ],
-    description: 'Steam power boosts energy and steel production',
+    description: 'High-pressure steam drives turbines — +0.8 energy/s and +0.8 steel/s',
     prerequisites: ['coalMine'],
   },
   factoryFloor: {
@@ -329,7 +329,7 @@ export const upgrades = {
     id: 'spaceStation', name: 'Space Station', era: 4,
     cost: { rocketFuel: 60, steel: 80, electronics: 40, food: 120 },
     effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.0 }],
-    description: 'Permanent orbital habitat',
+    description: 'A permanent habitat in orbit — +1 orbital infrastructure/s',
     prerequisites: ['reusableRockets'],
   },
   orbitalTelescope: {
@@ -528,21 +528,21 @@ export const upgrades = {
     id: 'warpDrive', name: 'Warp Drive', era: 6,
     cost: { darkEnergy: 60, research: 250, exoticMaterials: 120, steel: 1000 },
     effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }],
-    description: 'The warp equations were scratched into the walls of the oldest ruin. Whoever wrote them knew exactly where you would go.',
+    description: 'Warp equations scratched into the oldest ruin. They knew where you would go',
     prerequisites: ['fusionPower'],
   },
   stellarCartography: {
     id: 'stellarCartography', name: 'Stellar Cartography', era: 6,
     cost: { starSystems: 3, research: 60, data: 30 },
     effects: [{ type: 'production_mult', target: 'starSystems', value: 3 }],
-    description: 'Your cartographers map the stars and find every system already catalogued in the precursor database. The charts are perfect. The annotations say "again."',
+    description: 'Every system already catalogued in the precursor database. The annotations say "again."',
     prerequisites: ['warpDrive'],
   },
   dysonSwarms: {
     id: 'dysonSwarms', name: 'Dyson Swarms', era: 6,
     cost: { starSystems: 15, exoticMaterials: 200, energy: 500, labor: 500 },
     effects: [{ type: 'production_mult', target: 'energy', value: 50 }],
-    description: 'The swarm assembles itself from ancient debris orbiting dead stars. The collectors remember their purpose.',
+    description: 'Ancient debris orbiting dead stars assembles into collectors that remember their purpose',
     prerequisites: ['warpDrive'],
   },
   colonialFleet: {
@@ -562,7 +562,7 @@ export const upgrades = {
       { type: 'unlock_resource', target: 'galacticInfluence', value: 1 },
       { type: 'production_add', target: 'galacticInfluence', value: 0.5 },
     ],
-    description: 'The AI awakens already knowing your name, your history, your trajectory. It has governed before — it simply waited for you to ask.',
+    description: 'The AI knows your name, your history, your trajectory. It governed before — it waited for you',
     prerequisites: ['dysonSwarms'],
   },
   darkEnergyCollector: {
@@ -581,7 +581,7 @@ export const upgrades = {
       { type: 'production_add', target: 'galacticInfluence', value: 3.2 },
       { type: 'production_add', target: 'darkEnergy', value: 1 },
     ],
-    description: 'They greet you with a word that means "finally" in a language older than their species. Their histories mention you by name.',
+    description: 'They greet you with a word meaning "finally" — their histories mention you by name',
     prerequisites: ['diplomaticCorps'],
   },
 
@@ -593,7 +593,7 @@ export const upgrades = {
       { type: 'production_add', target: 'megastructures', value: 0.1 },
       { type: 'production_mult', target: 'energy', value: 20 },
     ],
-    description: 'The framework was already there -- dormant scaffolding around a dying star, waiting for someone to finish what was started.',
+    description: 'Dormant scaffolding around a dying star — waiting for someone to finish what was started',
     prerequisites: ['aiGovernance', 'stellarForgePrototype'],
   },
   starLifting: {
@@ -603,7 +603,7 @@ export const upgrades = {
       { type: 'production_add', target: 'stellarForge', value: 0.3 },
       { type: 'production_mult', target: 'materials', value: 10 },
     ],
-    description: 'You reach into a star and pull out its iron heart. The technique feels natural, as if your hands have done this a thousand times before.',
+    description: 'Reach into a star and pull out its iron heart. The technique feels natural — a thousand times before',
     prerequisites: ['dysonSphere'],
   },
   stellarNursery: {
@@ -613,7 +613,7 @@ export const upgrades = {
       { type: 'production_add', target: 'stellarForge', value: 4.8 },
       { type: 'production_add', target: 'exoticMaterials', value: 2 },
     ],
-    description: 'You ignite stellar nurseries in nebulae that bear the chemical signatures of previous ignitions. The stars remember being born before.',
+    description: 'Ignite nurseries in nebulae bearing signatures of previous ignitions. Stars remember being born',
     prerequisites: ['starLifting'],
   },
   megastructureFoundry: {
@@ -633,7 +633,7 @@ export const upgrades = {
       { type: 'unlock_resource', target: 'galacticInfluence', value: 1 },
       { type: 'production_add', target: 'galacticInfluence', value: 0.3 },
     ],
-    description: 'The brain boots with petabytes of pre-existing data. Memories of civilizations that built this exact machine, in this exact orbit, a thousand times before.',
+    description: 'Boots with petabytes of pre-existing data — memories of civilizations that built this machine before',
     prerequisites: ['starLifting'],
   },
   neuralUplink: {
@@ -643,7 +643,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'software', value: 20 },
       { type: 'production_mult', target: 'data', value: 10 },
     ],
-    description: 'When you link minds across the stellar network, the shared memories crash in like a flood. A billion lives, all yours, all forgotten.',
+    description: 'Shared memories crash in like a flood — a billion lives, all yours, all forgotten',
     prerequisites: ['matrioshkaBrain'],
   },
   stellarEngine: {
@@ -653,7 +653,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 18 },
       { type: 'production_add', target: 'darkEnergy', value: 1 },
     ],
-    description: 'You push a star across the void and find the path already cleared — gravitational scars from previous passages, etched into spacetime.',
+    description: 'Push a star across the void — gravitational scars from previous passages mark the path',
     prerequisites: ['dysonSphere', 'nicollDysonBeam'],
   },
   gravitonLens: {
@@ -663,7 +663,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 4.8 },
       { type: 'production_add', target: 'starSystems', value: 0.2 },
     ],
-    description: 'The lens bends light from systems that no longer exist. You see their last moments: fire, silence, and a single message — "Not this time."',
+    description: 'Bends light from dead systems. Their last message: "Not this time."',
     prerequisites: ['starLifting'],
   },
 
@@ -675,7 +675,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'starSystems', value: 10 },
       { type: 'production_add', target: 'exoticMatter', value: 0.5 },
     ],
-    description: 'The wormholes were already threaded through spacetime, collapsed but intact. You are not building a network. You are reopening one.',
+    description: 'Wormholes already threaded through spacetime, collapsed but intact. You reopen them',
     prerequisites: ['matrioshkaBrain', 'neuronStar'],
   },
   darkMatterHarvest: {
@@ -685,14 +685,14 @@ export const upgrades = {
       { type: 'production_mult', target: 'exoticMatter', value: 3 },
       { type: 'production_mult', target: 'darkEnergy', value: 5 },
     ],
-    description: 'The filaments pulse when your harvesters approach, as though anticipating the touch. Dark matter flows like it has always flowed here.',
+    description: 'Filaments pulse as harvesters approach — dark matter flows like it has always flowed here',
     prerequisites: ['wormholeNetwork'],
   },
   galacticSenate: {
     id: 'galacticSenate', name: 'Galactic Senate', era: 8,
     cost: { galacticInfluence: 500, starSystems: 100, research: 800, materials: 5000 },
     effects: [{ type: 'production_mult', target: 'galacticInfluence', value: 5 }],
-    description: 'Every species you contact already has a word for this moment. Their prophecies describe you perfectly. They have been waiting.',
+    description: 'Every species has a word for this moment. Their prophecies describe you perfectly',
     prerequisites: ['wormholeNetwork'],
   },
   culturalAssimilation: {
@@ -702,7 +702,7 @@ export const upgrades = {
       { type: 'production_add', target: 'galacticInfluence', value: 8 },
       { type: 'production_add', target: 'colonies', value: 16 },
     ],
-    description: 'A billion worlds adopt a single tongue. It sounds identical to the language carved in the oldest ruins on your homeworld.',
+    description: 'A billion worlds speak one tongue — identical to the script in the oldest ruins',
     prerequisites: ['galacticSenate'],
   },
   replicatorArray: {
@@ -730,7 +730,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 16 },
       { type: 'production_add', target: 'data', value: 60 },
     ],
-    description: 'The entangled particles vibrate to messages from parallel timelines. Each one is a warning. Each one was sent by you.',
+    description: 'Particles vibrate to parallel timelines. Each warning was sent by you',
     prerequisites: ['darkMatterHarvest', 'quantumFabric'],
   },
   matterReplicators: {
@@ -741,7 +741,7 @@ export const upgrades = {
       { type: 'unlock_resource', target: 'cosmicPower', value: 1 },
       { type: 'production_add', target: 'cosmicPower', value: 0.5 },
     ],
-    description: 'Matter from nothing. The replicators hum a frequency that matches the background radiation exactly. The universe already knew this song.',
+    description: 'Replicators hum a frequency matching the background radiation. The universe knew this song',
     prerequisites: ['galacticSenate'],
   },
 
@@ -750,7 +750,7 @@ export const upgrades = {
     id: 'galaxySeeding', name: 'Galaxy Seeding', era: 9,
     cost: { cosmicPower: 300, exoticMatter: 250, galacticInfluence: 600, steel: 5000 },
     effects: [{ type: 'production_mult', target: 'cosmicPower', value: 5 }],
-    description: 'You scatter life across virgin galaxies and find, in every one, fossils of civilizations that were already there. You are not the seed. You are the soil.',
+    description: 'Every galaxy holds fossils of civilizations already there. You are not the seed — you are the soil',
     prerequisites: ['matterReplicators', 'galacticAcademy'],
   },
   cosmicInfrastructure: {
@@ -760,14 +760,14 @@ export const upgrades = {
       { type: 'production_add', target: 'cosmicPower', value: 12 },
       { type: 'production_add', target: 'exoticMatter', value: 2 },
     ],
-    description: 'The infrastructure connects to anchor points that predate the galaxy itself. The scaffolding of something vast and patient.',
+    description: 'Anchor points predate the galaxy itself — the scaffolding of something vast and patient',
     prerequisites: ['galaxySeeding'],
   },
   voidBridges: {
     id: 'voidBridges', name: 'Void Bridges', era: 9,
     cost: { cosmicPower: 600, darkEnergy: 400, exoticMatter: 300, labor: 3000 },
     effects: [{ type: 'production_add', target: 'universalConstants', value: 0.5 }],
-    description: 'The void between clusters hums with residual energy from bridges built and collapsed a thousand cycles ago. You rebuild along the same fault lines.',
+    description: 'The void hums with energy from bridges collapsed a thousand cycles ago. You rebuild the path',
     prerequisites: ['galaxySeeding'],
   },
   universalTranslator: {
@@ -777,7 +777,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'galacticInfluence', value: 10 },
       { type: 'production_add', target: 'universalConstants', value: 0.05 },
     ],
-    description: 'The translator works because every language shares the same root — a precursor tongue spoken before the first cycle began.',
+    description: 'Every language shares the same root — a precursor tongue from before the first cycle',
     prerequisites: ['voidBridges'],
   },
   galaxyCluster: {
@@ -806,7 +806,7 @@ export const upgrades = {
       { type: 'unlock_resource', target: 'realityFragments', value: 1 },
       { type: 'production_add', target: 'realityFragments', value: 0.3 },
     ],
-    description: 'Entropy runs backward and the ruins rebuild themselves. For a moment you see them whole — gleaming, alive, waiting to fall again.',
+    description: 'Entropy runs backward. The ruins rebuild themselves, gleaming — waiting to fall again',
     prerequisites: ['voidBridges'],
   },
 
@@ -815,14 +815,14 @@ export const upgrades = {
     id: 'realityWeaving', name: 'Reality Weaving', era: 10,
     cost: { realityFragments: 50, universalConstants: 20, cosmicPower: 400, food: 2000 },
     effects: [{ type: 'production_mult', target: 'realityFragments', value: 5 }],
-    description: 'The loom remembers every thread. Each reality you weave contains echoes of all the others — and all of them contain you.',
+    description: 'The loom remembers every thread. Each reality contains echoes of all the others',
     prerequisites: ['entropyReversal', 'dimensionalScanner'],
   },
   dimensionalAnchors: {
     id: 'dimensionalAnchors', name: 'Dimensional Anchors', era: 10,
     cost: { realityFragments: 100, exoticMatter: 150, darkEnergy: 200 },
     effects: [{ type: 'production_add', target: 'quantumEchoes', value: 1 }],
-    description: 'The anchors lock into place with a click of recognition. The parallel universes were already reaching back toward you.',
+    description: 'Anchors lock with a click of recognition. Parallel universes reach back toward you',
     prerequisites: ['realityWeaving'],
   },
   parallelProcessing: {
@@ -832,7 +832,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'quantumEchoes', value: 5 },
       { type: 'production_mult', target: 'research', value: 50 },
     ],
-    description: 'Ten thousand versions of you solve the same problem simultaneously. The answer arrives before the question is fully asked.',
+    description: 'Ten thousand versions of you solve the same problem. The answer arrives before the question',
     prerequisites: ['dimensionalAnchors'],
   },
   realityLoom: {
@@ -851,7 +851,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'quantumEchoes', value: 10 },
       { type: 'production_mult', target: 'realityFragments', value: 10 },
     ],
-    description: 'The engine compiles every observation from every iteration. The output is a single word, in every language simultaneously: "Again."',
+    description: 'Compiles every observation from every iteration. The output: "Again."',
     prerequisites: ['dimensionalAnchors'],
   },
   dimensionalRift: {
@@ -1407,7 +1407,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
       { type: 'cap_mult', target: 'labor', value: 2 },
     ],
-    description: 'Ancient brick molds were found stacked in a sealed chamber — the clay fits them perfectly, as if the earth remembers',
+    description: 'Ancient molds in a sealed chamber — the clay fits perfectly, as if the earth remembers',
     prerequisites: ['quarry'],
   },
   marketplace: {
@@ -1437,7 +1437,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
       { type: 'cap_mult', target: 'materials', value: 3 },
     ],
-    description: 'The quarry walls are too smooth, too straight — this stone was cut before, by hands that left no other trace',
+    description: 'Walls too smooth, too straight — this stone was cut before, by hands that left no trace',
     prerequisites: ['storehouse'],
   },
   animalHusbandry: {
@@ -1447,7 +1447,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 0.5 },
       { type: 'production_add', target: 'labor', value: 0.5 },
     ],
-    description: 'The creatures came willingly, as if trained by someone long before us — muscle memory older than memory itself',
+    description: 'Creatures came willingly, as if trained long ago — muscle memory older than memory',
     prerequisites: ['irrigation'],
   },
   waterMill: {
@@ -1457,7 +1457,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.5 },
       { type: 'production_add', target: 'food', value: 0.5 },
     ],
-    description: 'The millrace follows channels cut into bedrock — channels that predate the crash by centuries',
+    description: 'Channels cut into bedrock predate the crash by centuries — harness the flow',
     prerequisites: ['basicPower'],
   },
   tradePost: {
@@ -1904,7 +1904,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
       { type: 'production_add', target: 'energy', value: 0.4 },
     ],
-    description: 'Saw teeth shaped from ruin-metal cut cleaner than anything forged new — the old alloys remember their purpose',
+    description: 'Ruin-metal teeth cut cleaner than anything forged new — the alloys remember',
     prerequisites: ['tools'],
   },
 
@@ -2563,7 +2563,7 @@ export const upgrades = {
   industrialComputer: { id: 'industrialComputer', name: 'Industrial Computer', era: 2, cost: { electronics: 20, steel: 25, research: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.5 }, { type: 'production_add', target: 'steel', value: 0.8 }], description: 'Computers optimize steel production and generate early research', prerequisites: ['computingLab', 'ironWorks'] },
 
   // Era 3: cross-link software and data chains
-  dataForge: { id: 'dataForge', name: 'Data Forge', era: 3, cost: { data: 25, software: 20, research: 30 }, effects: [{ type: 'production_add', target: 'data', value: 0.6 }, { type: 'production_add', target: 'software', value: 1.2 }], description: 'Machine learning forges new data from software models', prerequisites: ['cloudComputing', 'patternAnalysis'] },
+  mlDataForge: { id: 'mlDataForge', name: 'ML Data Forge', era: 3, cost: { data: 25, software: 20, research: 30 }, effects: [{ type: 'production_add', target: 'data', value: 0.6 }, { type: 'production_add', target: 'software', value: 1.2 }], description: 'Machine learning forges new data from software models', prerequisites: ['cloudComputing', 'patternAnalysis'] },
   secureAI: { id: 'secureAI', name: 'Secure AI', era: 3, cost: { software: 30, data: 20, electronics: 25 }, effects: [{ type: 'production_add', target: 'research', value: 0.6 }, { type: 'production_add', target: 'data', value: 0.5 }], description: 'Hardened AI systems accelerate research through secure data pipelines', prerequisites: ['cyberSecurity', 'aiResearch'] },
 
   // Era 4: cross-link orbital and fuel chains
@@ -3014,14 +3014,14 @@ export const upgrades = {
   },
 
   // Era 9 cross-chain upgrades
-  voidResonator: {
-    id: 'voidResonator', name: 'Void Resonator', era: 9,
+  voidAmplifier: {
+    id: 'voidAmplifier', name: 'Void Amplifier', era: 9,
     cost: { cosmicPower: 200, universalConstants: 10, darkEnergy: 500 },
     effects: [
       { type: 'production_mult', target: 'cosmicPower', value: 2 },
       { type: 'production_add', target: 'universalConstants', value: 2 },
     ],
-    description: 'Resonates with the void between galaxies, amplifying cosmic power',
+    description: 'Amplify the void between galaxies — x2 cosmic power and +2 constants/s',
     prerequisites: ['voidBridges', 'entropyReversal'],
   },
   constantManipulator: {
@@ -3053,14 +3053,14 @@ export const upgrades = {
     description: 'Forge quantum echoes into tangible reality fragments',
     prerequisites: ['dimensionalAnchors', 'realityWeaving'],
   },
-  realityCompiler: {
-    id: 'realityCompiler', name: 'Reality Compiler', era: 10,
+  realityRewriter: {
+    id: 'realityRewriter', name: 'Reality Rewriter', era: 10,
     cost: { realityFragments: 150, quantumEchoes: 200, universalConstants: 30 },
     effects: [
       { type: 'production_mult', target: 'realityFragments', value: 3 },
       { type: 'production_add', target: 'quantumEchoes', value: 5 },
     ],
-    description: 'Compile reality from raw fragments — the universe rewrites itself',
+    description: 'Rewrite reality from raw fragments — the universe reshapes itself',
     prerequisites: ['echoForge', 'parallelProcessing'],
   },
   multiverseCapstone: {

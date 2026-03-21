@@ -65,43 +65,14 @@ input:focus-visible {
   margin-bottom: 12px;
 }
 
-.game-header h1 {
-  font-size: 1.3em;
-  color: #7cb7ff;
-}
+/* game-header h1 styled below with gradient */
 
 .header-controls {
   display: flex;
   gap: 8px;
 }
 
-.reset-btn {
-  padding: 4px 10px;
-  background: #552222;
-  color: #e0e0e0;
-  border: 1px solid #773333;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.8em;
-}
-
-.reset-btn:hover {
-  background: #773333;
-}
-
-.prestige-btn {
-  padding: 4px 10px;
-  background: #3a2266;
-  color: #d0b0ff;
-  border: 1px solid #5533aa;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.8em;
-}
-
-.prestige-btn:hover {
-  background: #5533aa;
-}
+/* reset-btn and prestige-btn: primary definitions below */
 
 .game-layout {
   display: grid;
@@ -199,6 +170,7 @@ input:focus-visible {
   color: #66cc66;
   text-align: right;
   min-width: 70px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Upgrades & Tech */
@@ -221,6 +193,7 @@ input:focus-visible {
   cursor: pointer;
   font-family: inherit;
   font-size: 0.8em;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .upgrade-btn:hover:not(:disabled),
@@ -445,6 +418,7 @@ input:focus-visible {
 .era-panel h2 {
   font-size: 1.1em;
   letter-spacing: 1px;
+  justify-content: center;
 }
 
 .era-hint {
@@ -511,6 +485,7 @@ canvas:hover {
   cursor: pointer;
   font-family: inherit;
   font-size: 0.85em;
+  transition: background 0.2s ease;
 }
 
 .reset-btn:hover {
@@ -540,6 +515,7 @@ canvas:hover {
   font-size: 1em;
   font-weight: bold;
   line-height: 1.4;
+  transition: background 0.15s ease;
 }
 
 .gather-btn:hover {
@@ -595,7 +571,7 @@ canvas:hover {
   font-family: inherit;
   font-size: 1em;
   font-weight: bold;
-  transition: background 0.1s;
+  transition: background 0.15s ease;
 }
 
 .mine-btn:hover {
@@ -674,6 +650,7 @@ canvas:hover {
   font-family: inherit;
   font-size: 1em;
   font-weight: bold;
+  transition: background 0.15s ease;
 }
 
 .line-controls button:hover:not(:disabled) {
@@ -755,6 +732,7 @@ canvas:hover {
   font-family: inherit;
   font-size: 1.1em;
   font-weight: bold;
+  transition: background 0.15s ease;
 }
 
 .hack-btn:hover {
@@ -1098,6 +1076,7 @@ canvas:hover {
   cursor: pointer;
   font-family: inherit;
   font-size: 0.9em;
+  transition: background 0.2s ease;
 }
 
 .trade-btn:hover:not(:disabled) {
@@ -1249,7 +1228,7 @@ canvas:hover {
   font-family: inherit;
   font-size: 0.8em;
   font-weight: bold;
-  transition: color 0.2s, background 0.2s;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
 }
 
 .tab-btn:hover {
@@ -1539,10 +1518,6 @@ canvas:hover {
   color: #888;
 }
 
-.resource-rate {
-  font-variant-numeric: tabular-nums;
-}
-
 .rate-active {
   display: inline-block;
   width: 4px;
@@ -1738,6 +1713,7 @@ canvas:hover {
     font-size: 0.7em;
     white-space: nowrap;
     min-width: 0;
+    min-height: 44px;
   }
 
   .mine-btn,
@@ -1747,18 +1723,35 @@ canvas:hover {
   }
 
   .gather-btn {
-    min-width: 36px;
-    min-height: 36px;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .line-controls button {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     font-size: 1.2em;
   }
 
   .upgrade-btn {
-    padding: 8px;
+    padding: 10px 8px;
+    min-height: 44px;
+  }
+
+  .trade-btn,
+  .reset-btn,
+  .prestige-btn {
+    min-height: 44px;
+  }
+
+  .upgrade-sort button {
+    min-height: 36px;
+  }
+
+  .weave-fragment {
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
   }
 
   canvas {

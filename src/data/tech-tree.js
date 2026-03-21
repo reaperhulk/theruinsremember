@@ -172,7 +172,7 @@ export const techTree = {
     cost: { starSystems: 80, darkEnergy: 1000, research: 10000 },
     prerequisites: ['galacticCartography'],
     grantsEra: 7,
-    description: 'Engineering on a stellar scale — gateway to the Dyson Era',
+    description: 'Harness entire stars as raw material — gateway to the Dyson Era',
   },
 
   // Era 7 → 8 (Dyson Era → Galactic)
@@ -188,7 +188,7 @@ export const techTree = {
     cost: { megastructures: 300, stellarForge: 1000, research: 800000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: 8,
-    description: 'Galaxy-spanning communication and travel network',
+    description: 'Connect every star — a galaxy-spanning network of instant travel and communication',
   },
 
   // Era 8 → 9 (Galactic → Intergalactic)
@@ -229,7 +229,7 @@ export const techTree = {
     cost: { food: 30, materials: 15 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Advanced farming techniques — increased food output',
+    description: 'Advanced crop rotation and fertilization — +1 food/s',
     effects: [{ type: 'production_add', target: 'food', value: 1.0 }],
   },
   masonry: {
@@ -237,7 +237,7 @@ export const techTree = {
     cost: { materials: 25, labor: 15 },
     prerequisites: ['metallurgy'],
     grantsEra: null,
-    description: 'Stone construction — double materials and energy output',
+    description: 'Precision stonework doubles materials and energy output',
     effects: [{ type: 'production_mult', target: 'materials', value: 2 }, { type: 'production_mult', target: 'energy', value: 2 }],
   },
   massProduction: {
@@ -245,7 +245,7 @@ export const techTree = {
     cost: { steel: 80, electronics: 50, labor: 60 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
-    description: 'Assembly line mastery — triple steel and labor output',
+    description: 'Assembly line mastery — x3 steel and x3 labor output',
     effects: [{ type: 'production_mult', target: 'steel', value: 3 }, { type: 'production_mult', target: 'labor', value: 3 }],
   },
   electricalGrid: {
@@ -253,7 +253,7 @@ export const techTree = {
     cost: { electronics: 60, steel: 50, energy: 60 },
     prerequisites: ['advancedComputing'],
     grantsEra: null,
-    description: 'Nationwide electrical distribution — boosted energy and electronics',
+    description: 'Nationwide electrical grid — +2 energy/s and +2 electronics/s',
     effects: [{ type: 'production_add', target: 'energy', value: 2.0 }, { type: 'production_add', target: 'electronics', value: 2.0 }],
   },
   neuralInterfaces: {
@@ -261,7 +261,7 @@ export const techTree = {
     cost: { data: 40, software: 60, research: 100 },
     prerequisites: ['globalNetwork'],
     grantsEra: null,
-    description: 'The interface ports were already built into the ruins\' architecture — sockets that fit human neural patterns exactly',
+    description: 'Neural sockets built into the ruins fit human patterns exactly — x2 research and software',
     effects: [{ type: 'production_mult', target: 'research', value: 2 }, { type: 'production_mult', target: 'software', value: 2 }],
   },
   orbitalDefense: {
@@ -269,7 +269,7 @@ export const techTree = {
     cost: { orbitalInfra: 30, rocketFuel: 80, steel: 120 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: null,
-    description: 'The defense grid snaps into position along anchor points that predate your arrival by millennia',
+    description: 'Defense grid locks onto anchor points that predate your arrival — +5 orbital infra/s',
     effects: [{ type: 'production_add', target: 'orbitalInfra', value: 5.0 }],
   },
   gravitonTheory: {
@@ -277,7 +277,7 @@ export const techTree = {
     cost: { research: 2000, exoticMaterials: 100 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: null,
-    description: 'The graviton equations were incomplete in the ruins — the missing variable turns out to be your current orbital position',
+    description: 'Graviton equations completed — x2 exotic materials and x5 research capacity',
     effects: [{ type: 'production_mult', target: 'exoticMaterials', value: 2 }, { type: 'cap_mult', target: 'research', value: 5 }],
   },
   xenolinguistics: {
@@ -285,7 +285,7 @@ export const techTree = {
     cost: { galacticInfluence: 200, research: 20000 },
     prerequisites: ['galacticCartography'],
     grantsEra: null,
-    description: 'Communicate with alien civilizations — triple influence output',
+    description: 'Decode alien languages — x3 galactic influence output',
     effects: [{ type: 'production_mult', target: 'galacticInfluence', value: 3 }],
   },
   temporalMechanics: {
@@ -293,7 +293,7 @@ export const techTree = {
     cost: { stellarForge: 30, research: 300000, megastructures: 10 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: null,
-    description: 'Manipulate time itself — massive research boost and x10 research capacity',
+    description: 'Manipulate time — x5 research output and x10 research capacity',
     effects: [{ type: 'production_mult', target: 'research', value: 5 }, { type: 'cap_mult', target: 'research', value: 10 }],
   },
   darkMatterPhysics: {
@@ -301,7 +301,7 @@ export const techTree = {
     cost: { exoticMatter: 1000, darkEnergy: 10000 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
-    description: 'Master dark matter — double exotic matter output',
+    description: 'Master dark matter — x2 exotic matter output',
     effects: [{ type: 'production_mult', target: 'exoticMatter', value: 2 }],
   },
   // Era 7 branching: stellarControl vs stellarHarmony
@@ -310,7 +310,7 @@ export const techTree = {
     cost: { stellarForge: 40, megastructures: 12, research: 400000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: null,
-    description: 'Dominate stars — x5 stellar forge output',
+    description: 'Dominate stars by force — x5 stellar forge (excludes Harmony)',
     effects: [{ type: 'production_mult', target: 'stellarForge', value: 5 }],
     excludes: 'stellarHarmony',
   },
@@ -319,7 +319,7 @@ export const techTree = {
     cost: { stellarForge: 40, megastructures: 12, research: 400000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: null,
-    description: 'Harmonize with stars — x5 megastructure and energy output',
+    description: 'Harmonize with stellar rhythms — x5 megastructure and x5 energy (excludes Control)',
     effects: [{ type: 'production_mult', target: 'megastructures', value: 5 }, { type: 'production_mult', target: 'energy', value: 5 }],
     excludes: 'stellarControl',
   },
@@ -328,7 +328,7 @@ export const techTree = {
     cost: { universalConstants: 30, cosmicPower: 30000, research: 5000000 },
     prerequisites: ['realityScience'],
     grantsEra: null,
-    description: 'Understand higher dimensions — triple universal constants output and x10 research capacity',
+    description: 'Understand higher dimensions — x3 universal constants and x10 research capacity',
     effects: [{ type: 'production_mult', target: 'universalConstants', value: 3 }, { type: 'cap_mult', target: 'research', value: 10 }],
   },
   // Optional era 10 tech choice
@@ -340,7 +340,7 @@ export const techTree = {
     cost: { research: 300, orbitalInfra: 50 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: null,
-    description: 'Perfect orbital trajectories — boosted orbital infrastructure output',
+    description: 'Perfect orbital trajectories — +10 orbital infrastructure/s',
     effects: [{ type: 'production_add', target: 'orbitalInfra', value: 10.0 }],
   },
   // Era 6 optional
@@ -349,7 +349,7 @@ export const techTree = {
     cost: { research: 30000, darkEnergy: 3000, starSystems: 100 },
     prerequisites: ['galacticCartography'],
     grantsEra: null,
-    description: 'Understand subspace — double star system and dark energy output',
+    description: 'Understand subspace — x2 star system and x2 dark energy output',
     effects: [{ type: 'production_mult', target: 'starSystems', value: 2 }, { type: 'production_mult', target: 'darkEnergy', value: 2 }],
   },
   // Era 8 branching: expansion vs consolidation
@@ -358,7 +358,7 @@ export const techTree = {
     cost: { starSystems: 8000, exoticMatter: 2000, galacticInfluence: 50000 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
-    description: 'Expand rapidly — x5 star systems and colonies',
+    description: 'Expand rapidly — x5 star systems and x5 colonies (excludes Consolidation)',
     effects: [{ type: 'production_mult', target: 'starSystems', value: 5 }, { type: 'production_mult', target: 'colonies', value: 5 }],
     excludes: 'galacticConsolidation',
   },
@@ -367,7 +367,7 @@ export const techTree = {
     cost: { galacticInfluence: 80000, research: 500000, megastructures: 30 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
-    description: 'Consolidate power — x5 galactic influence and research',
+    description: 'Consolidate power — x5 influence and x5 research (excludes Expansion)',
     effects: [{ type: 'production_mult', target: 'galacticInfluence', value: 5 }, { type: 'production_mult', target: 'research', value: 5 }],
     excludes: 'galacticExpansion',
   },
@@ -376,7 +376,7 @@ export const techTree = {
     cost: { galacticInfluence: 60000, exoticMatter: 3000, megastructures: 35 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: null,
-    description: 'Engineer on a galactic scale — boosted galactic influence',
+    description: 'Engineer on a galactic scale — +200 galactic influence/s',
     effects: [{ type: 'production_add', target: 'galacticInfluence', value: 200.0 }],
   },
   voidMastery: {
@@ -384,7 +384,7 @@ export const techTree = {
     cost: { cosmicPower: 80000, universalConstants: 80, darkEnergy: 100000 },
     prerequisites: ['multidimensionalMath'],
     grantsEra: null,
-    description: 'Master the void — x5 cosmic power and dark energy',
+    description: 'Master the void — x5 cosmic power and x5 dark energy (excludes Reality Mastery)',
     effects: [{ type: 'production_mult', target: 'cosmicPower', value: 5 }, { type: 'production_mult', target: 'darkEnergy', value: 5 }],
     excludes: 'realityMastery',
   },
@@ -393,7 +393,7 @@ export const techTree = {
     cost: { cosmicPower: 80000, universalConstants: 80, realityFragments: 30 },
     prerequisites: ['multidimensionalMath'],
     grantsEra: null,
-    description: 'Master reality — x5 universal constants and reality fragments',
+    description: 'Master reality — x5 universal constants and x5 reality fragments (excludes Void Mastery)',
     effects: [{ type: 'production_mult', target: 'universalConstants', value: 5 }, { type: 'production_mult', target: 'realityFragments', value: 5 }],
     excludes: 'voidMastery',
   },

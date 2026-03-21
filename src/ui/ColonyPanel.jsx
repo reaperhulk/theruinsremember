@@ -38,9 +38,9 @@ export function ColonyPanel({ state, onUpdate }) {
 
   return (
     <div className="panel colony-panel">
-      <h2>Colonies ({formatNumber(maxColonies)}){strategy.type !== 'none' ? ` — ${strategy.type}` : ''}</h2>
+      <h2>Colonies ({Math.floor(maxColonies)}){strategy.type !== 'none' ? ` — ${strategy.type}` : ''}</h2>
       <div className="factory-info">
-        <span>Colonies: {formatNumber(available)}/{formatNumber(maxColonies)} available</span>
+        <span>Colonies: {Math.floor(available)}/{Math.floor(maxColonies)} available</span>
         {maxColonies >= 3 && (
           <button className="gather-btn" onClick={handleEvenSplit} style={{ fontSize: '0.7em', padding: '1px 6px' }}>
             Even Split

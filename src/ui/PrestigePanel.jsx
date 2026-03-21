@@ -30,8 +30,10 @@ export function PrestigePanel({ state, onUpdate }) {
     ? 'Third iteration. The machines remember you. They were waiting.'
     : cycleCount === 4
     ? 'Fourth cycle. You can feel the grooves worn into reality by your passage.'
-    : cycleCount < 10
+    : cycleCount < 7
     ? `Cycle ${cycleCount + 1}. The universe barely resists anymore. It knows the shape of you.`
+    : cycleCount < 10
+    ? `Cycle ${cycleCount + 1}. Reality bends before you even push. The grooves are well-worn now.`
     : cycleCount < 20
     ? `Cycle ${cycleCount + 1}. You no longer build — you remember. Each upgrade is a memory of a life already lived.`
     : cycleCount < 50

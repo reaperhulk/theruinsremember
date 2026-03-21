@@ -27,7 +27,7 @@ export function TradingPanel({ state, onUpdate }) {
       return {
         ...result,
         eventLog: [...(result.eventLog || []), {
-          message: `Traded ${cost.toFixed(0)} ${fromDef.name} for ${amount} ${toDef.name}`,
+          message: `Traded ${formatNumber(Math.floor(cost))} ${fromDef.name} for ${formatNumber(amount)} ${toDef.name}`,
           time: result.totalTime,
         }].slice(-10),
       };

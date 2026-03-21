@@ -49,9 +49,9 @@ function getLoreHint(eraCompletion, isMaxEra, era, totalTime) {
       3: ['The warnings are becoming clearer. You wish they weren\'t.', 'The AI keeps finding solutions before you define the problems.', 'Encrypted files unlock themselves when you approach.'],
       4: ['Those stations were abandoned in a hurry.', 'Escape pods from impossible eras drift in stable orbits.', 'The space stations match your blueprints. You haven\'t drawn them yet.'],
       5: ['The terraforming matches your own techniques exactly.', 'Colony sites were pre-selected by someone with your exact methodology.', 'The atmosphere processors bear serial numbers in your manufacturing sequence.'],
-      6: ['Every beacon tells the same story: expansion, then silence.', 'Trade routes predate first contact by millions of years.', 'The alien species you meet already know your name.'],
+      6: ['Every beacon tells the same story: expansion, then silence.', 'Trade routes predate first contact by millions of years.', 'The beacons broadcast in a language you can almost understand.'],
       7: ['Someone else\'s handprints are on every control surface.', 'The megastructures respond to your commands as if trained.', 'Stellar forges contain half-finished projects in your exact style.'],
-      8: ['The ruins aren\'t from different civilizations. They\'re from the same one, over and over.', 'Every galaxy tells the same story: rise, reach, reset.', 'The archives contain records of this exact conversation.'],
+      8: ['The ruins aren\'t from different civilizations. They\'re from the same one, over and over.', 'Every galaxy tells the same story: rise, reach, reset.', 'The archives describe a species identical to yours. In every galaxy.'],
       9: ['The cosmic web pulses with old, old signals.', 'Between superclusters, the void contains compressed memories.', 'Constants align in sequences that spell out warnings.'],
       10: ['Each prestige is a heartbeat in something vast.', 'The multiverse breathes in cycles. You are the breath.', 'Other versions of you wave from parallel timelines. They look tired.'],
     };
@@ -59,7 +59,7 @@ function getLoreHint(eraCompletion, isMaxEra, era, totalTime) {
   }
   if (eraCompletion < 75) {
     const late = {
-      1: ['Who were they? What happened to them?', 'The ruins whisper in a language your children will speak.', 'You find a journal in the wreckage. The handwriting is yours.'],
+      1: ['Who were they? What happened to them?', 'The ruins whisper in a language your children will speak.', 'You find a journal in the wreckage. The handwriting looks almost familiar.'],
       2: ['The deeper you dig, the more you find.', 'The machines improve themselves when no one is watching.', 'Factory output exceeds input. The extra comes from somewhere.'],
       3: ['The dead language is starting to feel native.', 'The code writes itself. You just watch the patterns unfold.', 'Warning: recursion detected in base reality.'],
       4: ['The wreckage matches your ship designs. Closely.', 'Navigation logs from dead ships describe your exact trajectory.', 'The void is not empty. It is waiting.'],
@@ -75,7 +75,7 @@ function getLoreHint(eraCompletion, isMaxEra, era, totalTime) {
   const final = {
     1: ['A new age stirs. The old one watches.', 'The ruins glow faintly. They approve.', 'Something ancient exhales as the first factory fires.'],
     2: ['Industry roars. The buried city hums in sympathy.', 'The smoke carries codes in its spirals. Someone is sending messages.', 'The machines achieve a harmony too perfect to be designed.'],
-    3: ['You can read the warnings now. They say: "We were you."', 'The final encryption key was your birthday. Every time.', 'Digital consciousness stirs. It remembers being turned off.'],
+    3: ['You can read the warnings now. They say: "Do not continue."', 'The final encryption key was a date that hasn\'t happened yet.', 'Digital consciousness stirs. It remembers being turned off.'],
     4: ['The void opens. It has been opened before.', 'Orbital infrastructure clicks into place like a lock finding its key.', 'The stars are not random. They are coordinates.'],
     5: ['The solar system is a graveyard you\'re building on.', 'Every planet colonized brings you closer to the edge.', 'The sun flickers in a pattern that matches your heartbeat.'],
     6: ['Every star you reach has already been mourned.', 'The galaxy map is complete. You\'ve drawn it before.', 'Interstellar highways converge on a single point. You know where.'],

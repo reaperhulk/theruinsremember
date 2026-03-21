@@ -57,7 +57,9 @@ export function App() {
     const perfects = state.dockingPerfects || 0;
     if (perfects > prevPerfectsRef.current) {
       setShakeClass('shake');
-      setTimeout(() => setShakeClass(''), 300);
+      const t = setTimeout(() => setShakeClass(''), 300);
+      prevPerfectsRef.current = perfects;
+      return () => clearTimeout(t);
     }
     prevPerfectsRef.current = perfects;
   }, [state.dockingPerfects]);
@@ -67,7 +69,9 @@ export function App() {
     const events = state.eventLog?.length || 0;
     if (events > prevEventsRef.current) {
       setFlashClass('event-flash');
-      setTimeout(() => setFlashClass(''), 500);
+      const t = setTimeout(() => setFlashClass(''), 500);
+      prevEventsRef.current = events;
+      return () => clearTimeout(t);
     }
     prevEventsRef.current = events;
   }, [state.eventLog?.length]);
@@ -75,21 +79,20 @@ export function App() {
   const handlePrestige = () => {
     if (state.era < ERA_COUNT) return;
     const summary = getPrestigeSummary(state);
+    const milestones = [];
+    if (summary.prestigeCount >= 3 && (state.prestigeCount || 0) < 3) milestones.push('NEW: Auto-gather unlocked');
+    if (summary.prestigeCount >= 5 && (state.prestigeCount || 0) < 5) milestones.push('NEW: Era 1 upgrades auto-purchased');
+    if (summary.prestigeCount >= 10 && (state.prestigeCount || 0) < 10) milestones.push('NEW: Starting resources doubled');
     const msg = [
       '--- The Cycle Ends. The Cycle Begins. ---',
       '',
-      `Prestige Bonus: x${summary.bonus.toFixed(1)}`,
-      `Multiplier: x${summary.currentMultiplier.toFixed(1)} → x${summary.newMultiplier.toFixed(1)}`,
-      `Prestige Points Earned: +${summary.points}`,
-      `Total Points After: ${summary.totalPoints}`,
-      `Prestige Count: #${summary.prestigeCount}`,
+      `Multiplier: x${summary.currentMultiplier.toFixed(1)} → x${summary.newMultiplier.toFixed(1)} (x${summary.bonus.toFixed(1)} bonus)`,
+      `Prestige Points: +${summary.points} (total: ${summary.totalPoints})`,
+      `Cycle: #${summary.prestigeCount}`,
       '',
       'KEPT: Achievements, prestige upgrades, multiplier, lifetime stats',
       'LOST: All resources, upgrades, tech, era progress, mini-game state',
-      '',
-      summary.prestigeCount >= 3 ? '(Milestone: auto-gather unlocked)' : '',
-      summary.prestigeCount >= 5 ? '(Milestone: era 1 upgrades auto-purchased)' : '',
-      summary.prestigeCount >= 10 ? '(Milestone: starting resources doubled)' : '',
+      ...milestones,
       '',
       '"We tried to stop. We could not. Neither will you."',
     ].filter(Boolean).join('\n');

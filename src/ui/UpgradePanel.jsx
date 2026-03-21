@@ -83,11 +83,13 @@ export function UpgradePanel({ state, onUpdate }) {
   const [sortBy, setSortBy] = useState('default');
   const [filterType, setFilterType] = useState('all');
   const [flashId, setFlashId] = useState(null);
+  const flashTimerRef = useRef(null);
 
   const handlePurchase = useCallback((upgradeId) => {
     setFlashId(upgradeId);
     onUpdate(s => purchaseUpgrade(s, upgradeId));
-    setTimeout(() => setFlashId(null), 400);
+    clearTimeout(flashTimerRef.current);
+    flashTimerRef.current = setTimeout(() => setFlashId(null), 400);
   }, [onUpdate]);
   const available = getAvailableUpgrades(state);
   const purchased = getPurchasedUpgrades(state);
@@ -247,7 +249,7 @@ export function UpgradePanel({ state, onUpdate }) {
                     />
                     {eta < Infinity && eta > 0 && (
                       <span className="upgrade-eta" style={{ position: 'absolute', right: '4px', top: '0', fontSize: '0.7em', color: '#888', lineHeight: '8px' }}>
-                        {eta > 600 ? 'long wait' : `~${eta < 60 ? `${Math.ceil(eta)}s` : `${Math.ceil(eta / 60)}m`}`}
+                        {eta > 600 ? 'long wait' : `~${eta < 60 ? `${Math.round(eta / 5) * 5 || 5}s` : `${Math.ceil(eta / 60)}m`}`}
                       </span>
                     )}
                   </div>
