@@ -11,6 +11,7 @@ export function ResourcePanel({ state, onUpdate }) {
   const [collapsed, setCollapsed] = useState({});
   const [autoCollapse, setAutoCollapse] = useState(true);
   const [floats, setFloats] = useState([]);
+  const [expandedResource, setExpandedResource] = useState(null);
 
   const handleGather = useCallback((resourceId, amount) => {
     onUpdate(s => gather(s, resourceId));
@@ -85,8 +86,9 @@ export function ResourcePanel({ state, onUpdate }) {
                   if (r.cap > 0) tooltipParts.push(`Cap: ${formatNumber(r.cap)}`);
                   const tooltip = tooltipParts.join('\n');
                   return (
-                    <div key={r.id} className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0)) ? 'consuming' : ''}`} title={tooltip}>
-                      <span className="resource-name">
+                    <div key={r.id} className={`resource-row-wrapper`}>
+                    <div className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0)) ? 'consuming' : ''}`} title={tooltip}>
+                      <span className="resource-name" style={{ cursor: 'pointer', textDecoration: expandedResource === r.id ? 'underline' : 'none' }} onClick={() => setExpandedResource(expandedResource === r.id ? null : r.id)}>
                         {r.def?.name || r.id}
                       </span>
                       <span className={`resource-amount ${r.cap > 0 && r.amount / r.cap > 0.9 ? 'near-cap' : ''}`}>
@@ -127,6 +129,32 @@ export function ResourcePanel({ state, onUpdate }) {
                           <span key={f.id} className="gather-float">{f.text}</span>
                         ))}
                       </span>
+                    </div>
+                    {expandedResource === r.id && (() => {
+                      const baseRate = r.def?.baseRate || 0;
+                      const upgradeAdd = r.rateAdd || 0;
+                      const mult = r.rateMult || 1;
+                      const fb = getFactoryBonus(state);
+                      const cb = getColonyBonus(state);
+                      const rb = getRouteBonus(state);
+                      const prestigeMult = state.prestigeMultiplier || 1;
+                      const net = getNetRate(state, r.id);
+                      const cap = r.cap;
+                      const pctFull = cap > 0 ? Math.floor(r.amount / cap * 100) : 0;
+                      return (
+                        <div style={{ fontSize: '0.7em', background: '#1a1a2a', padding: '4px 8px', margin: '0 0 2px 0', borderLeft: '2px solid #555', color: '#aaa' }}>
+                          <div>Base: {baseRate}/s</div>
+                          {upgradeAdd > 0 && <div>Upgrades: +{upgradeAdd.toFixed(1)}/s</div>}
+                          {mult > 1 && <div>Multiplier: x{mult}</div>}
+                          {fb[r.id] > 0 && <div>Factory: +{fb[r.id].toFixed(1)}/s</div>}
+                          {cb[r.id] > 0 && <div>Colonies: +{cb[r.id].toFixed(1)}/s</div>}
+                          {rb[r.id] > 0 && <div>Star routes: +{rb[r.id].toFixed(1)}/s</div>}
+                          {prestigeMult > 1 && <div>Prestige: x{prestigeMult.toFixed(1)}</div>}
+                          <div style={{ color: '#88dd88' }}>Effective: {formatNumber(r.rate)}/s{net !== r.rate ? ` (net: ${formatNumber(net)}/s)` : ''}</div>
+                          {cap > 0 && <div>Cap: {formatNumber(cap)} ({pctFull}% full)</div>}
+                        </div>
+                      );
+                    })()}
                     </div>
                   );
                 })}

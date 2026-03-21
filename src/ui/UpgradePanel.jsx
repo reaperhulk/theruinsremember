@@ -132,6 +132,11 @@ export function UpgradePanel({ state, onUpdate }) {
           </span>
         )}
       </h2>
+      {filteredAvailable.some(u => LORE_UPGRADE_IDS.has(u.id)) && (
+        <div style={{ fontSize: '0.7em', color: '#bb88ff', marginBottom: '4px' }}>
+          Purple border = story upgrades — collected in Stats → Codex
+        </div>
+      )}
       {showPurchased && purchased.length > 0 && (
         <div className="purchased-list">
           {purchased.map(u => (

@@ -47,10 +47,11 @@ export function App() {
   const { state, updateState, resetSave, offlineReport, dismissOfflineReport } = useGameLoop(initialState);
   const [activeTab, setActiveTab] = useState('upgrades');
   const [shakeClass, setShakeClass] = useState('');
+  const [flashClass, setFlashClass] = useState('');
   const prevEventsRef = useRef(state.eventLog?.length || 0);
   const prevPerfectsRef = useRef(state.dockingPerfects || 0);
 
-  // Screen shake on perfect dock, event flash on new events
+  // Screen shake on perfect dock
   useEffect(() => {
     const perfects = state.dockingPerfects || 0;
     if (perfects > prevPerfectsRef.current) {
@@ -58,14 +59,17 @@ export function App() {
       setTimeout(() => setShakeClass(''), 300);
     }
     prevPerfectsRef.current = perfects;
+  }, [state.dockingPerfects]);
 
+  // Event flash on new events
+  useEffect(() => {
     const events = state.eventLog?.length || 0;
     if (events > prevEventsRef.current) {
-      setShakeClass('event-flash');
-      setTimeout(() => setShakeClass(''), 500);
+      setFlashClass('event-flash');
+      setTimeout(() => setFlashClass(''), 500);
     }
     prevEventsRef.current = events;
-  }, [state.dockingPerfects, state.eventLog?.length]);
+  }, [state.eventLog?.length]);
 
   const handlePrestige = () => {
     if (state.era < ERA_COUNT) return;
@@ -130,7 +134,7 @@ export function App() {
   };
 
   return (
-    <div className={`game-container era-${state.era} ${shakeClass}`}>
+    <div className={`game-container era-${state.era} ${shakeClass} ${flashClass}`}>
       <header className="game-header">
         <h1>Planet to Multiverse{state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888', marginLeft: '8px' }}>Era {state.era}: {eraNames[state.era]}</span>}</h1>
         <div className="header-controls">

@@ -14,7 +14,7 @@ const LORE_UPGRADE_IDS = [
 ];
 
 export function StatsPanel({ state }) {
-  const [showCodex, setShowCodex] = useState(false);
+  const [showCodexOverride, setShowCodexOverride] = useState(null);
   const achievementList = getAchievementList(state);
   const earnedCount = achievementList.filter(a => a.earned).length;
   const summary = getPrestigeSummary(state);
@@ -150,10 +150,16 @@ export function StatsPanel({ state }) {
           ))}
       </div>
 
-      {(discoveredLore.length > 0 || loreEvents.length > 0) && (
+      {(discoveredLore.length > 0 || loreEvents.length > 0) && (() => {
+        const undiscoveredLore = LORE_UPGRADE_IDS.filter(id => !state.upgrades?.[id]);
+        const totalLore = LORE_UPGRADE_IDS.length;
+        const hasUndiscovered = undiscoveredLore.length > 0 && loreEvents.length > 0;
+        const defaultOpen = hasUndiscovered || discoveredLore.length > 0;
+        const showCodex = showCodexOverride !== null ? showCodexOverride : defaultOpen;
+        return (
         <>
-          <h3 onClick={() => setShowCodex(!showCodex)} style={{ cursor: 'pointer' }}>
-            Codex {showCodex ? '(hide)' : `(${discoveredLore.length + loreEvents.length} entries)`}
+          <h3 onClick={() => setShowCodexOverride(showCodex ? false : true)} style={{ cursor: 'pointer' }}>
+            Codex ({discoveredLore.length}/{totalLore} discovered) {showCodex ? '(hide)' : '(show)'}
           </h3>
           {showCodex && (
             <div className="achievement-list" style={{ marginBottom: '8px' }}>
@@ -180,6 +186,15 @@ export function StatsPanel({ state }) {
                   </div>
                 ));
               })()}
+              {undiscoveredLore.map(id => {
+                const def = upgradeDefs[id];
+                return def ? (
+                  <div key={id} className="achievement locked" style={{ opacity: 0.4 }}>
+                    <span className="achievement-name">? Era {def.era}: ???</span>
+                    <span className="achievement-desc">Purchase lore upgrades to reveal...</span>
+                  </div>
+                ) : null;
+              })}
               {loreEvents.length > 0 && (
                 <div style={{ fontSize: '0.8em', fontWeight: 'bold', color: '#aa8866', margin: '6px 0 2px', borderBottom: '1px solid #333' }}>
                   Echoes & Fragments
@@ -198,7 +213,8 @@ export function StatsPanel({ state }) {
             </div>
           )}
         </>
-      )}
+        );
+      })()}
 
       <h3>Achievements ({earnedCount}/{achievementList.length} — {achievementList.filter(a => a.earned).reduce((s, a) => s + (a.reward || 0), 0)} pts earned)</h3>
       <div className="achievement-progress-bar">

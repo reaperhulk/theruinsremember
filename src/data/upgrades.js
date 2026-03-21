@@ -118,7 +118,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'steel', value: 3 },
       { type: 'production_add', target: 'electronics', value: 1.5 },
     ],
-    description: 'Mass production of steel and electronics (+1.5 electronics/s)',
+    description: 'The assembly pattern comes naturally, as if encoded in genetic memory — hands move before minds understand',
     prerequisites: ['foundry'],
   },
   steelForge: {
@@ -128,7 +128,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 1.2 },
       { type: 'production_add', target: 'steel', value: 0.5 },
     ],
-    description: 'A dedicated steel forge boosts steel output and produces electronics (+1.2/s)',
+    description: 'The forge temperature was scratched into the wall in a script no one can read — but the numbers work perfectly',
     prerequisites: ['foundry'],
   },
   ironWorks: {
@@ -152,7 +152,7 @@ export const upgrades = {
     id: 'computingLab', name: 'Computing Lab', era: 2,
     cost: { electronics: 30, energy: 40, food: 50 },
     effects: [{ type: 'production_add', target: 'research', value: 1.5 }],
-    description: 'Begin scientific research — strong research output (+1.5/s)',
+    description: 'Buried circuitry hums when power flows through it — the machines teach us what we once knew',
     prerequisites: ['assemblyLines'],
   },
   automation: {
@@ -179,7 +179,7 @@ export const upgrades = {
     id: 'factoryFloor', name: 'Factory Floor', era: 2,
     cost: { steel: 15, electronics: 10, labor: 20 },
     effects: [{ type: 'production_add', target: 'electronics', value: 0.4 }],
-    description: 'Each factory floor adds +0.4 electronics/s',
+    description: 'The floor plan was already etched in the foundation — we just cleared the rubble and started building',
     prerequisites: ['assemblyLines'],
     repeatable: true,
     costScale: 1.3,
@@ -1407,7 +1407,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
       { type: 'cap_mult', target: 'labor', value: 2 },
     ],
-    description: 'Brick production boosts materials and doubles labor capacity',
+    description: 'Ancient brick molds were found stacked in a sealed chamber — the clay fits them perfectly, as if the earth remembers',
     prerequisites: ['quarry'],
   },
   marketplace: {
@@ -1437,7 +1437,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
       { type: 'cap_mult', target: 'materials', value: 3 },
     ],
-    description: 'A stone quarry boosts materials and triples storage',
+    description: 'The quarry walls are too smooth, too straight — this stone was cut before, by hands that left no other trace',
     prerequisites: ['storehouse'],
   },
   animalHusbandry: {
@@ -1447,7 +1447,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 0.5 },
       { type: 'production_add', target: 'labor', value: 0.5 },
     ],
-    description: 'Domesticated animals provide food and labor',
+    description: 'The creatures came willingly, as if trained by someone long before us — muscle memory older than memory itself',
     prerequisites: ['irrigation'],
   },
   waterMill: {
@@ -1457,7 +1457,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.5 },
       { type: 'production_add', target: 'food', value: 0.5 },
     ],
-    description: 'Water-powered mills generate energy and grind grain for food',
+    description: 'The millrace follows channels cut into bedrock — channels that predate the crash by centuries',
     prerequisites: ['basicPower'],
   },
   tradePost: {
@@ -1904,7 +1904,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
       { type: 'production_add', target: 'energy', value: 0.4 },
     ],
-    description: 'Processed lumber boosts material output and fuels energy',
+    description: 'Saw teeth shaped from ruin-metal cut cleaner than anything forged new — the old alloys remember their purpose',
     prerequisites: ['tools'],
   },
 
@@ -2076,7 +2076,7 @@ export const upgrades = {
 
   // Era 1
   charcoalPit: { id: 'charcoalPit', name: 'Charcoal Pit', era: 1, cost: { materials: 20, energy: 8, labor: 12 }, effects: [{ type: 'production_add', target: 'energy', value: 0.5 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'Burn wood into charcoal — generates energy and boosts materials', prerequisites: ['waterMill'] },
-  fishingWharf: { id: 'fishingWharf', name: 'Fishing Wharf', era: 1, cost: { food: 18, materials: 14, labor: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'labor', value: 0.5 }], description: 'Coastal fishing yields food and provides dockworker labor', prerequisites: ['irrigation'] },
+  fishingWharf: { id: 'fishingWharf', name: 'Fishing Wharf', era: 1, cost: { food: 18, materials: 14, labor: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'labor', value: 0.5 }], description: 'Stone pilings already lined the coast, as if someone knew we would need a harbor here', prerequisites: ['irrigation'] },
 
   // Era 2
   cementFactory: { id: 'cementFactory', name: 'Cement Factory', era: 2, cost: { steel: 18, materials: 22, energy: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.8 }], description: 'Cement production boosts materials and generates steel', prerequisites: ['hydraulicPress'] },

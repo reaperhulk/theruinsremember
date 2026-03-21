@@ -1290,6 +1290,8 @@ canvas:hover {
   flex-direction: column;
   gap: 4px;
   pointer-events: none;
+  max-height: calc(3 * 2.5em + 2 * 4px);
+  overflow: hidden;
 }
 
 .toast {
@@ -1787,6 +1789,16 @@ canvas:hover {
 
   .era-stats {
     font-size: 0.7em;
+  }
+
+  .toast-container {
+    right: 8px;
+    left: 8px;
+    max-width: none;
+  }
+
+  .toast {
+    font-size: 0.8em;
   }
 }
 

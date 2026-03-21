@@ -14,10 +14,13 @@ export function StarChartPanel({ state, onUpdate }) {
 
   const handleSystemClick = (sysId) => {
     if (selected === null) {
+      // First click: select system (show its bonuses)
       setSelected(sysId);
     } else if (selected === sysId) {
+      // Click same system: deselect
       setSelected(null);
     } else {
+      // Click different system while one is selected: create/remove route
       if (routeExists(state, selected, sysId)) {
         onUpdate(s => removeRoute(s, selected, sysId));
       } else {
@@ -75,7 +78,7 @@ export function StarChartPanel({ state, onUpdate }) {
                 x={sys.x * 100} y={sys.y * 100 - 4}
                 fill="#aaddff" fontSize="3" textAnchor="middle"
               >{sys.name}</text>
-              {isHovered && (
+              {(isHovered || isSelected) && (
                 <text
                   x={sys.x * 100} y={sys.y * 100 + 6}
                   fill="#ffeeaa" fontSize="2.5" textAnchor="middle"
@@ -86,6 +89,15 @@ export function StarChartPanel({ state, onUpdate }) {
           })}
         </svg>
       </div>
+      {selected && (() => {
+        const sys = systems.find(s => s.id === selected);
+        if (!sys) return null;
+        return (
+          <div style={{ fontSize: '0.75em', color: '#aaddff', padding: '4px', background: 'rgba(50,80,120,0.3)', borderRadius: '4px', marginTop: '4px' }}>
+            <strong>{sys.name}</strong>: {Object.entries(sys.bonus).map(([r,v]) => `${resourceName(r)} +${v}`).join(', ')}
+          </div>
+        );
+      })()}
       {Object.keys(bonus).length > 0 && (
         <div className="colony-bonus">
           Routes: {Object.entries(bonus).map(([r, v]) => `${resourceName(r)} +${v.toFixed(1)}`).join(', ')}
