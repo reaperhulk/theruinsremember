@@ -268,7 +268,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
       )}
       <div className="upgrade-list">
         {filteredAvailable.length === 0 && upcoming.length === 0 && (
-          <p className="empty-message">No upgrades available — buy prerequisite upgrades to unlock more</p>
+          <p className="empty-message">No upgrades available — explore the Tech Tree for new paths, or buy prerequisite upgrades to unlock more</p>
         )}
         {filteredAvailable.length === 0 && upcoming.length > 0 && (
           <p className="empty-message">Buy prerequisites to unlock {upcoming.length} upcoming upgrade{upcoming.length > 1 ? 's' : ''}</p>

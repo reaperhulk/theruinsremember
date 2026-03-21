@@ -20,6 +20,20 @@ describe('prestige', () => {
     expect(calculatePrestigeBonus(state)).toBeCloseTo(2.2);
   });
 
+  it('caps prestige bonus at 15x', () => {
+    const state = createInitialState();
+    state.era = 10;
+    // Give tons of upgrades, tech, and gems to push bonus way above 15
+    state.upgrades = {};
+    for (let i = 0; i < 200; i++) state.upgrades[`fake${i}`] = true;
+    state.tech = {};
+    for (let i = 0; i < 50; i++) state.tech[`fakeTech${i}`] = true;
+    state.totalGems = 500;
+    // Without cap: 1 + 10*0.5 + 200*0.05 + 50*0.1 + 500*0.02 = 1+5+10+5+10 = 31
+    // Should be capped to 15
+    expect(calculatePrestigeBonus(state)).toBe(15);
+  });
+
   it('includes gem bonus', () => {
     const state = createInitialState();
     state.era = 1;

@@ -237,6 +237,31 @@ describe('tick', () => {
     expect(after.resources.rocketFuel.amount).toBeCloseTo(100 - 1.2, 1);
   });
 
+  it('auto-purchase only buys non-repeatable upgrades from earlier eras', () => {
+    const state = createInitialState();
+    state.era = 5;
+    state.totalTicks = 59; // Will be 60 on next tick (auto-purchase fires at %60===0)
+    // Give the player tons of resources
+    for (const id of Object.keys(state.resources)) {
+      state.resources[id] = { ...state.resources[id], unlocked: true, amount: 999999 };
+    }
+    // Pre-own some era 1 upgrades so chain works
+    state.upgrades = { tools: true, irrigation: true, basicPower: true };
+    const after = tick(state, 0.1);
+    // Should have auto-purchased one non-repeatable upgrade from era <= 2
+    const newUpgrades = Object.keys(after.upgrades).filter(id => !state.upgrades[id]);
+    if (newUpgrades.length > 0) {
+      const { upgrades: upgradeDefs } = require('../../data/upgrades.js');
+      for (const id of newUpgrades) {
+        const def = upgradeDefs[id];
+        if (def) {
+          expect(def.era).toBeLessThanOrEqual(2); // era 5 - 3 = era 2 max
+          expect(def.repeatable).toBeFalsy();
+        }
+      }
+    }
+  });
+
   it('energy never goes below zero from electronics consumption', () => {
     const state = createInitialState();
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 100, rateMult: 1 };

@@ -115,7 +115,7 @@ export function DockingPanel({ state, onUpdate }) {
         {onCooldown ? `Wait ${cooldownRemaining.toFixed(1)}s` : 'Dock! (d)'}
       </button>
       <p className="mining-hint">
-        Hit green zone for fuel+infra | Perfect for exotic too | Combo up to x2
+        Press D when indicator is in the green zone | Perfect = bonus exotic materials | Combo streaks boost rewards up to x2
       </p>
     </div>
   );

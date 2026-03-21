@@ -175,7 +175,7 @@ export function EraProgress({ state }) {
           const isActive = cyclePos < 10;
           return (
             <span style={{ fontSize: '0.7em', color: isActive ? '#ffaa44' : '#555', marginLeft: '8px' }}>
-              {isActive ? 'OVERCLOCK' : `overclock in ${Math.ceil(60 - cyclePos)}s`}
+              {isActive ? `OVERCLOCK ${Math.ceil(10 - cyclePos)}s` : `overclock in ${Math.ceil(60 - cyclePos)}s`}
             </span>
           );
         })()}

@@ -182,6 +182,25 @@ describe('events', () => {
     });
   });
 
+  describe('timer bar duration', () => {
+    it('active effect tracks correct start and end times for timer bar', () => {
+      const state = makeState({ totalTime: 45 });
+      const timedEvent = events.solarFlare; // duration: 30s
+      const newState = applyEvent(state, timedEvent);
+      const effect = newState.activeEffects[0];
+      expect(effect.startedAt).toBe(45);
+      expect(effect.endsAt).toBe(75); // 45 + 30
+      // Timer bar would show remaining = endsAt - currentTime
+      const remaining = effect.endsAt - 55; // at time 55, 20s remain
+      expect(remaining).toBe(20);
+      // Progress fraction: elapsed / duration
+      const elapsed = 55 - effect.startedAt; // 10s elapsed
+      const duration = effect.endsAt - effect.startedAt; // 30s total
+      const fraction = elapsed / duration;
+      expect(fraction).toBeCloseTo(1 / 3, 5);
+    });
+  });
+
   describe('crisis events', () => {
     it('crisis events have negative effects', () => {
       const crisisEvents = Object.values(events).filter(e => e.id?.startsWith('crisis'));

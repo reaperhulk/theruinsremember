@@ -142,7 +142,7 @@ export function HackingPanel({ state, onUpdate }) {
           </div>
         </div>
       )}
-      <p className="mining-hint">Memorize the pattern, then enter it from memory | Keys: 0-3</p>
+      <p className="mining-hint">Memorize the sequence, then reproduce it | Keys: 0-3 | Reward: multiplies Data &amp; Software production</p>
     </div>
   );
 }

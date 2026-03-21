@@ -140,6 +140,15 @@ describe('mining', () => {
       expect(foundGem).toBe(false);
     });
 
+    it('first mine burst gives exactly 20 materials on a fresh state', () => {
+      const state = createInitialState();
+      const initialAmount = state.resources.materials.amount;
+      expect(initialAmount).toBe(0);
+      const { state: after, foundGem } = mine(state, 0.99);
+      expect(foundGem).toBe(false);
+      expect(after.resources.materials.amount).toBe(20);
+    });
+
     it('first mine burst only fires once', () => {
       const state = createInitialState();
       const first = mine(state, 0.99);
