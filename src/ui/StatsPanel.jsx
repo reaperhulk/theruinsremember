@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { eraNames, countEraUpgrades } from '../engine/eras.js';
 import { getPrestigeSummary } from '../engine/prestige.js';
 import { getAchievementList } from '../engine/achievements.js';
@@ -8,7 +8,7 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { formatTime, formatNumber } from './format.js';
 import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
-export function StatsPanel({ state }) {
+export const StatsPanel = memo(function StatsPanel({ state }) {
   const [showCodexOverride, setShowCodexOverride] = useState(null);
   const achievementList = getAchievementList(state);
   const earnedCount = achievementList.filter(a => a.earned).length;
@@ -241,4 +241,4 @@ export function StatsPanel({ state }) {
       </div>
     </div>
   );
-}
+});

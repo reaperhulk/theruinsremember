@@ -2,6 +2,8 @@ import { createInitialState } from './state.js';
 import { prestigeUpgrades } from '../data/prestige-upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
+import { resources as resourceDefs } from '../data/resources.js';
+import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
 // Calculate prestige multiplier based on current progress
 export function calculatePrestigeBonus(state) {
@@ -261,6 +263,100 @@ export function performPrestige(state) {
       newState.resources[id] = {
         ...newState.resources[id],
         rateMult: newState.resources[id].rateMult * 2,
+      };
+    }
+  }
+
+  // Temporal Mastery: start at Era 3 (supersedes Cosmic Insight's Era 2)
+  if (hasPrestigeUpgrade(state, 'temporalMastery')) {
+    newState.era = 3;
+    // Unlock era 1-3 resources
+    for (const def of Object.values(resourceDefs)) {
+      if (def.era <= 3 && newState.resources[def.id]) {
+        newState.resources[def.id] = { ...newState.resources[def.id], unlocked: true };
+      }
+    }
+    // Unlock era-gating tech for eras 1-3
+    for (const t of Object.values(techTree)) {
+      if (t.grantsEra && t.grantsEra <= 3) {
+        newState.tech[t.id] = true;
+      }
+    }
+  }
+
+  // Primordial Memory: auto-research all era 1-3 tech
+  if (hasPrestigeUpgrade(state, 'primordialMemory')) {
+    for (const t of Object.values(techTree)) {
+      if (t.era && t.era <= 3) {
+        newState.tech[t.id] = true;
+        if (t.effects) {
+          for (const effect of t.effects) {
+            const target = newState.resources[effect.target];
+            if (!target) continue;
+            switch (effect.type) {
+              case 'production_mult':
+                newState.resources[effect.target] = { ...target, rateMult: target.rateMult * effect.value };
+                break;
+              case 'production_add':
+                newState.resources[effect.target] = { ...target, rateAdd: target.rateAdd + effect.value };
+                break;
+              case 'unlock_resource':
+                newState.resources[effect.target] = { ...target, unlocked: true };
+                break;
+              case 'cap_mult':
+                newState.resources[effect.target] = { ...target, capMult: target.capMult * effect.value };
+                break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Accelerated Decay: x5 all production
+  if (hasPrestigeUpgrade(state, 'acceleratedDecay')) {
+    for (const id of Object.keys(newState.resources)) {
+      newState.resources[id] = {
+        ...newState.resources[id],
+        rateMult: newState.resources[id].rateMult * 5,
+      };
+    }
+  }
+
+  // Cosmic Awareness: auto-purchase all lore upgrades
+  if (hasPrestigeUpgrade(state, 'cosmicAwareness')) {
+    for (const loreId of LORE_UPGRADE_IDS) {
+      const def = upgradeDefs[loreId];
+      if (def && !newState.upgrades[loreId]) {
+        newState.upgrades[loreId] = true;
+        for (const effect of def.effects) {
+          const target = newState.resources[effect.target];
+          if (!target) continue;
+          switch (effect.type) {
+            case 'production_mult':
+              newState.resources[effect.target] = { ...target, rateMult: target.rateMult * effect.value };
+              break;
+            case 'production_add':
+              newState.resources[effect.target] = { ...target, rateAdd: target.rateAdd + effect.value };
+              break;
+            case 'unlock_resource':
+              newState.resources[effect.target] = { ...target, unlocked: true };
+              break;
+            case 'cap_mult':
+              newState.resources[effect.target] = { ...target, capMult: target.capMult * effect.value };
+              break;
+          }
+        }
+      }
+    }
+  }
+
+  // Eternal Return: x10 all production (true ending)
+  if (hasPrestigeUpgrade(state, 'eternalReturn')) {
+    for (const id of Object.keys(newState.resources)) {
+      newState.resources[id] = {
+        ...newState.resources[id],
+        rateMult: newState.resources[id].rateMult * 10,
       };
     }
   }

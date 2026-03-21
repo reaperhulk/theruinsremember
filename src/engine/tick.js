@@ -149,17 +149,6 @@ export function tick(state, dt) {
     }
   }
 
-  // Track best era times
-  if (newState.bestEraTimes && newState.era > 1) {
-    const currentEraTime = newState.bestEraTimes[newState.era];
-    if (currentEraTime === undefined) {
-      newState = {
-        ...newState,
-        bestEraTimes: { ...newState.bestEraTimes, [newState.era]: newState.totalTime },
-      };
-    }
-  }
-
   // Track total production for stats
   {
     let totalProduced = newState.totalResourcesProduced || 0;
@@ -247,6 +236,19 @@ export function tick(state, dt) {
       eventLog: [...(newState.eventLog || []), {
         message: 'THE FINAL TRUTH: The ruins were yours. The cycle is you. And it begins again.',
         time: newState.totalTime,
+      }].slice(-20),
+    };
+  }
+
+  // True Ending: purchasing eternalReturn marks the definitive completion
+  if (!newState.trueEnding && newState.prestigeUpgrades?.eternalReturn) {
+    newState = {
+      ...newState,
+      trueEnding: true,
+      eventLog: [...(newState.eventLog || []), {
+        message: 'TRUE ENDING: You have purchased every upgrade, unlocked every secret, and closed the loop. The cycle is complete. There is nothing left but the eternal return.',
+        time: newState.totalTime,
+        isLore: true,
       }].slice(-20),
     };
   }

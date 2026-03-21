@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
 import { getEffectiveRate, getEffectiveCap, getNetRate, gather } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
@@ -7,7 +7,7 @@ import { getColonyBonus } from '../engine/colonies.js';
 import { getRouteBonus } from '../engine/starChart.js';
 import { formatNumber } from './format.js';
 
-export function ResourcePanel({ state, onUpdate }) {
+export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
   const [collapsed, setCollapsed] = useState({});
   const [autoCollapse, setAutoCollapse] = useState(true);
   const [floats, setFloats] = useState([]);
@@ -213,4 +213,4 @@ export function ResourcePanel({ state, onUpdate }) {
       })}
     </div>
   );
-}
+});

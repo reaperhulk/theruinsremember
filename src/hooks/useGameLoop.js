@@ -98,6 +98,8 @@ export function useGameLoop(initialState) {
   }, []);
 
   const lastTimeRef = useRef(performance.now());
+  const lastStateUpdateRef = useRef(performance.now());
+  const accumulatedDtRef = useRef(0);
   const rafRef = useRef(null);
   const saveTimerRef = useRef(null);
 
@@ -107,8 +109,16 @@ export function useGameLoop(initialState) {
 
     // Cap dt to avoid spiral of death (e.g., tab was hidden)
     const cappedDt = Math.min(dt, 1);
+    accumulatedDtRef.current += cappedDt;
 
-    setState(prev => tick(prev, cappedDt));
+    // Throttle React state updates to ~10fps (100ms) while canvas animates at 60fps
+    if (now - lastStateUpdateRef.current > 100) {
+      const accDt = accumulatedDtRef.current;
+      accumulatedDtRef.current = 0;
+      lastStateUpdateRef.current = now;
+      setState(prev => tick(prev, accDt));
+    }
+
     rafRef.current = requestAnimationFrame(gameLoop);
   }, []);
 

@@ -184,4 +184,46 @@ export const prestigeUpgrades = {
     effect: 'all_production_x2',
     requires: ['temporalEcho', 'masterWeaver', 'quantumTunneling', 'infinitePatience'],
   },
+
+  // --- Ascension tier (post-endgame prestige sinks) ---
+  temporalMastery: {
+    id: 'temporalMastery',
+    name: 'Temporal Mastery',
+    cost: 50,
+    description: 'Three eras of history compressed into a single thought.',
+    effect: 'start_era3',
+    requires: 'cycleMastery',
+  },
+  primordialMemory: {
+    id: 'primordialMemory',
+    name: 'Primordial Memory',
+    cost: 75,
+    description: 'You remember everything. The machines remember you.',
+    effect: 'auto_era1_3_tech',
+    requires: 'temporalMastery',
+  },
+  acceleratedDecay: {
+    id: 'acceleratedDecay',
+    name: 'Accelerated Decay',
+    cost: 100,
+    description: 'The cycle spins faster. The universe accommodates.',
+    effect: 'production_x5',
+    requires: 'primordialMemory',
+  },
+  cosmicAwareness: {
+    id: 'cosmicAwareness',
+    name: 'Cosmic Awareness',
+    cost: 150,
+    description: 'You have read every inscription. You have heard every warning. You continue anyway.',
+    effect: 'auto_lore',
+    requires: 'acceleratedDecay',
+  },
+  eternalReturn: {
+    id: 'eternalReturn',
+    name: 'Eternal Return',
+    cost: 200,
+    description: 'The final upgrade. There is nothing more to learn. There is nothing more to build. There is only the next cycle, and the one after that, forever.',
+    effect: 'true_ending',
+    requires: 'cosmicAwareness',
+  },
 };

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, memo } from 'react';
 import { getAvailableTech, unlockTech } from '../engine/tech.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { techTree } from '../data/tech-tree.js';
@@ -55,7 +55,7 @@ function getAffordProgress(state, cost) {
   return totalNeeded > 0 ? totalHave / totalNeeded : 0;
 }
 
-export function TechTree({ state, onUpdate }) {
+export const TechTree = memo(function TechTree({ state, onUpdate }) {
   const [flashId, setFlashId] = useState(null);
   const [showUnlocked, setShowUnlocked] = useState(false);
   const flashTimerRef = useRef(null);
@@ -218,4 +218,4 @@ export function TechTree({ state, onUpdate }) {
       </div>
     </div>
   );
-}
+});

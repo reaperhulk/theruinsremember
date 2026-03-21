@@ -395,4 +395,8 @@ export const achievements = [
       Object.keys(s.prestigeUpgrades || {}).length >= 25 &&
       (s.prestigeCount || 0) >= 1;
   }, reward: 200 },
+
+  // Ascension achievements
+  { id: 'ascensionBegins', name: 'Ascension Begins', description: 'Purchase Temporal Mastery — the first ascension upgrade', check: s => !!(s.prestigeUpgrades?.temporalMastery), reward: 25 },
+  { id: 'trueEnding', name: 'True Ending', description: 'Purchase Eternal Return — the final upgrade in the game. There is nothing more.', check: s => !!(s.prestigeUpgrades?.eternalReturn), reward: 500 },
 ];

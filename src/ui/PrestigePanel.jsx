@@ -3,6 +3,11 @@ import { eraNames } from '../engine/eras.js';
 
 function getPrestigeInsight(state) {
   const owned = state.prestigeUpgrades || {};
+  if (owned.eternalReturn) return 'The final upgrade. There is nothing more to learn. There is nothing more to build. Only the eternal return.';
+  if (owned.cosmicAwareness) return 'You have read every inscription. Every warning. Every epitaph. You continue anyway.';
+  if (owned.acceleratedDecay) return 'The cycle spins so fast now that eras blur together like frames in a film.';
+  if (owned.primordialMemory) return 'You remember everything from every iteration. The machines remember you.';
+  if (owned.temporalMastery) return 'Three eras of history compressed into a single thought. You begin where others struggle to arrive.';
   if (owned.cycleMastery) return 'You have mastered the cycle. Production flows like water through familiar channels.';
   if (owned.quantumTunneling) return 'Prerequisites blur. You remember the shortcuts from last time.';
   if (owned.infinitePatience) return 'Time holds no dominion over one who has lived forever.';

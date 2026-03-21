@@ -521,13 +521,25 @@ canvas:hover {
   transform: scale(0.97);
 }
 
-/* Header title gradient */
+/* Header title gradient — shifts with era */
 .game-header h1 {
   background: linear-gradient(90deg, #8be9fd, #bd93f9);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: none;
+  transition: filter 1s ease;
 }
+.era-1 .game-header h1 { background: linear-gradient(90deg, #6ac46a, #8be9a0); -webkit-background-clip: text; background-clip: text; }
+.era-2 .game-header h1 { background: linear-gradient(90deg, #d4a053, #e8c078); -webkit-background-clip: text; background-clip: text; }
+.era-3 .game-header h1 { background: linear-gradient(90deg, #5ab5d4, #8be9fd); -webkit-background-clip: text; background-clip: text; }
+.era-4 .game-header h1 { background: linear-gradient(90deg, #8a8ac0, #b0b0e8); -webkit-background-clip: text; background-clip: text; }
+.era-5 .game-header h1 { background: linear-gradient(90deg, #c4c44a, #e8e878); -webkit-background-clip: text; background-clip: text; }
+.era-6 .game-header h1 { background: linear-gradient(90deg, #4a7ac4, #78a8e8); -webkit-background-clip: text; background-clip: text; }
+.era-7 .game-header h1 { background: linear-gradient(90deg, #d46a4a, #e89878); -webkit-background-clip: text; background-clip: text; }
+.era-8 .game-header h1 { background: linear-gradient(90deg, #9a4ac4, #c878e8); -webkit-background-clip: text; background-clip: text; }
+.era-9 .game-header h1 { background: linear-gradient(90deg, #4ac4a8, #78e8d0); -webkit-background-clip: text; background-clip: text; }
+.era-10 .game-header h1 { background: linear-gradient(90deg, #c44ac4, #e878e8); -webkit-background-clip: text; background-clip: text; }
 
 /* Tech exclusion choice highlight */
 .tech-btn[title*="Choose one"] {

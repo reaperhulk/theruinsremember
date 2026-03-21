@@ -143,8 +143,11 @@ export function EraProgress({ state }) {
         </p>
       )}
       <div className="era-stats">
-        <span>{formatTime(state.totalTime)}</span>
+        <span style={{ color: '#88ccff', fontWeight: 'bold' }}>Run: {formatTime(state.totalTime)}</span>
         <span> | era: {formatTime(state.totalTime - (state.eraStartTime || 0))}</span>
+        {state.bestEraTimes?.[state.era] !== undefined && state.era > 1 && (
+          <span style={{ color: '#888' }}> (best: {formatTime(state.bestEraTimes[state.era])})</span>
+        )}
         <span> | {upgradeCount} upgrades | {techCount} tech</span>
         {(state.totalGems || 0) > 0 && <span> | {state.totalGems} gems</span>}
         {state.prestigeMultiplier > 1 && (

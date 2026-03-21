@@ -79,5 +79,12 @@ export function transitionEra(state, newEra) {
     }
   }
 
-  return { ...state, era: newEra, resources: newResources, eraStartTime: state.totalTime };
+  // Record best era time (time to reach this era)
+  const bestEraTimes = { ...(state.bestEraTimes || {}) };
+  const currentTime = state.totalTime;
+  if (bestEraTimes[newEra] === undefined || currentTime < bestEraTimes[newEra]) {
+    bestEraTimes[newEra] = currentTime;
+  }
+
+  return { ...state, era: newEra, resources: newResources, eraStartTime: state.totalTime, bestEraTimes };
 }

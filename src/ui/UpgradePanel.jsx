@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect, memo } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades } from '../engine/upgrades.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -75,7 +75,7 @@ function getAffordProgress(state, cost) {
   return totalNeeded > 0 ? totalHave / totalNeeded : 0;
 }
 
-export function UpgradePanel({ state, onUpdate }) {
+export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const [showPurchased, setShowPurchased] = useState(false);
   const [sortBy, setSortBy] = useState('default');
   const [filterType, setFilterType] = useState('all');
@@ -307,4 +307,4 @@ export function UpgradePanel({ state, onUpdate }) {
       )}
     </div>
   );
-}
+});
