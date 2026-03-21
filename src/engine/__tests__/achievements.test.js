@@ -11,18 +11,17 @@ describe('achievements', () => {
     const firstGem = newAchievements.find(a => a.id === 'firstGem');
     expect(firstGem).toBeTruthy();
     expect(after.achievements.firstGem).toBe(true);
-    expect(after.prestigePoints).toBeGreaterThan(0);
+    // Achievements no longer award prestige points directly
+    expect(after.prestigePoints || 0).toBe(0);
   });
 
   it('does not re-award already earned achievements', () => {
     const state = createInitialState();
     state.totalGems = 1;
     state.achievements = { firstGem: true };
-    state.prestigePoints = 5;
     const { state: after, newAchievements } = checkAchievements(state);
     const firstGem = newAchievements.find(a => a.id === 'firstGem');
     expect(firstGem).toBeUndefined();
-    expect(after.prestigePoints).toBe(5); // unchanged
   });
 
   it('awards multiple achievements at once', () => {

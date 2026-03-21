@@ -90,15 +90,15 @@ describe('prestige', () => {
     it('calculates points based on era reached', () => {
       const state = createInitialState();
       state.era = 7;
-      // Era 7 = 2 points
-      expect(calculatePrestigePoints(state)).toBe(2);
+      // Era 7 = 3 points (no upgrades, no mini-games)
+      expect(calculatePrestigePoints(state)).toBe(3);
     });
 
     it('gives escalating points for deep eras', () => {
       const state = createInitialState();
       state.era = 10;
-      // Era 7=2, 8=+4, 9=+6, 10=+10 = 22
-      expect(calculatePrestigePoints(state)).toBe(22);
+      // Era 7=3, 8=+5, 9=+8, 10=+14 = 30 (no upgrades, no mini-games)
+      expect(calculatePrestigePoints(state)).toBe(30);
     });
   });
 

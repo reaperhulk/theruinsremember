@@ -27,16 +27,10 @@ export function checkAchievements(state) {
 
   if (newAchievements.length === 0) return { state, newAchievements: [] };
 
-  // Achievement Hunter prestige upgrade: 50% more points
-  const hasAchievementHunter = state.prestigeUpgrades && state.prestigeUpgrades.achievementHunter;
-  const rewardMult = hasAchievementHunter ? 1.5 : 1;
-  const totalReward = Math.floor(newAchievements.reduce((sum, a) => sum + (a.reward || 0), 0) * rewardMult);
-
   return {
     state: {
       ...state,
       achievements: earned,
-      prestigePoints: (state.prestigePoints || 0) + totalReward,
     },
     newAchievements,
   };

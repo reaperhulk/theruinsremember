@@ -32,20 +32,17 @@ export function calculatePrestigePoints(state) {
   if (state.era < 7) return 0;
   // Base: escalating points for deep eras
   let points = 0;
-  if (state.era >= 7) points += 2;
-  if (state.era >= 8) points += 4;
-  if (state.era >= 9) points += 6;
-  if (state.era >= 10) points += 10;  // 22 total for reaching era 10
-  // Bonus for era 10 upgrade completion (rewards thorough play)
-  const era10Upgrades = Object.keys(state.upgrades).filter(id => {
-    const def = upgradeDefs[id];
-    return def && def.era === 10;
-  }).length;
-  points += Math.floor(era10Upgrades / 5); // 1 point per 5 era-10 upgrades
+  if (state.era >= 7) points += 3;
+  if (state.era >= 8) points += 5;
+  if (state.era >= 9) points += 8;
+  if (state.era >= 10) points += 14;  // 30 total for reaching era 10
+  // Bonus for upgrade completion across all eras (rewards thorough play)
+  const totalUpgrades = Object.keys(state.upgrades).length;
+  points += Math.floor(totalUpgrades / 20); // 1 point per 20 upgrades
   // Small bonus for mini-game mastery (deep engagement reward)
-  points += Math.floor((state.hackSuccesses || 0) / 50);
-  points += Math.floor((state.dockingPerfects || 0) / 30);
-  points += Math.floor((state.totalWeaves || 0) / 25);
+  points += Math.floor((state.hackSuccesses || 0) / 30);
+  points += Math.floor((state.dockingPerfects || 0) / 20);
+  points += Math.floor((state.totalWeaves || 0) / 15);
   return points;
 }
 
