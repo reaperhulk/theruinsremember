@@ -9,7 +9,7 @@ export const techTree = {
     cost: { materials: 50, energy: 40 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Understanding of metal properties',
+    description: 'The ancient alloys in the crash debris teach us what ore can become',
   },
   // Era 1 branching: agrarian vs mining focus
   agrarianFocus: {
@@ -35,7 +35,7 @@ export const techTree = {
     cost: { materials: 80, energy: 60, labor: 40 },
     prerequisites: ['metallurgy'],
     grantsEra: 2,
-    description: 'Transition to machine-based manufacturing',
+    description: 'The buried factories showed us the blueprint — we just added steam',
   },
 
   // Era 2 → 3 (Digital Age)
@@ -44,7 +44,7 @@ export const techTree = {
     cost: { research: 80, electronics: 60 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Powerful computational systems',
+    description: 'The old machines left instruction sets — we just had to remember how to read them',
   },
   // Era 2 branching: heavy industry vs electronics revolution
   heavyIndustry: {
@@ -79,7 +79,7 @@ export const techTree = {
     cost: { software: 100, data: 60 },
     prerequisites: [],
     grantsEra: null,
-    description: 'A planet-spanning digital network — prerequisite for space era tech',
+    description: 'A planet-spanning network — the buried cables were already there, waiting for current',
   },
   // Era 3 branching: open source vs corporate data
   openSourceMovement: {
@@ -105,7 +105,7 @@ export const techTree = {
     cost: { software: 200, data: 120, research: 500 },
     prerequisites: ['globalNetwork'],
     grantsEra: 4,
-    description: 'An organized program to reach space',
+    description: 'The launch pad foundation was ancient. We just built on top of it',
   },
 
   // Era 4 → 5 (Space Age → Solar System)
@@ -114,7 +114,7 @@ export const techTree = {
     cost: { research: 3500, rocketFuel: 1200, orbitalInfra: 350 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Navigate between planets',
+    description: 'Star charts etched in the wreckage — coordinates we somehow already knew',
   },
   // Era 4 branching: rocket supremacy vs orbital elegance
   rocketSupremacy: {
@@ -140,7 +140,7 @@ export const techTree = {
     cost: { orbitalInfra: 800, rocketFuel: 3000, steel: 3500, research: 6000 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: 5,
-    description: 'A ship capable of reaching other planets',
+    description: 'The void between worlds holds wreckage from ships exactly like this one',
   },
 
   // Era 5 → 6 (Solar System → Interstellar)
@@ -149,14 +149,14 @@ export const techTree = {
     cost: { research: 5000, exoticMaterials: 200, energy: 50000 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Beyond chemical rockets',
+    description: 'The engine schematics were carved into the oldest ruin — someone wanted us to find them',
   },
   ftlResearch: {
     id: 'ftlResearch', name: 'FTL Research', era: 5,
     cost: { research: 10000, exoticMaterials: 500, colonies: 40 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: 6,
-    description: 'Faster-than-light travel theory',
+    description: 'The math was always impossible — until we found it scratched into a dead ship\'s hull',
   },
 
   // Era 6 → 7 (Interstellar → Dyson Era)
@@ -165,7 +165,7 @@ export const techTree = {
     cost: { starSystems: 30, research: 3000, darkEnergy: 300 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Map the galaxy',
+    description: 'Every dead beacon we relight adds another pin to a map someone drew long before us',
   },
   megaEngineering: {
     id: 'megaEngineering', name: 'Mega Engineering', era: 6,
@@ -181,7 +181,7 @@ export const techTree = {
     cost: { megastructures: 120, stellarForge: 400, research: 500000 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Prepare for galactic-scale civilization',
+    description: 'The Dyson sphere\'s control throne fits a human body perfectly. Coincidence fades',
   },
   galacticNetwork: {
     id: 'galacticNetwork', name: 'Galactic Network', era: 7,
@@ -197,14 +197,14 @@ export const techTree = {
     cost: { exoticMatter: 1500, galacticInfluence: 80000, research: 1000000 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Engineer on a cosmic scale',
+    description: 'The ruins at galactic center are tools, not monuments — and they still work',
   },
   intergalacticBeacon: {
     id: 'intergalacticBeacon', name: 'Intergalactic Beacon', era: 8,
     cost: { exoticMatter: 4000, galacticInfluence: 80000, cosmicPower: 80 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: 9,
-    description: 'Signal reaching beyond the galaxy',
+    description: 'The signal format was familiar — it matched the distress call that brought us here',
   },
 
   // Era 9 → 10 (Intergalactic → Multiverse)
@@ -213,14 +213,14 @@ export const techTree = {
     cost: { universalConstants: 10, cosmicPower: 10000, research: 2000000 },
     prerequisites: [],
     grantsEra: null,
-    description: 'Study the fabric of reality',
+    description: 'Reality has seams. The prior civilization found them. So have we',
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
     cost: { universalConstants: 30, cosmicPower: 30000, realityFragments: 15 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
-    description: 'Detect parallel universe signatures',
+    description: 'The signatures are identical to ours — every universe, the same collapse, the same rebirth',
   },
 
   // Optional tech nodes — not required for progression, but give bonuses

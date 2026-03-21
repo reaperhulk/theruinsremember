@@ -79,5 +79,5 @@ export function transitionEra(state, newEra) {
     }
   }
 
-  return { ...state, era: newEra, resources: newResources };
+  return { ...state, era: newEra, resources: newResources, eraStartTime: state.totalTime };
 }

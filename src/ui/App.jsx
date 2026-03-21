@@ -238,6 +238,7 @@ export function App() {
       <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#333', padding: '8px 0 4px' }}>
         v1.0 — {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.tech || {}).length} tech | {Object.keys(state.achievements || {}).length} achievements | Era {state.era}
         {state.prestigeMultiplier > 1 && ` | x${state.prestigeMultiplier.toFixed(1)}`}
+        {` | ${Math.floor(Object.keys(state.upgrades || {}).length / 550 * 100)}% complete`}
       </footer>
     </div>
   );

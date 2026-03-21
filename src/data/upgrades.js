@@ -3012,6 +3012,64 @@ export const upgrades = {
     description: 'The galactic senate halls echo with the voices of civilizations that sat in these same seats.',
     prerequisites: ['voidConduitUpgrade', 'galacticMindUpgrade'],
   },
+
+  // Era 9 cross-chain upgrades
+  voidResonator: {
+    id: 'voidResonator', name: 'Void Resonator', era: 9,
+    cost: { cosmicPower: 200, universalConstants: 10, darkEnergy: 500 },
+    effects: [
+      { type: 'production_mult', target: 'cosmicPower', value: 2 },
+      { type: 'production_add', target: 'universalConstants', value: 2 },
+    ],
+    description: 'Resonates with the void between galaxies, amplifying cosmic power',
+    prerequisites: ['voidBridges', 'entropyReversal'],
+  },
+  constantManipulator: {
+    id: 'constantManipulator', name: 'Constant Manipulator', era: 9,
+    cost: { universalConstants: 30, cosmicPower: 400, exoticMatter: 100 },
+    effects: [
+      { type: 'production_mult', target: 'universalConstants', value: 3 },
+      { type: 'production_add', target: 'cosmicPower', value: 5 },
+    ],
+    description: 'Manipulate universal constants to reshape cosmic power flows',
+    prerequisites: ['voidResonator', 'galaxySeeding'],
+  },
+  intergalacticCapstone: {
+    id: 'intergalacticCapstone', name: 'Intergalactic Capstone', era: 9,
+    cost: { cosmicPower: 600, universalConstants: 50, realityFragments: 5 },
+    effects: [{ type: 'production_mult_all', value: 2.0 }],
+    description: 'Every galaxy in the web pulses with the same rhythm — the heartbeat of a universe that has lived this moment before.',
+    prerequisites: ['voidResonator', 'constantManipulator'],
+  },
+
+  // Era 10 cross-chain upgrades
+  echoForge: {
+    id: 'echoForge', name: 'Echo Forge', era: 10,
+    cost: { quantumEchoes: 100, realityFragments: 80, cosmicPower: 300 },
+    effects: [
+      { type: 'production_mult', target: 'quantumEchoes', value: 3 },
+      { type: 'production_add', target: 'realityFragments', value: 3 },
+    ],
+    description: 'Forge quantum echoes into tangible reality fragments',
+    prerequisites: ['dimensionalAnchors', 'realityWeaving'],
+  },
+  realityCompiler: {
+    id: 'realityCompiler', name: 'Reality Compiler', era: 10,
+    cost: { realityFragments: 150, quantumEchoes: 200, universalConstants: 30 },
+    effects: [
+      { type: 'production_mult', target: 'realityFragments', value: 3 },
+      { type: 'production_add', target: 'quantumEchoes', value: 5 },
+    ],
+    description: 'Compile reality from raw fragments — the universe rewrites itself',
+    prerequisites: ['echoForge', 'parallelProcessing'],
+  },
+  multiverseCapstone: {
+    id: 'multiverseCapstone', name: 'Multiverse Capstone', era: 10,
+    cost: { realityFragments: 300, quantumEchoes: 300, cosmicPower: 500 },
+    effects: [{ type: 'production_mult_all', value: 3.0 }],
+    description: 'The final truth assembles itself: you are the universe experiencing itself, again and again, forever.',
+    prerequisites: ['echoForge', 'realityCompiler'],
+  },
 };
 
 // Balance scaling: multiply upgrade costs by era-dependent factors

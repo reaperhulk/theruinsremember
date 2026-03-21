@@ -157,14 +157,36 @@ export function StatsPanel({ state }) {
           </h3>
           {showCodex && (
             <div className="achievement-list" style={{ marginBottom: '8px' }}>
-              {discoveredLore.map(u => (
-                <div key={u.id} className="achievement earned" style={{ borderLeft: '2px solid #bb88ff' }}>
-                  <span className="achievement-name">{u.name}</span>
-                  <span className="achievement-desc" style={{ color: '#ccaa88', fontStyle: 'italic' }}>{u.description}</span>
+              {(() => {
+                // Group discovered lore by era
+                const byEra = {};
+                for (const u of discoveredLore) {
+                  const era = u.era || 0;
+                  if (!byEra[era]) byEra[era] = [];
+                  byEra[era].push(u);
+                }
+                const sortedEras = Object.keys(byEra).map(Number).sort((a, b) => a - b);
+                return sortedEras.map(era => (
+                  <div key={`era-${era}`}>
+                    <div style={{ fontSize: '0.8em', fontWeight: 'bold', color: '#aa88cc', margin: '6px 0 2px', borderBottom: '1px solid #333' }}>
+                      Era {era}: {eraNames[era] || `Era ${era}`}
+                    </div>
+                    {byEra[era].map(u => (
+                      <div key={u.id} className="achievement earned" style={{ borderLeft: '2px solid #bb88ff', marginLeft: '8px' }}>
+                        <span className="achievement-name">{u.name}</span>
+                        <span className="achievement-desc" style={{ color: '#ccaa88', fontStyle: 'italic' }}>{u.description}</span>
+                      </div>
+                    ))}
+                  </div>
+                ));
+              })()}
+              {loreEvents.length > 0 && (
+                <div style={{ fontSize: '0.8em', fontWeight: 'bold', color: '#aa8866', margin: '6px 0 2px', borderBottom: '1px solid #333' }}>
+                  Echoes & Fragments
                 </div>
-              ))}
+              )}
               {loreEvents.slice(-10).map((e, i) => (
-                <div key={i} className="achievement earned" style={{ borderLeft: '2px solid #888866' }}>
+                <div key={i} className="achievement earned" style={{ borderLeft: '2px solid #888866', marginLeft: '8px' }}>
                   <span className="achievement-desc" style={{ color: '#aa9977', fontStyle: 'italic' }}>{e.message}</span>
                 </div>
               ))}

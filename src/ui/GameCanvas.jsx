@@ -1680,7 +1680,15 @@ export function GameCanvas({ state, onUpdate }) {
           10: 'rgba(255,50,255,1)',   // multiverse magenta
         };
         const color = eraColors[currentEra] || 'rgba(139,233,253,1)';
-        spawnParticles(particlesRef.current, w / 2, h / 2, 40, color, 120);
+        // Large central burst
+        spawnParticles(particlesRef.current, w / 2, h / 2, 50, color, 150);
+        // Secondary ring bursts in white
+        spawnParticles(particlesRef.current, w / 2, h / 2, 20, 'rgba(255,255,255,0.9)', 100);
+        // Corner bursts for drama
+        spawnParticles(particlesRef.current, w * 0.2, h * 0.3, 10, color, 80);
+        spawnParticles(particlesRef.current, w * 0.8, h * 0.3, 10, color, 80);
+        spawnParticles(particlesRef.current, w * 0.2, h * 0.7, 10, color, 80);
+        spawnParticles(particlesRef.current, w * 0.8, h * 0.7, 10, color, 80);
         prevEraRef.current = currentEra;
       }
 

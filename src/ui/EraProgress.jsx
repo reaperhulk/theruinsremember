@@ -132,6 +132,7 @@ export function EraProgress({ state }) {
       )}
       <div className="era-stats">
         <span>{formatTime(state.totalTime)}</span>
+        <span> | era: {formatTime(state.totalTime - (state.eraStartTime || 0))}</span>
         <span> | {upgradeCount} upgrades | {techCount} tech</span>
         {(state.totalGems || 0) > 0 && <span> | {state.totalGems} gems</span>}
         {state.prestigeMultiplier > 1 && (

@@ -35,6 +35,7 @@ export function createInitialState() {
     // Trading (Era 6+)
     totalTrades: 0,
     // Era time tracking
+    eraStartTime: 0,    // totalTime when current era began
     bestEraTimes: {},
     // Prestige
     prestigeCount: 0,

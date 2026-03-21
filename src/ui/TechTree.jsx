@@ -131,8 +131,17 @@ export function TechTree({ state, onUpdate }) {
                 </div>
               )}
               {tech.excludes && (
-                <div className="tech-prereqs" style={{ color: '#ff8866' }}>
-                  Choose one: excludes {techTree[tech.excludes]?.name || tech.excludes}
+                <div className="tech-prereqs" style={{
+                  color: '#ffcc44',
+                  background: 'rgba(255,204,68,0.1)',
+                  border: '1px solid rgba(255,204,68,0.3)',
+                  borderRadius: '3px',
+                  padding: '2px 6px',
+                  marginTop: '2px',
+                  fontWeight: 'bold',
+                  fontSize: '0.85em',
+                }}>
+                  ⚠ Choose one: {tech.name} OR {techTree[tech.excludes]?.name || tech.excludes}
                 </div>
               )}
               {!affordable && (() => {
