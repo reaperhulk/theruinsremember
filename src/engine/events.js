@@ -9,7 +9,7 @@ const BASE_EVENT_CHANCE = 0.02; // 2% per second of gameplay
 // `roll` is optional 0-1 number for deterministic testing.
 // Returns { state, event } where event is the triggered event object or null.
 export function checkForEvent(state, dt, roll = Math.random()) {
-  if (state.era < 2) return { state, event: null };
+  if (state.era < 1) return { state, event: null };
 
   // Event Magnet prestige upgrade: 50% more events
   const hasEventMagnet = state.prestigeUpgrades && state.prestigeUpgrades.eventMagnet;
@@ -22,9 +22,16 @@ export function checkForEvent(state, dt, roll = Math.random()) {
   const eligible = getEligibleEvents(state.era);
   if (eligible.length === 0) return { state, event: null };
 
-  // Pick a deterministic event based on roll position within the eligible set
-  const index = Math.floor((roll / chance) * eligible.length) % eligible.length;
-  const event = eligible[index];
+  // Pick event using weighted selection — events with a `chance` field are rarer
+  const weights = eligible.map(e => e.chance || 1);
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+  const target = (roll / chance) * totalWeight;
+  let cumulative = 0;
+  let event = eligible[0];
+  for (let i = 0; i < eligible.length; i++) {
+    cumulative += weights[i];
+    if (target < cumulative) { event = eligible[i]; break; }
+  }
 
   const newState = applyEvent(state, event);
   return { state: newState, event };

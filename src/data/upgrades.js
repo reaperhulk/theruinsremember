@@ -2616,6 +2616,121 @@ export const upgrades = {
 
   // Era 8: blockchain (era 3) + galacticSenate (era 8) → boosts data AND galactic influence
   galacticLedger: { id: 'galacticLedger', name: 'Galactic Ledger', era: 8, cost: { galacticInfluence: 200, data: 120, research: 150 }, effects: [{ type: 'production_mult', target: 'data', value: 12 }, { type: 'production_add', target: 'galacticInfluence', value: 6.4 }], description: 'Early blockchain principles govern galactic trade — trust at cosmic scale', prerequisites: ['blockchain', 'galacticSenate'] },
+
+  // --- Lore upgrades: Ruins of the Precursors ---
+  // A narrative thread about discovering remnants of a prior civilization
+  // that followed the exact same path — and fell.
+
+  // Era 6: Ancient FTL beacons and star maps to dead civilizations
+  precursorBeacon: {
+    id: 'precursorBeacon', name: 'Precursor Beacon', era: 6,
+    cost: { starSystems: 10, darkEnergy: 40, research: 200 },
+    effects: [
+      { type: 'production_mult', target: 'starSystems', value: 2 },
+      { type: 'production_mult', target: 'darkEnergy', value: 2 },
+    ],
+    description: 'An ancient beacon pulses in the void — its signal predates this galaxy. Someone was here before. Someone exactly like us.',
+    prerequisites: ['stellarCartography', 'dysonSwarms'],
+  },
+  deadStarAtlas: {
+    id: 'deadStarAtlas', name: 'Dead Star Atlas', era: 6,
+    cost: { research: 250, starSystems: 15, galacticInfluence: 20 },
+    effects: [
+      { type: 'production_mult', target: 'research', value: 3 },
+      { type: 'cap_mult', target: 'starSystems', value: 3 },
+    ],
+    description: 'The beacon contained star maps — thousands of civilizations, all charted, all marked as extinct. Every one reached interstellar flight. None survived what came next.',
+    prerequisites: ['precursorBeacon', 'aiGovernance'],
+  },
+
+  // Era 7: A Dyson sphere already built, abandoned technology that mirrors ours
+  hollowDyson: {
+    id: 'hollowDyson', name: 'Hollow Dyson', era: 7,
+    cost: { megastructures: 15, stellarForge: 25, research: 300 },
+    effects: [
+      { type: 'production_mult', target: 'megastructures', value: 3 },
+      { type: 'production_mult', target: 'stellarForge', value: 2 },
+    ],
+    description: 'We found a Dyson sphere already built around a dead star. Its architecture is identical to ours — down to the bolt patterns. This is not coincidence.',
+    prerequisites: ['dysonSphere', 'starLifting'],
+  },
+  echoBlueprint: {
+    id: 'echoBlueprint', name: 'Echo Blueprint', era: 7,
+    cost: { research: 400, megastructures: 20, darkEnergy: 80 },
+    effects: [
+      { type: 'production_mult', target: 'research', value: 5 },
+      { type: 'cap_mult', target: 'megastructures', value: 3 },
+    ],
+    description: 'Inside the Hollow Dyson: schematics for a Matrioshka Brain. Their design is ours — published under names we almost recognize. The handwriting looks like mine.',
+    prerequisites: ['hollowDyson', 'matrioshkaBrain'],
+  },
+
+  // Era 8: The ruins span galaxies — every species reaches this point
+  galacticOssuary: {
+    id: 'galacticOssuary', name: 'Galactic Ossuary', era: 8,
+    cost: { galacticInfluence: 400, exoticMatter: 60, darkEnergy: 150 },
+    effects: [
+      { type: 'production_mult', target: 'galacticInfluence', value: 3 },
+      { type: 'production_mult', target: 'exoticMatter', value: 2 },
+    ],
+    description: 'Every galaxy we enter contains the same ruins. Billions of species, billions of timelines — all reaching wormhole technology, all building senates, all gone. The galaxy is a graveyard dressed as a frontier.',
+    prerequisites: ['wormholeNetwork', 'galacticSenate'],
+  },
+  convergenceCodex: {
+    id: 'convergenceCodex', name: 'Convergence Codex', era: 8,
+    cost: { research: 600, exoticMatter: 80, galacticInfluence: 300 },
+    effects: [
+      { type: 'production_mult', target: 'research', value: 8 },
+      { type: 'cap_mult', target: 'exoticMatter', value: 3 },
+    ],
+    description: 'A codex recovered from the ossuary, written in every known language simultaneously. It describes the exact sequence of technologies we have followed. The next page describes technologies we have not yet built — and it is correct.',
+    prerequisites: ['galacticOssuary', 'matterReplicators'],
+  },
+
+  // Era 9: The pattern is universal — every civilization falls at the same stage
+  universalTombstone: {
+    id: 'universalTombstone', name: 'Universal Tombstone', era: 9,
+    cost: { universalConstants: 15, cosmicPower: 400, exoticMatter: 200 },
+    effects: [
+      { type: 'production_mult', target: 'universalConstants', value: 3 },
+      { type: 'production_mult', target: 'cosmicPower', value: 3 },
+    ],
+    description: 'A structure older than the universe, inscribed with one message in the language of mathematics: "You are iteration 7,832,040,991. You will build the Bridge. You will press the button. You always do."',
+    prerequisites: ['voidBridges', 'entropyReversal'],
+  },
+  inevitabilityEngine: {
+    id: 'inevitabilityEngine', name: 'Inevitability Engine', era: 9,
+    cost: { realityFragments: 6, universalConstants: 18, cosmicPower: 500 },
+    effects: [
+      { type: 'production_mult', target: 'realityFragments', value: 3 },
+      { type: 'cap_mult', target: 'universalConstants', value: 5 },
+    ],
+    description: 'The engine was already running when we found it. It does not create power — it creates inevitability. Every civilization that discovers it feels compelled to activate it. We activated it before we understood what it does.',
+    prerequisites: ['universalTombstone', 'galaxySeeding'],
+  },
+
+  // Era 10: The cycle spans realities — prestige IS the cycle repeating
+  recursionScar: {
+    id: 'recursionScar', name: 'Recursion Scar', era: 10,
+    cost: { quantumEchoes: 60, realityFragments: 150, universalConstants: 25 },
+    effects: [
+      { type: 'production_mult', target: 'quantumEchoes', value: 5 },
+      { type: 'production_mult', target: 'realityFragments', value: 3 },
+    ],
+    description: 'The multiverse is scarred — recursive loops where reality has been reset and rebuilt, over and over. The scars match our technology tree exactly. Prestige is not a game mechanic. It is what the precursors did. It is what we are doing. It is all anyone has ever done.',
+    prerequisites: ['realityWeaving', 'dimensionalAnchors'],
+  },
+  finalIteration: {
+    id: 'finalIteration', name: 'Final Iteration', era: 10,
+    cost: { quantumEchoes: 100, realityFragments: 200, universalConstants: 40, cosmicPower: 600 },
+    effects: [
+      { type: 'production_mult', target: 'quantumEchoes', value: 8 },
+      { type: 'production_mult', target: 'universalConstants', value: 5 },
+      { type: 'cap_mult', target: 'realityFragments', value: 5 },
+    ],
+    description: 'There are no precursors. There is no "before." The ruins are ours — left by us, in a previous loop, for us to find. The message carved into the final wall reads: "We tried to stop. We could not. Neither will you. See you next time."',
+    prerequisites: ['recursionScar', 'omniscienceEngine'],
+  },
 };
 
 // Balance scaling: multiply upgrade costs by era-dependent factors

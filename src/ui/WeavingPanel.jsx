@@ -1,5 +1,5 @@
 import { drawFragment, resolveWeave, clearGrid, getWeavingStats } from '../engine/weaving.js';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const TYPE_COLORS = {
   temporal: '#ff8866',
@@ -11,6 +11,8 @@ const TYPE_COLORS = {
 
 export function WeavingPanel({ state, onUpdate }) {
   const [lastMatch, setLastMatch] = useState(null);
+  const [borderFlash, setBorderFlash] = useState(null);
+  const flashRef = useRef(null);
   const stats = getWeavingStats(state);
   const grid = stats.grid;
 
@@ -25,6 +27,11 @@ export function WeavingPanel({ state, onUpdate }) {
     onUpdate(s => {
       const { state: newState, matched, matchType } = resolveWeave(s);
       setLastMatch(matched ? matchType : null);
+      if (matched && matchType) {
+        clearTimeout(flashRef.current);
+        setBorderFlash(matchType);
+        flashRef.current = setTimeout(() => setBorderFlash(null), 600);
+      }
       return newState;
     });
   };
@@ -44,7 +51,8 @@ export function WeavingPanel({ state, onUpdate }) {
     ['temporal','spatial','causal','quantum'].some(t => ((counts[t]||0) + chaosCount) >= 3);
 
   return (
-    <div className="panel weaving-panel">
+    <div className={`panel weaving-panel${borderFlash ? ' weave-match-flash' : ''}`}
+      style={borderFlash ? { '--weave-flash-color': TYPE_COLORS[borderFlash] } : undefined}>
       <h2>Reality Weaving{stats.totalWeaves > 0 ? ` (${stats.totalWeaves} weaves)` : ''}</h2>
       <div className="dock-info">
         <span>Weaves: {stats.totalWeaves}</span>

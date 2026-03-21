@@ -9,8 +9,10 @@ export function HackingPanel({ state, onUpdate }) {
   const [lastResult, setLastResult] = useState(null);
   const [sequenceVisible, setSequenceVisible] = useState(true);
   const [countdown, setCountdown] = useState(0);
+  const [flashClass, setFlashClass] = useState('');
   const timerRef = useRef(null);
   const countdownRef = useRef(null);
+  const flashRef = useRef(null);
   const challenge = state.hackChallenge;
   const successes = state.hackSuccesses || 0;
   const difficulty = state.hackDifficulty || 0;
@@ -58,6 +60,9 @@ export function HackingPanel({ state, onUpdate }) {
       onUpdate(s => {
         const { state: newState, success } = submitHack(s, newInput);
         setLastResult(success ? 'success' : 'fail');
+        clearTimeout(flashRef.current);
+        setFlashClass(success ? 'hack-success-flash' : 'hack-fail-flash');
+        flashRef.current = setTimeout(() => setFlashClass(''), 500);
         setPlayerInput([]);
         return newState;
       });
@@ -65,11 +70,20 @@ export function HackingPanel({ state, onUpdate }) {
   };
 
   return (
-    <div className="panel hacking-panel">
+    <div className={`panel hacking-panel ${flashClass}`}>
       <h2>Hacking{successes > 0 ? ` (${successes} completed)` : ''}</h2>
       <div className="hack-info">
         <span>Hacks: {successes}</span>
         <span>Difficulty: {difficulty}</span>
+      </div>
+      <div style={{ height: '6px', background: '#222', borderRadius: '3px', margin: '4px 0' }}>
+        <div style={{
+          height: '100%',
+          width: `${(difficulty / 10) * 100}%`,
+          background: difficulty >= 8 ? '#ff4444' : difficulty >= 5 ? '#ffaa44' : '#44aa44',
+          borderRadius: '3px',
+          transition: 'width 0.3s ease',
+        }} />
       </div>
       {!challenge ? (
         <div>

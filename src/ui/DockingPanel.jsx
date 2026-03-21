@@ -4,6 +4,8 @@ import { attemptDock, getDockingInfo, getIndicatorPosition } from '../engine/doc
 export function DockingPanel({ state, onUpdate }) {
   const [lastResult, setLastResult] = useState(null);
   const [position, setPosition] = useState(0);
+  const [comboFlash, setComboFlash] = useState(false);
+  const prevComboRef = useRef(state.dockingCombo || 0);
   const animRef = useRef(null);
   const startTimeRef = useRef(performance.now());
 
@@ -19,6 +21,17 @@ export function DockingPanel({ state, onUpdate }) {
 
   const info = getDockingInfo(state);
   const combo = state.dockingCombo || 0;
+
+  // Detect combo increase and trigger flash
+  useEffect(() => {
+    if (combo > prevComboRef.current) {
+      setComboFlash(true);
+      const t = setTimeout(() => setComboFlash(false), 300);
+      prevComboRef.current = combo;
+      return () => clearTimeout(t);
+    }
+    prevComboRef.current = combo;
+  }, [combo]);
   const lastDock = state.lastDockTime || 0;
   const cooldownRemaining = Math.max(0, 2 - (state.totalTime - lastDock));
   const onCooldown = cooldownRemaining > 0;
@@ -42,7 +55,7 @@ export function DockingPanel({ state, onUpdate }) {
       <div className="dock-info">
         <span>Docks: {info.successes}/{info.attempts}{info.attempts > 0 && ` (${Math.floor(info.successes/info.attempts*100)}%)`}</span>
         <span>Perfect: {info.perfects}</span>
-        {combo > 0 && <span style={{ color: '#ffdd44' }}>Combo: x{combo} (+{Math.min(combo, 5) * 20}%)</span>}
+        {combo > 0 && <span className={comboFlash ? 'combo-flash' : ''} style={{ color: '#ffdd44', display: 'inline-block' }}>Combo: x{combo} (+{Math.min(combo, 5) * 20}%)</span>}
       </div>
       <div className="dock-bar">
         <div className="dock-zone" style={{ left: `${zoneLeft}%`, width: `${zoneWidth}%` }} />

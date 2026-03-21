@@ -37,10 +37,10 @@ describe('events', () => {
   });
 
   describe('checkForEvent', () => {
-    it('returns null event for era 1', () => {
+    it('can trigger events at era 1', () => {
       const state = makeState({ era: 1 });
       const { event } = checkForEvent(state, 1, 0.001);
-      expect(event).toBeNull();
+      expect(event).not.toBeNull();
     });
 
     it('can trigger events at era 2', () => {
