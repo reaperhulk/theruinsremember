@@ -99,13 +99,13 @@ export function ResourcePanel({ state, onUpdate }) {
                           </span>
                         )}
                         {r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0 && (
-                          <span style={{ fontSize: '0.6em', color: '#ff6644', marginLeft: '4px' }}>FULL</span>
+                          <span className="text-danger" style={{ fontSize: '0.6em', marginLeft: '4px' }}>FULL</span>
                         )}
                       </span>
                       <span className="resource-rate">
                         {r.rate > 0 ? (() => {
                           const net = getNetRate(state, r.id);
-                          const isConsumed = ['food','energy','rocketFuel'].includes(r.id) && net < r.rate;
+                          const isConsumed = ['food','energy','rocketFuel','exoticMaterials','stellarForge'].includes(r.id) && net < r.rate;
                           if (isConsumed) {
                             return <>
                               {net > 0 && <span className="rate-active" />}

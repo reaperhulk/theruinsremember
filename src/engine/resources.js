@@ -33,6 +33,14 @@ export function getNetRate(state, resourceId) {
     const orbRate = getEffectiveRate(state, 'orbitalInfra');
     return grossRate - orbRate * 0.5;
   }
+  if (resourceId === 'exoticMaterials' && state.era >= 5) {
+    const colonyRate = getEffectiveRate(state, 'colonies');
+    return grossRate - colonyRate * 0.2;
+  }
+  if (resourceId === 'stellarForge' && state.era >= 7) {
+    const megaRate = getEffectiveRate(state, 'megastructures');
+    return grossRate - megaRate * 0.3;
+  }
   return grossRate;
 }
 

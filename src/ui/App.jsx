@@ -48,6 +48,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState('upgrades');
   const [shakeClass, setShakeClass] = useState('');
   const [flashClass, setFlashClass] = useState('');
+  const [hintsDismissed, setHintsDismissed] = useState(false);
   const prevEventsRef = useRef(state.eventLog?.length || 0);
   const prevPerfectsRef = useRef(state.dockingPerfects || 0);
 
@@ -184,17 +185,19 @@ export function App() {
       </header>
 
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
-      {state.totalTime < 30 && Object.keys(state.upgrades).length === 0 && (
+      {!hintsDismissed && state.totalTime < 30 && Object.keys(state.upgrades).length === 0 && (
         <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '4px 0', opacity: Math.max(0, 1 - state.totalTime / 30) }}>
           Click resources to gather | Buy upgrades to boost production | Space to mine
+          <span onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em' }} title="Dismiss hints">&times;</span>
         </div>
       )}
       <EraTransition era={state.era} />
       <Toast state={state} />
       <EraProgress state={state} />
-      {state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
-        <div style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '2px 0' }}>
+      {!hintsDismissed && state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
+        <div style={{ textAlign: 'center', fontSize: '0.75em', color: '#666', padding: '2px 0', position: 'relative' }}>
           Gather resources by clicking +1 buttons. Buy upgrades to automate production.
+          <span onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em' }} title="Dismiss hints">&times;</span>
         </div>
       )}
 

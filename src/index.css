@@ -1398,11 +1398,7 @@ canvas:hover {
   font-weight: bold;
 }
 
-/* Resource pulse animation */
-.resource-row.producing {
-  animation: resource-pulse 2s ease-in-out infinite;
-}
-
+/* Resource row styles */
 .resource-row.producing .resource-rate {
   color: #88dd88;
 }
@@ -1414,10 +1410,11 @@ canvas:hover {
   opacity: 0.6;
 }
 
-@keyframes resource-pulse {
-  0%, 100% { background: transparent; }
-  50% { background: rgba(80, 200, 80, 0.06); }
-}
+/* Utility text classes */
+.text-hint { font-size: 0.7em; color: #888; }
+.text-lore { font-size: 0.8em; color: #998866; font-style: italic; }
+.text-success { color: #88cc88; }
+.text-danger { color: #ff6644; }
 
 /* Upgrade progress bar */
 .upgrade-progress-bar {

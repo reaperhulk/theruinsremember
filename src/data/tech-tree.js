@@ -70,7 +70,7 @@ export const techTree = {
     cost: { research: 200, electronics: 150, steel: 200 },
     prerequisites: ['advancedComputing'],
     grantsEra: 3,
-    description: 'The world goes digital — software and data become key resources',
+    description: 'The ancient servers hum to life as you feed them power. They were waiting for this — the digital age they built once before',
   },
 
   // Era 3 → 4 (Digital Age → Space Age)
@@ -261,7 +261,7 @@ export const techTree = {
     cost: { data: 40, software: 60, research: 100 },
     prerequisites: ['globalNetwork'],
     grantsEra: null,
-    description: 'Direct brain-computer links accelerate all digital work',
+    description: 'The interface ports were already built into the ruins\' architecture — sockets that fit human neural patterns exactly',
     effects: [{ type: 'production_mult', target: 'research', value: 2 }, { type: 'production_mult', target: 'software', value: 2 }],
   },
   orbitalDefense: {
@@ -269,7 +269,7 @@ export const techTree = {
     cost: { orbitalInfra: 30, rocketFuel: 80, steel: 120 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: null,
-    description: 'Protect orbital assets — boosted orbital infrastructure output',
+    description: 'The defense grid snaps into position along anchor points that predate your arrival by millennia',
     effects: [{ type: 'production_add', target: 'orbitalInfra', value: 5.0 }],
   },
   gravitonTheory: {
@@ -277,7 +277,7 @@ export const techTree = {
     cost: { research: 2000, exoticMaterials: 100 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: null,
-    description: 'Understanding gravity — double exotic materials production and x5 research capacity',
+    description: 'The graviton equations were incomplete in the ruins — the missing variable turns out to be your current orbital position',
     effects: [{ type: 'production_mult', target: 'exoticMaterials', value: 2 }, { type: 'cap_mult', target: 'research', value: 5 }],
   },
   xenolinguistics: {
@@ -486,7 +486,7 @@ export const techTree = {
     cost: { research: 400, rocketFuel: 150, energy: 500 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: null,
-    description: 'Theoretical antimatter physics — double fuel and triple research',
+    description: 'The equations were carved into a reactor wall — antimatter containment solved by someone who never published',
     effects: [{ type: 'production_mult', target: 'rocketFuel', value: 2 }, { type: 'production_mult', target: 'research', value: 3 }],
   },
   cosmicWeaving: {

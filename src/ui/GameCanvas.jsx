@@ -418,8 +418,11 @@ function drawEra3(ctx, w, h, t, state) {
   ctx.fillRect(issX - 12, issY - 3, 4, 6);
   ctx.fillRect(issX + 8, issY - 3, 4, 6);
 
-  // Rocket launch
-  const rocketCycle = (t * 0.25) % 4;
+  // Rocket launch — frequency scales with rocketFuel production
+  const fuelRate = state ? ((state.resources?.rocketFuel?.baseRate || 0) + (state.resources?.rocketFuel?.rateAdd || 0)) * (state.resources?.rocketFuel?.rateMult || 1) : 0;
+  const launchFrequency = Math.max(0.1, 2 - fuelRate * 0.1);
+  const rocketSpeed = 1 / (launchFrequency * 4);
+  const rocketCycle = (t * rocketSpeed) % 4;
   if (rocketCycle < 2.5) {
     const progress = Math.min(rocketCycle / 2.5, 1);
     const rx = w * 0.75;
@@ -1190,27 +1193,47 @@ function drawDigitalAge(ctx, w, h, t, state) {
   ctx.fillStyle = '#0a0e1a';
   ctx.fillRect(0, 0, w, h);
 
-  // Grid lines (circuit traces)
+  // Grid lines (circuit traces) — density scales with upgrade count
+  const gridSpacing = Math.max(10, 20 - Math.floor(Object.keys(state?.upgrades || {}).length / 8));
   ctx.strokeStyle = 'rgba(0, 200, 100, 0.08)';
   ctx.lineWidth = 1;
-  for (let x = 0; x < w; x += 20) {
+  for (let x = 0; x < w; x += gridSpacing) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
     ctx.lineTo(x, h);
     ctx.stroke();
   }
-  for (let y = 0; y < h; y += 20) {
+  for (let y = 0; y < h; y += gridSpacing) {
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(w, y);
     ctx.stroke();
   }
 
+  // Data streams that intensify with software/data production rate
+  const softwareRate = state ? ((state.resources?.software?.baseRate || 0) + (state.resources?.software?.rateAdd || 0)) * (state.resources?.software?.rateMult || 1) : 0;
+  const dataRate = state ? ((state.resources?.data?.baseRate || 0) + (state.resources?.data?.rateAdd || 0)) * (state.resources?.data?.rateMult || 1) : 0;
+  const streamIntensity = Math.min(1, (softwareRate + dataRate) * 0.05);
+  if (streamIntensity > 0.01) {
+    for (let i = 0; i < Math.floor(6 + streamIntensity * 12); i++) {
+      const sx = (i * 37 + Math.floor(t * 60)) % w;
+      const sy = 0;
+      const streamLen = h * (0.3 + streamIntensity * 0.7);
+      const alpha = 0.03 + streamIntensity * 0.08;
+      ctx.strokeStyle = `rgba(0, 255, 180, ${alpha})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx, sy + streamLen);
+      ctx.stroke();
+    }
+  }
+
   // Pulsing data nodes at intersections
   const rng = seededRandom(42);
   for (let i = 0; i < 15; i++) {
-    const nx = Math.floor(rng() * 14) * 20;
-    const ny = Math.floor(rng() * 9) * 20;
+    const nx = Math.floor(rng() * 14) * gridSpacing;
+    const ny = Math.floor(rng() * 9) * gridSpacing;
     const pulse = 0.5 + 0.5 * Math.sin(t * 3 + i * 1.7);
     ctx.fillStyle = `rgba(0, 255, 150, ${0.3 + pulse * 0.5})`;
     ctx.beginPath();
@@ -1221,7 +1244,7 @@ function drawDigitalAge(ctx, w, h, t, state) {
   // Flowing data packets along traces
   for (let i = 0; i < 8; i++) {
     const speed = 40 + i * 15;
-    const y = 20 + (i % 7) * 20;
+    const y = gridSpacing + (i % 7) * gridSpacing;
     const x = ((t * speed + i * 80) % (w + 20)) - 10;
     ctx.fillStyle = `rgba(100, 200, 255, ${0.6 + 0.4 * Math.sin(t * 5 + i)})`;
     ctx.fillRect(x, y - 1, 6, 2);
@@ -1535,9 +1558,13 @@ function drawFloatingTexts(ctx, floatingTexts) {
     const alpha = 1 - progress;
     const yOffset = progress * 25;
     ctx.save();
-    ctx.font = 'bold 11px monospace';
+    // Scale font size with gather amount
+    const amountMatch = ft.label.match(/\+(\d+)/);
+    const gatherAmount = amountMatch ? parseInt(amountMatch[1], 10) : 1;
+    const fontSize = gatherAmount >= 100 ? 16 : gatherAmount >= 10 ? 13 : 11;
+    ctx.font = `bold ${fontSize}px monospace`;
     ctx.textAlign = 'center';
-    ctx.fillStyle = `rgba(255,255,100,${alpha})`;
+    ctx.fillStyle = gatherAmount >= 100 ? `rgba(255,200,50,${alpha})` : `rgba(255,255,100,${alpha})`;
     ctx.strokeStyle = `rgba(0,0,0,${alpha * 0.7})`;
     ctx.lineWidth = 2;
     ctx.strokeText(ft.label, ft.x, ft.y - yOffset);
@@ -1629,6 +1656,7 @@ export function GameCanvas({ state, onUpdate }) {
   const particlesRef = useRef([]);
   const prevGemsRef = useRef(state.totalGems || 0);
   const prevEraRef = useRef(state.era);
+  const prevUpgradeCountRef = useRef(Object.keys(state.upgrades || {}).length);
   const bonusOrbRef = useRef(null); // { x, y, spawnTime, type, resource }
   const lastOrbTimeRef = useRef(performance.now() / 1000);
   const nextOrbDelayRef = useRef(30 + Math.random() * 60); // 30-90s
@@ -1789,6 +1817,17 @@ export function GameCanvas({ state, onUpdate }) {
         default: drawEra1(ctx, w, h, t, state); break;
       }
 
+      // Clickable element hint glows
+      const clickableEls = getClickableElements(era, w, h, t);
+      for (const el of clickableEls) {
+        if (el.type === 'space' || el.type === 'ground' || el.type === 'factory' || el.type === 'conveyor') continue;
+        ctx.strokeStyle = `rgba(255, 255, 200, ${0.15 + 0.1 * Math.sin(t * 2)})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(el.x, el.y, (el.r > 100 ? 20 : el.r) + 3, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
       // Production intensity glow
       const totalRate = Object.values(state?.resources || {})
         .filter(r => r.unlocked)
@@ -1865,13 +1904,17 @@ export function GameCanvas({ state, onUpdate }) {
         const chosenResource = possibleRes[Math.floor(Math.random() * possibleRes.length)];
         const types = ['burst', 'frenzy', 'lucky'];
         const chosenType = types[Math.floor(Math.random() * types.length)];
+        const orbX = 20 + Math.random() * (w - 40);
+        const orbY = 20 + Math.random() * (h - 40);
         bonusOrbRef.current = {
-          x: 20 + Math.random() * (w - 40),
-          y: 20 + Math.random() * (h - 40),
+          x: orbX,
+          y: orbY,
           spawnTime: t,
           type: chosenType,
           resource: chosenResource,
         };
+        // Spawn sparkle burst to draw the eye
+        spawnParticles(particlesRef.current, orbX, orbY, 12, 'rgba(255,221,100,0.8)', 40);
       }
 
       // Expire orb after 8 seconds
@@ -1910,6 +1953,19 @@ export function GameCanvas({ state, onUpdate }) {
         ctx.textBaseline = 'middle';
         ctx.fillText('\u2605', orb.x, orb.y);
         ctx.restore();
+      }
+
+      // Spawn particles when upgrade purchased
+      const currentUpgradeCount = Object.keys(stateRef.current?.upgrades || {}).length;
+      if (currentUpgradeCount > prevUpgradeCountRef.current) {
+        const eraColors = {
+          1: 'rgba(100,200,100,1)', 2: 'rgba(255,180,50,1)', 3: 'rgba(0,200,255,1)',
+          4: 'rgba(200,200,255,1)', 5: 'rgba(255,200,100,1)', 6: 'rgba(100,150,255,1)',
+          7: 'rgba(255,100,50,1)', 8: 'rgba(180,100,255,1)', 9: 'rgba(50,255,200,1)',
+          10: 'rgba(255,50,255,1)',
+        };
+        spawnParticles(particlesRef.current, w / 2, h / 2, 10, eraColors[era] || 'rgba(100,200,100,1)');
+        prevUpgradeCountRef.current = currentUpgradeCount;
       }
 
       // Spawn particles on gem find (detect change)

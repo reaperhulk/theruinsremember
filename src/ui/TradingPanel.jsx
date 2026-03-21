@@ -78,7 +78,7 @@ export function TradingPanel({ state, onUpdate }) {
                   };
                 })}
               >
-                {qt.from.def.name} → {qt.to.def.name} ({tradeAmount} units)
+                {qt.from.def.name} → {qt.to.def.name} ({tradeAmount} units, {qt.ratio.input}:{qt.ratio.output})
               </button>
             );
           })}

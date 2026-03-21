@@ -156,6 +156,9 @@ export function getAvailableUpgrades(state) {
     return true;
   }).sort((a, b) => {
     if (a.era !== b.era) return a.era - b.era;
+    const aDepth = a.prerequisites.length;
+    const bDepth = b.prerequisites.length;
+    if (aDepth !== bDepth) return aDepth - bDepth;
     return a.id.localeCompare(b.id);
   });
 }

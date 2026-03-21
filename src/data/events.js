@@ -52,7 +52,7 @@ export const events = {
   alienSignal: {
     id: 'alienSignal',
     name: 'Alien Signal',
-    description: 'A decoded alien transmission reveals advanced knowledge!',
+    description: 'The signal isn\'t alien — the carrier wave matches your ship\'s communication standard. The message is a research paper, dated forty thousand years from now.',
     minEra: 4,
     type: 'instant',
     effect: { resourceId: 'research', amount: 100 },
@@ -60,7 +60,7 @@ export const events = {
   meteorShower: {
     id: 'meteorShower',
     name: 'Meteor Shower',
-    description: 'Meteors rain down raw materials on the surface!',
+    description: 'The meteors fall in a pattern — concentric rings centered on the ruins. Each fragment contains refined alloys that shouldn\'t exist in nature.',
     minEra: 4,
     type: 'instant',
     effect: { resourceId: 'materials', amount: 200 },
@@ -68,7 +68,7 @@ export const events = {
   researchBreakthrough: {
     id: 'researchBreakthrough',
     name: 'Research Breakthrough',
-    description: 'Scientists make a breakthrough — research speed doubled!',
+    description: 'A researcher falls asleep at her desk and wakes with the solution fully formed — equations she never learned, in handwriting that isn\'t hers.',
     minEra: 4,
     type: 'timed',
     duration: 45,
@@ -545,7 +545,7 @@ export const events = {
   materialsBonanza: {
     id: 'materialsBonanza',
     name: 'Materials Bonanza',
-    description: 'Rich deposits uncovered!',
+    description: 'Excavators break through into a sealed cavern packed with pre-sorted ore — stacked in bins, labeled in a script no one can read. Someone stockpiled this.',
     minEra: 2,
     type: 'instant',
     effect: { resourceId: 'materials', amount: 80 },
@@ -724,7 +724,7 @@ export const events = {
   cometImpact: {
     id: 'cometImpact',
     name: 'Comet Impact',
-    description: 'A comet delivers rare materials from deep space!',
+    description: 'The comet\'s trajectory was too precise to be natural. It delivered its payload of exotic minerals to exactly the right coordinates — as if answering a requisition filed millennia ago.',
     minEra: 5,
     type: 'instant',
     effect: { resourceId: 'exoticMaterials', amount: 80 },
@@ -1455,16 +1455,22 @@ export const events = {
   storyAncientFoundation: { id: 'storyAncientFoundation', name: 'The Foundation Beneath', description: 'The crash site sits on bedrock — or what you thought was bedrock. Ground-penetrating scans reveal a grid of foundations extending kilometers in every direction. Your landing site isn\'t random. It\'s an address.', minEra: 1, chance: 0.006, type: 'instant', effect: { resourceId: 'energy', amount: 15 } },
 
   // Era 2: Industrialization — Buried machinery, sealed chamber, factory ruins
+  storyWorkshopGhost: { id: 'storyWorkshopGhost', name: 'Workshop Ghost', description: 'A factory worker swears the assembly line moved on its own overnight — the conveyor alignment matches blueprints no one drew.', minEra: 2, chance: 0.006, type: 'instant', effect: { resourceId: 'steel', amount: 35 } },
+
   storyBuriedGears: { id: 'storyBuriedGears', name: 'Buried Gears', description: 'A mining shaft breaks into a cavity. Inside, gears the size of houses — frozen mid-turn, their teeth worn smooth by centuries of operation before whatever stopped them. The lubricant is synthetic. Identical to yours.', minEra: 2, chance: 0.006, type: 'instant', effect: { resourceId: 'steel', amount: 40 } },
   storySealedChamber: { id: 'storySealedChamber', name: 'The Sealed Chamber', description: 'Behind a door that took three days to cut open: a workshop, hermetically sealed, tools hanging on pegboards. A wrench fits your bolts. A caliper reads your units. Dust covers everything. No footprints but yours.', minEra: 2, chance: 0.006, type: 'instant', effect: { resourceId: 'research', amount: 50 } },
   storyMirrorFactory: { id: 'storyMirrorFactory', name: 'Mirror Factory', description: 'The ancient assembly line stretches into darkness. Your engineers walk it in silence. Every station, every conveyor, every safety rail — it\'s their factory. The one they designed last month. Built ten thousand years ago.', minEra: 2, chance: 0.006, type: 'instant', effect: { resourceId: 'electronics', amount: 20 } },
 
   // Era 3: Digital Age — Ancient data storage, holographic message, digital ghosts
+  storyDigitalPhantom: { id: 'storyDigitalPhantom', name: 'Digital Phantom', description: 'A subroutine appears in the network that no one wrote. It optimizes power distribution perfectly. Its creation date is three thousand years ago.', minEra: 3, chance: 0.006, type: 'instant', effect: { resourceId: 'software', amount: 30 } },
+
   storyFragmentaryRecording: { id: 'storyFragmentaryRecording', name: 'Fragmentary Recording', description: 'The ancient storage medium yields 0.003% of its data. Enough for twelve seconds of video: a city skyline, children playing, a sunset. The architecture is wrong but the people — the people look like us.', minEra: 3, chance: 0.006, type: 'instant', effect: { resourceId: 'data', amount: 35 } },
   storyHolographicMessage: { id: 'storyHolographicMessage', name: 'Holographic Message', description: 'The projector activates without warning. A figure appears — human-shaped, human-faced — speaking urgently in a language no one knows. It points at a star chart. Then at you. Then it loops.', minEra: 3, chance: 0.006, type: 'instant', effect: { resourceId: 'research', amount: 60 } },
   storyDigitalGhosts: { id: 'storyDigitalGhosts', name: 'Digital Ghosts', description: 'The recovered hardware boots to a login screen. Behind it: processes still running, subroutines tending data gardens for an absent user. When you query the system, it asks for a password. Your lead programmer\'s birthday works.', minEra: 3, chance: 0.006, type: 'instant', effect: { resourceId: 'software', amount: 25 } },
 
   // Era 4: Space Age — Orbital debris, space elevator foundation, derelict ship
+  storyOrbitalMemory: { id: 'storyOrbitalMemory', name: 'Orbital Memory', description: 'The space station\'s navigation computer already has orbital data for every planet. It was loaded before the first launch.', minEra: 4, chance: 0.006, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 12 } },
+
   storyUnnaturalDebris: { id: 'storyUnnaturalDebris', name: 'Unnatural Debris', description: 'The orbital debris field isn\'t natural. Spectral analysis reveals hull plating, reactor shielding, and something that might have been a window. It\'s arranged in a perfect Keplerian graveyard orbit — parked, not crashed.', minEra: 4, chance: 0.006, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 15 } },
   storyElevatorFoundation: { id: 'storyElevatorFoundation', name: 'Elevator Foundation', description: 'The equatorial ridge isn\'t geological. It\'s the anchor point of a space elevator, the cable long since severed, the counterweight still orbiting as a captured asteroid. Your engineers had chosen the same site for theirs.', minEra: 4, chance: 0.006, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 80 } },
   storyDerelictShip: { id: 'storyDerelictShip', name: 'The Derelict', description: 'The derelict drifts in L2. Its cockpit seats adjust to human proportions. Its controls fall naturally under human hands. On the captain\'s console, scratched into the metal with something sharp: a tally. Four hundred and twelve marks.', minEra: 4, chance: 0.006, type: 'instant', effect: { resourceId: 'research', amount: 100 } },

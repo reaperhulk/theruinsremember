@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades } from '../engine/upgrades.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -120,10 +120,15 @@ export function UpgradePanel({ state, onUpdate }) {
     })
   );
 
+  const affordableCount = useMemo(() =>
+    filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length,
+    [filteredAvailable, state.resources]
+  );
+
   return (
     <div className="panel upgrade-panel">
       <h2>
-        Upgrades{filteredAvailable.length > 0 ? ` (${filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length}/${filteredAvailable.length})` : ''}
+        Upgrades{filteredAvailable.length > 0 ? ` (${affordableCount}/${filteredAvailable.length})` : ''}
         {upcoming.length > 0 ? ` — ${upcoming.length} soon` : ''}
         {purchased.length > 0 && (
           <span
@@ -135,7 +140,7 @@ export function UpgradePanel({ state, onUpdate }) {
         )}
       </h2>
       {filteredAvailable.some(u => LORE_UPGRADE_IDS.has(u.id)) && (
-        <div style={{ fontSize: '0.7em', color: '#bb88ff', marginBottom: '4px' }}>
+        <div className="text-hint" style={{ color: '#bb88ff', marginBottom: '4px' }}>
           Purple border = story upgrades — collected in Stats → Codex
         </div>
       )}
@@ -230,7 +235,7 @@ export function UpgradePanel({ state, onUpdate }) {
                 const enablesCount = Object.values(upgradeDefs).filter(u =>
                   u.prerequisites.includes(upgrade.id) && !state.upgrades[u.id]
                 ).length;
-                return enablesCount > 0 ? <div style={{ fontSize: '0.7em', color: '#88ccaa' }}>Enables {enablesCount} upgrade{enablesCount > 1 ? 's' : ''}</div> : null;
+                return enablesCount > 0 ? <div className="text-hint" style={{ color: '#88ccaa' }}>Enables {enablesCount} upgrade{enablesCount > 1 ? 's' : ''}</div> : null;
               })()}
               {!affordable && (() => {
                 const eta = getTimeToAfford(state, cost);

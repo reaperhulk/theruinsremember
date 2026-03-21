@@ -17,7 +17,8 @@ export function calculatePrestigeBonus(state) {
     bonus += (state.prestigeCount || 0) * 0.2;
   }
 
-  return bonus;
+  // Cap prestige bonus to prevent runaway multiplier growth
+  return Math.min(bonus, 10);
 }
 
 // Calculate prestige points earned from current run

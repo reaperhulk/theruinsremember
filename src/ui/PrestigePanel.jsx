@@ -1,4 +1,5 @@
 import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary } from '../engine/prestige.js';
+import { eraNames } from '../engine/eras.js';
 
 function getPrestigeInsight(state) {
   const owned = state.prestigeUpgrades || {};
@@ -40,7 +41,7 @@ export function PrestigePanel({ state, onUpdate }) {
   return (
     <div className="panel prestige-panel">
       <h2>Prestige{points > 0 ? ` (${points} pts)` : ''} — {shop.filter(u => u.owned).length}/{shop.length}</h2>
-      <p style={{ fontSize: '0.8em', color: '#998866', fontStyle: 'italic', margin: '0 0 8px', textAlign: 'center' }}>
+      <p className="text-lore" style={{ margin: '0 0 8px', textAlign: 'center' }}>
         {prestigeLore}
       </p>
       {getPrestigeInsight(state) && (
@@ -49,6 +50,10 @@ export function PrestigePanel({ state, onUpdate }) {
         </p>
       )}
       <div className="prestige-info">
+        <div className="stat-row">
+          <span>Current Era:</span>
+          <span>Era {state.era} ({eraNames[state.era] || 'Unknown'})</span>
+        </div>
         <div className="stat-row">
           <span>Prestige Points:</span>
           <span>{points}</span>
