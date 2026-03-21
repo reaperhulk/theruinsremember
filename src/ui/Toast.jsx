@@ -92,7 +92,7 @@ export function Toast({ state }) {
     prevEventsRef.current = currentEvents;
 
     if (newToasts.length > 0) {
-      setToasts(prev => [...prev, ...newToasts].slice(-5));
+      setToasts(prev => [...prev, ...newToasts].slice(-3));
       const ids = newToasts.map(t => t.id);
       clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => {

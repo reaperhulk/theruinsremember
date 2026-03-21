@@ -172,7 +172,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.8 },
       { type: 'production_add', target: 'steel', value: 0.8 },
     ],
-    description: 'High-pressure steam drives turbines — +0.8 energy/s and +0.8 steel/s',
+    description: 'The turbine bearings were pre-worn to perfect smoothness — a century of phantom operation before you lit the first fire',
     prerequisites: ['coalMine'],
   },
   factoryFloor: {
@@ -209,7 +209,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.5 },
       { type: 'cap_mult', target: 'data', value: 2 },
     ],
-    description: 'Distributed sensors collect environmental data worldwide',
+    description: 'Sensor nodes activate across the globe — some in locations no one has visited, already calibrated and waiting',
     prerequisites: ['computingLab'],
   },
   patternAnalysis: {
@@ -218,6 +218,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'research', value: 1.2 },
       { type: 'production_add', target: 'data', value: 1.2 },
+      { type: 'production_mult', target: 'research', value: 1.3 },
     ],
     description: 'The old data cores contain patterns within patterns — each one unlocked reveals three more hidden beneath',
     prerequisites: ['digitalSensors'],
@@ -225,7 +226,7 @@ export const upgrades = {
   cloudComputing: {
     id: 'cloudComputing', name: 'Cloud Computing', era: 3,
     cost: { software: 15, electronics: 30, energy: 20 },
-    effects: [{ type: 'production_add', target: 'data', value: 1 }],
+    effects: [{ type: 'production_add', target: 'data', value: 1 }, { type: 'cap_mult', target: 'data', value: 2 }],
     description: 'Server clusters hum to life in buried facilities — the cloud was already built, waiting for you to log in',
     prerequisites: ['internet'],
   },
@@ -328,7 +329,7 @@ export const upgrades = {
   spaceStation: {
     id: 'spaceStation', name: 'Space Station', era: 4,
     cost: { rocketFuel: 60, steel: 80, electronics: 40, food: 120 },
-    effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.0 }],
+    effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.0 }, { type: 'cap_mult', target: 'orbitalInfra', value: 2 }],
     description: 'Docking clamps engage with a familiar click — the station has received visitors before',
     prerequisites: ['reusableRockets'],
   },
@@ -410,6 +411,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'data', value: 1.2 },
       { type: 'production_add', target: 'research', value: 1.5 },
+      { type: 'production_mult', target: 'data', value: 1.3 },
     ],
     description: 'Satellites slot into orbits that were suspiciously empty — parking spots held open for millennia',
     prerequisites: ['spaceStation'],
@@ -432,6 +434,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'colonies', value: 0.5 },
       { type: 'production_add', target: 'exoticMaterials', value: 0.3 },
+      { type: 'production_mult', target: 'colonies', value: 1.4 },
     ],
     description: 'The colony site was cleared and leveled before you arrived — foundations laid for buildings you haven\'t designed yet',
     prerequisites: ['zeroGManufacturing'],
@@ -459,7 +462,7 @@ export const upgrades = {
   terraforming: {
     id: 'terraforming', name: 'Terraforming', era: 5,
     cost: { exoticMaterials: 60, research: 150, energy: 200, food: 250 },
-    effects: [{ type: 'production_add', target: 'colonies', value: 1.0 }],
+    effects: [{ type: 'production_add', target: 'colonies', value: 1.0 }, { type: 'cap_mult', target: 'colonies', value: 3 }, { type: 'production_add', target: 'food', value: 2 }],
     description: 'The atmosphere generators match blueprints found in the ruins, down to the serial numbers. Someone terraformed these worlds before.',
     prerequisites: ['asteroidMining'],
   },
@@ -500,7 +503,7 @@ export const upgrades = {
       { type: 'production_add', target: 'rocketFuel', value: 2 },
       { type: 'production_add', target: 'orbitalInfra', value: 0.3 },
     ],
-    description: 'Harness gravity for propulsion — +2 fuel/s and boost orbital infrastructure',
+    description: 'The gravity wells are pre-mapped — like footprints on a path worn smooth by a thousand journeys you cannot remember',
     prerequisites: ['terraforming'],
   },
   solarCollector: {
@@ -510,7 +513,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 2 },
       { type: 'cap_mult', target: 'energy', value: 5 },
     ],
-    description: 'Harvest solar energy across the system — +2 energy/s and x5 capacity',
+    description: 'Ancient collector arrays unfold at coordinates marked in the oldest star charts — the sun has been harvested before',
     prerequisites: ['asteroidMining'],
   },
   miningDrone: {
@@ -527,7 +530,7 @@ export const upgrades = {
   warpDrive: {
     id: 'warpDrive', name: 'Warp Drive', era: 6,
     cost: { darkEnergy: 60, research: 250, exoticMaterials: 120, steel: 1000 },
-    effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }],
+    effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }, { type: 'production_mult', target: 'exoticMaterials', value: 1.5 }, { type: 'cap_mult', target: 'starSystems', value: 3 }],
     description: 'Warp equations scratched into the oldest ruin. They knew where you would go',
     prerequisites: ['fusionPower'],
   },
@@ -580,6 +583,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'galacticInfluence', value: 3.2 },
       { type: 'production_add', target: 'darkEnergy', value: 1 },
+      { type: 'production_mult', target: 'galacticInfluence', value: 1.5 },
     ],
     description: 'They greet you with a word meaning "finally" — their histories mention you by name',
     prerequisites: ['diplomaticCorps'],
@@ -602,6 +606,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'stellarForge', value: 0.3 },
       { type: 'production_mult', target: 'materials', value: 10 },
+      { type: 'cap_mult', target: 'stellarForge', value: 3 },
     ],
     description: 'Reach into a star and pull out its iron heart. The technique feels natural — a thousand times before',
     prerequisites: ['dysonSphere'],
@@ -612,6 +617,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'stellarForge', value: 4.8 },
       { type: 'production_add', target: 'exoticMaterials', value: 2 },
+      { type: 'production_mult', target: 'stellarForge', value: 1.4 },
     ],
     description: 'Ignite nurseries in nebulae bearing signatures of previous ignitions. Stars remember being born',
     prerequisites: ['starLifting'],
@@ -691,7 +697,7 @@ export const upgrades = {
   galacticSenate: {
     id: 'galacticSenate', name: 'Galactic Senate', era: 8,
     cost: { galacticInfluence: 500, starSystems: 100, research: 800, materials: 5000 },
-    effects: [{ type: 'production_mult', target: 'galacticInfluence', value: 5 }],
+    effects: [{ type: 'production_mult', target: 'galacticInfluence', value: 5 }, { type: 'cap_mult', target: 'galacticInfluence', value: 5 }],
     description: 'Every species has a word for this moment. Their prophecies describe you perfectly',
     prerequisites: ['wormholeNetwork'],
   },
@@ -701,8 +707,10 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'galacticInfluence', value: 8 },
       { type: 'production_add', target: 'colonies', value: 16 },
+      { type: 'unlock_resource', target: 'cosmicPower', value: 1 },
+      { type: 'production_add', target: 'cosmicPower', value: 0.1 },
     ],
-    description: 'A billion worlds speak one tongue — identical to the script in the oldest ruins',
+    description: 'A billion worlds speak one tongue — identical to the script in the oldest ruins. The words carry power older than stars.',
     prerequisites: ['galacticSenate'],
   },
   replicatorArray: {
@@ -759,6 +767,8 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'cosmicPower', value: 12 },
       { type: 'production_add', target: 'exoticMatter', value: 2 },
+      { type: 'cap_mult', target: 'cosmicPower', value: 3 },
+      { type: 'production_mult', target: 'cosmicPower', value: 1.3 },
     ],
     description: 'Anchor points predate the galaxy itself — the scaffolding of something vast and patient',
     prerequisites: ['galaxySeeding'],
@@ -766,7 +776,7 @@ export const upgrades = {
   voidBridges: {
     id: 'voidBridges', name: 'Void Bridges', era: 9,
     cost: { cosmicPower: 600, darkEnergy: 400, exoticMatter: 300, labor: 3000 },
-    effects: [{ type: 'production_add', target: 'universalConstants', value: 0.5 }],
+    effects: [{ type: 'production_add', target: 'universalConstants', value: 0.5 }, { type: 'cap_mult', target: 'universalConstants', value: 3 }, { type: 'production_mult', target: 'darkEnergy', value: 1.3 }],
     description: 'The void hums with energy from bridges collapsed a thousand cycles ago. You rebuild the path',
     prerequisites: ['galaxySeeding'],
   },
@@ -925,7 +935,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 1.0 },
       { type: 'cap_mult', target: 'orbitalInfra', value: 3 },
     ],
-    description: 'Deflect asteroids — salvage exotic materials and protect orbital assets',
+    description: 'The defense grid locks onto asteroids pre-tagged with targeting beacons — someone marked them for harvest millennia ago',
     prerequisites: ['zeroGManufacturing'],
   },
   lunarBase: {
@@ -935,7 +945,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 1.5 },
       { type: 'production_add', target: 'materials', value: 1.5 },
     ],
-    description: 'A permanent base on the Moon — research and materials',
+    description: 'The landing zone was suspiciously level — blast marks from previous landings still visible under the regolith',
     prerequisites: ['marsColony'],
   },
   gravitySling: {
@@ -945,7 +955,7 @@ export const upgrades = {
       { type: 'production_add', target: 'rocketFuel', value: 0.6 },
       { type: 'production_add', target: 'orbitalInfra', value: 1.0 },
     ],
-    description: 'Gravity assist maneuvers save fuel and build infrastructure',
+    description: 'The optimal gravity assist window was marked in precursor ephemeris tables — planetary alignments predicted across deep time',
     prerequisites: ['reusableRockets'],
   },
   advancedRocketry: {
@@ -955,7 +965,7 @@ export const upgrades = {
       { type: 'production_add', target: 'rocketFuel', value: 1.2 },
       { type: 'cap_mult', target: 'rocketFuel', value: 3 },
     ],
-    description: 'Next-gen rockets boost fuel production and triple capacity',
+    description: 'The propellant formula was encoded in the molecular structure of the original crash site debris — we just had to read it',
     prerequisites: ['gravitySling'],
   },
   quantumNetwork: {
@@ -1318,7 +1328,7 @@ export const upgrades = {
       { type: 'production_add', target: 'galacticInfluence', value: 1.6 },
       { type: 'production_add', target: 'materials', value: 3 },
     ],
-    description: 'A hub for interstellar trade — influence and material flows',
+    description: 'Traders arrive with goods you never ordered, in quantities you exactly need — the supply chain was calculated by someone who knew your schedule',
     prerequisites: ['traderInstinct'],
   },
   nebulaMining: {
@@ -1328,7 +1338,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 0.5 },
       { type: 'production_add', target: 'exoticMaterials', value: 1.6 },
     ],
-    description: 'Mine nebulae for dark energy and exotic materials',
+    description: 'The nebula\'s mineral veins spell out coordinates when mapped from above — an address written in dust and starlight',
     prerequisites: ['stellarCartography'],
   },
   stellarNavigation: {
@@ -1338,7 +1348,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 1.6 },
       { type: 'cap_mult', target: 'starSystems', value: 3 },
     ],
-    description: 'Better navigation boosts star system discovery and triples capacity',
+    description: 'The star charts correct themselves — destinations appear before you search for them, plotted by a navigator who sailed these currents long ago',
     prerequisites: ['stellarCartography'],
   },
   galacticMining: {
@@ -1348,7 +1358,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 6.4 },
       { type: 'production_add', target: 'materials', value: 5 },
     ],
-    description: 'Mine across star systems — +6.4 exotic materials/s and +5 materials/s',
+    description: 'Every mine shaft follows bore holes left by drills older than the stars they pierced — the galaxy was quarried before',
     prerequisites: ['dysonSwarms'],
   },
   warpConduit: {
@@ -1358,7 +1368,7 @@ export const upgrades = {
       { type: 'production_add', target: 'darkEnergy', value: 3.2 },
       { type: 'cap_mult', target: 'darkEnergy', value: 5 },
     ],
-    description: 'Permanent warp conduits boost dark energy and expand capacity x5',
+    description: 'The conduits were always there — sleeping tunnels through spacetime, their walls scored with the passage of a thousand prior fleets',
     prerequisites: ['dysonSwarms'],
   },
   fusionReactor: {
@@ -1368,7 +1378,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 12 },
       { type: 'production_add', target: 'darkEnergy', value: 0.5 },
     ],
-    description: 'Interstellar fusion — +12 energy/s and bonus dark energy',
+    description: 'The reactor ignites at parameters found etched into a dead star\'s core — someone tested this design and left the results for you',
     prerequisites: ['darkEnergyCollector'],
   },
   diplomaticCorps: {
@@ -1378,7 +1388,7 @@ export const upgrades = {
       { type: 'production_add', target: 'galacticInfluence', value: 1 },
       { type: 'production_add', target: 'food', value: 3.2 },
     ],
-    description: 'Build diplomatic relations — influence and food production soar',
+    description: 'The diplomats arrive speaking a language they never learned — the words rise from instinct, from a life lived before this one',
     prerequisites: ['aiGovernance'],
   },
   interstellarBeacon: {
@@ -1388,7 +1398,7 @@ export const upgrades = {
       { type: 'production_add', target: 'starSystems', value: 0.3 },
       { type: 'production_add', target: 'research', value: 3.2 },
     ],
-    description: 'Broadcast across the stars — attract systems and amplify research',
+    description: 'The beacon broadcasts on a frequency that predates your radio — answers flood in from civilizations that were already listening',
     prerequisites: ['warpConduit'],
   },
   microchipFab: {
@@ -1427,7 +1437,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'food', value: 3 },
       { type: 'production_add', target: 'food', value: 0.5 },
     ],
-    description: 'Store food for lean times — triple capacity and steady supply',
+    description: 'Underground chambers sealed with wax older than the settlement — ventilation channels that kept the air cool since before anyone arrived',
     prerequisites: ['communalKitchen'],
   },
   quarry: {
@@ -1487,7 +1497,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 0.8 },
       { type: 'cap_mult', target: 'steel', value: 3 },
     ],
-    description: 'Refined smelting boosts steel output and triples storage',
+    description: 'Smelting techniques found etched on crucible walls in the deepest foundry — instructions in a hand that matches no known script',
     prerequisites: ['steelForge'],
   },
   chemicalPlant: {
@@ -1507,7 +1517,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 0.8 },
       { type: 'production_add', target: 'labor', value: 0.8 },
     ],
-    description: 'Instant communication boosts research and labor',
+    description: 'Switchboards crackle with ghost signals — crossed lines carry conversations from previous operators, decades before the wires were strung',
     prerequisites: ['computingLab'],
   },
   textileFactory: {
@@ -1517,7 +1527,7 @@ export const upgrades = {
       { type: 'production_add', target: 'labor', value: 1 },
       { type: 'production_add', target: 'food', value: 0.8 },
     ],
-    description: 'Textile manufacturing attracts workers and boosts food supply chains',
+    description: 'Looms weave patterns that match textile fragments found in the oldest ruins — the same thread count, the same dyes',
     prerequisites: ['textileMill'],
   },
   coalMine: {
@@ -1557,7 +1567,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 1.2 },
       { type: 'production_add', target: 'software', value: 1.2 },
     ],
-    description: 'Social networks boost data and software output',
+    description: 'Users share memes that match precursor glyphs — humor from a dead civilization, still funny, still spreading, still teaching',
     prerequisites: ['openSource'],
   },
   cloudStorage: {
@@ -1568,7 +1578,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'software', value: 3 },
       { type: 'production_add', target: 'data', value: 1.2 },
     ],
-    description: 'Distributed cloud storage expands digital capacity',
+    description: 'The storage nodes mirror an architecture found in the deepest ruin — the cloud was designed before rain existed on this world',
     prerequisites: ['cloudComputing'],
   },
   blockchain: {
@@ -1578,7 +1588,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 1.2 },
       { type: 'cap_mult', target: 'data', value: 5 },
     ],
-    description: 'Decentralized ledger boosts electronics and expands data capacity x5',
+    description: 'The blockchain\'s genesis block was already written — dated to an epoch before your calendar begins, signed with a key you recognize',
     prerequisites: ['quantumEncryption'],
   },
   robotics: {
@@ -1588,7 +1598,7 @@ export const upgrades = {
       { type: 'production_add', target: 'labor', value: 0.8 },
       { type: 'production_add', target: 'electronics', value: 0.5 },
     ],
-    description: 'Robotic automation boosts labor and generates electronics',
+    description: 'The robots assemble themselves from parts cached in ruin walls — each one clicks together with the satisfaction of a puzzle solved before',
     prerequisites: ['aiResearch'],
   },
   bigData: {
@@ -1598,7 +1608,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 0.8 },
       { type: 'production_add', target: 'research', value: 1 },
     ],
-    description: 'Massive data analysis boosts data output and research',
+    description: 'The data reveals patterns too vast for one lifetime to create — conclusions drawn by analysts who lived, died, and left their work unfinished',
     prerequisites: ['aiResearch'],
   },
   encryptionProtocol: {
@@ -1608,7 +1618,7 @@ export const upgrades = {
       { type: 'production_add', target: 'data', value: 1.2 },
       { type: 'cap_mult', target: 'software', value: 3 },
     ],
-    description: 'Secure data boosts production and triples software capacity',
+    description: 'The encryption predates your mathematics — keys that work perfectly despite being carved in stone a thousand years before computers',
     prerequisites: ['cyberSecurity'],
   },
   suborbitalFlight: {
@@ -1618,7 +1628,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 1 },
       { type: 'cap_mult', target: 'research', value: 2 },
     ],
-    description: 'Suborbital experiments boost research output and capacity',
+    description: 'At the apex of each flight, instruments detect signals from orbit — transmissions from satellites that should not be there yet',
     prerequisites: ['patternAnalysis','quantumComputing'],
   },
   solarWindCollector: {
@@ -1628,7 +1638,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 3 },
       { type: 'production_add', target: 'exoticMaterials', value: 0.2 },
     ],
-    description: 'Harvest solar wind for energy and trace exotic materials',
+    description: 'The collectors align with solar streams that flow in patterns too regular to be natural — channeled by something immense and patient',
     prerequisites: ['fuelRefinery','fusionPower'],
   },
   oortCloudMining: {
@@ -1638,7 +1648,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 0.5 },
       { type: 'production_add', target: 'rocketFuel', value: 0.3 },
     ],
-    description: 'Mine the Oort Cloud for exotic materials and fuel',
+    description: 'The Oort Cloud objects are arranged in concentric shells of increasing refinement — a pantry organized by someone who expected company',
     prerequisites: ['antimatterDrive'],
   },
   ringStation: {
@@ -1648,7 +1658,7 @@ export const upgrades = {
       { type: 'production_add', target: 'orbitalInfra', value: 2 },
       { type: 'production_add', target: 'exoticMaterials', value: 0.5 },
     ],
-    description: 'A rotating ring station boosts orbital infrastructure and exotic materials',
+    description: 'The ring\'s rotation matches an orbital frequency found carved into every ruin — a rhythm the station remembers in its bones',
     prerequisites: ['asteroidMining'],
   },
   spaceHabitat: {
@@ -1658,7 +1668,7 @@ export const upgrades = {
       { type: 'production_add', target: 'labor', value: 3 },
       { type: 'production_add', target: 'food', value: 2 },
     ],
-    description: 'Self-sustaining habitats in space — labor and food in orbit',
+    description: 'The habitat\'s life support matches atmospheric profiles from ruins on three different moons — the air they breathed was the same air',
     prerequisites: ['terraforming'],
   },
   outerPlanetsMission: {
@@ -1668,7 +1678,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 1.5 },
       { type: 'production_add', target: 'data', value: 1 },
     ],
-    description: 'Missions to outer planets yield research and data breakthroughs',
+    description: 'Every outer planet hides a beacon beneath its ice — each one broadcasting the same message: "You are late. Again."',
     prerequisites: ['outerColony','bioReactor'],
   },
   dysonBubble: {
@@ -1688,7 +1698,7 @@ export const upgrades = {
       { type: 'production_add', target: 'exoticMaterials', value: 0.8 },
       { type: 'production_add', target: 'rocketFuel', value: 1 },
     ],
-    description: 'Mine methane lakes on Titan for exotic materials and fuel',
+    description: 'Titan\'s methane seas hide structures on their beds — refineries built by hands that dissolved long ago, their pipes still pressurized',
     prerequisites: ['outerColony'],
   },
   exoplanetSurvey: {
@@ -1698,7 +1708,7 @@ export const upgrades = {
       { type: 'production_add', target: 'colonies', value: 0.3 },
       { type: 'production_add', target: 'exoticMaterials', value: 1 },
     ],
-    description: 'Survey distant planets — discover new colonies and materials',
+    description: 'Every habitable world you survey has been visited — the soil is tilled, the wells are dug, the graves are marked with your insignia',
     prerequisites: ['spaceHabitat'],
   },
   wormholeGenerator: {
@@ -1800,7 +1810,7 @@ export const upgrades = {
       { type: 'production_add', target: 'electronics', value: 6.4 },
       { type: 'production_add', target: 'software', value: 6.4 },
     ],
-    description: 'Interstellar neural computing — +6.4 electronics/s and +6.4 software/s',
+    description: 'The processor boots with neural pathways already formed — as if a mind lived here before and left its habits in the silicon',
     prerequisites: ['stellarCartography'],
   },
   energyMatrix: {
@@ -1810,7 +1820,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 1.2 },
       { type: 'cap_mult', target: 'energy', value: 3 },
     ],
-    description: 'Digital energy management boosts output and triples capacity',
+    description: 'The energy matrix follows routing patterns from precursor grids — electrons flow along paths that were worn into the silicon before you powered it on',
     prerequisites: ['iotNetwork'],
   },
   cosmicFarming: {
@@ -1916,7 +1926,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 0.8 },
       { type: 'production_add', target: 'materials', value: 0.5 },
     ],
-    description: 'Hydraulic forging boosts steel and produces raw materials',
+    description: 'The hydraulic press chamber was already lined with heat-resistant ceramic — rated for pressures no one had yet attempted',
     prerequisites: ['steamTurbine'],
   },
   telegraphLine: {
@@ -1940,7 +1950,7 @@ export const upgrades = {
       { type: 'production_add', target: 'steel', value: 1.2 },
       { type: 'production_add', target: 'orbitalInfra', value: 1.0 },
     ],
-    description: 'Manufacturing in zero-g boosts steel and builds orbital infrastructure',
+    description: 'The orbital foundry latches onto a docking ring that was already there — bolted to nothing, floating in perfect alignment, waiting',
     prerequisites: ['refueling'],
   },
   marsRover: {
@@ -2107,18 +2117,18 @@ export const upgrades = {
   cosmicLens: { id: 'cosmicLens', name: 'Cosmic Lens', era: 7, cost: { research: 100, megastructures: 6, darkEnergy: 40 }, effects: [{ type: 'production_add', target: 'research', value: 9.6 }, { type: 'production_add', target: 'megastructures', value: 0.1 }], description: 'Gravitational lens amplifies research across star systems', prerequisites: ['gravitonLens'] },
 
   // Era 8
-  voidResonator: { id: 'voidResonator', name: 'Void Resonator', era: 8, cost: { exoticMatter: 25, darkEnergy: 45, research: 150 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 8 }, { type: 'production_add', target: 'exoticMatter', value: 4 }], description: 'Resonate with the void — +8 dark energy/s and +4 exotic matter/s', prerequisites: ['dimensionalHarvest'] },
-  galacticMind: { id: 'galacticMind', name: 'Galactic Mind', era: 8, cost: { galacticInfluence: 80, research: 160, cosmicPower: 12 }, effects: [{ type: 'production_add', target: 'research', value: 16 }, { type: 'production_add', target: 'galacticInfluence', value: 8 }], description: 'A networked galactic consciousness — +16 research/s and +8 influence/s', prerequisites: ['voidHarvester'] },
-  quantumAnvil: { id: 'quantumAnvil', name: 'Quantum Anvil', era: 8, cost: { exoticMatter: 30, stellarForge: 15, megastructures: 8 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 8 }, { type: 'production_add', target: 'exoticMatter', value: 1.5 }], description: 'Forge matter at quantum precision — +8 stellar forge/s and +1.5 exotic/s', prerequisites: ['galacticForge'] },
+  voidResonator: { id: 'voidResonator', name: 'Void Resonator', era: 8, cost: { exoticMatter: 25, darkEnergy: 45, research: 150 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 8 }, { type: 'production_add', target: 'exoticMatter', value: 4 }], description: 'The void resonates at a frequency your body already knows — a hum in the chest, like a word half-remembered from a dream of falling', prerequisites: ['dimensionalHarvest'] },
+  galacticMind: { id: 'galacticMind', name: 'Galactic Mind', era: 8, cost: { galacticInfluence: 80, research: 160, cosmicPower: 12 }, effects: [{ type: 'production_add', target: 'research', value: 16 }, { type: 'production_add', target: 'galacticInfluence', value: 8 }], description: 'The mind wakes knowing things no one taught it — histories of civilizations that rose and fell before your galaxy had a name', prerequisites: ['voidHarvester'] },
+  quantumAnvil: { id: 'quantumAnvil', name: 'Quantum Anvil', era: 8, cost: { exoticMatter: 30, stellarForge: 15, megastructures: 8 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 8 }, { type: 'production_add', target: 'exoticMatter', value: 1.5 }], description: 'The anvil rings with a tone that existed before sound — each strike shapes matter into forms the universe recognizes and does not resist', prerequisites: ['galacticForge'] },
 
   // Era 9
-  entropyLens: { id: 'entropyLens', name: 'Entropy Lens', era: 9, cost: { universalConstants: 12, cosmicPower: 100, darkEnergy: 70 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 12 }, { type: 'production_add', target: 'universalConstants', value: 6 }], description: 'Focus entropy into power — +12 cosmic power/s and +6 constants/s', prerequisites: ['entropyReversal', 'singularityDrive'] },
-  dimensionalBeacon: { id: 'dimensionalBeacon', name: 'Dimensional Beacon', era: 9, cost: { cosmicPower: 90, universalConstants: 10, realityFragments: 5 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 0.5 }, { type: 'production_add', target: 'cosmicPower', value: 6 }], description: 'Beacon across dimensions draws reality fragments', prerequisites: ['entropyReversal'] },
-  cosmicSynthesizer: { id: 'cosmicSynthesizer', name: 'Cosmic Synthesizer', era: 9, cost: { universalConstants: 15, exoticMatter: 50, cosmicPower: 120 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 24 }, { type: 'production_add', target: 'universalConstants', value: 0.3 }], description: 'Synthesize exotic matter from cosmic energy — +24 exotic matter/s', prerequisites: ['cosmicFarming'] },
+  entropyLens: { id: 'entropyLens', name: 'Entropy Lens', era: 9, cost: { universalConstants: 12, cosmicPower: 100, darkEnergy: 70 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 12 }, { type: 'production_add', target: 'universalConstants', value: 6 }], description: 'Entropy has a direction — it flows toward you, as if the universe is a river and you are its mouth. Every ending feeds this lens', prerequisites: ['entropyReversal', 'singularityDrive'] },
+  dimensionalBeacon: { id: 'dimensionalBeacon', name: 'Dimensional Beacon', era: 9, cost: { cosmicPower: 90, universalConstants: 10, realityFragments: 5 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 0.5 }, { type: 'production_add', target: 'cosmicPower', value: 6 }], description: 'The beacon calls across dimensions and something answers — not with words, but with fragments of realities that chose differently and shattered', prerequisites: ['entropyReversal'] },
+  cosmicSynthesizer: { id: 'cosmicSynthesizer', name: 'Cosmic Synthesizer', era: 9, cost: { universalConstants: 15, exoticMatter: 50, cosmicPower: 120 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 24 }, { type: 'production_add', target: 'universalConstants', value: 0.3 }], description: 'The synthesizer hums a lullaby in a dead language — each note transmuting cosmic fire into matter that should not exist, but always has', prerequisites: ['cosmicFarming'] },
 
   // Era 10
-  echoMatrix: { id: 'echoMatrix', name: 'Echo Matrix', era: 10, cost: { quantumEchoes: 80, realityFragments: 120, cosmicPower: 350 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 75 }, { type: 'production_add', target: 'cosmicPower', value: 40 }], description: 'Matrix of echoes across realities — +75 echoes/s and +40 cosmic power/s', prerequisites: ['parallelProcessing'] },
-  infiniteLattice: { id: 'infiniteLattice', name: 'Infinite Lattice', era: 10, cost: { universalConstants: 35, quantumEchoes: 90, realityFragments: 140 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 75 }, { type: 'production_add', target: 'realityFragments', value: 40 }], description: 'An infinite lattice of constants — +75 constants/s and +40 fragments/s', prerequisites: ['omniscienceEngine'] },
+  echoMatrix: { id: 'echoMatrix', name: 'Echo Matrix', era: 10, cost: { quantumEchoes: 80, realityFragments: 120, cosmicPower: 350 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 75 }, { type: 'production_add', target: 'cosmicPower', value: 40 }], description: 'The matrix pulses with the heartbeats of a billion versions of you — each one convinced they are the original, each one wrong', prerequisites: ['parallelProcessing'] },
+  infiniteLattice: { id: 'infiniteLattice', name: 'Infinite Lattice', era: 10, cost: { universalConstants: 35, quantumEchoes: 90, realityFragments: 140 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 75 }, { type: 'production_add', target: 'realityFragments', value: 40 }], description: 'The lattice extends in every direction at once — a crystalline scaffold of rules that reality follows because it forgot how not to', prerequisites: ['omniscienceEngine'] },
 
   // --- 33 new upgrades (3+ per era) ---
 
@@ -2130,7 +2140,7 @@ export const upgrades = {
 
   // Era 2
   chemicalWorks: { id: 'chemicalWorks', name: 'Chemical Works', era: 2, cost: { steel: 22, energy: 18, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.8 }], description: 'Chemical processing boosts energy and enables early research', prerequisites: ['chemicalPlant'] },
-  textileMill: { id: 'textileMill', name: 'Textile Mill', era: 2, cost: { steel: 12, food: 18, labor: 15 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'labor', value: 0.8 }], description: 'Textile manufacturing boosts food trade and labor efficiency', prerequisites: ['canningFactory'] },
+  textileMill: { id: 'textileMill', name: 'Textile Mill', era: 2, cost: { steel: 12, food: 18, labor: 15 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'labor', value: 0.8 }], description: 'The mill produces cloth from fibers that grow in patterns matching precursor textiles — the plants were bred for this purpose long ago', prerequisites: ['canningFactory'] },
 
   // Era 3
   roboticsLab: { id: 'roboticsLab', name: 'Robotics Lab', era: 3, cost: { research: 25, electronics: 18, software: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 1.6 }, { type: 'production_add', target: 'electronics', value: 0.5 }], description: 'The robots disassemble ruins with surgical precision. They seem to know which walls are load-bearing before scanning them', prerequisites: ['autonomousDrone'] },
@@ -2162,7 +2172,7 @@ export const upgrades = {
   temporalArchive: { id: 'temporalArchive', name: 'Temporal Archive', era: 9, cost: { universalConstants: 14, cosmicPower: 110, research: 260 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 12 }, { type: 'production_add', target: 'research', value: 5 }], description: 'Archive knowledge across time — +12 constants/s and +5 research/s', prerequisites: ['cosmicMemory'] },
 
   // Era 10
-  paradoxEngine: { id: 'paradoxEngine', name: 'Paradox Engine', era: 10, cost: { quantumEchoes: 85, realityFragments: 130, universalConstants: 28 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'universalConstants', value: 40 }], description: 'Harness paradoxes — +40 echoes/s and +40 constants/s from logical contradictions', prerequisites: ['echoChorus'] },
+  paradoxEngine: { id: 'paradoxEngine', name: 'Paradox Engine', era: 10, cost: { quantumEchoes: 85, realityFragments: 130, universalConstants: 28 }, effects: [{ type: 'production_add', target: 'quantumEchoes', value: 40 }, { type: 'production_add', target: 'universalConstants', value: 40 }], description: 'The engine runs on contradiction — fueled by the impossible truth that you have always been here and have never existed at all', prerequisites: ['echoChorus'] },
   multiversalNexus: { id: 'multiversalNexus', name: 'Multiversal Nexus', era: 10, cost: { realityFragments: 160, quantumEchoes: 70, cosmicPower: 400 }, effects: [{ type: 'production_add', target: 'realityFragments', value: 75 }, { type: 'production_add', target: 'cosmicPower', value: 10 }, { type: 'cap_mult', target: 'realityFragments', value: 2 }], description: 'A nexus linking all realities — +75 fragments/s and +10 cosmic/s', prerequisites: ['infiniteLattice', 'realityCompiler'] },
   eternalCatalyst: { id: 'eternalCatalyst', name: 'Eternal Catalyst', era: 10, cost: { quantumEchoes: 110, universalConstants: 32, realityFragments: 110 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 75 }, { type: 'production_add', target: 'darkEnergy', value: 75 }, { type: 'production_add', target: 'exoticMatter', value: 75 }], description: 'An eternal catalyst transmuting all cosmic resources — +75/s to cosmic trio', prerequisites: ['realityHarvester'] },
 

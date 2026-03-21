@@ -9,6 +9,15 @@ import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
 const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 
+function countEffects(upgrades) {
+  let count = 0;
+  for (const u of upgrades) {
+    count += u.effects.length;
+    if (u.mechanic) count++;
+  }
+  return count;
+}
+
 const mechanicDescriptions = {
   clickAll: 'Clicking any resource gives +1 to all others',
   surplusConvert: 'Capped resources trickle to your lowest resource',
@@ -104,6 +113,8 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const [chainFlash, setChainFlash] = useState(false);
   const flashTimerRef = useRef(null);
   const chainTimerRef = useRef(null);
+  const seenUpgradeIdsRef = useRef(new Set());
+  const [newUpgradeIds, setNewUpgradeIds] = useState(new Set());
 
   const handlePurchase = useCallback((upgradeId) => {
     setFlashId(upgradeId);
@@ -124,6 +135,29 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const purchased = getPurchasedUpgrades(state);
 
   const upcoming = getUpcomingUpgrades(state);
+
+  // Track newly appearing upgrades for "NEW" glow
+  useEffect(() => {
+    const currentIds = new Set(available.filter(u => !u.repeatable).map(u => u.id));
+    const fresh = new Set();
+    for (const id of currentIds) {
+      if (!seenUpgradeIdsRef.current.has(id)) {
+        fresh.add(id);
+        seenUpgradeIdsRef.current.add(id);
+      }
+    }
+    if (fresh.size > 0) {
+      setNewUpgradeIds(prev => new Set([...prev, ...fresh]));
+      const timer = setTimeout(() => {
+        setNewUpgradeIds(prev => {
+          const next = new Set(prev);
+          for (const id of fresh) next.delete(id);
+          return next;
+        });
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [available.length]);
 
   // Sort upgrades
   const sortedAvailable = [...available].sort((a, b) => {
@@ -216,7 +250,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
               return current;
             })}
           >
-            {affordableNonRepeatable.length > 0 ? `Buy All Affordable (${affordableNonRepeatable.length})` : 'No affordable upgrades'}
+            {affordableNonRepeatable.length > 0 ? `Buy All Affordable (${affordableNonRepeatable.length} upgrades, ${countEffects(affordableNonRepeatable)} effects)` : 'No affordable upgrades'}
           </button>
         );
       })()}
@@ -248,7 +282,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           return (
             <div key={upgrade.id} className="upgrade-row">
             <button
-              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''} ${LORE_UPGRADE_ID_SET.has(upgrade.id) ? 'lore-upgrade' : ''} ${isMechanic ? 'mechanic-upgrade' : ''}`}
+              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''} ${LORE_UPGRADE_ID_SET.has(upgrade.id) ? 'lore-upgrade' : ''} ${isMechanic ? 'mechanic-upgrade' : ''} ${newUpgradeIds.has(upgrade.id) ? 'new-upgrade' : ''}`}
               disabled={!affordable}
               onClick={() => handlePurchase(upgrade.id)}
               title={`${upgrade.description}\nEffects: ${formatEffects(upgrade.effects)}`}
@@ -277,7 +311,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 {isMechanic && <span className="effect-tag effect-mechanic" title={mechanicDescriptions[upgrade.mechanic] || 'Special mechanic'}>MECHANIC</span>}
               </div>
               {enablesCountMap[upgrade.id] > 0 && (
-                <div className="text-hint" style={{ color: '#88ccaa' }}>Enables {enablesCountMap[upgrade.id]} upgrade{enablesCountMap[upgrade.id] > 1 ? 's' : ''}</div>
+                <div className="text-hint" style={{ color: enablesCountMap[upgrade.id] >= 5 ? '#ddaa44' : enablesCountMap[upgrade.id] >= 3 ? '#88ccaa' : '#777' }}>Enables {enablesCountMap[upgrade.id]} upgrade{enablesCountMap[upgrade.id] > 1 ? 's' : ''}</div>
               )}
               {!affordable && (() => {
                 const eta = getTimeToAfford(state, cost);

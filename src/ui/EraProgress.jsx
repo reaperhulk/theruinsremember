@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { eraNames, ERA_COUNT, getMinUpgradesForEra, countEraUpgrades } from '../engine/eras.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { calculateProduction } from '../engine/resources.js';
@@ -105,6 +106,19 @@ export function EraProgress({ state }) {
     .filter(([id]) => state.resources[id]?.unlocked)
     .reduce((sum, [, rate]) => sum + Math.max(0, rate), 0);
 
+  // Detect significant production rate increases for flash effect
+  const prevTotalRateRef = useRef(0);
+  const [rateFlash, setRateFlash] = useState(false);
+  useEffect(() => {
+    const prev = prevTotalRateRef.current;
+    if (totalRate > prev * 1.2 && prev > 0) {
+      setRateFlash(true);
+      const timer = setTimeout(() => setRateFlash(false), 600);
+      return () => clearTimeout(timer);
+    }
+    prevTotalRateRef.current = totalRate;
+  }, [totalRate]);
+
   return (
     <div className="panel era-panel">
       <h2>Era {state.era}: {currentEra} {eraCompletion >= 100 && '(complete)'}</h2>
@@ -154,7 +168,7 @@ export function EraProgress({ state }) {
           <span> | x{state.prestigeMultiplier.toFixed(1)}</span>
         )}
         {totalRate > 0 && (
-          <span> | {formatNumber(totalRate)}/s</span>
+          <span style={rateFlash ? { color: '#88ff88', transition: 'color 0.6s ease' } : { transition: 'color 0.6s ease' }}> | {formatNumber(totalRate)}/s total</span>
         )}
         {state.upgrades?.overclockProtocol && (() => {
           const cyclePos = (state.totalTime || 0) % 60;

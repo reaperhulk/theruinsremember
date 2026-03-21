@@ -197,4 +197,42 @@ describe('events', () => {
       }
     });
   });
+
+  describe('resource_percent effect type', () => {
+    it('removes a percentage of current resource amount', () => {
+      const state = makeState();
+      state.resources.food = { ...state.resources.food, unlocked: true, amount: 1000 };
+      // Create a crisis event that uses resource_percent
+      const crisisEvent = {
+        id: 'testCrisis', name: 'Test Crisis', type: 'instant',
+        effects: [{ type: 'resource_percent', target: 'food', value: -0.2 }],
+      };
+      const newState = applyEvent(state, crisisEvent);
+      // Should lose 20% of 1000 = 200, leaving 800
+      expect(newState.resources.food.amount).toBe(800);
+    });
+
+    it('does not reduce below zero', () => {
+      const state = makeState();
+      state.resources.food = { ...state.resources.food, unlocked: true, amount: 5 };
+      const crisisEvent = {
+        id: 'testCrisis', name: 'Test Crisis', type: 'instant',
+        effects: [{ type: 'resource_percent', target: 'food', value: -1.5 }],
+      };
+      const newState = applyEvent(state, crisisEvent);
+      expect(newState.resources.food.amount).toBe(0);
+    });
+
+    it('scales percentage loss with current amount (not era scaling)', () => {
+      const state = makeState({ era: 5 });
+      state.resources.food = { ...state.resources.food, unlocked: true, amount: 500 };
+      const crisisEvent = {
+        id: 'testCrisis', name: 'Test Crisis', type: 'instant',
+        effects: [{ type: 'resource_percent', target: 'food', value: -0.1 }],
+      };
+      const newState = applyEvent(state, crisisEvent);
+      // 10% of 500 = 50 lost, 450 remaining
+      expect(newState.resources.food.amount).toBe(450);
+    });
+  });
 });

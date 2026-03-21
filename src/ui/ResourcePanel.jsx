@@ -14,6 +14,8 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
   const [expandedResource, setExpandedResource] = useState(null);
   const seenResourcesRef = useRef(new Set());
   const [newResources, setNewResources] = useState(new Set());
+  const prevRatesRef = useRef({});
+  const [boostedResources, setBoostedResources] = useState(new Set());
 
   const handleGather = useCallback((resourceId, amount) => {
     onUpdate(s => gather(s, resourceId));
@@ -56,6 +58,28 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
       rate: getEffectiveRate(state, id),
       cap: getEffectiveCap(state, id),
     }));
+
+  // Detect rate boosts (e.g., from multiplier upgrades)
+  useEffect(() => {
+    const boosted = new Set();
+    for (const r of unlockedResources) {
+      const prev = prevRatesRef.current[r.id] || 0;
+      if (r.rate > prev * 1.5 && prev > 0) {
+        boosted.add(r.id);
+      }
+      prevRatesRef.current[r.id] = r.rate;
+    }
+    if (boosted.size > 0) {
+      setBoostedResources(prev => new Set([...prev, ...boosted]));
+      setTimeout(() => {
+        setBoostedResources(prev => {
+          const next = new Set(prev);
+          for (const id of boosted) next.delete(id);
+          return next;
+        });
+      }, 600);
+    }
+  }, [state.upgrades]);
 
   // Group by era
   const byEra = {};
@@ -121,7 +145,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                   const tooltip = tooltipParts.join('\n');
                   return (
                     <div key={r.id} className={`resource-row-wrapper`}>
-                    <div className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0)) ? 'consuming' : ''}`} title={tooltip}>
+                    <div className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${boostedResources.has(r.id) ? 'rate-boosted' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0)) ? 'consuming' : ''}`} title={tooltip}>
                       <span className="resource-name" style={{ cursor: 'pointer', textDecoration: expandedResource === r.id ? 'underline' : 'none', borderBottom: expandedResource === r.id ? 'none' : '1px dotted #556' }} onClick={() => setExpandedResource(expandedResource === r.id ? null : r.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedResource(expandedResource === r.id ? null : r.id); }}} tabIndex={0} role="button" aria-expanded={expandedResource === r.id}>
                         {r.def?.name || r.id}
                       </span>
