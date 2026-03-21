@@ -13,7 +13,11 @@ export function checkForEvent(state, dt, roll = Math.random()) {
 
   // Event Magnet prestige upgrade: 50% more events
   const hasEventMagnet = state.prestigeUpgrades && state.prestigeUpgrades.eventMagnet;
-  const eventChance = hasEventMagnet ? BASE_EVENT_CHANCE * 1.5 : BASE_EVENT_CHANCE;
+  // Temporal Echo prestige upgrade: additional 50% more events (stacks with Event Magnet)
+  const hasTemporalEcho = state.prestigeUpgrades && state.prestigeUpgrades.temporalEcho;
+  let eventChance = BASE_EVENT_CHANCE;
+  if (hasEventMagnet) eventChance *= 1.5;
+  if (hasTemporalEcho) eventChance *= 1.5;
 
   // Probability scales with dt so faster/slower ticks behave consistently
   const chance = 1 - Math.pow(1 - eventChance, dt);

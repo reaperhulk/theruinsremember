@@ -8,12 +8,22 @@ export function PrestigePanel({ state, onUpdate }) {
 
   const cycleCount = state.prestigeCount || 0;
   const prestigeLore = cycleCount === 0
-    ? 'The pattern repeats. Every civilization reaches this point. Will you break the cycle — or begin it again?'
+    ? 'The pattern repeats...'
     : cycleCount === 1
     ? 'You remember flashes of a previous life. The ruins make more sense now.'
-    : cycleCount < 5
-    ? `Cycle ${cycleCount + 1}. Each iteration reveals more of the truth. The ruins remember you.`
-    : `Cycle ${cycleCount + 1}. You have walked this path ${cycleCount} times. The universe barely notices.`;
+    : cycleCount === 2
+    ? 'The ruins make sense now. You built them.'
+    : cycleCount === 3
+    ? 'Third iteration. The machines remember you. They were waiting.'
+    : cycleCount === 4
+    ? 'Fourth cycle. You can feel the grooves worn into reality by your passage.'
+    : cycleCount < 10
+    ? `Cycle ${cycleCount + 1}. The universe barely resists anymore. It knows the shape of you.`
+    : cycleCount < 20
+    ? `Cycle ${cycleCount + 1}. You no longer build — you remember. Each upgrade is a memory of a life already lived.`
+    : cycleCount < 50
+    ? `Cycle ${cycleCount + 1}. The boundary between iterations blurs. Past and future are the same hallway, walked in both directions.`
+    : `Cycle ${cycleCount + 1}. You are the cycle. The cycle is you. There is no difference anymore.`;
 
   return (
     <div className="panel prestige-panel">

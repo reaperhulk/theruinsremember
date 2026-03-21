@@ -2,6 +2,8 @@
 // Clicking to mine has a chance to find a gem (5x materials).
 // Consecutive clicks without a gem increase the chance (pity mechanic).
 
+import { getEffectiveCap } from './resources.js';
+
 const BASE_GEM_CHANCE = 0.1;       // 10% base
 const STREAK_BONUS = 0.02;         // +2% per consecutive miss
 const MAX_GEM_CHANCE = 0.5;        // 50% cap
@@ -42,7 +44,7 @@ export function mine(state, roll = Math.random()) {
       ...state.resources,
       materials: {
         ...r,
-        amount: r.amount + gathered,
+        amount: Math.min(r.amount + gathered, getEffectiveCap(state, 'materials')),
       },
     },
   };

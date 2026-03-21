@@ -59,7 +59,7 @@ export function attemptDock(state, position) {
   const dockPrestigeMult = hasDockingPro ? 2 : 1;
 
   // Era scaling: later eras give proportionally more docking rewards
-  const eraScale = 1 + (state.era - 4) * 0.25;
+  const eraScale = Math.pow(1.5, Math.max(0, state.era - 4));
 
   // Apply rewards scaled by prestige, combo, and era
   const newResources = { ...state.resources };

@@ -77,8 +77,8 @@ describe('factory', () => {
     it('worker pool still limited by labor rate', () => {
       const state = makeEra2State();
       state.era = 10;
-      // laborRate = 2, rateMult = 1 => pool = min(floor(2) + 2, 30) = 4
-      expect(getWorkerPool(state)).toBe(4);
+      // laborRate = 2, rateMult = 1 => pool = min(floor(2) + 2 + (10-2)*2, 30) = min(20, 30) = 20
+      expect(getWorkerPool(state)).toBe(20);
     });
   });
 });

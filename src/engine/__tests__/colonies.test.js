@@ -41,10 +41,10 @@ describe('colonies', () => {
     let s = assignColonies(state, 'growth', 2);
     s = assignColonies(s, 'science', 1);
     const bonus = getColonyBonus(s);
-    expect(bonus.food).toBeCloseTo(4);      // 2 * 2
-    expect(bonus.labor).toBeCloseTo(1);      // 2 * 0.5
-    expect(bonus.research).toBeCloseTo(1.5); // 1 * 1.5
-    expect(bonus.data).toBeCloseTo(0.8);     // 1 * 0.8
+    expect(bonus.food).toBeCloseTo(10);     // 2 * 5
+    expect(bonus.labor).toBeCloseTo(3);      // 2 * 1.5
+    expect(bonus.research).toBeCloseTo(4);   // 1 * 4
+    expect(bonus.data).toBeCloseTo(2);       // 1 * 2
   });
 
   it('returns empty bonus before era 5', () => {

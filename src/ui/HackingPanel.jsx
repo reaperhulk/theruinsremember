@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { startHack, submitHack } from '../engine/hacking.js';
 
 const SYMBOLS = ['0', '1', '2', '3'];
@@ -52,7 +52,7 @@ export function HackingPanel({ state, onUpdate }) {
     onUpdate(s => startHack(s));
   };
 
-  const handleSymbol = (sym) => {
+  const handleSymbol = useCallback((sym) => {
     const newInput = [...playerInput, sym];
     setPlayerInput(newInput);
 
@@ -67,7 +67,18 @@ export function HackingPanel({ state, onUpdate }) {
         return newState;
       });
     }
-  };
+  }, [playerInput, challenge, onUpdate]);
+
+  useEffect(() => {
+    if (!challenge) return;
+    const handler = (e) => {
+      if (['0','1','2','3'].includes(e.key)) {
+        handleSymbol(e.key);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [challenge, handleSymbol]);
 
   return (
     <div className={`panel hacking-panel ${flashClass}`}>

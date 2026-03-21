@@ -26,7 +26,6 @@ export function TradingPanel({ state, onUpdate }) {
       const toDef = resourceDefs[toId];
       return {
         ...result,
-        totalTrades: (result.totalTrades || 0) + 1,
         eventLog: [...(result.eventLog || []), {
           message: `Traded ${cost.toFixed(0)} ${fromDef.name} for ${amount} ${toDef.name}`,
           time: result.totalTime,
@@ -72,7 +71,6 @@ export function TradingPanel({ state, onUpdate }) {
                   if (!result) return null;
                   return {
                     ...result,
-                    totalTrades: (result.totalTrades || 0) + 1,
                     eventLog: [...(result.eventLog || []), {
                       message: `Quick traded ${Math.floor(getCost)} ${qt.from.def.name} → ${tradeAmount} ${qt.to.def.name}`,
                       time: result.totalTime,

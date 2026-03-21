@@ -11,7 +11,7 @@ import { checkComboReset } from './weaving.js';
 // Resource consumption rates
 const FOOD_PER_LABOR = 0.3;       // Food consumed per labor/s
 const ENERGY_PER_ELECTRONICS = 0.2; // Energy consumed per electronics/s
-const FUEL_PER_ORBITAL = 0.5;     // Fuel consumed per orbitalInfra/s
+const FUEL_PER_ORBITAL = 0.3;     // Fuel consumed per orbitalInfra/s
 
 // Core game loop: advance state by dt seconds
 export function tick(state, dt) {

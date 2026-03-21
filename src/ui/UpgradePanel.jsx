@@ -5,6 +5,12 @@ import { resources as resourceDefs } from '../data/resources.js';
 
 import { formatNumber } from './format.js';
 
+const LORE_UPGRADE_IDS = new Set([
+  'precursorBeacon', 'deadStarAtlas', 'hollowDyson', 'echoBlueprint',
+  'galacticOssuary', 'convergenceCodex', 'universalTombstone',
+  'inevitabilityEngine', 'recursionScar', 'finalIteration',
+]);
+
 function resourceName(id) {
   return resourceDefs[id]?.name || id;
 }
@@ -144,9 +150,14 @@ export function UpgradePanel({ state, onUpdate }) {
           <button
             className="gather-btn"
             style={{ width: '100%', marginBottom: '4px', padding: '4px', fontSize: '0.8em' }}
-            onClick={() => {
-              affordableNonRepeatable.forEach(u => onUpdate(s => purchaseUpgrade(s, u.id)));
-            }}
+            onClick={() => onUpdate(s => {
+              let current = s;
+              for (const u of affordableNonRepeatable) {
+                const next = purchaseUpgrade(current, u.id);
+                if (next) current = next;
+              }
+              return current;
+            })}
           >
             Buy All Affordable ({affordableNonRepeatable.length})
           </button>
@@ -179,7 +190,7 @@ export function UpgradePanel({ state, onUpdate }) {
           return (
             <div key={upgrade.id} className="upgrade-row">
             <button
-              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''}`}
+              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''} ${LORE_UPGRADE_IDS.has(upgrade.id) ? 'lore-upgrade' : ''}`}
               disabled={!affordable}
               onClick={() => handlePurchase(upgrade.id)}
               title={`${upgrade.description}\nEffects: ${formatEffects(upgrade.effects)}`}

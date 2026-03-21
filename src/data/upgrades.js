@@ -2884,6 +2884,35 @@ export const upgrades = {
     description: 'Every digital system on the planet awakens simultaneously. The singularity is not artificial — the planet itself is computing. It always was.',
     prerequisites: ['algorithmicForge', 'nanoelectronicsLab', 'cognitiveMesh'],
   },
+
+  // Late-game production_mult_all upgrades — reward deep runs with global scaling
+  galacticResonance: {
+    id: 'galacticResonance', name: 'Galactic Resonance', era: 8,
+    cost: { galacticInfluence: 500, exoticMatter: 200, research: 5000 },
+    effects: [
+      { type: 'production_mult_all', value: 1.5 },
+    ],
+    description: 'The ruins hum with a frequency that amplifies all production — the precursors knew how to optimize everything.',
+    prerequisites: ['galacticOssuary'],
+  },
+  cosmicHarmony: {
+    id: 'cosmicHarmony', name: 'Cosmic Harmony', era: 9,
+    cost: { cosmicPower: 800, universalConstants: 50, darkEnergy: 2000 },
+    effects: [
+      { type: 'production_mult_all', value: 2 },
+    ],
+    description: 'Aligning with the universal constants doubles all production — you understand now why they built what they built.',
+    prerequisites: ['universalTombstone'],
+  },
+  omniscientFlow: {
+    id: 'omniscientFlow', name: 'Omniscient Flow', era: 10,
+    cost: { realityFragments: 500, quantumEchoes: 300, cosmicPower: 1000 },
+    effects: [
+      { type: 'production_mult_all', value: 3 },
+    ],
+    description: 'Knowledge flows from every previous iteration — all production tripled as the cycle accelerates.',
+    prerequisites: ['recursionScar'],
+  },
 };
 
 // Balance scaling: multiply upgrade costs by era-dependent factors

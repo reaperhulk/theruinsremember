@@ -28,10 +28,10 @@ export function calculatePrestigePoints(state) {
   if (state.era < 7) return 0;
   // Base: escalating points for deep eras
   let points = 0;
-  if (state.era >= 7) points += 1;
-  if (state.era >= 8) points += 2;
-  if (state.era >= 9) points += 3;
-  if (state.era >= 10) points += 5;  // 11 total for reaching era 10
+  if (state.era >= 7) points += 2;
+  if (state.era >= 8) points += 4;
+  if (state.era >= 9) points += 6;
+  if (state.era >= 10) points += 10;  // 22 total for reaching era 10
   // Bonus for era 10 upgrade completion (rewards thorough play)
   const era10Upgrades = Object.keys(state.upgrades).filter(id => {
     const def = upgradeDefs[id];
@@ -72,8 +72,11 @@ export function purchasePrestigeUpgrade(state, upgradeId) {
   if (!def) return null;
   if (hasPrestigeUpgrade(state, upgradeId)) return null;
   if ((state.prestigePoints || 0) < def.cost) return null;
-  // Check prerequisite
-  if (def.requires && !hasPrestigeUpgrade(state, def.requires)) return null;
+  // Check prerequisite(s) — supports single string or array
+  if (def.requires) {
+    const reqs = Array.isArray(def.requires) ? def.requires : [def.requires];
+    if (reqs.some(r => !hasPrestigeUpgrade(state, r))) return null;
+  }
 
   return {
     ...state,
@@ -88,8 +91,8 @@ export function getPrestigeShop(state) {
     ...u,
     owned: hasPrestigeUpgrade(state, u.id),
     affordable: (state.prestigePoints || 0) >= u.cost,
-    locked: u.requires && !hasPrestigeUpgrade(state, u.requires),
-    requiresName: u.requires ? prestigeUpgrades[u.requires]?.name : null,
+    locked: u.requires && (Array.isArray(u.requires) ? u.requires.some(r => !hasPrestigeUpgrade(state, r)) : !hasPrestigeUpgrade(state, u.requires)),
+    requiresName: u.requires ? (Array.isArray(u.requires) ? u.requires.map(r => prestigeUpgrades[r]?.name).join(', ') : prestigeUpgrades[u.requires]?.name) : null,
   }));
 }
 
@@ -209,6 +212,16 @@ export function performPrestige(state) {
           };
         }
       }
+    }
+  }
+
+  // Cycle Mastery: all production x2 permanently
+  if (hasPrestigeUpgrade(state, 'cycleMastery')) {
+    for (const id of Object.keys(newState.resources)) {
+      newState.resources[id] = {
+        ...newState.resources[id],
+        rateMult: newState.resources[id].rateMult * 2,
+      };
     }
   }
 

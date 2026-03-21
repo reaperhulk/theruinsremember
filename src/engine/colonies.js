@@ -5,9 +5,9 @@
 const FOCUS_TYPES = ['growth', 'science', 'industry'];
 
 const FOCUS_BONUSES = {
-  growth: { food: 2, labor: 0.5 },
-  science: { research: 1.5, data: 0.8 },
-  industry: { exoticMaterials: 0.3, energy: 5 },
+  growth: { food: 5, labor: 1.5 },
+  science: { research: 4, data: 2 },
+  industry: { exoticMaterials: 1, energy: 15 },
 };
 
 // Get max assignable colonies (based on colonies resource amount)
@@ -66,7 +66,7 @@ export function getColonyBonus(state) {
   const focusMult = isSpecialized ? 2 : (isDiversified ? 1.25 : 1);
 
   // Era scaling: colony bonuses increase with era
-  const eraScale = 1 + (state.era - 5) * 0.3; // x1 at era 5, x2.5 at era 10
+  const eraScale = 1 + (state.era - 5) * 0.5; // x1 at era 5, x3.5 at era 10
 
   const bonus = {};
   for (const focus of FOCUS_TYPES) {

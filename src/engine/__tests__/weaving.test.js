@@ -54,7 +54,7 @@ describe('weaving', () => {
     expect(after.weavingGrid).toHaveLength(0);
     expect(after.totalWeaves).toBe(1);
     expect(after.activeEffects).toHaveLength(1);
-    expect(after.activeEffects[0].effects[0].resourceId).toBe('cosmicPower');
+    expect(after.activeEffects[0].effect.resourceId).toBe('cosmicPower');
   });
 
   it('does not resolve with less than 3 matches', () => {
@@ -103,13 +103,13 @@ describe('weaving', () => {
     const { state: after1 } = resolveWeave(state);
     expect(after1.weaveCombo).toBe(1);
     // First weave: x2 base, combo 1 = x1 mult = x2 total
-    expect(after1.activeEffects[0].effects[0].rateMultBonus).toBe(2);
+    expect(after1.activeEffects[0].effect.rateMultBonus).toBe(2);
 
     // Second weave
     after1.weavingGrid = ['spatial', 'spatial', 'spatial'];
     const { state: after2 } = resolveWeave(after1);
     expect(after2.weaveCombo).toBe(2);
     // Combo 2 = x1.5 mult, base 2 = x3 total
-    expect(after2.activeEffects[1].effects[0].rateMultBonus).toBe(3);
+    expect(after2.activeEffects[1].effect.rateMultBonus).toBe(3);
   });
 });

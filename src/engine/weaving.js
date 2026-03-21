@@ -131,9 +131,7 @@ export function resolveWeave(state) {
     id: `weave_${matchType}_${state.totalTime}`,
     endsAt: state.totalTime + BONUS_DURATION,
     description: `Reality Weave: x${effectMult.toFixed(1)} ${bonus.resource}`,
-    effects: [
-      { resourceId: bonus.resource, rateMultBonus: effectMult },
-    ],
+    effect: { resourceId: bonus.resource, rateMultBonus: effectMult },
   };
 
   return {

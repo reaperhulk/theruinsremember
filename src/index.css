@@ -1547,6 +1547,21 @@ canvas:hover {
   100% { background: #1a2845; transform: scale(1); }
 }
 
+.tech-btn.breakthrough-flash {
+  animation: tech-breakthrough 0.8s ease-out;
+}
+
+@keyframes tech-breakthrough {
+  0% { background: rgba(255, 255, 100, 0.4); box-shadow: 0 0 20px rgba(255, 255, 100, 0.6); transform: scale(1.05); }
+  50% { background: rgba(255, 255, 100, 0.1); box-shadow: 0 0 40px rgba(255, 255, 100, 0.3); }
+  100% { background: #1a2845; box-shadow: none; transform: scale(1); }
+}
+
+.upgrade-btn.lore-upgrade {
+  border-left: 3px solid #bb88ff;
+  background: linear-gradient(90deg, rgba(187, 136, 255, 0.08), transparent);
+}
+
 /* Resource amount smooth transitions */
 .resource-amount {
   transition: color 0.3s ease;

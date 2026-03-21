@@ -110,7 +110,7 @@ export const achievements = [
   { id: 'hackerElite', name: 'Hacker Elite', description: 'Complete 50 hacks', check: s => (s.hackSuccesses || 0) >= 50, reward: 5 },
   { id: 'weaveMaster', name: 'Weave Master', description: 'Complete 50 weaves', check: s => (s.totalWeaves || 0) >= 50, reward: 5 },
   { id: 'gemOverlord', name: 'Gem Overlord', description: 'Find 500 gems', check: s => (s.totalGems || 0) >= 500, reward: 10 },
-  { id: 'allPrestige', name: 'Prestige Collector', description: 'Buy all prestige upgrades', check: s => Object.keys(s.prestigeUpgrades || {}).length >= 15, reward: 20 },
+  { id: 'allPrestige', name: 'Prestige Collector', description: 'Buy all prestige upgrades', check: s => Object.keys(s.prestigeUpgrades || {}).length >= 25, reward: 20 },
 
   // New achievements
   { id: 'quadrillion', name: 'Quadrillionaire', description: 'Have 1 quadrillion of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e15), reward: 10 },
@@ -326,4 +326,43 @@ export const achievements = [
   { id: 'era1Mastery', name: 'Era 1 Mastery', description: 'Buy the Era 1 capstone upgrade', check: s => !!s.upgrades?.settlerMonument, reward: 3 },
   { id: 'cycleAwareness', name: 'Cycle Awareness', description: 'Buy the Recursion Scar lore upgrade', check: s => !!s.upgrades?.recursionScar, reward: 15 },
   { id: 'finalTruth', name: 'Final Truth', description: 'Buy the Final Iteration lore upgrade', check: s => !!s.upgrades?.finalIteration, reward: 20 },
+
+  // --- Gap-filling achievements ---
+
+  // Upgrade milestones
+  { id: 'upgrader25', name: 'Quarter Century', description: 'Purchase 25 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 25, reward: 1 },
+  { id: 'upgrader75', name: 'Seventy-Five Strong', description: 'Purchase 75 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 75, reward: 5 },
+  { id: 'upgrader150', name: 'Sesquicentennial', description: 'Purchase 150 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 150, reward: 10 },
+  { id: 'upgrader175', name: 'Rising Titan', description: 'Purchase 175 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 175, reward: 10 },
+  { id: 'upgrader225', name: 'Relentless Buyer', description: 'Purchase 225 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 225, reward: 10 },
+
+  // Gem milestones
+  { id: 'gem25', name: 'Gem Enthusiast', description: 'Find 25 gems', check: s => (s.totalGems || 0) >= 25, reward: 1 },
+  { id: 'gem75', name: 'Gem Prospector', description: 'Find 75 gems', check: s => (s.totalGems || 0) >= 75, reward: 3 },
+
+  // Trade milestones
+  { id: 'trade10', name: 'Novice Trader', description: 'Complete 10 trades', check: s => (s.totalTrades || 0) >= 10, reward: 1 },
+  { id: 'trade75', name: 'Shrewd Dealer', description: 'Complete 75 trades', check: s => (s.totalTrades || 0) >= 75, reward: 3 },
+
+  // Hack milestones
+  { id: 'hack15', name: 'Code Monkey', description: 'Complete 15 hacks', check: s => (s.hackSuccesses || 0) >= 15, reward: 1 },
+  { id: 'hack30', name: 'Grey Hat', description: 'Complete 30 hacks', check: s => (s.hackSuccesses || 0) >= 30, reward: 2 },
+  { id: 'hack75', name: 'Black Hat', description: 'Complete 75 hacks', check: s => (s.hackSuccesses || 0) >= 75, reward: 5 },
+
+  // Dock perfect milestones
+  { id: 'dock3', name: 'Smooth Landing', description: 'Land 3 perfect docks', check: s => (s.dockingPerfects || 0) >= 3, reward: 1 },
+  { id: 'dock20', name: 'Seasoned Pilot', description: 'Land 20 perfect docks', check: s => (s.dockingPerfects || 0) >= 20, reward: 2 },
+  { id: 'dock35', name: 'Precision Pilot', description: 'Land 35 perfect docks', check: s => (s.dockingPerfects || 0) >= 35, reward: 3 },
+  { id: 'dock75', name: 'Top Gun', description: 'Land 75 perfect docks', check: s => (s.dockingPerfects || 0) >= 75, reward: 5 },
+
+  // Weave milestones
+  { id: 'weave3', name: 'Thread Puller', description: 'Complete 3 weaves', check: s => (s.totalWeaves || 0) >= 3, reward: 1 },
+  { id: 'weave15', name: 'Pattern Maker', description: 'Complete 15 weaves', check: s => (s.totalWeaves || 0) >= 15, reward: 1 },
+  { id: 'weave30', name: 'Loom Operator', description: 'Complete 30 weaves', check: s => (s.totalWeaves || 0) >= 30, reward: 2 },
+  { id: 'weave75', name: 'Tapestry Artisan', description: 'Complete 75 weaves', check: s => (s.totalWeaves || 0) >= 75, reward: 5 },
+
+  // Time played milestones
+  { id: 'oneHour', name: 'Getting Started', description: 'Play for 1 hour total', check: s => s.totalTime >= 3600, reward: 1 },
+  { id: 'fourHours', name: 'Invested', description: 'Play for 4 hours total', check: s => s.totalTime >= 14400, reward: 3 },
+  { id: 'twelveHours', name: 'Half Day', description: 'Play for 12 hours total', check: s => s.totalTime >= 43200, reward: 5 },
 ];

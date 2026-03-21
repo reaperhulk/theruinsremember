@@ -16,7 +16,8 @@ export function getWorkerPool(state) {
   const laborRate = state.resources.labor?.rateAdd || 0;
   const laborMult = state.resources.labor?.rateMult || 1;
   const maxWorkers = getMaxWorkers(state);
-  return Math.min(Math.floor((laborRate * laborMult) + 2), maxWorkers);
+  const eraBonus = Math.max(0, (state.era - 2) * 2);
+  return Math.min(Math.floor((laborRate * laborMult) + 2) + eraBonus, maxWorkers);
 }
 
 // Get current allocation from state

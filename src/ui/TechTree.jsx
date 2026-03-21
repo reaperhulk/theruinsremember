@@ -3,6 +3,7 @@ import { getAvailableTech, unlockTech } from '../engine/tech.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
+import { formatNumber } from './format.js';
 
 function resourceName(id) {
   return resourceDefs[id]?.name || id;
@@ -18,7 +19,7 @@ function CostDisplay({ cost, state }) {
           <span key={id}>
             {i > 0 && ', '}
             <span style={{ color: enough ? '#88cc88' : '#ff8888' }}>
-              {resourceName(id)}: {amount}
+              {resourceName(id)}: {formatNumber(amount)}
             </span>
           </span>
         );
@@ -61,7 +62,8 @@ export function TechTree({ state, onUpdate }) {
   const handleUnlock = useCallback((techId) => {
     setFlashId(techId);
     onUpdate(s => unlockTech(s, techId));
-    setTimeout(() => setFlashId(null), 400);
+    const tech = techTree[techId];
+    setTimeout(() => setFlashId(null), tech?.grantsEra ? 800 : 400);
   }, [onUpdate]);
 
   // Show unlocked techs count
@@ -94,7 +96,7 @@ export function TechTree({ state, onUpdate }) {
           return (
             <button
               key={tech.id}
-              className={`tech-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === tech.id ? 'purchase-flash' : ''}`}
+              className={`tech-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === tech.id ? (tech.grantsEra ? 'breakthrough-flash' : 'purchase-flash') : ''}`}
               disabled={!affordable}
               onClick={() => handleUnlock(tech.id)}
               title={tech.description}
