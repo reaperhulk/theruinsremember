@@ -72,7 +72,7 @@ function getAffordProgress(state, cost) {
 
 export function UpgradePanel({ state, onUpdate }) {
   const [showPurchased, setShowPurchased] = useState(false);
-  const [sortBy, setSortBy] = useState('affordable');
+  const [sortBy, setSortBy] = useState('default');
   const [filterType, setFilterType] = useState('all');
   const [flashId, setFlashId] = useState(null);
 
