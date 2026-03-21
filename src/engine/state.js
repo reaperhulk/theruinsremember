@@ -41,5 +41,6 @@ export function createInitialState() {
     prestigePoints: 0,
     prestigeUpgrades: {},
     achievements: {},
+    saveVersion: 2,
   };
 }

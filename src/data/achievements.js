@@ -365,4 +365,16 @@ export const achievements = [
   { id: 'oneHour', name: 'Getting Started', description: 'Play for 1 hour total', check: s => s.totalTime >= 3600, reward: 1 },
   { id: 'fourHours', name: 'Invested', description: 'Play for 4 hours total', check: s => s.totalTime >= 14400, reward: 3 },
   { id: 'twelveHours', name: 'Half Day', description: 'Play for 12 hours total', check: s => s.totalTime >= 43200, reward: 5 },
+
+  // --- Mini-game mastery achievements ---
+  { id: 'miningLegend', name: 'Mining Legend', description: 'Find 250 gems', check: s => (s.totalGems || 0) >= 250, reward: 7 },
+  { id: 'factoryOptimizer', name: 'Factory Optimizer', description: 'Have all factory lines at max with full capacity bonus', check: s => { const a = s.factoryAllocation || {}; return (a.steel || 0) >= 10 && (a.electronics || 0) >= 10 && (a.research || 0) >= 10; }, reward: 5 },
+  { id: 'hackMilestone40', name: 'Hack Streak', description: 'Complete 40 hacks', check: s => (s.hackSuccesses || 0) >= 40, reward: 4 },
+  { id: 'perfectRun75', name: 'Perfect Run', description: 'Land 75 perfect docks', check: s => (s.dockingPerfects || 0) >= 75, reward: 5 },
+  { id: 'weaveArtist', name: 'Weave Artist', description: 'Complete 40 weaves', check: s => (s.totalWeaves || 0) >= 40, reward: 4 },
+  { id: 'starMapper', name: 'Star Mapper', description: 'Create 10 star routes', check: s => (s.starRoutes?.length || 0) >= 10, reward: 3 },
+  { id: 'colonyEmpire50', name: 'Colony Empire', description: 'Assign 50+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 50; }, reward: 5 },
+  { id: 'allMiniGames', name: 'All Mini-Games', description: 'Have activity in all 7 mini-games', check: s => (s.totalGems || 0) > 0 && (s.hackSuccesses || 0) > 0 && (s.dockingPerfects || 0) > 0 && (s.totalWeaves || 0) > 0 && (s.starRoutes?.length || 0) > 0 && Object.values(s.colonyAssignments || {}).some(v => v > 0) && Object.values(s.factoryAllocation || {}).some(v => v > 0), reward: 10 },
+  { id: 'comboKing', name: 'Combo King', description: 'Reach 3x dock combo AND 2x weave combo', check: s => (s.dockingCombo || 0) >= 3 && (s.weaveCombo || 0) >= 2, reward: 5 },
+  { id: 'grandMiner', name: 'Grand Miner', description: 'Find 1500 gems', check: s => (s.totalGems || 0) >= 1500, reward: 10 },
 ];

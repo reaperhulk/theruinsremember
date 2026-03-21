@@ -1460,7 +1460,8 @@ canvas:hover {
   background: rgba(0, 0, 0, 0.7);
   z-index: 1000;
   animation: era-fade-in 0.3s ease;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .era-transition-overlay.fading {
@@ -1508,6 +1509,23 @@ canvas:hover {
   50% { text-shadow: 0 0 30px rgba(139, 233, 253, 0.8), 0 0 60px rgba(139, 233, 253, 0.5), 0 0 80px rgba(139, 233, 253, 0.2); }
 }
 
+.era-transition-unlocks {
+  margin-top: 14px;
+  font-size: 0.85em;
+  color: #aaddaa;
+  line-height: 1.6;
+}
+
+.era-unlock-line {
+  margin-top: 4px;
+}
+
+.era-unlock-label {
+  color: #8be9fd;
+  font-weight: bold;
+  margin-right: 4px;
+}
+
 .cap-indicator {
   font-size: 0.8em;
   color: #888;
@@ -1515,6 +1533,33 @@ canvas:hover {
 
 .resource-rate {
   font-variant-numeric: tabular-nums;
+}
+
+.rate-active {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #66cc66;
+  margin-right: 4px;
+  vertical-align: middle;
+  animation: rate-dot-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes rate-dot-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.rate-negative {
+  font-weight: bold;
+}
+
+.rate-warning {
+  color: #ff4444;
+  font-weight: bold;
+  font-size: 1.1em;
+  animation: rate-dot-pulse 1.5s ease-in-out infinite;
 }
 
 /* Affordable upgrade glow pulse */

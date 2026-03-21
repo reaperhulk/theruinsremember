@@ -1,5 +1,17 @@
 import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary } from '../engine/prestige.js';
 
+function getPrestigeInsight(state) {
+  const owned = state.prestigeUpgrades || {};
+  if (owned.cycleMastery) return 'You have mastered the cycle. Production flows like water through familiar channels.';
+  if (owned.quantumTunneling) return 'Prerequisites blur. You remember the shortcuts from last time.';
+  if (owned.infinitePatience) return 'Time holds no dominion over one who has lived forever.';
+  if (owned.temporalEcho) return 'Events ripple backward through time. You catch their echoes.';
+  if (owned.deepPockets) return 'The universe provides more space for those who have walked this path before.';
+  if (owned.fastStart) return 'The first steps are muscle memory now.';
+  if (Object.keys(owned).length > 0) return 'Each upgrade is a scar from a previous iteration.';
+  return null;
+}
+
 export function PrestigePanel({ state, onUpdate }) {
   const shop = getPrestigeShop(state);
   const summary = getPrestigeSummary(state);
@@ -31,6 +43,11 @@ export function PrestigePanel({ state, onUpdate }) {
       <p style={{ fontSize: '0.8em', color: '#998866', fontStyle: 'italic', margin: '0 0 8px', textAlign: 'center' }}>
         {prestigeLore}
       </p>
+      {getPrestigeInsight(state) && (
+        <p style={{ fontSize: '0.75em', color: '#7799aa', fontStyle: 'italic', margin: '0 0 8px', textAlign: 'center' }}>
+          {getPrestigeInsight(state)}
+        </p>
+      )}
       <div className="prestige-info">
         <div className="stat-row">
           <span>Prestige Points:</span>

@@ -1,5 +1,22 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { tick } from '../engine/tick.js';
+import { createInitialState } from '../engine/state.js';
+
+function migrateState(saved) {
+  const fresh = createInitialState();
+  // Ensure all fields exist by merging with defaults
+  const migrated = { ...fresh, ...saved };
+  // Ensure resources have all required fields
+  for (const [id, freshR] of Object.entries(fresh.resources)) {
+    if (!migrated.resources[id]) {
+      migrated.resources[id] = freshR;
+    } else {
+      migrated.resources[id] = { ...freshR, ...migrated.resources[id] };
+    }
+  }
+  migrated.saveVersion = 2;
+  return migrated;
+}
 
 const SAVE_KEY = 'incremental-game-save';
 const SAVE_INTERVAL = 15000; // 15 seconds — more frequent saves
@@ -16,11 +33,22 @@ export function useGameLoop(initialState) {
         // Calculate offline progress
         const now = Date.now();
         const elapsed = (now - parsed.lastSaved) / 1000;
+        const migrated = migrateState(parsed);
         if (elapsed > 10) {
           // Cap offline time at 24 hours
           const offlineDt = Math.min(elapsed, 86400);
-          const before = parsed;
-          const after = tick(parsed, offlineDt);
+          const before = migrated;
+
+          // Process offline in chunks for proper event/achievement checking
+          const chunkSize = 60;
+          const chunks = Math.min(Math.floor(offlineDt / chunkSize), 1440);
+          let tickState = migrated;
+          for (let i = 0; i < chunks; i++) {
+            tickState = tick(tickState, chunkSize);
+          }
+          const remainder = offlineDt - chunks * chunkSize;
+          if (remainder > 0) tickState = tick(tickState, remainder);
+          const after = tickState;
 
           // Calculate resource gains for offline report
           const gains = {};
@@ -34,7 +62,7 @@ export function useGameLoop(initialState) {
           setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains }), 100);
           return after;
         }
-        return parsed;
+        return migrated;
       } catch {
         // Corrupted save, start fresh
       }

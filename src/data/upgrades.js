@@ -11,28 +11,28 @@ export const upgrades = {
     id: 'tools', name: 'Stone Tools', era: 1,
     cost: { labor: 10, materials: 5 },
     effects: [{ type: 'production_mult', target: 'materials', value: 2 }],
-    description: 'Basic tools double material production',
+    description: 'You chip stones into blades using techniques no one taught you — the hands just remember',
     prerequisites: [],
   },
   irrigation: {
     id: 'irrigation', name: 'Irrigation', era: 1,
     cost: { labor: 15, materials: 10 },
     effects: [{ type: 'production_mult', target: 'food', value: 2 }],
-    description: 'Irrigated fields double food output',
+    description: 'The soil here is strangely fertile — as if someone enriched it long ago',
     prerequisites: [],
   },
   basicPower: {
     id: 'basicPower', name: 'Basic Power', era: 1,
     cost: { labor: 20, materials: 15 },
     effects: [{ type: 'production_mult', target: 'energy', value: 3 }],
-    description: 'Wind and water power triple energy output',
+    description: 'The river bends at exact right angles — too perfect to be natural. You harness its flow',
     prerequisites: [],
   },
   housing: {
     id: 'housing', name: 'Housing', era: 1,
     cost: { materials: 20, food: 15 },
     effects: [{ type: 'production_add', target: 'labor', value: 1 }],
-    description: 'Proper housing provides steady labor',
+    description: 'Foundation stones fit together without mortar — an old trick from a world you half-remember',
     prerequisites: ['tools'],
   },
   expandWorkforce: {
@@ -51,7 +51,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'food', value: 2 },
       { type: 'cap_mult', target: 'materials', value: 2 },
     ],
-    description: 'Double food and material storage capacity',
+    description: 'You find a buried vault with climate-controlled chambers — someone built these before the crash',
     prerequisites: ['tools'],
   },
   foundry: {
@@ -61,7 +61,7 @@ export const upgrades = {
       { type: 'unlock_resource', target: 'steel', value: 1 },
       { type: 'production_add', target: 'steel', value: 0.5 },
     ],
-    description: 'Smelt metals into steel — gateway to industrialization',
+    description: 'Salvaged wreckage from the crash yields strange alloys — you learn to forge them into steel',
     prerequisites: ['basicPower', 'tools'],
   },
 
@@ -73,7 +73,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.5 },
       { type: 'production_add', target: 'energy', value: 0.5 },
     ],
-    description: 'Better tools boost materials and generate energy',
+    description: 'The crash site yields precision instruments — whoever built them understood materials you have no name for',
     prerequisites: ['foundry'],
   },
   gemPolisher: {
@@ -138,14 +138,14 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.8 },
       { type: 'production_add', target: 'steel', value: 0.8 },
     ],
-    description: 'Heavy industry boosts materials and steel production',
+    description: 'Furnace smoke rises where ancient chimneys still stand — the old builders knew this trick too',
     prerequisites: ['foundry'],
   },
   powerGrid: {
     id: 'powerGrid', name: 'Power Grid', era: 2,
     cost: { steel: 40, electronics: 15 },
     effects: [{ type: 'production_mult', target: 'energy', value: 3 }],
-    description: 'Centralized power distribution',
+    description: 'Copper cables thread through buried conduits — the old grid was waiting to be reawakened',
     prerequisites: ['assemblyLines'],
   },
   computingLab: {
@@ -219,7 +219,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 1.2 },
       { type: 'production_add', target: 'data', value: 1.2 },
     ],
-    description: 'Statistical algorithms boost research and data analysis',
+    description: 'The old data cores contain patterns within patterns — each one unlocked reveals three more hidden beneath',
     prerequisites: ['digitalSensors'],
   },
   cloudComputing: {
@@ -2924,6 +2924,93 @@ export const upgrades = {
     ],
     description: 'Knowledge flows from every previous iteration — all production tripled as the cycle accelerates.',
     prerequisites: ['recursionScar'],
+  },
+
+  // Era 6 cross-chain + capstone
+  warpForge: {
+    id: 'warpForge', name: 'Warp Forge', era: 6,
+    cost: { starSystems: 20, darkEnergy: 50, research: 200 },
+    effects: [
+      { type: 'production_mult', target: 'starSystems', value: 2 },
+      { type: 'production_add', target: 'darkEnergy', value: 3 },
+    ],
+    description: 'Forging warp fields doubles star system output and generates dark energy',
+    prerequisites: ['warpDrive', 'stellarCartography'],
+  },
+  beaconNetwork: {
+    id: 'beaconNetwork', name: 'Beacon Network', era: 6,
+    cost: { darkEnergy: 80, starSystems: 15, exoticMaterials: 40 },
+    effects: [
+      { type: 'production_mult', target: 'darkEnergy', value: 2 },
+      { type: 'production_add', target: 'starSystems', value: 2 },
+    ],
+    description: 'A network of beacons doubles dark energy collection and reveals new systems',
+    prerequisites: ['darkEnergyCollector', 'warpForge'],
+  },
+  interstellarCapstone: {
+    id: 'interstellarCapstone', name: 'Interstellar Capstone', era: 6,
+    cost: { starSystems: 30, darkEnergy: 100, research: 300 },
+    effects: [{ type: 'production_mult_all', value: 1.3 }],
+    description: 'Every star system we colonize mirrors a pattern in the ancient maps — our expansion follows grooves carved by the previous cycle.',
+    prerequisites: ['warpForge', 'beaconNetwork'],
+  },
+
+  // Era 7 cross-chain + capstone
+  forgeHarmonics: {
+    id: 'forgeHarmonics', name: 'Forge Harmonics', era: 7,
+    cost: { stellarForge: 100, megastructures: 30, energy: 1000 },
+    effects: [
+      { type: 'production_mult', target: 'stellarForge', value: 3 },
+      { type: 'production_add', target: 'megastructures', value: 1 },
+    ],
+    description: 'Harmonic resonance in stellar forges triples output and builds megastructures',
+    prerequisites: ['starLifting', 'dysonSphere'],
+  },
+  neuralLattice: {
+    id: 'neuralLattice', name: 'Neural Lattice', era: 7,
+    cost: { megastructures: 50, research: 500, stellarForge: 80 },
+    effects: [
+      { type: 'production_mult', target: 'megastructures', value: 2 },
+      { type: 'production_add', target: 'research', value: 10 },
+    ],
+    description: 'A lattice of thinking matter doubles megastructure output and accelerates research',
+    prerequisites: ['matrioshkaBrain', 'forgeHarmonics'],
+  },
+  dysonCapstone: {
+    id: 'dysonCapstone', name: 'Dyson Capstone', era: 7,
+    cost: { megastructures: 80, stellarForge: 150, research: 800 },
+    effects: [{ type: 'production_mult_all', value: 1.5 }],
+    description: 'The megastructure completes itself — the blueprints were already encoded in its foundation.',
+    prerequisites: ['forgeHarmonics', 'neuralLattice'],
+  },
+
+  // Era 8 cross-chain + capstone
+  voidConduitUpgrade: {
+    id: 'voidConduitUpgrade', name: 'Void Conduit', era: 8,
+    cost: { exoticMatter: 100, galacticInfluence: 200, cosmicPower: 20 },
+    effects: [
+      { type: 'production_mult', target: 'exoticMatter', value: 3 },
+      { type: 'production_add', target: 'galacticInfluence', value: 5 },
+    ],
+    description: 'A conduit through the void triples exotic matter output and extends influence',
+    prerequisites: ['wormholeNetwork', 'darkMatterHarvest'],
+  },
+  galacticMindUpgrade: {
+    id: 'galacticMindUpgrade', name: 'Galactic Mind', era: 8,
+    cost: { galacticInfluence: 500, exoticMatter: 80, research: 1000 },
+    effects: [
+      { type: 'production_mult', target: 'galacticInfluence', value: 2 },
+      { type: 'production_add', target: 'exoticMatter', value: 3 },
+    ],
+    description: 'A unified galactic consciousness doubles influence and synthesizes exotic matter',
+    prerequisites: ['galacticSenate', 'voidConduitUpgrade'],
+  },
+  galacticCapstone: {
+    id: 'galacticCapstone', name: 'Galactic Capstone', era: 8,
+    cost: { galacticInfluence: 800, exoticMatter: 150, cosmicPower: 50 },
+    effects: [{ type: 'production_mult_all', value: 1.5 }],
+    description: 'The galactic senate halls echo with the voices of civilizations that sat in these same seats.',
+    prerequisites: ['voidConduitUpgrade', 'galacticMindUpgrade'],
   },
 };
 

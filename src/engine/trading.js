@@ -5,7 +5,7 @@ import { resources as resourceDefs } from '../data/resources.js';
 
 // Trade ratios:
 //   Same era: 1:1
-//   Trading up (lower era -> higher era): 10:1 per era difference
+//   Trading up (lower era -> higher era): 4:1 per era difference
 //   Trading down (higher era -> lower era): 1:5 per era difference
 
 export function getTradeRatio(fromResourceId, toResourceId) {
@@ -19,8 +19,8 @@ export function getTradeRatio(fromResourceId, toResourceId) {
     // Same era: 1:1
     return { input: 1, output: 1 };
   } else if (eraDiff > 0) {
-    // Trading up: expensive — need 10^eraDiff input per 1 output
-    return { input: Math.pow(10, eraDiff), output: 1 };
+    // Trading up: expensive — need 4^eraDiff input per 1 output
+    return { input: Math.pow(4, eraDiff), output: 1 };
   } else {
     // Trading down: cheap — 1 input gives 5^|eraDiff| output
     return { input: 1, output: Math.pow(5, Math.abs(eraDiff)) };

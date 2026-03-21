@@ -102,11 +102,15 @@ export function ResourcePanel({ state, onUpdate }) {
                           const net = getNetRate(state, r.id);
                           const isConsumed = ['food','energy','rocketFuel'].includes(r.id) && net < r.rate;
                           if (isConsumed) {
-                            return <span style={{ color: net >= 0 ? '#88dd88' : '#ff8844' }}>
-                              {net >= 0 ? '+' : ''}{formatNumber(net)}/s
-                            </span>;
+                            return <>
+                              {net > 0 && <span className="rate-active" />}
+                              <span className={net < 0 ? 'rate-negative' : ''} style={{ color: net >= 0 ? '#88dd88' : '#ff6644' }}>
+                                {net >= 0 ? '+' : ''}{formatNumber(net)}/s
+                                {net < 0 && <span className="rate-warning" title="Consumption exceeds production!"> !</span>}
+                              </span>
+                            </>;
                           }
-                          return `+${formatNumber(r.rate)}/s`;
+                          return <><span className="rate-active" />+{formatNumber(r.rate)}/s</>;
                         })() : ''}
                       </span>
                       <span className="resource-gather" style={{ position: 'relative' }}>

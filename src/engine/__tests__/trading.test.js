@@ -37,16 +37,16 @@ describe('trading', () => {
       expect(ratio).toEqual({ input: 1, output: 1 });
     });
 
-    it('returns 10:1 for trading up one era', () => {
+    it('returns 4:1 for trading up one era', () => {
       // materials (era 1) -> steel (era 2)
       const ratio = getTradeRatio('materials', 'steel');
-      expect(ratio).toEqual({ input: 10, output: 1 });
+      expect(ratio).toEqual({ input: 4, output: 1 });
     });
 
-    it('returns 1000:1 for trading up three eras', () => {
+    it('returns 64:1 for trading up three eras', () => {
       // materials (era 1) -> rocketFuel (era 4)
       const ratio = getTradeRatio('materials', 'rocketFuel');
-      expect(ratio).toEqual({ input: 1000, output: 1 });
+      expect(ratio).toEqual({ input: 64, output: 1 });
     });
 
     it('returns 1:5 for trading down one era', () => {
@@ -122,14 +122,14 @@ describe('trading', () => {
       expect(result.resources.materials.amount).toBe(30);
     });
 
-    it('trades up at 10:1 per era difference', () => {
+    it('trades up at 4:1 per era difference', () => {
       let state = makeState();
       state = withUnlocked(state, 'materials', 100); // era 1
       state = withUnlocked(state, 'steel', 0);       // era 2
-      // 1 era diff up: 10:1. Want 5 steel, costs 50 materials.
+      // 1 era diff up: 4:1. Want 5 steel, costs 20 materials.
       const result = executeTrade(state, 'materials', 'steel', 5);
       expect(result).not.toBeNull();
-      expect(result.resources.materials.amount).toBe(50);
+      expect(result.resources.materials.amount).toBe(80);
       expect(result.resources.steel.amount).toBe(5);
     });
 
@@ -157,10 +157,10 @@ describe('trading', () => {
       let state = makeState();
       state = withUnlocked(state, 'food', 10000);         // era 1
       state = withUnlocked(state, 'rocketFuel', 0);       // era 4
-      // 3 era diff up: 1000:1. Want 3 rocketFuel, costs 3000 food.
+      // 3 era diff up: 64:1. Want 3 rocketFuel, costs 192 food.
       const result = executeTrade(state, 'food', 'rocketFuel', 3);
       expect(result).not.toBeNull();
-      expect(result.resources.food.amount).toBe(7000);
+      expect(result.resources.food.amount).toBe(9808);
       expect(result.resources.rocketFuel.amount).toBe(3);
     });
 
