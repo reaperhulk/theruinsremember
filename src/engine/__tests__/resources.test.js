@@ -100,5 +100,17 @@ describe('resources', () => {
       const after = gather(state, 'steel');
       expect(after).toBe(state);
     });
+
+    it('scavengerInstinct gives +1 to all other resources on gather', () => {
+      const state = createInitialState();
+      state.upgrades = { scavengerInstinct: true };
+      state.resources.food.unlocked = true;
+      state.resources.materials.unlocked = true;
+      state.resources.energy.unlocked = true;
+      const before = state.resources.materials.amount;
+      const after = gather(state, 'food');
+      // Materials should have increased by at least 1
+      expect(after.resources.materials.amount).toBeGreaterThan(before);
+    });
   });
 });

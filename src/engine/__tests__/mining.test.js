@@ -139,5 +139,14 @@ describe('mining', () => {
       expect(after).toBe(state);
       expect(foundGem).toBe(false);
     });
+
+    it('first mine burst only fires once', () => {
+      const state = createInitialState();
+      const first = mine(state, 0.99);
+      expect(first.state.resources.materials.amount).toBeGreaterThanOrEqual(20); // Burst
+      const second = mine(first.state, 0.99);
+      // Second mine should NOT give burst (miningStreak > 0)
+      expect(second.state.resources.materials.amount - first.state.resources.materials.amount).toBeLessThan(20);
+    });
   });
 });

@@ -65,12 +65,14 @@ export function App() {
     prevPerfectsRef.current = perfects;
   }, [state.dockingPerfects]);
 
-  // Event flash on new events
+  // Event flash on new events (red for crisis, blue for normal)
   useEffect(() => {
     const events = state.eventLog?.length || 0;
     if (events > prevEventsRef.current) {
-      setFlashClass('event-flash');
-      const t = setTimeout(() => setFlashClass(''), 500);
+      const latestMsg = state.eventLog?.[state.eventLog.length - 1]?.message || '';
+      const isCrisis = /^Blight|strikes|surge|rupture|corrupted/i.test(latestMsg);
+      setFlashClass(isCrisis ? 'crisis-flash' : 'event-flash');
+      const t = setTimeout(() => setFlashClass(''), isCrisis ? 800 : 500);
       prevEventsRef.current = events;
       return () => clearTimeout(t);
     }

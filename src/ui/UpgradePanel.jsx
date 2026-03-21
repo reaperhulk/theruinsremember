@@ -212,10 +212,11 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           const affordable = canAfford(state, cost);
           const count = typeof state.upgrades[upgrade.id] === 'number' ? state.upgrades[upgrade.id] : 0;
           const progress = affordable ? 1 : getAffordProgress(state, cost);
+          const isMechanic = !!upgrade.mechanic;
           return (
             <div key={upgrade.id} className="upgrade-row">
             <button
-              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''} ${LORE_UPGRADE_ID_SET.has(upgrade.id) ? 'lore-upgrade' : ''}`}
+              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''} ${LORE_UPGRADE_ID_SET.has(upgrade.id) ? 'lore-upgrade' : ''} ${isMechanic ? 'mechanic-upgrade' : ''}`}
               disabled={!affordable}
               onClick={() => handlePurchase(upgrade.id)}
               title={`${upgrade.description}\nEffects: ${formatEffects(upgrade.effects)}`}
@@ -241,6 +242,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                   }
                   return <span key={i} className={cls}>{label}</span>;
                 })}
+                {isMechanic && <span className="effect-tag effect-mechanic">MECHANIC</span>}
               </div>
               {enablesCountMap[upgrade.id] > 0 && (
                 <div className="text-hint" style={{ color: '#88ccaa' }}>Enables {enablesCountMap[upgrade.id]} upgrade{enablesCountMap[upgrade.id] > 1 ? 's' : ''}</div>

@@ -156,6 +156,15 @@ export function EraProgress({ state }) {
         {totalRate > 0 && (
           <span> | {formatNumber(totalRate)}/s</span>
         )}
+        {state.upgrades?.overclockProtocol && (() => {
+          const cyclePos = (state.totalTime || 0) % 60;
+          const isActive = cyclePos < 10;
+          return (
+            <span style={{ fontSize: '0.7em', color: isActive ? '#ffaa44' : '#555', marginLeft: '8px' }}>
+              {isActive ? 'OVERCLOCK' : `overclock in ${Math.ceil(60 - cyclePos)}s`}
+            </span>
+          );
+        })()}
       </div>
     </div>
   );

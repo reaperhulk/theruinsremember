@@ -181,4 +181,19 @@ describe('events', () => {
       expect(getTimedRateMultiplier(state, 'energy')).toBe(1);
     });
   });
+
+  describe('crisis events', () => {
+    it('crisis events have negative effects', () => {
+      const crisisEvents = Object.values(events).filter(e => e.id?.startsWith('crisis'));
+      expect(crisisEvents.length).toBeGreaterThanOrEqual(5);
+      // Each should have effects that are negative resource or < 1 multiplier
+      for (const e of crisisEvents) {
+        const hasNegative = (e.effects?.some(eff =>
+          (eff.type === 'resource' && eff.value < 0) ||
+          (eff.type === 'resource_mult' && eff.value < 1)
+        )) || (e.effect?.rateMultBonus !== undefined && e.effect.rateMultBonus < 1);
+        expect(hasNegative).toBe(true);
+      }
+    });
+  });
 });

@@ -41,4 +41,32 @@ describe('tick', () => {
     // Food: baseRate 1.5 * rateMult 1 * prestige 3 = 4.5/s
     expect(after.resources.food.amount).toBeCloseTo(4.5, 5);
   });
+
+  it('surplusExchange converts capped resources to lowest', () => {
+    const state = createInitialState();
+    state.upgrades = { surplusExchange: true };
+    state.resources.food = { ...state.resources.food, unlocked: true, amount: 4900, capMult: 1 };
+    state.resources.materials = { ...state.resources.materials, unlocked: true, amount: 10, capMult: 1 };
+    const after = tick(state, 1);
+    // Materials should have increased (received overflow)
+    expect(after.resources.materials.amount).toBeGreaterThan(10);
+  });
+
+  it('overclockProtocol doubles production during pulse', () => {
+    const state = createInitialState();
+    state.upgrades = { overclockProtocol: true };
+    state.totalTime = 5; // In the pulse window (0-10)
+    const after = tick(state, 1);
+    // Food should gain more than base 1.5/s (doubled = 3.0/s)
+    expect(after.resources.food.amount).toBeGreaterThan(state.resources.food.amount + 2.5);
+  });
+
+  it('communalEffort gives bonus per upgrade', () => {
+    const state = createInitialState();
+    state.upgrades = { communalEffort: true, tools: true, irrigation: true }; // 3 upgrades = +3%
+    const baseTick = tick(createInitialState(), 1);
+    const bonusTick = tick(state, 1);
+    // With communalEffort, production should be slightly higher
+    expect(bonusTick.resources.food.amount).toBeGreaterThan(baseTick.resources.food.amount);
+  });
 });
