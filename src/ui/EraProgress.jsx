@@ -165,7 +165,7 @@ export function EraProgress({ state }) {
         <span> | {upgradeCount} upgrades | {techCount} tech</span>
         {(state.totalGems || 0) > 0 && <span> | {state.totalGems} gems</span>}
         {state.prestigeMultiplier > 1 && (
-          <span> | x{state.prestigeMultiplier.toFixed(1)}</span>
+          <span> | x{formatNumber(state.prestigeMultiplier)}</span>
         )}
         {totalRate > 0 && (
           <span style={rateFlash ? { color: '#88ff88', transition: 'color 0.6s ease' } : { transition: 'color 0.6s ease' }}> | {formatNumber(totalRate)}/s total</span>

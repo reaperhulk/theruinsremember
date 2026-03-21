@@ -28,6 +28,7 @@ import { getAvailableTech } from '../engine/tech.js';
 import { canAfford } from '../engine/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { LORE_UPGRADE_IDS } from '../data/lore.js';
+import { formatNumber } from './format.js';
 
 const initialState = createInitialState();
 
@@ -286,7 +287,7 @@ export function App() {
       <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#333', padding: '8px 0 4px' }}>
         v1.0 — {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.tech || {}).length} tech | {Object.keys(state.achievements || {}).length} achievements | Era {state.era}
         {(state.prestigeCount || 0) > 0 && ` | ${state.prestigeCount} prestige`}
-        {state.prestigeMultiplier > 1 && ` | x${state.prestigeMultiplier.toFixed(1)}`}
+        {state.prestigeMultiplier > 1 && ` | x${formatNumber(state.prestigeMultiplier)}`}
         {` | ${Math.floor(Object.keys(state.upgrades || {}).length / Object.keys(upgradeDefs).length * 100)}% complete`}
         {(() => {
           const found = LORE_UPGRADE_IDS.filter(id => state.upgrades?.[id]).length;

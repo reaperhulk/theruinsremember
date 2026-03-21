@@ -1,5 +1,6 @@
 import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary } from '../engine/prestige.js';
 import { eraNames } from '../engine/eras.js';
+import { formatNumber } from './format.js';
 
 function getPrestigeInsight(state) {
   const owned = state.prestigeUpgrades || {};
@@ -61,22 +62,26 @@ export function PrestigePanel({ state, onUpdate }) {
           <span>Current Era:</span>
           <span>Era {state.era} ({eraNames[state.era] || 'Unknown'})</span>
         </div>
-        <div className="stat-row">
-          <span>Prestige Points:</span>
-          <span>{points}</span>
-        </div>
-        <div className="stat-row">
-          <span>Prestige Count:</span>
-          <span>{state.prestigeCount || 0}</span>
-        </div>
-        <div className="stat-row">
-          <span>Current Multiplier:</span>
-          <span>x{state.prestigeMultiplier.toFixed(1)}</span>
-        </div>
-        <div className="stat-row">
-          <span>Next Prestige:</span>
-          <span>+{summary.points} pts, x{summary.bonus.toFixed(1)} → total x{summary.newMultiplier.toFixed(1)}{state.era < 7 ? ' (points start at Era 7)' : state.era < 10 ? ' (prestige at Era 10)' : ''}</span>
-        </div>
+        {(state.era >= 7 || (state.prestigeCount || 0) > 0) && (
+          <>
+            <div className="stat-row">
+              <span>Prestige Points:</span>
+              <span>{points}</span>
+            </div>
+            <div className="stat-row">
+              <span>Prestige Count:</span>
+              <span>{state.prestigeCount || 0}</span>
+            </div>
+            <div className="stat-row">
+              <span>Current Multiplier:</span>
+              <span>x{formatNumber(state.prestigeMultiplier)}</span>
+            </div>
+            <div className="stat-row">
+              <span>Next Prestige:</span>
+              <span>+{summary.points} pts, x{formatNumber(summary.bonus)} → total x{formatNumber(summary.newMultiplier)}{state.era < 10 ? ' (prestige at Era 10)' : ''}</span>
+            </div>
+          </>
+        )}
       </div>
 
       {state.era < 7 && (state.prestigeCount || 0) === 0 && (
@@ -85,10 +90,10 @@ export function PrestigePanel({ state, onUpdate }) {
             "Every civilization reaches the end. Every civilization starts again."
           </p>
           <p style={{ fontSize: '0.85em', marginBottom: '4px' }}>
-            Prestige becomes available at Era 7. Reset your progress to gain a permanent production multiplier and prestige points to spend on powerful upgrades.
+            The ruins whisper of cycles — civilizations that rose, reached the Dyson Era, and began anew. Something awaits at Era 7.
           </p>
           <p style={{ fontSize: '0.8em', color: '#666' }}>
-            Everything you learn carries forward. The ruins will remember.
+            Keep building. The path reveals itself to those who persist.
           </p>
         </div>
       )}

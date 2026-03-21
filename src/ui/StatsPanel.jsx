@@ -92,7 +92,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
         </div>
         <div className="stat-row">
           <span>Production Mult</span>
-          <span>x{(state.prestigeMultiplier || 1).toFixed(1)}</span>
+          <span>x{formatNumber(state.prestigeMultiplier || 1)}</span>
         </div>
         {state.lastUpgradeTime > 0 && (
           <div className="stat-row">

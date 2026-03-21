@@ -261,7 +261,7 @@ export const techTree = {
     cost: { data: 40, software: 60, research: 100 },
     prerequisites: ['globalNetwork'],
     grantsEra: null,
-    description: 'Neural sockets built into the ruins fit human patterns exactly — x2 research and software',
+    description: 'Neural sockets built into the ruins fit human brain patterns exactly — someone designed these interfaces for minds that hadn\'t evolved yet',
     effects: [{ type: 'production_mult', target: 'research', value: 2 }, { type: 'production_mult', target: 'software', value: 2 }],
   },
   orbitalDefense: {
@@ -269,7 +269,7 @@ export const techTree = {
     cost: { orbitalInfra: 30, rocketFuel: 80, steel: 120 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: null,
-    description: 'Defense grid locks onto anchor points that predate your arrival — +5 orbital infra/s',
+    description: 'Defense grid locks onto anchor points that predate your arrival — weapons platforms pre-positioned by a strategist who knew the threats you\'d face',
     effects: [{ type: 'production_add', target: 'orbitalInfra', value: 5.0 }],
   },
   gravitonTheory: {

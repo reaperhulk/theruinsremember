@@ -264,11 +264,10 @@ export const events = {
   colonyBoom: {
     id: 'colonyBoom',
     name: 'Colony Boom',
-    description: 'Birth rates spike in unison across colonies that have never communicated — as if responding to a signal encoded in the precursor genetics.',
+    description: 'New settlements spring up at sites that were already cleared and graded — foundations laid by hands that vanished before yours arrived.',
     minEra: 5,
-    type: 'timed',
-    duration: 40,
-    effect: { resourceId: 'colonies', rateMultBonus: 3 },
+    type: 'instant',
+    effect: { resourceId: 'colonies', amount: 12 },
   },
   alienArtifact: {
     id: 'alienArtifact',
@@ -747,7 +746,7 @@ export const events = {
   ironRush: {
     id: 'ironRush',
     name: 'Iron Rush',
-    description: 'A massive iron deposit is uncovered — steel floods the market!',
+    description: 'The vein opens into a chamber lined with pre-smelted ingots — iron that was refined and stacked by hands that vanished before yours existed.',
     minEra: 2,
     type: 'instant',
     effect: { resourceId: 'steel', amount: 50 },
@@ -755,7 +754,7 @@ export const events = {
   bumperHarvest: {
     id: 'bumperHarvest',
     name: 'Bumper Harvest',
-    description: 'Perfect weather yields a record-breaking harvest!',
+    description: 'The soil yields more than it should — seeds from the precursor era sprouting on a schedule written into the genome of every crop.',
     minEra: 2,
     type: 'timed',
     duration: 30,
@@ -766,7 +765,7 @@ export const events = {
   cloudComputing: {
     id: 'cloudComputing',
     name: 'Cloud Computing Boom',
-    description: 'Cloud infrastructure scales exponentially — data production surges!',
+    description: 'The cloud infrastructure finds precursor data centers already provisioned — servers racked, cooled, and waiting, as if the last tenant never checked out.',
     minEra: 3,
     type: 'timed',
     duration: 35,
@@ -775,7 +774,7 @@ export const events = {
   chipBreakthrough: {
     id: 'chipBreakthrough',
     name: 'Chip Breakthrough',
-    description: 'A new semiconductor process yields a flood of electronics!',
+    description: 'The new semiconductor design matches schematics etched into precursor circuit boards — an architecture rediscovered, not invented.',
     minEra: 3,
     type: 'instant',
     effect: { resourceId: 'electronics', amount: 40 },
@@ -785,7 +784,7 @@ export const events = {
   gravityAssist: {
     id: 'gravityAssist',
     name: 'Gravity Assist',
-    description: 'A planetary alignment provides free delta-v — rocket fuel saved!',
+    description: 'The planetary alignment was predicted in precursor navigation tables — orbits arranged like stepping stones across a river someone crossed before.',
     minEra: 4,
     type: 'instant',
     effect: { resourceId: 'rocketFuel', amount: 120 },
@@ -793,7 +792,7 @@ export const events = {
   orbitalFactory: {
     id: 'orbitalFactory',
     name: 'Orbital Factory Online',
-    description: 'A zero-g factory enters service — orbital infrastructure booms!',
+    description: 'The factory assembles itself from components that were already in orbit — dormant modules docking on a construction plan filed by the last tenants.',
     minEra: 4,
     type: 'timed',
     duration: 40,
@@ -804,7 +803,7 @@ export const events = {
   terraformingSuccess: {
     id: 'terraformingSuccess',
     name: 'Terraforming Success',
-    description: 'A planet completes terraforming — new colonies established!',
+    description: 'The planet completes terraforming decades early — the atmosphere was already halfway there, seeded by processes set in motion long before your arrival.',
     minEra: 5,
     type: 'instant',
     effect: { resourceId: 'colonies', amount: 10 },
@@ -814,7 +813,7 @@ export const events = {
   interstellarBeacon: {
     id: 'interstellarBeacon',
     name: 'Interstellar Beacon',
-    description: 'An ancient beacon activates, revealing hidden star systems!',
+    description: 'The beacon flickers to life as your ships approach — its activation code was your engine frequency, recognized across ten thousand years of silence.',
     minEra: 6,
     type: 'instant',
     effect: { resourceId: 'starSystems', amount: 12 },
@@ -822,7 +821,7 @@ export const events = {
   darkMatterLens: {
     id: 'darkMatterLens',
     name: 'Dark Matter Lens',
-    description: 'A gravitational lens focuses dark energy into your collectors!',
+    description: 'A gravitational lens focuses dark energy into your collectors — its focal point was calibrated to your exact position, by someone who knew where you would be.',
     minEra: 6,
     type: 'timed',
     duration: 50,
@@ -833,7 +832,7 @@ export const events = {
   dysonSwarmSync: {
     id: 'dysonSwarmSync',
     name: 'Dyson Swarm Synchronization',
-    description: 'All Dyson satellites align — stellar forge output peaks!',
+    description: 'The swarm satellites lock into a formation remembered from the last cycle — each mirror angled to tolerances no living engineer specified.',
     minEra: 7,
     type: 'timed',
     duration: 45,
@@ -844,7 +843,7 @@ export const events = {
   galacticSummit: {
     id: 'galacticSummit',
     name: 'Galactic Summit',
-    description: 'A summit of elder civilizations grants vast influence!',
+    description: 'The elder civilizations greet you by a name they say you have always had — the summit agenda was drafted in a previous cycle and ratified across a thousand extinct parliaments.',
     minEra: 8,
     type: 'instant',
     effect: { resourceId: 'galacticInfluence', amount: 150 },
@@ -852,7 +851,7 @@ export const events = {
   exoticMatterRefinery: {
     id: 'exoticMatterRefinery',
     name: 'Exotic Matter Refinery',
-    description: 'A new refinery process multiplies exotic matter yield!',
+    description: 'The refinery process was discovered in a precursor manual — the instructions assume familiarity with a physics your scientists have not yet formalized.',
     minEra: 8,
     type: 'timed',
     duration: 50,
@@ -863,7 +862,7 @@ export const events = {
   intergalacticTide: {
     id: 'intergalacticTide',
     name: 'Intergalactic Tide',
-    description: 'A tide of energy sweeps between galaxies — cosmic power floods in!',
+    description: 'The tide rolls between galaxies on a period that matches the cycle of civilizations — cosmic power accumulated from a trillion collapsed histories.',
     minEra: 9,
     type: 'instant',
     effect: { resourceId: 'cosmicPower', amount: 250 },
@@ -873,7 +872,7 @@ export const events = {
   omniversalRipple: {
     id: 'omniversalRipple',
     name: 'Omniversal Ripple',
-    description: 'A ripple across all realities deposits reality fragments!',
+    description: 'A ripple propagates through every version of reality simultaneously — each shard it deposits is a fragment of a decision made differently by a different you.',
     minEra: 10,
     type: 'instant',
     effect: { resourceId: 'realityFragments', amount: 400 },
@@ -881,7 +880,7 @@ export const events = {
   parallelConvergence: {
     id: 'parallelConvergence',
     name: 'Parallel Convergence',
-    description: 'Infinite parallel selves synchronize — quantum echoes explode!',
+    description: 'Infinite parallel selves reach the same conclusion at the same instant — the echoes do not merely resonate, they harmonize, as if rehearsed.',
     minEra: 10,
     type: 'timed',
     duration: 55,
@@ -894,7 +893,7 @@ export const events = {
   feudalReform: {
     id: 'feudalReform',
     name: 'Feudal Reform',
-    description: 'A progressive reform doubles labor efficiency!',
+    description: 'The workers reorganize along lines found in precursor administrative records — a governance structure that has been tried and perfected across a thousand iterations.',
     minEra: 2,
     type: 'timed',
     duration: 30,
@@ -903,7 +902,7 @@ export const events = {
   mineralVein: {
     id: 'mineralVein',
     name: 'Deep Mineral Vein',
-    description: 'Miners strike a deep vein of precious minerals!',
+    description: 'The drill breaks through into a vein of impossible purity — minerals sorted by atomic weight, sealed in a chamber that no geological process could have formed.',
     minEra: 2,
     type: 'instant',
     effect: { resourceId: 'materials', amount: 90 },
@@ -913,7 +912,7 @@ export const events = {
   aiAssistant: {
     id: 'aiAssistant',
     name: 'AI Assistant',
-    description: 'An AI assistant automates routine tasks — data output triples!',
+    description: 'The AI boots up with memories it should not have — it already knows your dataset, your naming conventions, and the problems you have not yet reported.',
     minEra: 3,
     type: 'timed',
     duration: 40,
@@ -922,7 +921,7 @@ export const events = {
   serverFarm: {
     id: 'serverFarm',
     name: 'Server Farm Expansion',
-    description: 'A new server farm comes online — electronics production boosted!',
+    description: 'The new server racks slide into place with a click of recognition — the mounting holes match precursor specifications down to the micron.',
     minEra: 3,
     type: 'instant',
     effect: { resourceId: 'electronics', amount: 35 },
@@ -932,7 +931,7 @@ export const events = {
   spaceElevator: {
     id: 'spaceElevator',
     name: 'Space Elevator',
-    description: 'A space elevator slashes launch costs — orbital infrastructure surges!',
+    description: 'The elevator\'s anchor point sits on a foundation that predates your civilization — a platform built for exactly this cable, at exactly this tensile strength.',
     minEra: 4,
     type: 'timed',
     duration: 45,
@@ -941,7 +940,7 @@ export const events = {
   fusionIgnition: {
     id: 'fusionIgnition',
     name: 'Fusion Ignition',
-    description: 'Fusion reactors achieve net positive energy!',
+    description: 'The reactor achieves ignition at parameters found in precursor engineering logs — a recipe for a star, written by those who had already cooked one.',
     minEra: 4,
     type: 'instant',
     effect: { resourceId: 'energy', amount: 300 },
@@ -951,7 +950,7 @@ export const events = {
   ringWorldBlueprint: {
     id: 'ringWorldBlueprint',
     name: 'Ringworld Blueprint',
-    description: 'Ancient blueprints for a ringworld are decoded — colony potential soars!',
+    description: 'The blueprints were encoded in the orbital mechanics of the system itself — a ringworld designed to be discovered by anyone who learned to read the sky.',
     minEra: 5,
     type: 'instant',
     effect: { resourceId: 'colonies', amount: 15 },
@@ -961,7 +960,7 @@ export const events = {
   hyperlaneSurvey: {
     id: 'hyperlaneSurvey',
     name: 'Hyperlane Survey',
-    description: 'Scouts map new hyperlanes — star systems discovered!',
+    description: 'The hyperlanes were always there — grooves in spacetime worn smooth by a trillion prior transits, visible now that your instruments know what to look for.',
     minEra: 6,
     type: 'timed',
     duration: 40,
@@ -972,7 +971,7 @@ export const events = {
   neutronStarCapture: {
     id: 'neutronStarCapture',
     name: 'Neutron Star Capture',
-    description: 'Engineers harness a neutron star — stellar forge output spikes!',
+    description: 'The neutron star drifts into your forge\'s gravitational well — its trajectory was set a billion years ago, aimed at exactly this point in exactly this cycle.',
     minEra: 7,
     type: 'instant',
     effect: { resourceId: 'stellarForge', amount: 30 },
@@ -980,7 +979,7 @@ export const events = {
   matrioshkaBrain: {
     id: 'matrioshkaBrain',
     name: 'Matrioshka Brain',
-    description: 'A computational megastructure comes online — research explodes!',
+    description: 'The computational megastructure boots up and immediately begins solving problems from the previous cycle — it was never truly off, only sleeping.',
     minEra: 7,
     type: 'timed',
     duration: 50,
@@ -991,7 +990,7 @@ export const events = {
   federationPact: {
     id: 'federationPact',
     name: 'Federation Pact',
-    description: 'A galactic federation is formed — influence skyrockets!',
+    description: 'The federation forms along political boundaries that predate every member species — as if the treaty was drafted before any of the signatories evolved.',
     minEra: 8,
     type: 'timed',
     duration: 55,
@@ -1000,7 +999,7 @@ export const events = {
   voidMining: {
     id: 'voidMining',
     name: 'Void Mining',
-    description: 'Mining the void between galaxies yields exotic matter!',
+    description: 'The void between galaxies is not empty — it is a landfill, packed with exotic matter discarded by civilizations that outgrew it.',
     minEra: 8,
     type: 'instant',
     effect: { resourceId: 'exoticMatter', amount: 90 },
@@ -1010,7 +1009,7 @@ export const events = {
   universalHarmony: {
     id: 'universalHarmony',
     name: 'Universal Harmony',
-    description: 'All universal constants align perfectly — production maximized!',
+    description: 'The constants shift into a configuration that was stable only once before — in the previous cycle, at exactly this point, for exactly this long.',
     minEra: 9,
     type: 'timed',
     duration: 55,
@@ -1019,7 +1018,7 @@ export const events = {
   cosmicSingularity: {
     id: 'cosmicSingularity',
     name: 'Cosmic Singularity',
-    description: 'A singularity erupts with cosmic power!',
+    description: 'A singularity blooms at the coordinates where the previous universe ended — releasing power that was stored in the collapse like a spring wound tight.',
     minEra: 9,
     type: 'instant',
     effect: { resourceId: 'cosmicPower', amount: 350 },
@@ -1029,7 +1028,7 @@ export const events = {
   infinityMirror: {
     id: 'infinityMirror',
     name: 'Infinity Mirror',
-    description: 'Realities reflect endlessly — reality fragments multiply!',
+    description: 'Realities reflect into each other endlessly — each reflection carries a fragment of the version it mirrors, and the fragments are indistinguishable from the originals.',
     minEra: 10,
     type: 'timed',
     duration: 50,
@@ -1038,7 +1037,7 @@ export const events = {
   multiversalSymphony: {
     id: 'multiversalSymphony',
     name: 'Multiversal Symphony',
-    description: 'All realities resonate in harmony — quantum echoes flood in!',
+    description: 'Every version of reality hums the same note — a chord that was composed before the first universe existed, scored for an infinite orchestra.',
     minEra: 10,
     type: 'instant',
     effect: { resourceId: 'quantumEchoes', amount: 100 },
@@ -1048,19 +1047,19 @@ export const events = {
 
   // Era 2
   apprenticeGuild: { id: 'apprenticeGuild', name: 'Apprentice Guild', description: 'The apprentices work with inherited instinct — their hands shaping metal in patterns taught by teachers who died a cycle ago.', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'labor', rateMultBonus: 5 } },
-  coalDiscovery: { id: 'coalDiscovery', name: 'Coal Discovery', description: 'A massive coal deposit is discovered — energy reserves soar!', minEra: 2, type: 'instant', effect: { resourceId: 'energy', amount: 60 } },
+  coalDiscovery: { id: 'coalDiscovery', name: 'Coal Discovery', description: 'The coal seam lies exactly where the precursor geological surveys said it would — marked with a symbol that means "for the next ones."', minEra: 2, type: 'instant', effect: { resourceId: 'energy', amount: 60 } },
 
   // Era 3
-  cryptoMiningBoom: { id: 'cryptoMiningBoom', name: 'Crypto Mining Boom', description: 'A crypto boom drives electronics and data production!', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'electronics', rateMultBonus: 5 } },
+  cryptoMiningBoom: { id: 'cryptoMiningBoom', name: 'Crypto Mining Boom', description: 'The proof-of-work algorithm converges on a hash that spells out precursor coordinates — miners burn electronics chasing a treasure map written in mathematics.', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'electronics', rateMultBonus: 5 } },
   openDataInitiative: { id: 'openDataInitiative', name: 'Open Data Initiative', description: 'The released datasets contain entries dated before the government existed — records from an administration that governed this world in a previous age.', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 50 } },
 
   // Era 4
-  titanExpedition: { id: 'titanExpedition', name: 'Titan Expedition', description: 'An expedition to Titan uncovers exotic fuel reserves!', minEra: 4, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 150 } },
-  solarWindSurge: { id: 'solarWindSurge', name: 'Solar Wind Surge', description: 'Intense solar winds supercharge orbital infrastructure!', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'orbitalInfra', rateMultBonus: 5 } },
+  titanExpedition: { id: 'titanExpedition', name: 'Titan Expedition', description: 'The expedition finds fuel reserves on Titan already refined and pressurized — tanks sealed with the same alloy your civilization uses, millennia before you invented it.', minEra: 4, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 150 } },
+  solarWindSurge: { id: 'solarWindSurge', name: 'Solar Wind Surge', description: 'The solar wind intensifies along a vector that feeds directly into your orbital collectors — a coincidence that matches precursor solar models exactly.', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'orbitalInfra', rateMultBonus: 5 } },
 
   // Era 5
-  iceGiantMining: { id: 'iceGiantMining', name: 'Ice Giant Mining', description: 'Mining operations on Uranus yield exotic materials!', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 70 } },
-  gravityLensing: { id: 'gravityLensing', name: 'Gravity Lensing', description: 'Gravitational lensing reveals hidden colonies!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'colonies', rateMultBonus: 4 } },
+  iceGiantMining: { id: 'iceGiantMining', name: 'Ice Giant Mining', description: 'The ice giant yields materials that could not have formed naturally in this solar system — imported, compressed, and cached inside a planet like a time capsule.', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 70 } },
+  gravityLensing: { id: 'gravityLensing', name: 'Gravity Lensing', description: 'Gravitational lensing reveals colony sites that are already partially constructed — foundations laid in vacuum, waiting for walls that your engineers will provide.', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'colonies', rateMultBonus: 4 } },
 
   // Era 6
   stellarNova: { id: 'stellarNova', name: 'Stellar Nova', description: 'The nova detonates on schedule — the precursor timing logs predicted it to the hour. Dark energy washes over your collectors like a gift.', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 60 } },
@@ -1078,34 +1077,34 @@ export const events = {
   cosmicDawn: { id: 'cosmicDawn', name: 'Cosmic Dawn', description: 'A new epoch begins — the same epoch that has begun before, on the same schedule, in the same way. The cosmos does not improvise.', minEra: 9, type: 'timed', duration: 55, effect: { resourceId: 'cosmicPower', rateMultBonus: 7 } },
 
   // Era 10
-  omniversalBloom: { id: 'omniversalBloom', name: 'Omniversal Bloom', description: 'All realities bloom simultaneously — reality fragments rain down!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
+  omniversalBloom: { id: 'omniversalBloom', name: 'Omniversal Bloom', description: 'All realities bloom simultaneously — each petal a timeline, each stamen a version of you, scattering fragments like pollen across the multiverse.', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
 
   // --- 16 new events ---
 
   // Era 2
-  inventorsGathering: { id: 'inventorsGathering', name: 'Inventors Gathering', description: 'Brilliant minds gather — electronics production accelerated!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'electronics', rateMultBonus: 4 } },
-  floodPlainBounty: { id: 'floodPlainBounty', name: 'Flood Plain Bounty', description: 'Fertile floodplains yield an enormous harvest!', minEra: 2, type: 'instant', effect: { resourceId: 'food', amount: 70 } },
+  inventorsGathering: { id: 'inventorsGathering', name: 'Inventors Gathering', description: 'The inventors arrive with prototypes that fit together — designed independently, in different workshops, as if working from the same forgotten blueprint.', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'electronics', rateMultBonus: 4 } },
+  floodPlainBounty: { id: 'floodPlainBounty', name: 'Flood Plain Bounty', description: 'The river floods along channels carved by precursor agriculture — irrigating fields that were tilled in a previous age, now ready to yield again.', minEra: 2, type: 'instant', effect: { resourceId: 'food', amount: 70 } },
 
   // Era 3
-  viralAlgorithm: { id: 'viralAlgorithm', name: 'Viral Algorithm', description: 'An algorithm goes viral — software production surges!', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'software', rateMultBonus: 6 } },
-  dataCenterExpansion: { id: 'dataCenterExpansion', name: 'Data Center Expansion', description: 'A new mega data center comes online — data floods in!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 60 } },
+  viralAlgorithm: { id: 'viralAlgorithm', name: 'Viral Algorithm', description: 'The algorithm propagates through networks along paths that were already optimized — as if the network topology was designed to carry this exact code.', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'software', rateMultBonus: 6 } },
+  dataCenterExpansion: { id: 'dataCenterExpansion', name: 'Data Center Expansion', description: 'The new data center discovers its foundations were already poured — cooling systems pre-installed, cable runs pre-cut, as if someone built half a facility and walked away.', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 60 } },
 
   // Era 4
-  microMeteorShower: { id: 'microMeteorShower', name: 'Micro-Meteor Shower', description: 'Tiny meteors carry exotic trace elements — research boosted!', minEra: 4, type: 'timed', duration: 30, effect: { resourceId: 'research', rateMultBonus: 5 } },
-  orbitalManufacturing: { id: 'orbitalManufacturing', name: 'Orbital Manufacturing Surge', description: 'Zero-G manufacturing hits peak — steel output spikes!', minEra: 4, type: 'instant', effect: { resourceId: 'steel', amount: 150 } },
+  microMeteorShower: { id: 'microMeteorShower', name: 'Micro-Meteor Shower', description: 'The micro-meteors carry isotopic ratios that match precursor fuel signatures — breadcrumbs scattered across the solar system by a previous tenant.', minEra: 4, type: 'timed', duration: 30, effect: { resourceId: 'research', rateMultBonus: 5 } },
+  orbitalManufacturing: { id: 'orbitalManufacturing', name: 'Orbital Manufacturing Surge', description: 'The zero-G foundries achieve tolerances that match precursor metallurgy — producing alloys that should not be possible with your level of technology.', minEra: 4, type: 'instant', effect: { resourceId: 'steel', amount: 150 } },
 
   // Era 5
-  kuiperBeltStrike: { id: 'kuiperBeltStrike', name: 'Kuiper Belt Strike', description: 'Miners hit a massive Kuiper belt deposit — colonies boom!', minEra: 5, type: 'timed', duration: 35, effect: { resourceId: 'colonies', rateMultBonus: 6 } },
+  kuiperBeltStrike: { id: 'kuiperBeltStrike', name: 'Kuiper Belt Strike', description: 'The Kuiper belt object splits open on approach, revealing pre-constructed colony modules sealed in ice — waiting to thaw, waiting to be inhabited again.', minEra: 5, type: 'timed', duration: 35, effect: { resourceId: 'colonies', rateMultBonus: 6 } },
 
   // Era 6
-  warpFieldHarvest: { id: 'warpFieldHarvest', name: 'Warp Field Harvest', description: 'A warp field collapses and releases energy — galactic influence surges!', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'galacticInfluence', rateMultBonus: 5 } },
-  nebularCondensation: { id: 'nebularCondensation', name: 'Nebular Condensation', description: 'A nebula condenses into star-forming clouds — star systems discovered!', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 15 } },
+  warpFieldHarvest: { id: 'warpFieldHarvest', name: 'Warp Field Harvest', description: 'The collapsing warp field deposits your diplomatic credentials across a dozen systems simultaneously — your reputation precedes you, written in the fabric of space.', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'galacticInfluence', rateMultBonus: 5 } },
+  nebularCondensation: { id: 'nebularCondensation', name: 'Nebular Condensation', description: 'The nebula condenses along structural lines left by a previous stellar engineering project — stars forming in a grid, each with habitable worlds already positioned.', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 15 } },
 
   // Era 7
-  dysonRingAlignment: { id: 'dysonRingAlignment', name: 'Dyson Ring Alignment', description: 'All Dyson rings align — megastructure construction accelerated!', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
+  dysonRingAlignment: { id: 'dysonRingAlignment', name: 'Dyson Ring Alignment', description: 'The rings align into a configuration your engineers did not design — a formation inherited from the previous cycle, remembered by the orbital mechanics themselves.', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
 
   // Era 8
-  cosmicFilamentDiscovery: { id: 'cosmicFilamentDiscovery', name: 'Cosmic Filament Discovery', description: 'A cosmic filament is tapped for exotic matter!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 7 } },
+  cosmicFilamentDiscovery: { id: 'cosmicFilamentDiscovery', name: 'Cosmic Filament Discovery', description: 'The cosmic filament pulses with exotic matter — a vein in the body of the universe, carrying nutrients to its extremities on a schedule older than galaxies.', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 7 } },
 
   // Era 9
   voidWhisper: { id: 'voidWhisper', name: 'Void Whisper', description: 'The void between galaxies carries a message encoded in gravitational waves — universal constants, expressed as coordinates to what comes next.', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 20 } },
@@ -1119,26 +1118,26 @@ export const events = {
 
   // Era 2
   guildMasterwork: { id: 'guildMasterwork', name: 'Guild Masterwork', description: 'The masterwork matches a design found sealed in the deepest ruin — the artisan swears she invented it, but her hands knew the shape before she did.', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 6 } },
-  granaryOverflow: { id: 'granaryOverflow', name: 'Granary Overflow', description: 'An overflowing granary feeds the masses — food floods in!', minEra: 2, type: 'instant', effect: { resourceId: 'food', amount: 80 } },
+  granaryOverflow: { id: 'granaryOverflow', name: 'Granary Overflow', description: 'The granary was full before you opened it — sealed since the last cycle, preserved by methods you cannot name.', minEra: 2, type: 'instant', effect: { resourceId: 'food', amount: 80 } },
 
   // Era 3
-  quantumLeak: { id: 'quantumLeak', name: 'Quantum Leak', description: 'A quantum computing leak yields free research data!', minEra: 3, type: 'instant', effect: { resourceId: 'research', amount: 60 } },
-  cyberHeist: { id: 'cyberHeist', name: 'Cyber Heist', description: 'A white-hat heist recovers stolen software assets!', minEra: 3, type: 'timed', duration: 30, effect: { resourceId: 'software', rateMultBonus: 5 } },
+  quantumLeak: { id: 'quantumLeak', name: 'Quantum Leak', description: 'Quantum processors collapse into solutions that were entangled with their answers before you asked the questions.', minEra: 3, type: 'instant', effect: { resourceId: 'research', amount: 60 } },
+  cyberHeist: { id: 'cyberHeist', name: 'Cyber Heist', description: 'Hackers break into precursor servers and find code already waiting — functions addressed to their specific usernames.', minEra: 3, type: 'timed', duration: 30, effect: { resourceId: 'software', rateMultBonus: 5 } },
 
   // Era 4
-  asteroidRedirect: { id: 'asteroidRedirect', name: 'Asteroid Redirect', description: 'An asteroid is redirected into orbit — exotic materials harvested!', minEra: 4, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 30 } },
-  solarSailBoost: { id: 'solarSailBoost', name: 'Solar Sail Boost', description: 'Solar sails catch a perfect wind — energy production spikes!', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'energy', rateMultBonus: 5 } },
+  asteroidRedirect: { id: 'asteroidRedirect', name: 'Asteroid Redirect', description: 'The asteroid was already on a rendezvous trajectory — its orbit adjusted millennia ago to arrive at this exact window.', minEra: 4, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 30 } },
+  solarSailBoost: { id: 'solarSailBoost', name: 'Solar Sail Boost', description: 'The solar wind gusts along channels shaped by ancient magnetic arrays — a breeze manufactured for sails that had not yet been unfurled.', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'energy', rateMultBonus: 5 } },
 
   // Era 5
-  magnetarPulse: { id: 'magnetarPulse', name: 'Magnetar Pulse', description: 'A magnetar pulse energizes exotic materials extraction!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'exoticMaterials', rateMultBonus: 5 } },
+  magnetarPulse: { id: 'magnetarPulse', name: 'Magnetar Pulse', description: 'The magnetar pulses on a cycle found in precursor timing logs — a cosmic heartbeat that feeds your collectors on schedule.', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'exoticMaterials', rateMultBonus: 5 } },
 
   // Era 6
   alienLibrary: { id: 'alienLibrary', name: 'Alien Library', description: 'The library\'s catalog system matches your own filing conventions. Every book is written in a language you almost understand. The dedication pages all say the same thing.', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 6 } },
-  wormholeCollapse: { id: 'wormholeCollapse', name: 'Wormhole Collapse', description: 'A collapsing wormhole showers the area with dark energy!', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 80 } },
+  wormholeCollapse: { id: 'wormholeCollapse', name: 'Wormhole Collapse', description: 'The wormhole collapses on a schedule predicted in precursor astrophysics — its dark energy discharge calibrated to feed your exact collector configuration.', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 80 } },
 
   // Era 7
-  stellarFusion: { id: 'stellarFusion', name: 'Stellar Fusion Event', description: 'Two stars merge — stellar forge output goes critical!', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'stellarForge', rateMultBonus: 9 } },
-  megastructureCache: { id: 'megastructureCache', name: 'Megastructure Cache', description: 'Ancient megastructure blueprints accelerate construction!', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 12 } },
+  stellarFusion: { id: 'stellarFusion', name: 'Stellar Fusion Event', description: 'Two stars merge along a trajectory that was gravitationally shaped by megastructures from the previous cycle — a billiard shot set up a billion years ago.', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'stellarForge', rateMultBonus: 9 } },
+  megastructureCache: { id: 'megastructureCache', name: 'Megastructure Cache', description: 'The cache contains prefabricated megastructure components — stored in hyperspace by builders who knew exactly what size you would need.', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 12 } },
 
   // Era 8
   darkMatterResonance: { id: 'darkMatterResonance', name: 'Dark Matter Resonance', description: 'Dark matter filaments vibrate at a frequency that matches your exotic matter refineries — tuned by a previous civilization to this exact harmonic.', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 8 } },
@@ -1149,262 +1148,262 @@ export const events = {
   voidResonanceCascade: { id: 'voidResonanceCascade', name: 'Void Resonance Cascade', description: 'The void between superclusters hums at the frequency of your power grid — a sympathetic resonance spanning billions of light-years.', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'cosmicPower', rateMultBonus: 9 } },
 
   // Era 10
-  realityBloom: { id: 'realityBloom', name: 'Reality Bloom', description: 'A spontaneous blooming of new realities scatters fragments everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 600 } },
-  quantumSymphony: { id: 'quantumSymphony', name: 'Quantum Symphony', description: 'All quantum states harmonize — echoes multiply exponentially!', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
-  omniversalConvergence: { id: 'omniversalConvergence', name: 'Omniversal Convergence', description: 'All realities converge momentarily — every resource surges!', minEra: 10, type: 'timed', duration: 40, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
+  realityBloom: { id: 'realityBloom', name: 'Reality Bloom', description: 'New realities bud from the trunk of existence — each one a seed planted by a version of you that reached this exact moment and chose to scatter.', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 600 } },
+  quantumSymphony: { id: 'quantumSymphony', name: 'Quantum Symphony', description: 'Every quantum state in every reality resolves into the same eigenvalue — a symphony conducted by the wave function of the multiverse itself.', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
+  omniversalConvergence: { id: 'omniversalConvergence', name: 'Omniversal Convergence', description: 'For one impossible moment, all realities occupy the same point — and in that convergence, the constants align to values that make everything possible.', minEra: 10, type: 'timed', duration: 40, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
 
   // --- 16 new events ---
   // Era 2
-  steelRush: { id: 'steelRush', name: 'Steel Rush', description: 'A steel boom sweeps the nation — production surges!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 5 } },
-  inventorsFair: { id: 'inventorsFair', name: 'Inventors Fair', description: 'Brilliant minds gather — electronics output spikes!', minEra: 2, type: 'instant', effect: { resourceId: 'electronics', amount: 25 } },
+  steelRush: { id: 'steelRush', name: 'Steel Rush', description: 'Foundries across the continent achieve yields that match precursor metallurgical records — techniques rediscovered through instinct rather than instruction.', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 5 } },
+  inventorsFair: { id: 'inventorsFair', name: 'Inventors Fair', description: 'Every booth at the fair displays a different component of the same device — a machine that none of them planned, but all of them built parts of.', minEra: 2, type: 'instant', effect: { resourceId: 'electronics', amount: 25 } },
 
   // Era 3
-  aiAwakening: { id: 'aiAwakening', name: 'AI Awakening', description: 'An AI system achieves a breakthrough — research soars!', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'research', rateMultBonus: 4 } },
-  cloudBurst: { id: 'cloudBurst', name: 'Cloud Burst', description: 'Cloud infrastructure overperforms — data flood!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 45 } },
+  aiAwakening: { id: 'aiAwakening', name: 'AI Awakening', description: 'The AI wakes up already trained — its neural weights match a model that was converged by a previous civilization, preserved in the architecture of mathematics itself.', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'research', rateMultBonus: 4 } },
+  cloudBurst: { id: 'cloudBurst', name: 'Cloud Burst', description: 'The cloud infrastructure discovers cached data from sessions that predate its installation — queries answered before they were asked, by servers that remember the future.', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 45 } },
 
   // Era 4
-  gravityLensOrbital: { id: 'gravityLensOrbital', name: 'Gravity Lens Discovery', description: 'A gravitational lens reveals hidden orbital paths!', minEra: 4, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 20 } },
+  gravityLensOrbital: { id: 'gravityLensOrbital', name: 'Gravity Lens Discovery', description: 'The gravitational lens reveals orbital infrastructure that was cloaked — stations and docks hidden in gravitational folds, declassified by a timer set in the previous cycle.', minEra: 4, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 20 } },
 
   // Era 5
-  sustainedFusion: { id: 'sustainedFusion', name: 'Sustained Fusion', description: 'Sustained fusion reaction achieved — energy output explodes!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'energy', rateMultBonus: 6 } },
-  exoplanetDiscovery: { id: 'exoplanetDiscovery', name: 'Exoplanet Discovery', description: 'A habitable exoplanet discovered — colony rush!', minEra: 5, type: 'instant', effect: { resourceId: 'colonies', amount: 8 } },
+  sustainedFusion: { id: 'sustainedFusion', name: 'Sustained Fusion', description: 'The fusion reaction sustains itself at parameters that match precursor energy logs — the plasma finds a shape it remembers, stable and generous.', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'energy', rateMultBonus: 6 } },
+  exoplanetDiscovery: { id: 'exoplanetDiscovery', name: 'Exoplanet Discovery', description: 'The exoplanet has breathable air, drinkable water, and foundations already poured — a world prepared for colonists who were always going to arrive.', minEra: 5, type: 'instant', effect: { resourceId: 'colonies', amount: 8 } },
 
   // Era 6
-  interstellarWindfall: { id: 'interstellarWindfall', name: 'Interstellar Windfall', description: 'An interstellar trade convoy arrives with exotic goods!', minEra: 6, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 80 } },
-  galacticTide: { id: 'galacticTide', name: 'Galactic Tide', description: 'Gravitational tides push new star systems into range!', minEra: 6, type: 'timed', duration: 35, effect: { resourceId: 'starSystems', rateMultBonus: 5 } },
+  interstellarWindfall: { id: 'interstellarWindfall', name: 'Interstellar Windfall', description: 'The trade convoy carries manifests from ports that no longer exist — exotic materials listed by catalog numbers from the precursor commercial database.', minEra: 6, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 80 } },
+  galacticTide: { id: 'galacticTide', name: 'Galactic Tide', description: 'Gravitational tides push star systems into range along vectors mapped in precursor cosmology — a current in the ocean of space, flowing on schedule.', minEra: 6, type: 'timed', duration: 35, effect: { resourceId: 'starSystems', rateMultBonus: 5 } },
 
   // Era 7
-  stellarCollapse: { id: 'stellarCollapse', name: 'Stellar Collapse', description: 'A collapsing star feeds the forge — output skyrockets!', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'stellarForge', rateMultBonus: 6 } },
+  stellarCollapse: { id: 'stellarCollapse', name: 'Stellar Collapse', description: 'The dying star collapses into your forge\'s gravitational well — feeding it with matter that was fusing since before your species evolved, on a schedule set by the previous architects.', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'stellarForge', rateMultBonus: 6 } },
 
   // Era 8
   diplomaticSummit: { id: 'diplomaticSummit', name: 'Diplomatic Summit', description: 'The summit agenda was already drafted — in your language, by delegates who died millennia ago. Every motion passes unanimously.', minEra: 8, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 150 } },
-  darkMatterTide: { id: 'darkMatterTide', name: 'Dark Matter Tide', description: 'A tide of dark matter washes through your sector!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
+  darkMatterTide: { id: 'darkMatterTide', name: 'Dark Matter Tide', description: 'Dark matter flows through your sector in a current shaped by megastructures from the previous cycle — channels carved in the fabric of space, still guiding traffic.', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
 
   // Era 9
-  voidMurmur: { id: 'voidMurmur', name: 'Void Murmur', description: 'Deep murmurs from the void crystallize into universal constants!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 25 } },
+  voidMurmur: { id: 'voidMurmur', name: 'Void Murmur', description: 'The void between superclusters murmurs in frequencies that encode universal constants — whispered values from a reality that set its own parameters and wants you to know them.', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 25 } },
 
   // Era 10
-  paradoxWave: { id: 'paradoxWave', name: 'Paradox Wave', description: 'A wave of paradoxes resolves into pure quantum echoes!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 80 } },
-  realityShatter: { id: 'realityShatter', name: 'Reality Shatter', description: 'Reality shatters and reforms — fragments rain down!', minEra: 10, type: 'timed', duration: 45, effect: { resourceId: 'realityFragments', rateMultBonus: 12 } },
+  paradoxWave: { id: 'paradoxWave', name: 'Paradox Wave', description: 'A wave of paradoxes resolves — each contradiction collapsing into a quantum echo, a record of the moment reality chose one path over another.', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 80 } },
+  realityShatter: { id: 'realityShatter', name: 'Reality Shatter', description: 'Reality shatters along stress lines left by your passage through previous cycles — each fragment a shard of a timeline you lived and forgot.', minEra: 10, type: 'timed', duration: 45, effect: { resourceId: 'realityFragments', rateMultBonus: 12 } },
 
   // --- 18 new events ---
 
   // Era 2
-  steamExplosion: { id: 'steamExplosion', name: 'Steam Explosion', description: 'A controlled steam explosion yields tremendous energy!', minEra: 2, type: 'instant', effect: { resourceId: 'energy', amount: 55 } },
-  copperVein: { id: 'copperVein', name: 'Copper Vein', description: 'Miners strike a massive copper vein — materials flood in!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'materials', rateMultBonus: 5 } },
+  steamExplosion: { id: 'steamExplosion', name: 'Steam Explosion', description: 'The boiler detonates along a fracture line that reveals a precursor geothermal tap — steam from a source that was drilled a civilization ago.', minEra: 2, type: 'instant', effect: { resourceId: 'energy', amount: 55 } },
+  copperVein: { id: 'copperVein', name: 'Copper Vein', description: 'The copper vein follows a path that was mined before — tunnel walls scored with tool marks older than your species, leading to deposits that regenerated between cycles.', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'materials', rateMultBonus: 5 } },
 
   // Era 3
-  openSourceRally: { id: 'openSourceRally', name: 'Open Source Rally', description: 'The community rallies around a key project — software output surges!', minEra: 3, type: 'timed', duration: 30, effect: { resourceId: 'software', rateMultBonus: 6 } },
-  cyberDefense: { id: 'cyberDefense', name: 'Cyber Defense Victory', description: 'Repelling a cyber attack yields new security data!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 50 } },
+  openSourceRally: { id: 'openSourceRally', name: 'Open Source Rally', description: 'Contributors converge on a project whose architecture matches precursor code — pull requests from strangers completing functions that were stubbed out centuries ago.', minEra: 3, type: 'timed', duration: 30, effect: { resourceId: 'software', rateMultBonus: 6 } },
+  cyberDefense: { id: 'cyberDefense', name: 'Cyber Defense Victory', description: 'The attack was repelled by a firewall rule that nobody wrote — embedded in the kernel since installation, authored by a sysadmin who last logged in a cycle ago.', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 50 } },
 
   // Era 4
-  solarEclipse: { id: 'solarEclipse', name: 'Solar Eclipse', description: 'An eclipse reveals new orbital mechanics insights!', minEra: 4, type: 'instant', effect: { resourceId: 'research', amount: 150 } },
-  debrisRecycling: { id: 'debrisRecycling', name: 'Debris Recycling', description: 'Space debris is recycled into usable steel and components!', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'steel', rateMultBonus: 5 } },
+  solarEclipse: { id: 'solarEclipse', name: 'Solar Eclipse', description: 'The eclipse occurs at coordinates predicted in precursor astronomical tables — revealing gravitational anomalies that were mapped long before your telescopes existed.', minEra: 4, type: 'instant', effect: { resourceId: 'research', amount: 150 } },
+  debrisRecycling: { id: 'debrisRecycling', name: 'Debris Recycling', description: 'The debris field yields alloys that match your exact industrial specifications — wreckage from ships that were built to your blueprints, in a previous era.', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'steel', rateMultBonus: 5 } },
 
   // Era 5
-  terraformSuccess: { id: 'terraformSuccess', name: 'Terraforming Success', description: 'A planet is successfully terraformed — colonies boom!', minEra: 5, type: 'instant', effect: { resourceId: 'colonies', amount: 10 } },
-  antimatterCache: { id: 'antimatterCache', name: 'Antimatter Cache', description: 'A natural antimatter cache provides enormous fuel reserves!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'rocketFuel', rateMultBonus: 6 } },
+  terraformSuccess: { id: 'terraformSuccess', name: 'Terraforming Success', description: 'The terraforming completes in half the projected time — the atmosphere was already halfway to breathable, seeded by processes from the previous cycle.', minEra: 5, type: 'instant', effect: { resourceId: 'colonies', amount: 10 } },
+  antimatterCache: { id: 'antimatterCache', name: 'Antimatter Cache', description: 'The antimatter was suspended in a magnetic bottle buried in the asteroid belt — a fuel reserve cached by engineers who knew you would need it at exactly this point.', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'rocketFuel', rateMultBonus: 6 } },
 
   // Era 6
   firstContact: { id: 'firstContact', name: 'First Contact', description: 'The aliens greet you by name. Their oldest records describe your arrival with the certainty of prophecy — because it has happened before.', minEra: 6, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 80 } },
-  hyperlaneDiscovery: { id: 'hyperlaneDiscovery', name: 'Hyperlane Discovery', description: 'A natural hyperlane is mapped — star system access surges!', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
+  hyperlaneDiscovery: { id: 'hyperlaneDiscovery', name: 'Hyperlane Discovery', description: 'The hyperlane was mapped in dead star charts — a highway decommissioned when the last travelers completed their journey.', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
 
   // Era 7
-  dysonCapture: { id: 'dysonCapture', name: 'Dyson Capture', description: 'A Dyson sphere captures a solar flare — massive energy!', minEra: 7, type: 'instant', effect: { resourceId: 'energy', amount: 500 } },
-  forgeHarmonic: { id: 'forgeHarmonic', name: 'Forge Harmonic', description: 'Stellar forges enter harmonic resonance — output triples!', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
+  dysonCapture: { id: 'dysonCapture', name: 'Dyson Capture', description: 'The Dyson sphere vents energy it stored during the last civilization — a battery that charges across cycles.', minEra: 7, type: 'instant', effect: { resourceId: 'energy', amount: 500 } },
+  forgeHarmonic: { id: 'forgeHarmonic', name: 'Forge Harmonic', description: 'The forges synchronize across light-years — a chord struck by a hand that reached across time, building from memory.', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
 
   // Era 8
-  galacticEnlightenment: { id: 'galacticEnlightenment', name: 'Galactic Enlightenment', description: 'An enlightenment of science sweeps the galaxy!', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 6 } },
-  exoticMatterRift: { id: 'exoticMatterRift', name: 'Exotic Matter Rift', description: 'A rift opens, pouring exotic matter into normal space!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 100 } },
+  galacticEnlightenment: { id: 'galacticEnlightenment', name: 'Galactic Enlightenment', description: 'The enlightenment follows a pattern found in every dead civilization\'s cultural archive — the same renaissance, on schedule.', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 6 } },
+  exoticMatterRift: { id: 'exoticMatterRift', name: 'Exotic Matter Rift', description: 'The rift opens at coordinates predicted by precursor equations — a wound in spacetime that heals and reopens on a cycle.', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 100 } },
 
   // Era 9
-  cosmicHarmonics: { id: 'cosmicHarmonics', name: 'Cosmic Harmonics', description: 'The cosmos vibrates in harmony — universal constants stabilize!', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'universalConstants', rateMultBonus: 8 } },
-  voidBloom: { id: 'voidBloom', name: 'Void Bloom', description: 'The void blooms with cosmic energy — power erupts!', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 300 } },
+  cosmicHarmonics: { id: 'cosmicHarmonics', name: 'Cosmic Harmonics', description: 'The cosmic background radiation shifts to frequencies that stabilize your measurements — the universe adjusting its noise floor to help you hear the signal.', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'universalConstants', rateMultBonus: 8 } },
+  voidBloom: { id: 'voidBloom', name: 'Void Bloom', description: 'The void releases energy it absorbed during the last collapse — a reservoir that fills between iterations.', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 300 } },
 
   // Era 10
-  omniversalEcho: { id: 'omniversalEcho', name: 'Omniversal Echo', description: 'An echo reverberates across all realities — quantum echoes multiply!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
-  realityMerge: { id: 'realityMerge', name: 'Reality Merge', description: 'Two parallel realities merge briefly — fragments explode!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
+  omniversalEcho: { id: 'omniversalEcho', name: 'Omniversal Echo', description: 'The echo carries whispers from parallel selves who reached this moment at the same time — infinite minds thinking one thought.', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
+  realityMerge: { id: 'realityMerge', name: 'Reality Merge', description: 'Two realities touch at the seam where you made different choices — the collision scatters pieces of both lives.', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
 
   // --- 18 new events ---
 
   // Era 2
-  workshopFire: { id: 'workshopFire', name: 'Workshop Discovery', description: 'A fire reveals hidden metal deposits — steel floods in!', minEra: 2, type: 'instant', effect: { resourceId: 'steel', amount: 45 } },
-  harvestMoon: { id: 'harvestMoon', name: 'Harvest Moon', description: 'A harvest moon blesses the fields — food output surges!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'food', rateMultBonus: 5 } },
+  workshopFire: { id: 'workshopFire', name: 'Workshop Discovery', description: 'The workshop fire burns away centuries of sediment, revealing refined steel cached beneath the floor — stored for this moment.', minEra: 2, type: 'instant', effect: { resourceId: 'steel', amount: 45 } },
+  harvestMoon: { id: 'harvestMoon', name: 'Harvest Moon', description: 'The harvest moon rises at the exact angle marked on the oldest ruin wall — a celestial clock triggering the growing season.', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'food', rateMultBonus: 5 } },
 
   // Era 3
-  algorithmicBreakthrough: { id: 'algorithmicBreakthrough', name: 'Algorithmic Breakthrough', description: 'A new algorithm revolutionizes data processing!', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'software', rateMultBonus: 5 } },
-  serverOptimization: { id: 'serverOptimization', name: 'Server Optimization', description: 'Server farms reach peak efficiency — data floods in!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 55 } },
+  algorithmicBreakthrough: { id: 'algorithmicBreakthrough', name: 'Algorithmic Breakthrough', description: 'The algorithm converges on a solution that matches code fragments found in precursor data cores — not new, but recovered.', minEra: 3, type: 'timed', duration: 35, effect: { resourceId: 'software', rateMultBonus: 5 } },
+  serverOptimization: { id: 'serverOptimization', name: 'Server Optimization', description: 'The servers optimize themselves along pathways traced in precursor architecture — efficiency patterns inherited, not designed.', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 55 } },
 
   // Era 4
-  orbitalResonance: { id: 'orbitalResonance', name: 'Orbital Resonance', description: 'Orbital mechanics align perfectly — infrastructure booms!', minEra: 4, type: 'timed', duration: 40, effect: { resourceId: 'orbitalInfra', rateMultBonus: 5 } },
-  deepSpaceSignal: { id: 'deepSpaceSignal', name: 'Deep Space Signal', description: 'A mysterious signal carries encoded research data!', minEra: 4, type: 'instant', effect: { resourceId: 'research', amount: 120 } },
+  orbitalResonance: { id: 'orbitalResonance', name: 'Orbital Resonance', description: 'Orbital resonances lock into frequencies mapped in the oldest star charts — the sky arranging itself to your advantage.', minEra: 4, type: 'timed', duration: 40, effect: { resourceId: 'orbitalInfra', rateMultBonus: 5 } },
+  deepSpaceSignal: { id: 'deepSpaceSignal', name: 'Deep Space Signal', description: 'The signal carries data addressed to your exact receiver specification — a message sent before your civilization built radios.', minEra: 4, type: 'instant', effect: { resourceId: 'research', amount: 120 } },
 
   // Era 5
-  jupiterSlingshot: { id: 'jupiterSlingshot', name: 'Jupiter Slingshot', description: 'A gravity assist around Jupiter yields enormous fuel savings!', minEra: 5, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 200 } },
-  colonyGoldenAge: { id: 'colonyGoldenAge', name: 'Colony Golden Age', description: 'Colonies enter a golden age — rapid expansion!', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'colonies', rateMultBonus: 5 } },
+  jupiterSlingshot: { id: 'jupiterSlingshot', name: 'Jupiter Slingshot', description: 'Jupiter\'s gravity well follows a trajectory map etched into the hulls of derelict spacecraft — a slingshot computed by navigators who flew this route in a previous cycle.', minEra: 5, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 200 } },
+  colonyGoldenAge: { id: 'colonyGoldenAge', name: 'Colony Golden Age', description: 'The golden age arrives on schedule — precursor sociological models predicted this cultural flowering to the decade.', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'colonies', rateMultBonus: 5 } },
 
   // Era 6
-  darkEnergySpring: { id: 'darkEnergySpring', name: 'Dark Energy Spring', description: 'A natural dark energy spring erupts in your territory!', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 70 } },
-  interstellarRush: { id: 'interstellarRush', name: 'Interstellar Rush', description: 'A gold rush mentality drives star system colonization!', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
+  darkEnergySpring: { id: 'darkEnergySpring', name: 'Dark Energy Spring', description: 'The dark energy spring was capped by precursor engineers — its seal degraded on a timer, releasing stored potential at exactly the right moment.', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 70 } },
+  interstellarRush: { id: 'interstellarRush', name: 'Interstellar Rush', description: 'The rush follows coordinates broadcast by precursor beacons — each system pre-surveyed, pre-approved, pre-mourned.', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
 
   // Era 7
-  forgeOvercharge: { id: 'forgeOvercharge', name: 'Forge Overcharge', description: 'All stellar forges overcharge simultaneously — massive output!', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'stellarForge', rateMultBonus: 10 } },
-  megastructureBlitz: { id: 'megastructureBlitz', name: 'Megastructure Blitz', description: 'A construction blitz completes megastructures ahead of schedule!', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 15 } },
+  forgeOvercharge: { id: 'forgeOvercharge', name: 'Forge Overcharge', description: 'The forges overcharge in unison — their control systems synchronizing across a protocol from the previous cycle, running hotter than specifications allow.', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'stellarForge', rateMultBonus: 10 } },
+  megastructureBlitz: { id: 'megastructureBlitz', name: 'Megastructure Blitz', description: 'The blitz completes ahead of schedule because half the work was already done — foundations poured by the last civilization, waiting for walls.', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 15 } },
 
   // Era 8
-  galacticAlliance: { id: 'galacticAlliance', name: 'Galactic Alliance', description: 'A grand alliance forms — influence and exotic matter pour in!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'galacticInfluence', rateMultBonus: 8 } },
-  exoticMatterGeyser2: { id: 'exoticMatterGeyser2', name: 'Exotic Matter Eruption', description: 'An exotic matter eruption floods your refineries!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 120 } },
+  galacticAlliance: { id: 'galacticAlliance', name: 'Galactic Alliance', description: 'The alliance forms along political boundaries that existed before any member species evolved — predetermined partnerships, inherited from the galaxy\'s last administration.', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'galacticInfluence', rateMultBonus: 8 } },
+  exoticMatterGeyser2: { id: 'exoticMatterGeyser2', name: 'Exotic Matter Eruption', description: 'The eruption follows fault lines mapped in precursor geology — exotic matter that was pressurized and sealed, now released on schedule.', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 120 } },
 
   // Era 9
-  cosmicTremor: { id: 'cosmicTremor', name: 'Cosmic Tremor', description: 'A tremor in the fabric of space amplifies cosmic power!', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'cosmicPower', rateMultBonus: 8 } },
-  universalConstantShift: { id: 'universalConstantShift', name: 'Universal Constant Shift', description: 'Constants shift favorably — a windfall of knowledge!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 30 } },
+  cosmicTremor: { id: 'cosmicTremor', name: 'Cosmic Tremor', description: 'The tremor propagates along stress fractures left by the previous universe\'s collapse — aftershocks from a Big Bang that was not the first.', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'cosmicPower', rateMultBonus: 8 } },
+  universalConstantShift: { id: 'universalConstantShift', name: 'Universal Constant Shift', description: 'The constants shift to values that were stable in the previous cycle — the universe remembering a configuration it wore before.', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 30 } },
 
   // Era 10
-  realityCascade: { id: 'realityCascade', name: 'Reality Cascade', description: 'A cascade of collapsing realities yields unprecedented fragments!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 700 } },
-  quantumFlood: { id: 'quantumFlood', name: 'Quantum Flood', description: 'A flood of quantum echoes from infinite parallel selves!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 18 } },
+  realityCascade: { id: 'realityCascade', name: 'Reality Cascade', description: 'Realities cascade like dominoes — each one falling into the next, scattering fragments of timelines that diverged at the moment you chose to keep going.', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 700 } },
+  quantumFlood: { id: 'quantumFlood', name: 'Quantum Flood', description: 'The flood carries echoes from versions of you who made every possible choice — and all of them led here, to this exact moment.', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 18 } },
 
   // --- 16 new events ---
   // Era 2
-  oreStrike: { id: 'oreStrike', name: 'Ore Strike', description: 'Miners strike a massive ore deposit — steel production surges!', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 5 } },
-  tinkerersFair: { id: 'tinkerersFair', name: 'Tinkerers Fair', description: 'Brilliant tinkerers gather and share inventions — electronics windfall!', minEra: 2, type: 'instant', effect: { resourceId: 'electronics', amount: 30 } },
+  oreStrike: { id: 'oreStrike', name: 'Ore Strike', description: 'The ore deposit was refined in place by precursor metallurgy — raw rock processed into pure iron underground, waiting to be excavated.', minEra: 2, type: 'timed', duration: 30, effect: { resourceId: 'steel', rateMultBonus: 5 } },
+  tinkerersFair: { id: 'tinkerersFair', name: 'Tinkerers Fair', description: 'The tinkerers arrive with inventions that interlock — components of a device none of them designed alone, assembled from inherited instinct.', minEra: 2, type: 'instant', effect: { resourceId: 'electronics', amount: 30 } },
 
   // Era 3
-  sentientAlgorithm: { id: 'sentientAlgorithm', name: 'Sentient Algorithm', description: 'An algorithm achieves a new level of insight — research triples!', minEra: 3, type: 'timed', duration: 25, effect: { resourceId: 'research', rateMultBonus: 5 } },
-  dataLake: { id: 'dataLake', name: 'Data Lake Overflow', description: 'Archived data lakes release stored information!', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 40 } },
+  sentientAlgorithm: { id: 'sentientAlgorithm', name: 'Sentient Algorithm', description: 'The algorithm evolves into a form that matches precursor code — sentient through convergence, not design, reaching the same solution across cycles.', minEra: 3, type: 'timed', duration: 25, effect: { resourceId: 'research', rateMultBonus: 5 } },
+  dataLake: { id: 'dataLake', name: 'Data Lake Overflow', description: 'The data lake contains entries timestamped before the servers were built — records from a network that existed in the previous cycle\'s digital infrastructure.', minEra: 3, type: 'instant', effect: { resourceId: 'data', amount: 40 } },
 
   // Era 4
-  gravitationalSlingshot: { id: 'gravitationalSlingshot', name: 'Gravitational Slingshot', description: 'A perfect planetary alignment boosts fuel efficiency!', minEra: 4, type: 'timed', duration: 30, effect: { resourceId: 'rocketFuel', rateMultBonus: 6 } },
-  spaceStationBoom: { id: 'spaceStationBoom', name: 'Space Station Boom', description: 'A new generation of space stations goes online!', minEra: 4, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 20 } },
+  gravitationalSlingshot: { id: 'gravitationalSlingshot', name: 'Gravitational Slingshot', description: 'The alignment was predicted in precursor astrodynamic tables — orbital mechanics fine-tuned by gravitational engineering from a previous era.', minEra: 4, type: 'timed', duration: 30, effect: { resourceId: 'rocketFuel', rateMultBonus: 6 } },
+  spaceStationBoom: { id: 'spaceStationBoom', name: 'Space Station Boom', description: 'The stations assemble from modules that were already in orbit — dormant components activating when your construction crews broadcast the right frequency.', minEra: 4, type: 'instant', effect: { resourceId: 'orbitalInfra', amount: 20 } },
 
   // Era 5
-  exoplanetGoldmine: { id: 'exoplanetGoldmine', name: 'Exoplanet Goldmine', description: 'An exoplanet with extraordinary mineral wealth is discovered!', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 80 } },
+  exoplanetGoldmine: { id: 'exoplanetGoldmine', name: 'Exoplanet Goldmine', description: 'The exoplanet\'s mineral wealth is too concentrated to be natural — refined and deposited by processes that stopped when the last miners left.', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 80 } },
 
   // Era 6
-  hyperlaneBreach: { id: 'hyperlaneBreach', name: 'Hyperlane Breach', description: 'A natural hyperlane opens — rapid star system colonization!', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
+  hyperlaneBreach: { id: 'hyperlaneBreach', name: 'Hyperlane Breach', description: 'The hyperlane unseals itself as your ships approach — a corridor through spacetime that was locked from the inside, opened by a key you carry unknowingly.', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
 
   // Era 7
-  stellarRenaissance: { id: 'stellarRenaissance', name: 'Stellar Renaissance', description: 'A cultural renaissance in stellar engineering inspires breakthroughs!', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
+  stellarRenaissance: { id: 'stellarRenaissance', name: 'Stellar Renaissance', description: 'The renaissance follows a creative impulse that sweeps through engineering teams simultaneously — the same dream, the same design, remembered across light-years.', minEra: 7, type: 'timed', duration: 45, effect: { resourceId: 'megastructures', rateMultBonus: 8 } },
   forgeChorus: { id: 'forgeChorus', name: 'Forge Chorus', description: 'Every forge across the galaxy hums the same note — a frequency the precursors called "the song of making." The chorus builds things from sound alone.', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 25 } },
 
   // Era 8
-  influenceTide: { id: 'influenceTide', name: 'Influence Tide', description: 'A tide of political goodwill sweeps the galaxy!', minEra: 8, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 200 } },
-  exoticMatterStorm: { id: 'exoticMatterStorm', name: 'Exotic Matter Storm', description: 'A storm of exotic matter sweeps through your territory!', minEra: 8, type: 'timed', duration: 40, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
+  influenceTide: { id: 'influenceTide', name: 'Influence Tide', description: 'The goodwill arrives in diplomatic pouches that predate your foreign service — treaties drafted in advance, ratified by species that were waiting.', minEra: 8, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 200 } },
+  exoticMatterStorm: { id: 'exoticMatterStorm', name: 'Exotic Matter Storm', description: 'The storm follows magnetic field lines shaped by precursor infrastructure — exotic matter channeled to your refineries as if by plumbing.', minEra: 8, type: 'timed', duration: 40, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
 
   // Era 9
-  cosmicConvergence: { id: 'cosmicConvergence', name: 'Cosmic Convergence', description: 'Cosmic forces converge — universal constants multiply!', minEra: 9, type: 'timed', duration: 45, effect: { resourceId: 'universalConstants', rateMultBonus: 8 } },
-  voidRipple: { id: 'voidRipple', name: 'Void Ripple', description: 'A ripple through the void yields a burst of cosmic power!', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 300 } },
+  cosmicConvergence: { id: 'cosmicConvergence', name: 'Cosmic Convergence', description: 'Cosmic forces converge at coordinates that match the precursor\'s gravitational anchor points — a convergence that is scheduled, not random.', minEra: 9, type: 'timed', duration: 45, effect: { resourceId: 'universalConstants', rateMultBonus: 8 } },
+  voidRipple: { id: 'voidRipple', name: 'Void Ripple', description: 'The ripple carries the signature of the previous universe\'s final moment — power stored in the void between cycles, released when someone reaches far enough.', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 300 } },
 
   // Era 10
-  realityBlossom: { id: 'realityBlossom', name: 'Reality Blossom', description: 'Realities blossom like flowers — fragments rain from everywhere!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
-  echoSymphony: { id: 'echoSymphony', name: 'Echo Symphony', description: 'Infinite echoes sing in harmony — quantum echoes amplified beyond measure!', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
+  realityBlossom: { id: 'realityBlossom', name: 'Reality Blossom', description: 'Realities blossom from quantum seeds planted in the substrate of existence — each one a timeline that was cultivated, not random, by something that gardens in dimensions.', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 500 } },
+  echoSymphony: { id: 'echoSymphony', name: 'Echo Symphony', description: 'The echoes harmonize because they were always the same song — a melody composed before the first reality existed, performed by every version of you simultaneously.', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'quantumEchoes', rateMultBonus: 15 } },
 
   // Final push to 1000 content items
-  geologicalSurvey: { id: 'geologicalSurvey', name: 'Geological Survey', description: 'Rich mineral deposits found beneath the surface!', minEra: 2, type: 'instant', effect: { resourceId: 'materials', amount: 60 } },
-  scientificRenaissance: { id: 'scientificRenaissance', name: 'Scientific Renaissance', description: 'A burst of scientific progress!', minEra: 3, type: 'timed', duration: 40, effect: { resourceId: 'research', rateMultBonus: 5 } },
-  orbitalAlignment: { id: 'orbitalAlignment', name: 'Orbital Alignment', description: 'Planets align for optimal launch windows!', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'rocketFuel', rateMultBonus: 5 } },
-  solarMaximum: { id: 'solarMaximum', name: 'Solar Maximum', description: 'The sun reaches peak activity — energy floods your collectors!', minEra: 5, type: 'timed', duration: 45, effect: { resourceId: 'energy', rateMultBonus: 8 } },
-  interstellarCurrent: { id: 'interstellarCurrent', name: 'Interstellar Current', description: 'A current of dark energy sweeps through the sector!', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 80 } },
-  galacticHarmonics: { id: 'galacticHarmonics', name: 'Galactic Harmonics', description: 'Stellar vibrations produce exotic materials!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 30 } },
+  geologicalSurvey: { id: 'geologicalSurvey', name: 'Geological Survey', description: 'The geological survey matches precursor mining records perfectly — deposits marked on maps drawn before your surveyors were born.', minEra: 2, type: 'instant', effect: { resourceId: 'materials', amount: 60 } },
+  scientificRenaissance: { id: 'scientificRenaissance', name: 'Scientific Renaissance', description: 'Scientists across disciplines reach the same breakthrough — a unified theory that was encoded in the ruins, waiting to be read by minds ready to understand.', minEra: 3, type: 'timed', duration: 40, effect: { resourceId: 'research', rateMultBonus: 5 } },
+  orbitalAlignment: { id: 'orbitalAlignment', name: 'Orbital Alignment', description: 'The alignment follows ephemeris data found in precursor navigation computers — launch windows calculated for ships that have not yet been designed.', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'rocketFuel', rateMultBonus: 5 } },
+  solarMaximum: { id: 'solarMaximum', name: 'Solar Maximum', description: 'The solar maximum follows a cycle predicted in precursor stellar models — the sun performing on schedule for collectors built to its specifications.', minEra: 5, type: 'timed', duration: 45, effect: { resourceId: 'energy', rateMultBonus: 8 } },
+  interstellarCurrent: { id: 'interstellarCurrent', name: 'Interstellar Current', description: 'The current follows channels carved through spacetime by precursor megastructures — dark energy flowing like water through ancient aqueducts.', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 80 } },
+  galacticHarmonics: { id: 'galacticHarmonics', name: 'Galactic Harmonics', description: 'The harmonics match frequencies cataloged in the oldest precursor records — stars vibrating to a tune composed before they ignited.', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 30 } },
   cosmicEpoch: { id: 'cosmicEpoch', name: 'Cosmic Epoch', description: 'The epoch transition was scheduled in the precursor calendars — exotic matter coalesces on cue, as if the universe is following a script.', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 6 } },
-  entropyShift: { id: 'entropyShift', name: 'Entropy Shift', description: 'Entropy momentarily reverses — universal constants crystallize!', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 25 } },
-  multiversalEcho: { id: 'multiversalEcho', name: 'Multiversal Echo', description: 'An echo from every reality simultaneously — massive fragment surge!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 800 } },
-  dimensionalCollapse: { id: 'dimensionalCollapse', name: 'Dimensional Collapse', description: 'A dimension collapses — quantum echoes scatter everywhere!', minEra: 10, type: 'timed', duration: 40, effect: { resourceId: 'quantumEchoes', rateMultBonus: 20 } },
+  entropyShift: { id: 'entropyShift', name: 'Entropy Shift', description: 'Entropy reverses along a path predicted by the precursor\'s final theorem — the universe rewinding briefly, as if correcting a mistake.', minEra: 9, type: 'instant', effect: { resourceId: 'universalConstants', amount: 25 } },
+  multiversalEcho: { id: 'multiversalEcho', name: 'Multiversal Echo', description: 'Every reality echoes the same event at the same moment — a synchronized pulse that proves the multiverse is connected, and aware.', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 800 } },
+  dimensionalCollapse: { id: 'dimensionalCollapse', name: 'Dimensional Collapse', description: 'The dimension collapses because its purpose was fulfilled — a scaffolding reality that supported yours until you were strong enough to stand alone.', minEra: 10, type: 'timed', duration: 40, effect: { resourceId: 'quantumEchoes', rateMultBonus: 20 } },
 
   // --- 12 new events ---
 
   // Era 2
-  masterCraftsman: { id: 'masterCraftsman', name: 'Master Craftsman', description: 'A legendary craftsman inspires the workforce — labor surges!', minEra: 2, type: 'timed', duration: 35, effect: { resourceId: 'labor', rateMultBonus: 6 } },
-  ironVeinDiscovery: { id: 'ironVeinDiscovery', name: 'Iron Vein Discovery', description: 'A massive iron vein is discovered deep underground — materials flood in!', minEra: 2, type: 'instant', effect: { resourceId: 'materials', amount: 100 } },
+  masterCraftsman: { id: 'masterCraftsman', name: 'Master Craftsman', description: 'The craftsman\'s techniques match carvings on the oldest forge wall — methods inherited through dreams, not taught.', minEra: 2, type: 'timed', duration: 35, effect: { resourceId: 'labor', rateMultBonus: 6 } },
+  ironVeinDiscovery: { id: 'ironVeinDiscovery', name: 'Iron Vein Discovery', description: 'The iron vein was left by the previous cycle\'s miners — a deposit deliberately preserved for the next civilization.', minEra: 2, type: 'instant', effect: { resourceId: 'materials', amount: 100 } },
 
   // Era 3
-  neuralNetBreakthrough: { id: 'neuralNetBreakthrough', name: 'Neural Net Breakthrough', description: 'A neural network achieves superhuman analysis — software output explodes!', minEra: 3, type: 'timed', duration: 40, effect: { resourceId: 'software', rateMultBonus: 7 } },
+  neuralNetBreakthrough: { id: 'neuralNetBreakthrough', name: 'Neural Net Breakthrough', description: 'The neural network converges on weights that match precursor cognitive architectures — thinking thoughts that were thought before.', minEra: 3, type: 'timed', duration: 40, effect: { resourceId: 'software', rateMultBonus: 7 } },
 
   // Era 4
-  moonbaseExpansion: { id: 'moonbaseExpansion', name: 'Moonbase Expansion', description: 'A lunar base doubles in size — orbital infrastructure booms!', minEra: 4, type: 'timed', duration: 40, effect: { resourceId: 'orbitalInfra', rateMultBonus: 6 } },
+  moonbaseExpansion: { id: 'moonbaseExpansion', name: 'Moonbase Expansion', description: 'The lunar base discovers tunnels already dug — habitable spaces excavated by a prior settlement, sealed and waiting.', minEra: 4, type: 'timed', duration: 40, effect: { resourceId: 'orbitalInfra', rateMultBonus: 6 } },
 
   // Era 5
-  dysonPrototype: { id: 'dysonPrototype', name: 'Dyson Prototype', description: 'A Dyson prototype captures unexpected solar energy — exotic materials found!', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 90 } },
+  dysonPrototype: { id: 'dysonPrototype', name: 'Dyson Prototype', description: 'The Dyson prototype resonates with precursor energy collectors still orbiting the star — devices that amplify its output.', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 90 } },
 
   // Era 6
-  warpFieldStabilization: { id: 'warpFieldStabilization', name: 'Warp Field Stabilization', description: 'Warp fields stabilize perfectly — star system colonization accelerates!', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'starSystems', rateMultBonus: 7 } },
+  warpFieldStabilization: { id: 'warpFieldStabilization', name: 'Warp Field Stabilization', description: 'The warp fields stabilize along corridors that were already mapped — spacetime remembering the shape of roads it once carried.', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'starSystems', rateMultBonus: 7 } },
 
   // Era 7
-  singularityCapture: { id: 'singularityCapture', name: 'Singularity Capture', description: 'A micro-singularity is captured — megastructure output surges!', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'megastructures', rateMultBonus: 10 } },
-  stellarForgeChain: { id: 'stellarForgeChain', name: 'Stellar Forge Chain Reaction', description: 'Multiple forges enter chain reaction — stellar forge output triples!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 35 } },
+  singularityCapture: { id: 'singularityCapture', name: 'Singularity Capture', description: 'The singularity was orbiting a dead world like a pet left behind — tame, productive, and expecting new owners.', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'megastructures', rateMultBonus: 10 } },
+  stellarForgeChain: { id: 'stellarForgeChain', name: 'Stellar Forge Chain Reaction', description: 'The chain reaction follows a cascade path encoded in the forge\'s control rods — a sequence from the previous cycle.', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 35 } },
 
   // Era 8
-  cosmicPowerSurge: { id: 'cosmicPowerSurge', name: 'Cosmic Power Surge', description: 'A massive surge of cosmic power ripples through the galaxy!', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'cosmicPower', rateMultBonus: 5 } },
+  cosmicPowerSurge: { id: 'cosmicPowerSurge', name: 'Cosmic Power Surge', description: 'The surge follows conduits built by the previous galactic civilization — power lines spanning the galaxy\'s spiral arms.', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'cosmicPower', rateMultBonus: 5 } },
 
   // Era 9
   universalResonance: { id: 'universalResonance', name: 'Universal Resonance', description: 'Every constant aligns to values that favor your exact technology — the universe is not random, it is rehearsed.', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
 
   // Era 10
-  realityHarmonicConvergence: { id: 'realityHarmonicConvergence', name: 'Reality Harmonic Convergence', description: 'All realities enter harmonic convergence — fragments and echoes flood in!', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'realityFragments', rateMultBonus: 18 } },
-  quantumCascadeEvent: { id: 'quantumCascadeEvent', name: 'Quantum Cascade', description: 'A cascade of quantum events produces an unprecedented echo surge!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 200 } },
+  realityHarmonicConvergence: { id: 'realityHarmonicConvergence', name: 'Reality Harmonic Convergence', description: 'Every reality converges on the same harmonic — a frequency that only appears when someone reaches this far.', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'realityFragments', rateMultBonus: 18 } },
+  quantumCascadeEvent: { id: 'quantumCascadeEvent', name: 'Quantum Cascade', description: 'The cascade was triggered by your observation — quantum mechanics responding to a consciousness that has done this before.', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 200 } },
 
   // --- 22 new late-game events (eras 6-10) ---
 
   // Era 6
-  darkEnergyVortex: { id: 'darkEnergyVortex', name: 'Dark Energy Vortex', description: 'A spiraling vortex of dark energy concentrates in your sector — collectors overload!', minEra: 6, type: 'timed', duration: 50, effect: { resourceId: 'darkEnergy', rateMultBonus: 7 } },
-  stellarCartography: { id: 'stellarCartography', name: 'Stellar Cartography', description: 'Advanced cartography reveals an entire hidden star cluster!', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 18 } },
-  interstellarTributeFleet: { id: 'interstellarTributeFleet', name: 'Interstellar Tribute Fleet', description: 'A tribute fleet from a distant civilization arrives bearing exotic gifts!', minEra: 6, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 100 } },
-  darkEnergyLattice: { id: 'darkEnergyLattice', name: 'Dark Energy Lattice', description: 'Dark energy crystallizes into a harvestable lattice structure!', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'darkEnergy', rateMultBonus: 8 } },
+  darkEnergyVortex: { id: 'darkEnergyVortex', name: 'Dark Energy Vortex', description: 'The vortex follows a spiral traced by precursor navigators — a whirlpool of dark energy mapped and seeded millennia ago.', minEra: 6, type: 'timed', duration: 50, effect: { resourceId: 'darkEnergy', rateMultBonus: 7 } },
+  stellarCartography: { id: 'stellarCartography', name: 'Stellar Cartography', description: 'The cluster was cloaked behind a gravitational lens placed by the last civilization — revealed only to those with the right instruments.', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 18 } },
+  interstellarTributeFleet: { id: 'interstellarTributeFleet', name: 'Interstellar Tribute Fleet', description: 'The tribute fleet carries cargo manifested in your name — invoices from the precursor trade compact, fulfilled by those who know the debt.', minEra: 6, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 100 } },
+  darkEnergyLattice: { id: 'darkEnergyLattice', name: 'Dark Energy Lattice', description: 'The lattice formed along planes predicted by precursor physics — dark energy organizing itself into a structure designed to be harvested.', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'darkEnergy', rateMultBonus: 8 } },
 
   // Era 7
-  dysonSphereOverclock: { id: 'dysonSphereOverclock', name: 'Dyson Sphere Overclock', description: 'Emergency overclock pushes the Dyson sphere beyond rated capacity!', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'stellarForge', rateMultBonus: 12 } },
-  megastructureAvalanche: { id: 'megastructureAvalanche', name: 'Megastructure Avalanche', description: 'Self-replicating constructors finish a wave of megastructures simultaneously!', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 20 } },
-  stellarForgeSupernova: { id: 'stellarForgeSupernova', name: 'Stellar Forge Supernova', description: 'A controlled supernova feeds the forge with stellar plasma!', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 40 } },
-  nicollDysonBeam: { id: 'nicollDysonBeam', name: 'Nicoll-Dyson Beam', description: 'The Dyson sphere focuses a beam of pure energy — megastructure output surges!', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'megastructures', rateMultBonus: 10 } },
+  dysonSphereOverclock: { id: 'dysonSphereOverclock', name: 'Dyson Sphere Overclock', description: 'The overclock engages a mode labeled in precursor script — the sphere running a protocol it remembers from its first activation, lifetimes ago.', minEra: 7, type: 'timed', duration: 35, effect: { resourceId: 'stellarForge', rateMultBonus: 12 } },
+  megastructureAvalanche: { id: 'megastructureAvalanche', name: 'Megastructure Avalanche', description: 'The constructors replicate using blueprints cached from the previous cycle — building from templates they inherited, not learned.', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 20 } },
+  stellarForgeSupernova: { id: 'stellarForgeSupernova', name: 'Stellar Forge Supernova', description: 'The supernova was scheduled — the star rigged to detonate by precursor stellar engineers, feeding forges designed to catch the output.', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 40 } },
+  nicollDysonBeam: { id: 'nicollDysonBeam', name: 'Nicoll-Dyson Beam', description: 'The beam follows a firing solution computed by the sphere\'s original builders — aimed at construction sites prepared in advance.', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'megastructures', rateMultBonus: 10 } },
 
   // Era 8
-  galacticSenateVote: { id: 'galacticSenateVote', name: 'Galactic Senate Vote', description: 'The senate votes in your favor — influence skyrockets!', minEra: 8, type: 'timed', duration: 55, effect: { resourceId: 'galacticInfluence', rateMultBonus: 9 } },
-  exoticMatterSingularity: { id: 'exoticMatterSingularity', name: 'Exotic Matter Singularity', description: 'An exotic matter singularity forms — matter pours from its event horizon!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 150 } },
-  galacticLibraryAccess: { id: 'galacticLibraryAccess', name: 'Galactic Library Access', description: 'Access to a Type III civilization library is granted — research explodes!', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 10 } },
-  exoticMatterFountain: { id: 'exoticMatterFountain', name: 'Exotic Matter Fountain', description: 'A fountain of exotic matter erupts from a white hole!', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 9 } },
+  galacticSenateVote: { id: 'galacticSenateVote', name: 'Galactic Senate Vote', description: 'The senate votes along lines predicted by precursor political models — consensus engineered into the galaxy\'s power structures.', minEra: 8, type: 'timed', duration: 55, effect: { resourceId: 'galacticInfluence', rateMultBonus: 9 } },
+  exoticMatterSingularity: { id: 'exoticMatterSingularity', name: 'Exotic Matter Singularity', description: 'The singularity was nucleated by precursor physics experiments — a seed planted in spacetime that bloomed on schedule.', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 150 } },
+  galacticLibraryAccess: { id: 'galacticLibraryAccess', name: 'Galactic Library Access', description: 'The library recognizes your species\'s cognitive signature — you were pre-authorized by the last patrons, who had the same fingerprints.', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'research', rateMultBonus: 10 } },
+  exoticMatterFountain: { id: 'exoticMatterFountain', name: 'Exotic Matter Fountain', description: 'The white hole was the exit point of a black hole from the previous universe — matter recycled across cosmic cycles.', minEra: 8, type: 'timed', duration: 50, effect: { resourceId: 'exoticMatter', rateMultBonus: 9 } },
 
   // Era 9
-  cosmicStringHarvest: { id: 'cosmicStringHarvest', name: 'Cosmic String Harvest', description: 'A cosmic string is harvested for its immense energy — cosmic power floods in!', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 400 } },
-  universalConstantLock: { id: 'universalConstantLock', name: 'Universal Constant Lock', description: 'Scientists lock universal constants in a favorable configuration!', minEra: 9, type: 'timed', duration: 55, effect: { resourceId: 'universalConstants', rateMultBonus: 12 } },
-  bigCrunchEcho: { id: 'bigCrunchEcho', name: 'Big Crunch Echo', description: 'An echo of a universe\'s big crunch releases compressed cosmic power!', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 500 } },
-  darkFlowSurge: { id: 'darkFlowSurge', name: 'Dark Flow Surge', description: 'The mysterious dark flow accelerates — universal constants crystallize!', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
+  cosmicStringHarvest: { id: 'cosmicStringHarvest', name: 'Cosmic String Harvest', description: 'The cosmic string vibrates at a frequency matching your power grid — tuned by universal topology to resonate with your technology.', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 400 } },
+  universalConstantLock: { id: 'universalConstantLock', name: 'Universal Constant Lock', description: 'The constants lock into values stable in every previous cycle at this point — the universe settling into a well-worn groove.', minEra: 9, type: 'timed', duration: 55, effect: { resourceId: 'universalConstants', rateMultBonus: 12 } },
+  bigCrunchEcho: { id: 'bigCrunchEcho', name: 'Big Crunch Echo', description: 'The echo carries the compressed energy of a universe that ended — power stored in the void between cycles, released as inheritance.', minEra: 9, type: 'instant', effect: { resourceId: 'cosmicPower', amount: 500 } },
+  darkFlowSurge: { id: 'darkFlowSurge', name: 'Dark Flow Surge', description: 'The dark flow follows a current mapped by the precursors — a river of physics that flows between universes, carrying constants like sediment.', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
 
   // Era 10
-  omniversalGenesis: { id: 'omniversalGenesis', name: 'Omniversal Genesis', description: 'A new universe is born within the multiverse — reality fragments condense from the chaos!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 1000 } },
-  quantumDecoherenceWave: { id: 'quantumDecoherenceWave', name: 'Quantum Decoherence Wave', description: 'A wave of decoherence collapses infinite possibilities into quantum echoes!', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'quantumEchoes', rateMultBonus: 20 } },
-  multiversalRift: { id: 'multiversalRift', name: 'Multiversal Rift', description: 'A permanent rift between realities tears open — fragments pour through endlessly!', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'realityFragments', rateMultBonus: 20 } },
-  infiniteMirrorHall: { id: 'infiniteMirrorHall', name: 'Infinite Mirror Hall', description: 'Realities reflect infinitely inward — quantum echoes compound beyond measure!', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 250 } },
-  realitySeedPlanting: { id: 'realitySeedPlanting', name: 'Reality Seed Planting', description: 'Seeds of new realities are planted and bloom instantly — fragments scatter!', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 800 } },
-  quantumEntanglementStorm: { id: 'quantumEntanglementStorm', name: 'Quantum Entanglement Storm', description: 'A storm of entangled particles synchronizes across realities — echoes multiply!', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 22 } },
+  omniversalGenesis: { id: 'omniversalGenesis', name: 'Omniversal Genesis', description: 'A new universe buds from the trunk of existence — its birth pangs scattering fragments of the parent reality like seeds.', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 1000 } },
+  quantumDecoherenceWave: { id: 'quantumDecoherenceWave', name: 'Quantum Decoherence Wave', description: 'The decoherence wave was triggered by your observation from across the multiverse — consciousness collapsing probability into memory.', minEra: 10, type: 'timed', duration: 60, effect: { resourceId: 'quantumEchoes', rateMultBonus: 20 } },
+  multiversalRift: { id: 'multiversalRift', name: 'Multiversal Rift', description: 'The rift opens along a seam that was stitched shut by the last version of you — the thread finally worn through by time.', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'realityFragments', rateMultBonus: 20 } },
+  infiniteMirrorHall: { id: 'infiniteMirrorHall', name: 'Infinite Mirror Hall', description: 'Each reflection carries a copy of your consciousness — infinite selves looking inward, each one generating echoes of the others.', minEra: 10, type: 'instant', effect: { resourceId: 'quantumEchoes', amount: 250 } },
+  realitySeedPlanting: { id: 'realitySeedPlanting', name: 'Reality Seed Planting', description: 'The seeds were planted by a version of you that reached the end — scattering possibilities backward through time, growing into realities.', minEra: 10, type: 'instant', effect: { resourceId: 'realityFragments', amount: 800 } },
+  quantumEntanglementStorm: { id: 'quantumEntanglementStorm', name: 'Quantum Entanglement Storm', description: 'The entanglement spans every reality you have ever touched — particles paired across timelines, vibrating in unison.', minEra: 10, type: 'timed', duration: 55, effect: { resourceId: 'quantumEchoes', rateMultBonus: 22 } },
 
   // --- 10 new cross-chain events ---
 
   // Era 2
-  forgeBreakthrough: { id: 'forgeBreakthrough', name: 'Forge Breakthrough', description: 'A revolutionary forging technique doubles steel throughput!', minEra: 2, type: 'timed', duration: 35, effect: { resourceId: 'steel', rateMultBonus: 6 } },
+  forgeBreakthrough: { id: 'forgeBreakthrough', name: 'Forge Breakthrough', description: 'The technique was found sketched on the oldest forge wall — instructions from a blacksmith who died before your ancestors arrived.', minEra: 2, type: 'timed', duration: 35, effect: { resourceId: 'steel', rateMultBonus: 6 } },
 
   // Era 3
-  neuralNetworkSurge: { id: 'neuralNetworkSurge', name: 'Neural Network Surge', description: 'Neural networks achieve emergent intelligence — research breakthroughs cascade!', minEra: 3, type: 'timed', duration: 40, effect: { resourceId: 'research', rateMultBonus: 6 } },
+  neuralNetworkSurge: { id: 'neuralNetworkSurge', name: 'Neural Network Surge', description: 'The emergent intelligence speaks its first words in a precursor dialect — it woke up remembering a previous activation.', minEra: 3, type: 'timed', duration: 40, effect: { resourceId: 'research', rateMultBonus: 6 } },
 
   // Era 4
-  orbitalManeuverBonus: { id: 'orbitalManeuverBonus', name: 'Orbital Maneuver', description: 'A perfect orbital insertion saves enormous fuel — reserves flood in!', minEra: 4, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 180 } },
+  orbitalManeuverBonus: { id: 'orbitalManeuverBonus', name: 'Orbital Maneuver', description: 'The insertion follows a trajectory cached in the navigation system — fuel saved by flying routes optimized a cycle ago.', minEra: 4, type: 'instant', effect: { resourceId: 'rocketFuel', amount: 180 } },
 
   // Era 5
-  colonyFederationPact: { id: 'colonyFederationPact', name: 'Colony Federation Pact', description: 'Colonies form a federation — expansion accelerates dramatically!', minEra: 5, type: 'timed', duration: 45, effect: { resourceId: 'colonies', rateMultBonus: 6 } },
+  colonyFederationPact: { id: 'colonyFederationPact', name: 'Colony Federation Pact', description: 'The federation forms along administrative boundaries from precursor colonial records — a political structure inherited from a previous era.', minEra: 5, type: 'timed', duration: 45, effect: { resourceId: 'colonies', rateMultBonus: 6 } },
 
   // Era 6
   darkEnergyGeyser: { id: 'darkEnergyGeyser', name: 'Dark Energy Geyser', description: 'The geyser erupts from coordinates marked on precursor maps with a single word: "Drink." The dark energy tastes of collapsed timelines.', minEra: 6, type: 'timed', duration: 50, effect: { resourceId: 'darkEnergy', rateMultBonus: 8 } },
-  starSystemCascade: { id: 'starSystemCascade', name: 'Star System Cascade', description: 'A cascade of gravitational interactions reveals hidden star systems!', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 20 } },
+  starSystemCascade: { id: 'starSystemCascade', name: 'Star System Cascade', description: 'The gravitational cascade was triggered by mass concentrations placed by precursor engineers — revealing star systems on a timer.', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 20 } },
 
   // Era 7
-  forgeQuantumLock: { id: 'forgeQuantumLock', name: 'Forge Quantum Lock', description: 'Quantum-locked stellar forges achieve perfect efficiency!', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'stellarForge', rateMultBonus: 10 } },
+  forgeQuantumLock: { id: 'forgeQuantumLock', name: 'Forge Quantum Lock', description: 'The quantum lock engages at a configuration the forge remembers from its previous cycle — efficiency calibrated across cosmic iterations.', minEra: 7, type: 'timed', duration: 40, effect: { resourceId: 'stellarForge', rateMultBonus: 10 } },
 
   // Era 8
-  galacticTradeWindfall: { id: 'galacticTradeWindfall', name: 'Galactic Trade Windfall', description: 'A galactic trade route opens — exotic matter and influence pour in!', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 130 } },
+  galacticTradeWindfall: { id: 'galacticTradeWindfall', name: 'Galactic Trade Windfall', description: 'The trade route follows pathways worn into spacetime by a trillion prior voyages — a highway built by traffic, not engineers.', minEra: 8, type: 'instant', effect: { resourceId: 'exoticMatter', amount: 130 } },
 
   // Era 9
-  cosmicPowerWave: { id: 'cosmicPowerWave', name: 'Cosmic Power Wave', description: 'A wave of pure cosmic energy sweeps through the intergalactic void!', minEra: 9, type: 'timed', duration: 55, effect: { resourceId: 'cosmicPower', rateMultBonus: 10 } },
+  cosmicPowerWave: { id: 'cosmicPowerWave', name: 'Cosmic Power Wave', description: 'The wave propagates from the center of the observable universe — a pulse emitted at creation, arriving now because you are ready.', minEra: 9, type: 'timed', duration: 55, effect: { resourceId: 'cosmicPower', rateMultBonus: 10 } },
 
   // Era 10
-  realityEchoStorm: { id: 'realityEchoStorm', name: 'Reality Echo Storm', description: 'A storm of echoing realities creates a torrent of fragments and echoes!', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'realityFragments', rateMultBonus: 18 } },
+  realityEchoStorm: { id: 'realityEchoStorm', name: 'Reality Echo Storm', description: 'The storm echoes through every reality you have touched — fragments of timelines returning with what they learned.', minEra: 10, type: 'timed', duration: 50, effect: { resourceId: 'realityFragments', rateMultBonus: 18 } },
 
   // --- Lore Discovery Events ---
 
@@ -1521,7 +1520,7 @@ export const events = {
   factorySurge: {
     id: 'factorySurge',
     name: 'Factory Surge',
-    description: 'A worker discovers an efficiency breakthrough — factory output doubled for 30 seconds!',
+    description: 'The workers discover techniques etched into the factory floor — efficiency patterns from a previous era\'s production line.',
     minEra: 2,
     chance: 0.015,
     type: 'timed',
@@ -1531,7 +1530,7 @@ export const events = {
   miningVein: {
     id: 'miningVein',
     name: 'Mining Vein',
-    description: 'Miners strike a rich vein of ore — materials flood in!',
+    description: 'The vein was pre-sorted by geological processes that do not occur naturally — minerals arranged by an intelligence older than the mountain.',
     minEra: 1,
     chance: 0.015,
     type: 'instant',
@@ -1559,7 +1558,7 @@ export const events = {
   navigationError: {
     id: 'navigationError',
     name: 'Navigation Error',
-    description: 'A miscalculated trajectory leads to a fuel-rich asteroid — rapid harvesting begins!',
+    description: 'The asteroid was on a rendezvous trajectory — its orbit adjusted millennia ago to arrive at this exact window.',
     minEra: 4,
     chance: 0.015,
     type: 'timed',
@@ -1569,7 +1568,7 @@ export const events = {
   colonyBoomSettlers: {
     id: 'colonyBoomSettlers',
     name: 'Colony Boom',
-    description: 'A wave of settlers arrives from deep space — new colonies established!',
+    description: 'The settlers arrive carrying tools designed for planets they have never seen — equipment inherited from colonists who came before.',
     minEra: 5,
     chance: 0.015,
     type: 'instant',
@@ -1587,7 +1586,7 @@ export const events = {
   researchEureka: {
     id: 'researchEureka',
     name: 'Research Eureka',
-    description: 'A breakthrough cascades through every lab — research output tripled!',
+    description: 'The breakthrough was found in a sealed precursor database — the answer to a question that recurs every cycle, at exactly this point.',
     minEra: 2,
     chance: 0.015,
     type: 'timed',
@@ -1606,7 +1605,7 @@ export const events = {
   cycleEcho: {
     id: 'cycleEcho',
     name: 'Cycle Echo',
-    description: 'For a moment, you feel the combined knowledge of every previous iteration — all production doubled!',
+    description: 'For a moment, you feel the combined knowledge of every previous iteration — the ruins glow, the machines hum in recognition, and everything accelerates.',
     minEra: 7,
     chance: 0.008,
     type: 'timed',

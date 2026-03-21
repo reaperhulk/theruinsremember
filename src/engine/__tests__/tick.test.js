@@ -138,4 +138,111 @@ describe('tick', () => {
     expect(after.resources.energy.amount).toBeLessThan(energyBefore + 0.5);
     expect(after.resources.energy.amount).toBeCloseTo(Math.max(0, energyBefore + 0.5 - 0.9), 1);
   });
+
+  // --- Mechanic upgrade tests ---
+
+  it('resourcePipeline converts overflow to research when resources are at cap', () => {
+    const state = createInitialState();
+    state.upgrades = { resourcePipeline: true };
+    // Unlock research and set food at cap with production
+    state.resources.research = { ...state.resources.research, unlocked: true, amount: 0, rateAdd: 0, rateMult: 1, capMult: 1 };
+    state.resources.food = { ...state.resources.food, unlocked: true, amount: 5000, capMult: 1 };
+    // Food is at cap (5000) with baseRate 1.5, so overflow should trickle to research
+    const after = tick(state, 1);
+    // Research should have increased from overflow: 1.5 * 0.1 = 0.15
+    expect(after.resources.research.amount).toBeGreaterThan(0);
+  });
+
+  it('resourcePipeline does not convert when resources are below cap', () => {
+    const state = createInitialState();
+    state.upgrades = { resourcePipeline: true };
+    state.resources.research = { ...state.resources.research, unlocked: true, amount: 0, rateAdd: 0, rateMult: 1, capMult: 1 };
+    state.resources.food = { ...state.resources.food, unlocked: true, amount: 100, capMult: 1 };
+    const after = tick(state, 1);
+    // Research should stay at 0 since no resource is at cap
+    expect(after.resources.research.amount).toBe(0);
+  });
+
+  it('recursiveOptimizer gives 1.1x per era (era 5 = 1.1^4 bonus)', () => {
+    const state = createInitialState();
+    state.upgrades = { recursiveOptimizer: true };
+    state.era = 5;
+    const baseState = createInitialState();
+    baseState.era = 5;
+    const baseTick = tick(baseState, 1);
+    const bonusTick = tick(state, 1);
+    // Era 5: 1.1^4 = 1.4641, so bonus fraction = 0.4641
+    // Food: 1.5 base + 1.5 * 0.4641 = 1.5 + 0.696 = 2.196
+    expect(bonusTick.resources.food.amount).toBeGreaterThan(baseTick.resources.food.amount * 1.4);
+  });
+
+  it('recursiveOptimizer gives no bonus at era 1', () => {
+    const state = createInitialState();
+    state.upgrades = { recursiveOptimizer: true };
+    state.era = 1;
+    const baseTick = tick(createInitialState(), 1);
+    const bonusTick = tick(state, 1);
+    // Era 1: 1.1^0 = 1, no bonus
+    expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount, 5);
+  });
+
+  it('orbitalResonance gives +10% per mini-game interacted with', () => {
+    const state = createInitialState();
+    state.upgrades = { orbitalResonance: true };
+    // Interact with 3 mini-games: mining (totalGems), factory, hacking
+    state.totalGems = 1;
+    state.factoryAllocation = { steel: 1 };
+    state.hackSuccesses = 1;
+    const baseTick = tick(createInitialState(), 1);
+    const bonusTick = tick(state, 1);
+    // 3 mini-games * 10% = 30% bonus on food: 1.5 + 1.5*0.3 = 1.95
+    expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount * 1.3, 1);
+  });
+
+  it('orbitalResonance gives no bonus with zero mini-game interaction', () => {
+    const state = createInitialState();
+    state.upgrades = { orbitalResonance: true };
+    // No mini-game interactions
+    const baseTick = tick(createInitialState(), 1);
+    const bonusTick = tick(state, 1);
+    expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount, 5);
+  });
+
+  it('warpEcho gives +3% per star route', () => {
+    const state = createInitialState();
+    state.upgrades = { warpEcho: true };
+    state.starRoutes = [{ from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 }, { from: 4, to: 5 }];
+    const baseTick = tick(createInitialState(), 1);
+    const bonusTick = tick(state, 1);
+    // 5 routes * 3% = 15% bonus: 1.5 * 1.15 = 1.725
+    expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount * 1.15, 1);
+  });
+
+  it('warpEcho gives no bonus with zero routes', () => {
+    const state = createInitialState();
+    state.upgrades = { warpEcho: true };
+    state.starRoutes = [];
+    const baseTick = tick(createInitialState(), 1);
+    const bonusTick = tick(state, 1);
+    expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount, 5);
+  });
+
+  it('fuel is consumed by orbital infra production', () => {
+    const state = createInitialState();
+    state.era = 4;
+    state.resources.orbitalInfra = { ...state.resources.orbitalInfra, unlocked: true, rateAdd: 2, rateMult: 1 };
+    state.resources.rocketFuel = { ...state.resources.rocketFuel, unlocked: true, amount: 100, rateAdd: 0, rateMult: 1, capMult: 1 };
+    // Orbital rate = 2/s, fuel consumed = 2 * 0.6 = 1.2/s
+    const after = tick(state, 1);
+    expect(after.resources.rocketFuel.amount).toBeCloseTo(100 - 1.2, 1);
+  });
+
+  it('energy never goes below zero from electronics consumption', () => {
+    const state = createInitialState();
+    state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 100, rateMult: 1 };
+    state.resources.energy = { ...state.resources.energy, unlocked: true, amount: 1 };
+    // Electronics rate = 100/s, energy consumed = 100 * 0.3 = 30/s, but only 1 + 0.5 available
+    const after = tick(state, 1);
+    expect(after.resources.energy.amount).toBe(0);
+  });
 });

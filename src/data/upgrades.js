@@ -39,7 +39,7 @@ export const upgrades = {
     id: 'expandWorkforce', name: 'Expand Workforce', era: 1,
     cost: { food: 10, materials: 8 },
     effects: [{ type: 'production_add', target: 'labor', value: 0.5 }],
-    description: 'Each expansion adds +0.5 labor/s',
+    description: 'Each wave of settlers arrives knowing the terrain — as if they dreamed the landscape before landing',
     prerequisites: ['housing'],
     repeatable: true,
     costScale: 1.5,
@@ -83,7 +83,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 0.4 },
       { type: 'production_add', target: 'energy', value: 0.5 },
     ],
-    description: 'Find 5 gems to unlock — gem expertise boosts production',
+    description: 'The gems pulse with light from a frequency no instrument can name — polish them and they teach your hands to shape matter',
     prerequisites: ['tools'],
     requireGems: 5,
   },
@@ -94,7 +94,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 2.0 },
       { type: 'production_add', target: 'software', value: 2.0 },
     ],
-    description: 'Find 20 gems to unlock — deep gem knowledge boosts research & software',
+    description: 'Twenty gems arranged in a circle glow with precursor equations — the knowledge they emit accelerates thought itself',
     prerequisites: ['internet'],
     requireGems: 20,
   },
@@ -105,7 +105,7 @@ export const upgrades = {
       { type: 'production_add', target: 'galacticInfluence', value: 1.6 },
       { type: 'production_add', target: 'starSystems', value: 0.2 },
     ],
-    description: 'Complete 10 trades to unlock — trade expertise boosts influence',
+    description: 'Ten trades carve a pattern into the market — the same pattern found in precursor ledgers, dated to the last cycle',
     prerequisites: ['warpDrive'],
     requireTrades: 10,
   },
@@ -241,7 +241,7 @@ export const upgrades = {
     id: 'dataCenter', name: 'Data Center', era: 3,
     cost: { electronics: 20, energy: 15, steel: 10 },
     effects: [{ type: 'production_add', target: 'data', value: 0.5 }],
-    description: 'Each data center adds +0.5 data/s — build more for more data',
+    description: 'Each center connects to buried fiber lines that predate the network — conduits waiting in the dark',
     prerequisites: ['internet'],
     repeatable: true,
     costScale: 1.4,
@@ -347,7 +347,7 @@ export const upgrades = {
     id: 'launchComplex', name: 'Launch Complex', era: 4,
     cost: { steel: 30, energy: 20, rocketFuel: 10 },
     effects: [{ type: 'production_add', target: 'rocketFuel', value: 1.5 }],
-    description: 'Each launch complex adds +1.5 rocket fuel/s',
+    description: 'Each pad sits on ancient blast craters — scorch marks that match your engine specifications exactly',
     prerequisites: ['rocketScience'],
     repeatable: true,
     costScale: 1.3,
@@ -470,7 +470,7 @@ export const upgrades = {
     id: 'orbitalHabitat', name: 'Orbital Habitat', era: 5,
     cost: { exoticMaterials: 15, energy: 40, steel: 50 },
     effects: [{ type: 'production_add', target: 'colonies', value: 0.3 }],
-    description: 'Each habitat adds +0.3 colonies/s — expand across the system',
+    description: 'Each habitat docks to anchor points that predate your species — the system was built for tenants',
     prerequisites: ['terraforming'],
     repeatable: true,
     costScale: 1.6,
@@ -520,7 +520,7 @@ export const upgrades = {
     id: 'miningDrone', name: 'Mining Drone', era: 5,
     cost: { exoticMaterials: 10, electronics: 30, rocketFuel: 20 },
     effects: [{ type: 'production_add', target: 'exoticMaterials', value: 0.3 }],
-    description: 'Each drone adds +0.3 exotic materials/s',
+    description: 'Each drone navigates asteroid fields with eerie precision — following ore maps burned into its firmware from a previous era',
     prerequisites: ['asteroidMining'],
     repeatable: true,
     costScale: 1.5,
@@ -552,7 +552,7 @@ export const upgrades = {
     id: 'colonialFleet', name: 'Colonial Fleet', era: 6,
     cost: { darkEnergy: 20, steel: 200, colonies: 5 },
     effects: [{ type: 'production_add', target: 'starSystems', value: 0.05 }],
-    description: 'Each fleet expands +0.05 star systems/s',
+    description: 'Each fleet follows routes charted in dead stars\' light — the colonial paths were walked before',
     prerequisites: ['warpDrive'],
     repeatable: true,
     costScale: 1.5,
@@ -572,7 +572,7 @@ export const upgrades = {
     id: 'darkEnergyCollector', name: 'Dark Energy Collector', era: 6,
     cost: { darkEnergy: 15, exoticMaterials: 20, energy: 100 },
     effects: [{ type: 'production_add', target: 'darkEnergy', value: 0.1 }],
-    description: 'Each collector adds +0.1 dark energy/s',
+    description: 'Each collector resonates with dark currents that flow along paths carved by the previous cycle\'s collapse',
     prerequisites: ['warpDrive'],
     repeatable: true,
     costScale: 1.5,
@@ -626,7 +626,7 @@ export const upgrades = {
     id: 'megastructureFoundry', name: 'Megastructure Foundry', era: 7,
     cost: { stellarForge: 8, energy: 200, exoticMaterials: 30 },
     effects: [{ type: 'production_add', target: 'megastructures', value: 0.05 }],
-    description: 'Each foundry adds +0.05 megastructures/s',
+    description: 'Each foundry ignites where a previous foundry collapsed — the stellar ash is still warm from the last firing',
     prerequisites: ['starLifting'],
     repeatable: true,
     costScale: 1.6,
@@ -717,7 +717,7 @@ export const upgrades = {
     id: 'replicatorArray', name: 'Replicator Array', era: 8,
     cost: { exoticMatter: 10, research: 100, energy: 150 },
     effects: [{ type: 'production_add', target: 'exoticMatter', value: 0.3 }],
-    description: 'Each array adds +0.3 exotic matter/s',
+    description: 'Each array hums with templates from a dead universe — replicating matter that existed before the laws of physics were finalized',
     prerequisites: ['wormholeNetwork'],
     repeatable: true,
     costScale: 1.5,
@@ -726,7 +726,7 @@ export const upgrades = {
     id: 'galacticFarm', name: 'Galactic Farm', era: 8,
     cost: { galacticInfluence: 40, colonies: 15, food: 300 },
     effects: [{ type: 'production_add', target: 'galacticInfluence', value: 0.3 }],
-    description: 'Each farm adds +0.3 galactic influence/s',
+    description: 'Each farm cultivates worlds where your crops already grew in a previous cycle — the soil knows what to yield',
     prerequisites: ['galacticSenate'],
     repeatable: true,
     costScale: 1.5,
@@ -794,7 +794,7 @@ export const upgrades = {
     id: 'galaxyCluster', name: 'Galaxy Cluster', era: 9,
     cost: { cosmicPower: 60, exoticMatter: 30, darkEnergy: 40 },
     effects: [{ type: 'production_add', target: 'universalConstants', value: 0.05 }],
-    description: 'Each cluster adds +0.05 universal constants/s',
+    description: 'Each cluster orbits a truth that was old when the first star ignited — constants encoded in gravity',
     prerequisites: ['voidBridges'],
     repeatable: true,
     costScale: 1.6,
@@ -803,7 +803,7 @@ export const upgrades = {
     id: 'cosmicBeacon', name: 'Cosmic Beacon', era: 9,
     cost: { cosmicPower: 40, darkEnergy: 30, galacticInfluence: 50 },
     effects: [{ type: 'production_add', target: 'cosmicPower', value: 0.5 }],
-    description: 'Each beacon adds +0.5 cosmic power/s',
+    description: 'Each beacon lights up in sequence — a constellation spelling a word in a language spoken before languages existed',
     prerequisites: ['galaxySeeding', 'temporalBattery'],
     repeatable: true,
     costScale: 1.5,
@@ -1507,7 +1507,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.5 },
       { type: 'production_add', target: 'materials', value: 0.8 },
     ],
-    description: 'Chemical processing generates energy and materials',
+    description: 'The reaction formulas were scratched into the kiln walls — chemistry solved by hands that left no other trace',
     prerequisites: ['electricMotor'],
   },
   telephoneNetwork: {
@@ -1537,7 +1537,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 0.8 },
       { type: 'production_add', target: 'materials', value: 0.8 },
     ],
-    description: 'Deep coal mining generates energy and produces materials',
+    description: 'The shafts follow seams of coal laid down by forests that grew in a previous cycle — fuel from trees that remembered sunlight',
     prerequisites: ['steelRefinery'],
   },
   communalKitchen: {
@@ -1547,7 +1547,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 0.4 },
       { type: 'production_add', target: 'labor', value: 0.5 },
     ],
-    description: 'Shared meals boost food output and provide extra labor',
+    description: 'The recipes taste right before anyone seasons them — ancestral flavors from a kitchen that existed before this settlement',
     prerequisites: ['animalHusbandry'],
   },
   deepMining: {
@@ -1557,7 +1557,7 @@ export const upgrades = {
       { type: 'production_add', target: 'materials', value: 1 },
       { type: 'production_add', target: 'energy', value: 0.5 },
     ],
-    description: 'Dig deeper for rare ores — more materials and energy',
+    description: 'The deepest shafts break into tunnels already bored — pick marks from a previous age, following veins that someone mapped before',
     prerequisites: ['copperSmelter'],
   },
   socialMedia: {
@@ -1688,7 +1688,7 @@ export const upgrades = {
       { type: 'production_add', target: 'energy', value: 4 },
       { type: 'cap_mult', target: 'energy', value: 5 },
     ],
-    description: 'A proto-Dyson structure — +4 energy/s and x5 capacity',
+    description: 'The bubble framework was already in orbit — gossamer strands of ancient material, stretching toward the sun like a hand remembering warmth',
     prerequisites: ['heliumMiner'],
   },
   titanMining: {
@@ -1844,7 +1844,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'materials', value: 2 },
       { type: 'production_mult', target: 'energy', value: 2 },
     ],
-    description: 'Past-life knowledge doubles all Era 1 production (prestige-only)',
+    description: 'Knowledge from a previous life surfaces unbidden — your hands move faster, the earth yields more readily, as if welcoming you back',
     prerequisites: [],
     requirePrestige: 1,
   },
@@ -1855,7 +1855,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'research', value: 5 },
       { type: 'production_mult', target: 'data', value: 5 },
     ],
-    description: 'Echoes from past timelines accelerate digital progress (prestige-only)',
+    description: 'Code compiles faster than you can type it — your fingers finishing functions that a previous self began',
     prerequisites: ['cloudStorage'],
     requirePrestige: 1,
   },
@@ -1866,7 +1866,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'steel', value: 3 },
       { type: 'production_mult', target: 'electronics', value: 3 },
     ],
-    description: 'Remember industrial techniques — triple steel and electronics (prestige-only)',
+    description: 'The forges feel familiar — the alloy ratios, the temper times, all remembered from a factory floor you never stood on',
     prerequisites: ['assemblyLines'],
     requirePrestige: 1,
   },
@@ -1877,7 +1877,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'rocketFuel', value: 3 },
       { type: 'production_mult', target: 'orbitalInfra', value: 3 },
     ],
-    description: 'Remember spacefaring techniques — triple fuel and orbital output (prestige-only)',
+    description: 'Launch trajectories arrive as dreams — equations solved in your sleep by someone who already flew this route',
     prerequisites: ['quantumNetwork'],
     requirePrestige: 1,
   },
@@ -1888,7 +1888,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'starSystems', value: 5 },
       { type: 'production_mult', target: 'darkEnergy', value: 5 },
     ],
-    description: 'Remember the cosmos from past lives (prestige-only)',
+    description: 'Star maps bloom in your mind fully formed — navigation data from a self that crossed these voids before',
     prerequisites: ['neuralProcessor'],
     requirePrestige: 1,
   },
@@ -1899,7 +1899,7 @@ export const upgrades = {
       { type: 'production_mult', target: 'cosmicPower', value: 10 },
       { type: 'production_mult', target: 'universalConstants', value: 10 },
     ],
-    description: 'Remember the multiverse from past lives (prestige-only)',
+    description: 'The boundaries between realities thin at your touch — you remember them from the other side',
     prerequisites: ['galaxySeeding'],
     requirePrestige: 2,
   },
@@ -1936,7 +1936,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 0.4 },
       { type: 'production_add', target: 'electronics', value: 0.8 },
     ],
-    description: 'Long-distance communication accelerates research and electronics',
+    description: 'The telegraph pulses match a rhythm found tapped into ruin walls — Morse code predating Morse by millennia',
     prerequisites: ['telephoneNetwork'],
   },
 
@@ -1960,7 +1960,7 @@ export const upgrades = {
       { type: 'production_add', target: 'research', value: 1.5 },
       { type: 'production_add', target: 'data', value: 1.0 },
     ],
-    description: 'Robotic rovers on Mars discover new data and boost research',
+    description: 'The rover finds its own tire tracks in the Martian dust — fresh, impossible, pointing toward the next discovery',
     prerequisites: ['rocketScience'],
   },
 
@@ -1972,7 +1972,7 @@ export const upgrades = {
       { type: 'cap_mult', target: 'rocketFuel', value: 5 },
       { type: 'cap_mult', target: 'exoticMaterials', value: 3 },
     ],
-    description: 'Cryo-tanks massively expand fuel and exotic material storage',
+    description: 'The cryo-tanks were already cold when you opened them — pressurized and sealed, waiting across geological time',
     prerequisites: ['quantumReactor'],
   },
 
@@ -1984,7 +1984,7 @@ export const upgrades = {
       { type: 'production_add', target: 'food', value: 6.4 },
       { type: 'production_add', target: 'exoticMaterials', value: 0.5 },
     ],
-    description: 'Alien plant life revolutionizes food production and yields exotic materials',
+    description: 'Alien crops grow from seeds that match pollen found in your homeworld\'s oldest ruins — planted here by hands from there',
     prerequisites: ['tradeHub'],
   },
 
@@ -2057,23 +2057,23 @@ export const upgrades = {
   },
 
   // --- Worktree Agent: 30 new upgrades (3 per era) ---
-  oxCart: { id: 'oxCart', name: 'Ox Cart', era: 1, cost: { food: 15, materials: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'labor', value: 0.5 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'Beast-drawn carts boost labor and haul extra materials', prerequisites: ['huntingParty'] },
-  oilRefinery: { id: 'oilRefinery', name: 'Oil Refinery', era: 2, cost: { steel: 25, energy: 20, materials: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.5 }], description: 'Refine petroleum — boost energy and generate steel byproducts', prerequisites: ['steamTurbine'] },
-  laboratoryComplex: { id: 'laboratoryComplex', name: 'Laboratory Complex', era: 2, cost: { electronics: 20, steel: 15, research: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'cap_mult', target: 'research', value: 3 }], description: 'Dedicated labs boost research and triple capacity', prerequisites: ['computingLab'] },
-  conveyor: { id: 'conveyor', name: 'Conveyor System', era: 2, cost: { steel: 20, electronics: 10, energy: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 0.8 }], description: 'Automated conveyors boost steel and electronics output', prerequisites: ['railroad'] },
+  oxCart: { id: 'oxCart', name: 'Ox Cart', era: 1, cost: { food: 15, materials: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'labor', value: 0.5 }, { type: 'production_add', target: 'materials', value: 0.4 }], description: 'The beasts follow paths worn smooth by hooves from a previous age — they know the routes better than you do', prerequisites: ['huntingParty'] },
+  oilRefinery: { id: 'oilRefinery', name: 'Oil Refinery', era: 2, cost: { steel: 25, energy: 20, materials: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.5 }], description: 'The petroleum pools collect in basins shaped by ancient hands — reservoirs designed to fill on a geological schedule', prerequisites: ['steamTurbine'] },
+  laboratoryComplex: { id: 'laboratoryComplex', name: 'Laboratory Complex', era: 2, cost: { electronics: 20, steel: 15, research: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'cap_mult', target: 'research', value: 3 }], description: 'The labs were sealed and sterile when you found them — instruments calibrated for experiments no one had proposed yet', prerequisites: ['computingLab'] },
+  conveyor: { id: 'conveyor', name: 'Conveyor System', era: 2, cost: { steel: 20, electronics: 10, energy: 15 }, effects: [{ type: 'production_add', target: 'steel', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 0.8 }], description: 'Conveyor belts slot into tracks worn smooth by decades of phantom operation — the factory ran before you staffed it', prerequisites: ['railroad'] },
   fiberOptic: { id: 'fiberOptic', name: 'Fiber Optic Network', era: 3, cost: { electronics: 30, energy: 20, materials: 25 }, effects: [{ type: 'production_add', target: 'data', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 1.2 }], description: 'The fiber channels were already threaded through the bedrock — ancient glass, still flawless, waiting for light', prerequisites: ['internet'] },
   autonomousDrone: { id: 'autonomousDrone', name: 'Autonomous Drone', era: 3, cost: { software: 20, electronics: 25, research: 15 }, effects: [{ type: 'production_add', target: 'labor', value: 1 }, { type: 'production_add', target: 'materials', value: 1.2 }], description: 'The drone navigates ruins with eerie confidence — its pathfinding mirrors routes carved into ancient walls', prerequisites: ['robotics'] },
-  cryoFuelTank: { id: 'cryoFuelTank', name: 'Cryo Fuel Tank', era: 4, cost: { rocketFuel: 20, steel: 30, energy: 15 }, effects: [{ type: 'cap_mult', target: 'rocketFuel', value: 5 }, { type: 'production_add', target: 'rocketFuel', value: 1.0 }], description: 'Cryogenic storage expands fuel capacity x5 and boosts fuel production', prerequisites: ['advancedRocketry'] },
-  magneticShield: { id: 'magneticShield', name: 'Magnetic Shield', era: 4, cost: { electronics: 20, energy: 25, steel: 20 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 0.6 }, { type: 'cap_mult', target: 'orbitalInfra', value: 3 }], description: 'Magnetic shielding protects orbital assets — boost output and triple capacity', prerequisites: ['spaceStation'] },
-  nanofabricator: { id: 'nanofabricator', name: 'Nanofabricator', era: 5, cost: { exoticMaterials: 20, research: 40, electronics: 30 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 2 }, { type: 'production_add', target: 'electronics', value: 4 }], description: 'Nanoscale fabrication boosts exotic materials and electronics', prerequisites: ['massDriver'] },
-  gravitySiphon: { id: 'gravitySiphon', name: 'Gravity Siphon', era: 5, cost: { rocketFuel: 40, energy: 50, research: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 4 }, { type: 'production_add', target: 'darkEnergy', value: 0.1 }], description: 'Siphon energy from gravity wells', prerequisites: ['dysonBubble'] },
-  cometHarvester: { id: 'cometHarvester', name: 'Comet Harvester', era: 5, cost: { orbitalInfra: 20, rocketFuel: 30, materials: 100 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 0.5 }, { type: 'production_add', target: 'food', value: 2 }], description: 'Harvest comets for exotic ice and organic compounds', prerequisites: ['oortCloudMining'] },
-  graviticLoom: { id: 'graviticLoom', name: 'Gravitic Loom', era: 6, cost: { darkEnergy: 30, exoticMaterials: 40, starSystems: 5 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 3.2 }, { type: 'production_add', target: 'darkEnergy', value: 0.5 }], description: 'Weave exotic materials using gravity — boosts output', prerequisites: ['fusionReactor', 'cosmicRecollection'] },
-  stellarAcademy: { id: 'stellarAcademy', name: 'Stellar Academy', era: 6, cost: { research: 80, galacticInfluence: 20, starSystems: 4 }, effects: [{ type: 'production_add', target: 'research', value: 6.4 }, { type: 'production_add', target: 'galacticInfluence', value: 0.3 }], description: 'Train across star systems — +6.4 research/s and +0.3 influence/s', prerequisites: ['aiGovernance'] },
-  voidProbe: { id: 'voidProbe', name: 'Void Probe', era: 6, cost: { darkEnergy: 25, starSystems: 3, electronics: 40 }, effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }, { type: 'production_add', target: 'data', value: 1 }], description: 'Probes into the void discover systems and transmit data', prerequisites: ['stellarCartography'] },
+  cryoFuelTank: { id: 'cryoFuelTank', name: 'Cryo Fuel Tank', era: 4, cost: { rocketFuel: 20, steel: 30, energy: 15 }, effects: [{ type: 'cap_mult', target: 'rocketFuel', value: 5 }, { type: 'production_add', target: 'rocketFuel', value: 1.0 }], description: 'Cryo-valves open with a sigh of recognition — the tanks were pressurized by engineers who knew your fuel specifications', prerequisites: ['advancedRocketry'] },
+  magneticShield: { id: 'magneticShield', name: 'Magnetic Shield', era: 4, cost: { electronics: 20, energy: 25, steel: 20 }, effects: [{ type: 'production_add', target: 'orbitalInfra', value: 0.6 }, { type: 'cap_mult', target: 'orbitalInfra', value: 3 }], description: 'The magnetic field aligns with anchor points set by the precursors — a shield already calibrated for threats you haven\'t encountered', prerequisites: ['spaceStation'] },
+  nanofabricator: { id: 'nanofabricator', name: 'Nanofabricator', era: 5, cost: { exoticMaterials: 20, research: 40, electronics: 30 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 2 }, { type: 'production_add', target: 'electronics', value: 4 }], description: 'The nanobots self-replicate using templates cached in precursor memory crystals — designs from a scale too small to forget', prerequisites: ['massDriver'] },
+  gravitySiphon: { id: 'gravitySiphon', name: 'Gravity Siphon', era: 5, cost: { rocketFuel: 40, energy: 50, research: 30 }, effects: [{ type: 'production_add', target: 'energy', value: 4 }, { type: 'production_add', target: 'darkEnergy', value: 0.1 }], description: 'The siphon taps gravity wells that pulse on a cycle — energy stored by something patient, released on schedule', prerequisites: ['dysonBubble'] },
+  cometHarvester: { id: 'cometHarvester', name: 'Comet Harvester', era: 5, cost: { orbitalInfra: 20, rocketFuel: 30, materials: 100 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 0.5 }, { type: 'production_add', target: 'food', value: 2 }], description: 'The comets carry seeds frozen in their ice — organic compounds arranged in patterns that spell out growth instructions', prerequisites: ['oortCloudMining'] },
+  graviticLoom: { id: 'graviticLoom', name: 'Gravitic Loom', era: 6, cost: { darkEnergy: 30, exoticMaterials: 40, starSystems: 5 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 3.2 }, { type: 'production_add', target: 'darkEnergy', value: 0.5 }], description: 'The loom warps spacetime into threads of exotic matter — a craft the precursors called "singing the void still"', prerequisites: ['fusionReactor', 'cosmicRecollection'] },
+  stellarAcademy: { id: 'stellarAcademy', name: 'Stellar Academy', era: 6, cost: { research: 80, galacticInfluence: 20, starSystems: 4 }, effects: [{ type: 'production_add', target: 'research', value: 6.4 }, { type: 'production_add', target: 'galacticInfluence', value: 0.3 }], description: 'The academy curriculum matches a syllabus found in every ruin — the same lessons, taught across cycles, to the same eager minds', prerequisites: ['aiGovernance'] },
+  voidProbe: { id: 'voidProbe', name: 'Void Probe', era: 6, cost: { darkEnergy: 25, starSystems: 3, electronics: 40 }, effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }, { type: 'production_add', target: 'data', value: 1 }], description: 'Each probe finds relay stations already waiting — dormant receivers that light up at the touch of a familiar signal', prerequisites: ['stellarCartography'] },
   chronoForge: { id: 'chronoForge', name: 'Chrono Forge', era: 7, cost: { stellarForge: 15, megastructures: 5, darkEnergy: 40 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 4.8 }, { type: 'production_add', target: 'materials', value: 9.6 }], description: 'The forge reaches across timelines, pulling raw materials from moments before each universe collapsed', prerequisites: ['starLifting'] },
   galacticSpire: { id: 'galacticSpire', name: 'Galactic Spire', era: 7, cost: { megastructures: 8, research: 100, galacticInfluence: 30 }, effects: [{ type: 'production_add', target: 'megastructures', value: 2.4 }, { type: 'production_add', target: 'galacticInfluence', value: 4.8 }, { type: 'cap_mult', target: 'megastructures', value: 3 }], description: 'The spire broadcasts on a frequency older than your galaxy — answering a call placed before time began', prerequisites: ['chronoAccelerator'] },
-  stellarGarden: { id: 'stellarGarden', name: 'Stellar Garden', era: 7, cost: { stellarForge: 10, colonies: 10, food: 200 }, effects: [{ type: 'production_add', target: 'colonies', value: 1 }, { type: 'production_add', target: 'food', value: 18 }], description: 'Grow food around stars — +18 food/s and +1 colony/s', prerequisites: ['gravitationalWave'] },
+  stellarGarden: { id: 'stellarGarden', name: 'Stellar Garden', era: 7, cost: { stellarForge: 10, colonies: 10, food: 200 }, effects: [{ type: 'production_add', target: 'colonies', value: 1 }, { type: 'production_add', target: 'food', value: 18 }], description: 'Gardens grow in stellar light — each plant follows a growth pattern encoded in the star\'s spectrum, as if the sun knows what to feed', prerequisites: ['gravitationalWave'] },
   dimensionalHarvest: { id: 'dimensionalHarvest', name: 'Dimensional Harvest', era: 8, cost: { exoticMatter: 25, darkEnergy: 50, galacticInfluence: 40 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 8 }, { type: 'production_add', target: 'cosmicPower', value: 0.5 }], description: 'The harvest pulls from dimensions where your civilization already collapsed — feeding on the ruins of parallel selves', prerequisites: ['darkMatterHarvest', 'singularityHarvester'] },
   galacticForge: { id: 'galacticForge', name: 'Galactic Forge', era: 8, cost: { exoticMatter: 20, stellarForge: 15, megastructures: 10 }, effects: [{ type: 'production_add', target: 'stellarForge', value: 16 }, { type: 'production_add', target: 'megastructures', value: 8 }], description: 'A forge spanning the galaxy — its anvil is a neutron star, its hammer is gravity, and its design predates both', prerequisites: ['antimatterForge'] },
   cosmicDiplomacy: { id: 'cosmicDiplomacy', name: 'Cosmic Diplomacy', era: 8, cost: { galacticInfluence: 80, research: 150, starSystems: 20 }, effects: [{ type: 'production_add', target: 'galacticInfluence', value: 16 }, { type: 'production_add', target: 'exoticMatter', value: 1 }, { type: 'cap_mult', target: 'galacticInfluence', value: 5 }], description: 'The alien ambassadors bow before you arrive — their prophecies describe this moment in perfect detail', prerequisites: ['galacticSenate', 'galacticRelay'] },
@@ -2085,18 +2085,18 @@ export const upgrades = {
   // --- 30 new upgrades (3 per era) ---
 
   // Era 1
-  charcoalPit: { id: 'charcoalPit', name: 'Charcoal Pit', era: 1, cost: { materials: 20, energy: 8, labor: 12 }, effects: [{ type: 'production_add', target: 'energy', value: 0.5 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'Burn wood into charcoal — generates energy and boosts materials', prerequisites: ['waterMill'] },
+  charcoalPit: { id: 'charcoalPit', name: 'Charcoal Pit', era: 1, cost: { materials: 20, energy: 8, labor: 12 }, effects: [{ type: 'production_add', target: 'energy', value: 0.5 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'The charcoal pit follows burn patterns etched into ancient stone — a recipe for fire written before the trees grew', prerequisites: ['waterMill'] },
   fishingWharf: { id: 'fishingWharf', name: 'Fishing Wharf', era: 1, cost: { food: 18, materials: 14, labor: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'labor', value: 0.5 }], description: 'Stone pilings already lined the coast, as if someone knew we would need a harbor here', prerequisites: ['irrigation'] },
 
   // Era 2
-  cementFactory: { id: 'cementFactory', name: 'Cement Factory', era: 2, cost: { steel: 18, materials: 22, energy: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.8 }], description: 'Cement production boosts materials and generates steel', prerequisites: ['hydraulicPress'] },
-  wirelessTelegraph: { id: 'wirelessTelegraph', name: 'Wireless Telegraph', era: 2, cost: { electronics: 15, research: 12, steel: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 0.8 }], description: 'Wireless communication boosts research and electronics', prerequisites: ['telegraphLine'] },
-  canningFactory: { id: 'canningFactory', name: 'Canning Factory', era: 2, cost: { steel: 15, food: 20, labor: 15 }, effects: [{ type: 'cap_mult', target: 'food', value: 5 }, { type: 'production_add', target: 'food', value: 0.8 }], description: 'Preserved food boosts output and expands storage x5', prerequisites: ['industrialFarming'] },
+  cementFactory: { id: 'cementFactory', name: 'Cement Factory', era: 2, cost: { steel: 18, materials: 22, energy: 15 }, effects: [{ type: 'production_add', target: 'materials', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.8 }], description: 'The cement formula matches mortar found binding ruin walls — a mixture designed to outlast the civilizations that poured it', prerequisites: ['hydraulicPress'] },
+  wirelessTelegraph: { id: 'wirelessTelegraph', name: 'Wireless Telegraph', era: 2, cost: { electronics: 15, research: 12, steel: 10 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'electronics', value: 0.8 }], description: 'The wireless signals bounce off atmospheric layers shaped by ancient terraforming — the sky was an antenna all along', prerequisites: ['telegraphLine'] },
+  canningFactory: { id: 'canningFactory', name: 'Canning Factory', era: 2, cost: { steel: 15, food: 20, labor: 15 }, effects: [{ type: 'cap_mult', target: 'food', value: 5 }, { type: 'production_add', target: 'food', value: 0.8 }], description: 'The canning process matches preservation methods found in sealed ruin pantries — food kept fresh across geological time', prerequisites: ['industrialFarming'] },
 
   // Era 3
   deepLearning: { id: 'deepLearning', name: 'Deep Learning', era: 3, cost: { data: 20, software: 20, research: 25 }, effects: [{ type: 'production_add', target: 'research', value: 0.8 }, { type: 'production_add', target: 'software', value: 0.5 }], description: 'The neural network trains itself on data from the ruins. It converges instantly — as if remembering, not learning', prerequisites: ['bigData'] },
   iotNetwork: { id: 'iotNetwork', name: 'IoT Network', era: 3, cost: { electronics: 25, data: 15, software: 12 }, effects: [{ type: 'production_add', target: 'electronics', value: 1.2 }, { type: 'production_add', target: 'data', value: 1.2 }], description: 'Every device connects to a network topology that was already mapped in the ancient infrastructure', prerequisites: ['cloudComputing'] },
-  quantumEncryption: { id: 'quantumEncryption', name: 'Quantum Encryption', era: 3, cost: { research: 30, software: 25, data: 15 }, effects: [{ type: 'cap_mult', target: 'data', value: 5 }, { type: 'production_add', target: 'software', value: 1.2 }], description: 'Unbreakable encryption expands data capacity x5 and boosts software', prerequisites: ['encryptionProtocol'] },
+  quantumEncryption: { id: 'quantumEncryption', name: 'Quantum Encryption', era: 3, cost: { research: 30, software: 25, data: 15 }, effects: [{ type: 'cap_mult', target: 'data', value: 5 }, { type: 'production_add', target: 'software', value: 1.2 }], description: 'The encryption keys were already set — quantum states frozen in ruin crystals, awaiting the right observer to collapse them', prerequisites: ['encryptionProtocol'] },
 
   // Era 4
   plasmaEngine: { id: 'plasmaEngine', name: 'Plasma Engine', era: 4, cost: { rocketFuel: 20, research: 30, energy: 25 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 1.2 }, { type: 'production_add', target: 'energy', value: 0.6 }], description: 'The plasma containment field stabilizes at parameters that shouldn\'t work — unless the chamber geometry was designed for exactly this reaction', prerequisites: ['reusableRockets'] },
@@ -2134,12 +2134,12 @@ export const upgrades = {
 
   // Era 1
   apprenticeSmith: { id: 'apprenticeSmith', name: 'Apprentice Smith', era: 1, cost: { materials: 22, labor: 12, energy: 8 }, effects: [{ type: 'production_add', target: 'steel', value: 0.5 }, { type: 'production_add', target: 'labor', value: 0.5 }], description: 'Train apprentice smiths — early steel trickle and +0.5 labor/s', prerequisites: ['copperMine'] },
-  huntingParty: { id: 'huntingParty', name: 'Hunting Party', era: 1, cost: { food: 20, labor: 15, materials: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.4 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'Organized hunting boosts food and yields hides for materials', prerequisites: ['animalHusbandry'] },
-  stoneQuarry: { id: 'stoneQuarry', name: 'Stone Quarry', era: 1, cost: { labor: 18, materials: 15, energy: 10 }, effects: [{ type: 'production_add', target: 'materials', value: 0.5 }, { type: 'cap_mult', target: 'materials', value: 3 }], description: 'Stone quarry boosts material output and triples capacity', prerequisites: ['ropeAndPulley'] },
+  huntingParty: { id: 'huntingParty', name: 'Hunting Party', era: 1, cost: { food: 20, labor: 15, materials: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.4 }, { type: 'production_add', target: 'materials', value: 0.5 }], description: 'The hunting grounds were marked with cairns older than the forest — trails blazed by hunters who left no bones', prerequisites: ['animalHusbandry'] },
+  stoneQuarry: { id: 'stoneQuarry', name: 'Stone Quarry', era: 1, cost: { labor: 18, materials: 15, energy: 10 }, effects: [{ type: 'production_add', target: 'materials', value: 0.5 }, { type: 'cap_mult', target: 'materials', value: 3 }], description: 'The quarry face is scored with chisel marks from a previous excavation — the stone remembers being cut', prerequisites: ['ropeAndPulley'] },
   potteryKiln: { id: 'potteryKiln', name: 'Pottery Kiln', era: 1, cost: { materials: 14, energy: 12, labor: 8 }, effects: [{ type: 'cap_mult', target: 'food', value: 2 }, { type: 'production_add', target: 'materials', value: 0.3 }], description: 'Pottery stores food and provides trade goods', prerequisites: ['charcoalPit'] },
 
   // Era 2
-  chemicalWorks: { id: 'chemicalWorks', name: 'Chemical Works', era: 2, cost: { steel: 22, energy: 18, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.8 }], description: 'Chemical processing boosts energy and enables early research', prerequisites: ['chemicalPlant'] },
+  chemicalWorks: { id: 'chemicalWorks', name: 'Chemical Works', era: 2, cost: { steel: 22, energy: 18, research: 10 }, effects: [{ type: 'production_add', target: 'energy', value: 0.8 }, { type: 'production_add', target: 'research', value: 0.8 }], description: 'The vats contain residue of compounds no one has synthesized yet — reactions that ran themselves in a previous age', prerequisites: ['chemicalPlant'] },
   textileMill: { id: 'textileMill', name: 'Textile Mill', era: 2, cost: { steel: 12, food: 18, labor: 15 }, effects: [{ type: 'production_add', target: 'food', value: 0.8 }, { type: 'production_add', target: 'labor', value: 0.8 }], description: 'The mill produces cloth from fibers that grow in patterns matching precursor textiles — the plants were bred for this purpose long ago', prerequisites: ['canningFactory'] },
 
   // Era 3
@@ -2223,7 +2223,7 @@ export const upgrades = {
 
   // Era 1
   beeKeeping: { id: 'beeKeeping', name: 'Bee Keeping', era: 1, cost: { food: 18, materials: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.5 }, { type: 'production_add', target: 'energy', value: 0.5 }], description: 'Domesticated bees pollinate crops and produce wax for candles', prerequisites: ['fishTrap'] },
-  copperSmelter: { id: 'copperSmelter', name: 'Copper Smelter', era: 1, cost: { materials: 28, energy: 18, labor: 14 }, effects: [{ type: 'production_add', target: 'energy', value: 0.5 }, { type: 'production_add', target: 'steel', value: 0.5 }], description: 'Smelt copper ore for early metalwork and improved energy conductors', prerequisites: ['advancedTools'] },
+  copperSmelter: { id: 'copperSmelter', name: 'Copper Smelter', era: 1, cost: { materials: 28, energy: 18, labor: 14 }, effects: [{ type: 'production_add', target: 'energy', value: 0.5 }, { type: 'production_add', target: 'steel', value: 0.5 }], description: 'The smelter\'s crucible fits copper ore from this exact vein — shaped by a metallurgist who knew what you would mine', prerequisites: ['advancedTools'] },
 
   // Era 2
   blastFurnace: { id: 'blastFurnace', name: 'Blast Furnace', era: 2, cost: { steel: 20, energy: 22, materials: 18 }, effects: [{ type: 'production_add', target: 'steel', value: 0.6 }, { type: 'production_add', target: 'energy', value: 0.5 }], description: 'Industrial blast furnaces boost steel output with waste heat recovery', prerequisites: ['oilRefinery'] },
@@ -2335,7 +2335,7 @@ export const upgrades = {
 
   // Era 5
   gravitySmelter: { id: 'gravitySmelter', name: 'Gravity Smelter', era: 5, cost: { exoticMaterials: 20, energy: 45, research: 35 }, effects: [{ type: 'production_add', target: 'exoticMaterials', value: 2 }, { type: 'production_add', target: 'steel', value: 1.5 }], description: 'Smelt materials in zero-g for exotic alloys', prerequisites: ['titanMining'] },
-  bioReactor: { id: 'bioReactor', name: 'Bio-Reactor', era: 5, cost: { colonies: 5, food: 40, energy: 30 }, effects: [{ type: 'production_add', target: 'food', value: 2 }, { type: 'production_add', target: 'colonies', value: 1 }], description: 'Biological reactors provide steady food and colony support', prerequisites: ['geneticEngineering'] },
+  bioReactor: { id: 'bioReactor', name: 'Bio-Reactor', era: 5, cost: { colonies: 5, food: 40, energy: 30 }, effects: [{ type: 'production_add', target: 'food', value: 2 }, { type: 'production_add', target: 'colonies', value: 1 }], description: 'The bio-reactor cultures match organisms found frozen in ruin vaults — designed to feed civilizations that hadn\'t arrived yet', prerequisites: ['geneticEngineering'] },
   antimatterCollider: { id: 'antimatterCollider', name: 'Antimatter Collider', era: 5, cost: { rocketFuel: 30, research: 50, energy: 55 }, effects: [{ type: 'production_add', target: 'rocketFuel', value: 2 }, { type: 'production_add', target: 'research', value: 1 }], description: 'Collide antimatter for fuel and scientific discovery', prerequisites: ['antimatterDrive'] },
 
   // Era 6
@@ -2462,7 +2462,7 @@ export const upgrades = {
 
   // Era 1: deepen housing->expandWorkforce chain and cross-link food/materials chains
   communalWell: { id: 'communalWell', name: 'Communal Well', era: 1, cost: { labor: 14, materials: 18, food: 10 }, effects: [{ type: 'production_add', target: 'food', value: 0.3 }, { type: 'production_add', target: 'labor', value: 0.3 }], description: 'A shared water source boosts food and provides labor', prerequisites: ['housing', 'irrigation'] },
-  tannery: { id: 'tannery', name: 'Tannery', era: 1, cost: { materials: 20, food: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'materials', value: 0.5 }, { type: 'production_add', target: 'energy', value: 0.5 }], description: 'Tan hides into leather — materials and waste heat energy', prerequisites: ['huntingParty', 'waterMill'] },
+  tannery: { id: 'tannery', name: 'Tannery', era: 1, cost: { materials: 20, food: 12, labor: 10 }, effects: [{ type: 'production_add', target: 'materials', value: 0.5 }, { type: 'production_add', target: 'energy', value: 0.5 }], description: 'The tanning pits were already dug and lined with bark — cured by time itself, ready for hides that hadn\'t been taken yet', prerequisites: ['huntingParty', 'waterMill'] },
   fortifiedGranary: { id: 'fortifiedGranary', name: 'Fortified Granary', era: 1, cost: { food: 30, materials: 22, labor: 14 }, effects: [{ type: 'production_add', target: 'food', value: 0.5 }, { type: 'cap_mult', target: 'food', value: 2 }], description: 'Reinforced grain stores double food capacity and boost output', prerequisites: ['granary', 'watchTower'] },
 
   // Era 2: cross-link steel/electronics chains and deepen automation path

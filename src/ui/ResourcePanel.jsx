@@ -135,7 +135,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                   if (cb[r.id]) tooltipParts.push(`Colonies: +${cb[r.id].toFixed(1)}/s`);
                   const rb = getRouteBonus(state);
                   if (rb[r.id]) tooltipParts.push(`Star routes: +${rb[r.id].toFixed(1)}/s`);
-                  if (state.prestigeMultiplier > 1) tooltipParts.push(`Prestige: x${state.prestigeMultiplier.toFixed(1)}`);
+                  if (state.prestigeMultiplier > 1) tooltipParts.push(`Prestige: x${formatNumber(state.prestigeMultiplier)}`);
                   // Consumption info
                   if (r.id === 'food' && r.rate > 0) tooltipParts.push(`Consumed by: labor (0.8/labor/s)`);
                   if (r.id === 'energy') tooltipParts.push(`Consumed by: electronics (0.3/elec/s)`);
@@ -172,7 +172,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                               {net > 0 && <span className="rate-active" />}
                               <span className={net < 0 ? 'rate-negative' : ''} style={{ color: net >= 0 ? '#88dd88' : '#ff6644' }}>
                                 {net >= 0 ? '+' : ''}{formatNumber(net)}/s
-                                {net < 0 && <span className="rate-warning" title="Consumption exceeds production!"> !</span>}
+                                {net < 0 && <span className="rate-warning" title="Consumption exceeds production!"> DRAINING</span>}
                               </span>
                             </>;
                           }
@@ -211,7 +211,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                           {fb[r.id] > 0 && <div>Factory: +{fb[r.id].toFixed(1)}/s</div>}
                           {cb[r.id] > 0 && <div>Colonies: +{cb[r.id].toFixed(1)}/s</div>}
                           {rb[r.id] > 0 && <div>Star routes: +{rb[r.id].toFixed(1)}/s</div>}
-                          {prestigeMult > 1 && <div>Prestige: x{prestigeMult.toFixed(1)}</div>}
+                          {prestigeMult > 1 && <div>Prestige: x{formatNumber(prestigeMult)}</div>}
                           {r.id === 'food' && getEffectiveRate(state, 'labor') > 0 && (
                             <div style={{ color: '#ff9966' }}>Consumed by: labor (0.8/labor/s)</div>
                           )}
