@@ -110,4 +110,32 @@ describe('tick', () => {
     // Should be slightly higher due to compounding
     expect(bonusTick.resources.food.amount).toBeGreaterThan(baseTick.resources.food.amount);
   });
+
+  it('food is consumed by labor production', () => {
+    const state = createInitialState();
+    state.resources.labor = { ...state.resources.labor, unlocked: true, rateAdd: 2, rateMult: 1 };
+    // Give enough food so food-limitation doesn't throttle labor
+    state.resources.food.amount = 100;
+    // Labor effective rate = (baseRate 0 + rateAdd 2) * rateMult 1 * prestige 1 = 2/s
+    // Food consumed = 2 * 0.8 = 1.6/s
+    // Food gross rate = (baseRate 1.5 + 0) * 1 * 1 = 1.5/s
+    // Food after tick: 100 + 1.5 (produced) - 1.6 (consumed) = 99.9
+    const after = tick(state, 1);
+    expect(after.resources.food.amount).toBeLessThan(100 + 1.5);
+    expect(after.resources.food.amount).toBeCloseTo(100 + 1.5 - 1.6, 1);
+  });
+
+  it('energy is consumed by electronics production', () => {
+    const state = createInitialState();
+    state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 3, rateMult: 1 };
+    // Electronics effective rate = (baseRate 0 + rateAdd 3) * 1 * 1 = 3/s
+    // Energy consumed = 3 * 0.3 = 0.9/s
+    // Energy gross rate = (baseRate 0.5 + 0) * 1 * 1 = 0.5/s
+    // Net energy = 0.5 - 0.9 = -0.4/s
+    const energyBefore = state.resources.energy.amount;
+    const after = tick(state, 1);
+    // Energy added 0.5 then consumed 0.9, net = energyBefore + 0.5 - 0.9 = energyBefore - 0.4
+    expect(after.resources.energy.amount).toBeLessThan(energyBefore + 0.5);
+    expect(after.resources.energy.amount).toBeCloseTo(Math.max(0, energyBefore + 0.5 - 0.9), 1);
+  });
 });

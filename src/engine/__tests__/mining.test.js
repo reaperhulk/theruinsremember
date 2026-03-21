@@ -148,5 +148,30 @@ describe('mining', () => {
       // Second mine should NOT give burst (miningStreak > 0)
       expect(second.state.resources.materials.amount - first.state.resources.materials.amount).toBeLessThan(20);
     });
+
+    it('mine output scales with rateAdd', () => {
+      const state = createInitialState();
+      state.miningStreak = 1; // Skip first-mine burst
+      state.totalGems = 1;
+      state.resources.materials.rateAdd = 5;
+      // fullRate = (baseRate 0.8 + rateAdd 5) * rateMult 1 * prestige 1 = 5.8
+      // rateScale = max(1, 5.8) = 5.8, eraScale = 1, savantMult = 1
+      // baseGather = 5.8 * 1 * 1 = 5.8
+      const { state: after } = mine(state, 0.99);
+      const gained = after.resources.materials.amount - state.resources.materials.amount;
+
+      // Compare with base state (rateAdd=0)
+      const baseState = createInitialState();
+      baseState.miningStreak = 1;
+      baseState.totalGems = 1;
+      // fullRate = (0.8 + 0) * 1 * 1 = 0.8, rateScale = max(1, 0.8) = 1
+      // baseGather = 1 * 1 * 1 = 1
+      const { state: baseAfter } = mine(baseState, 0.99);
+      const baseGained = baseAfter.resources.materials.amount - baseState.resources.materials.amount;
+
+      expect(gained).toBeCloseTo(5.8, 1);
+      expect(baseGained).toBeCloseTo(1, 1);
+      expect(gained).toBeGreaterThan(baseGained);
+    });
   });
 });

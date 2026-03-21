@@ -107,4 +107,23 @@ describe('docking', () => {
     expect(info.perfectSize).toBe(0.05);
     expect(info.attempts).toBe(0);
   });
+
+  it('perfect dock rewards scale with fuel production rate', () => {
+    const state = makeEra4State();
+    state.resources.rocketFuel = {
+      ...state.resources.rocketFuel,
+      unlocked: true, amount: 100,
+      baseRate: 0, rateAdd: 5, rateMult: 2, // fuelRate = (0 + 5) * 2 = 10
+    };
+    const zone = getTargetZone(state); // use exact zone center for perfect
+    const { state: after, result } = attemptDock(state, zone);
+    expect(result).toBe('perfect');
+    // effectiveFuelRate = max(1, 10) = 10
+    // perfect reward: rocketFuel = 10 * 15 = 150
+    // combo = 1 → comboMult = 1 + 1*0.2 = 1.2
+    // eraScale = 1.5^(4-4) = 1, prestige = 1
+    // total fuel gained = 150 * 1 * 1.2 * 1 * 1 * 1 = 180
+    expect(after.resources.rocketFuel.amount).toBe(100 + 180);
+    expect(after.resources.rocketFuel.amount).toBeGreaterThan(200);
+  });
 });

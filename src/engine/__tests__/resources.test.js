@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateProduction, canAfford, spend, getEffectiveRate, gather } from '../resources.js';
+import { calculateProduction, canAfford, spend, getEffectiveRate, getNetRate, gather } from '../resources.js';
 import { createInitialState } from '../state.js';
 
 describe('resources', () => {
@@ -111,6 +111,42 @@ describe('resources', () => {
       const after = gather(state, 'food');
       // Materials should have increased by at least 1
       expect(after.resources.materials.amount).toBeGreaterThan(before);
+    });
+  });
+
+  describe('getNetRate', () => {
+    it('returns gross rate when no consumption', () => {
+      const state = createInitialState();
+      state.resources.materials.rateAdd = 2;
+      const net = getNetRate(state, 'materials');
+      const gross = getEffectiveRate(state, 'materials');
+      // materials has no consumption chain, so net === gross
+      expect(net).toBe(gross);
+      // gross = (baseRate 0.8 + rateAdd 2) * 1 * 1 = 2.8
+      expect(net).toBeCloseTo(2.8, 5);
+    });
+
+    it('subtracts food consumed by labor', () => {
+      const state = createInitialState();
+      state.resources.labor = { ...state.resources.labor, unlocked: true, rateAdd: 2, rateMult: 1 };
+      // labor effective rate = (baseRate 0 + rateAdd 2) * 1 * 1 = 2
+      // food gross = (1.5 + 0) * 1 * 1 = 1.5
+      // food net = 1.5 - 2 * 0.8 = 1.5 - 1.6 = -0.1
+      const grossFood = getEffectiveRate(state, 'food');
+      const netFood = getNetRate(state, 'food');
+      expect(netFood).toBeLessThan(grossFood);
+      expect(netFood).toBeCloseTo(grossFood - 2 * 0.8, 5);
+      expect(netFood).toBeCloseTo(-0.1, 5);
+    });
+
+    it('subtracts energy consumed by electronics', () => {
+      const state = createInitialState();
+      state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 3, rateMult: 1 };
+      // electronics effective rate = (0 + 3) * 1 * 1 = 3
+      // energy gross = (0.5 + 0) * 1 * 1 = 0.5
+      // energy net = 0.5 - 3 * 0.3 = 0.5 - 0.9 = -0.4
+      const netEnergy = getNetRate(state, 'energy');
+      expect(netEnergy).toBeCloseTo(-0.4, 5);
     });
   });
 });
