@@ -76,7 +76,7 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
 
   return (
     <div className="panel tuning-panel">
-      <h2>Cosmic Tuning (score: {tuningScore})</h2>
+      <h2>Cosmic Tuning ({tuningScore} score)</h2>
       <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#50b098', margin: '0 0 6px' }}>
         The universe hums at a frequency only the patient can hear.
       </p>
