@@ -18,6 +18,9 @@ import { WeavingPanel } from './WeavingPanel.jsx';
 import { DysonPanel } from './DysonPanel.jsx';
 import { TuningPanel } from './TuningPanel.jsx';
 import { TradingPanel } from './TradingPanel.jsx';
+import { SenatePanel } from './SenatePanel.jsx';
+import { RealityForgePanel } from './RealityForgePanel.jsx';
+import { VictoryScreen } from './VictoryScreen.jsx';
 import { setMuted, isMuted } from './AudioManager.js';
 import { StatsPanel } from './StatsPanel.jsx';
 import { PrestigePanel } from './PrestigePanel.jsx';
@@ -53,6 +56,7 @@ export function App() {
   const [flashClass, setFlashClass] = useState('');
   const [hintsDismissed, setHintsDismissed] = useState(false);
   const [audioMuted, setAudioMuted] = useState(() => localStorage.getItem('audioMuted') === 'true');
+  const [victoryDismissed, setVictoryDismissed] = useState(false);
   const prevEventsRef = useRef(state.eventLog?.length || 0);
   const prevPerfectsRef = useRef(state.dockingPerfects || 0);
 
@@ -165,8 +169,10 @@ export function App() {
     if (state.era >= 5) panels.push(<ColonyPanel key="colony" state={state} onUpdate={updateState} />);
     if (state.era >= 6) panels.push(<StarChartPanel key="starChart" state={state} onUpdate={updateState} />);
     if (state.era >= 7) panels.push(<DysonPanel key="dyson" state={state} onUpdate={updateState} />);
+    if (state.era >= 8) panels.push(<SenatePanel key="senate" state={state} onUpdate={updateState} />);
     if (state.era >= 8) panels.push(<WeavingPanel key="weaving" state={state} onUpdate={updateState} />);
     if (state.era >= 9) panels.push(<TuningPanel key="tuning" state={state} onUpdate={updateState} />);
+    if (state.era >= 10) panels.push(<RealityForgePanel key="realityForge" state={state} onUpdate={updateState} />);
     return panels;
   };
 
@@ -297,6 +303,9 @@ export function App() {
           </div>
         </div>
       </div>
+      {!victoryDismissed && (state.gameComplete || state.trueEnding) && (
+        <VictoryScreen state={state} onDismiss={() => setVictoryDismissed(true)} />
+      )}
       <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#444', padding: '8px 0 4px' }}>
         v1.0 — Era {state.era} | {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.achievements || {}).length} achievements
         {(state.prestigeCount || 0) > 0 && ` | Cycle ${state.prestigeCount}`}

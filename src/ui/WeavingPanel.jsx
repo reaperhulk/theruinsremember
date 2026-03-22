@@ -1,5 +1,5 @@
 import { drawFragment, resolveWeave, clearGrid, getWeavingStats } from '../engine/weaving.js';
-import { useState, useRef } from 'react';
+import { useState, useRef, memo } from 'react';
 
 const TYPE_COLORS = {
   temporal: '#ff8866',
@@ -9,7 +9,7 @@ const TYPE_COLORS = {
   chaos: '#ffdd44',
 };
 
-export function WeavingPanel({ state, onUpdate }) {
+export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
   const [lastMatch, setLastMatch] = useState(null);
   const [borderFlash, setBorderFlash] = useState(null);
   const flashRef = useRef(null);
@@ -113,4 +113,4 @@ export function WeavingPanel({ state, onUpdate }) {
       </p>
     </div>
   );
-}
+});

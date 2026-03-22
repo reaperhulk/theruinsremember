@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { getWorkerPool, getAllocation, getTotalAssigned, allocateWorker, hasEfficiencyBonus, getMaxWorkers } from '../engine/factory.js';
 
 const LINES = [
@@ -6,7 +7,7 @@ const LINES = [
   { id: 'research', label: 'Research', color: '#aaddaa' },
 ];
 
-export function FactoryPanel({ state, onUpdate }) {
+export const FactoryPanel = memo(function FactoryPanel({ state, onUpdate }) {
   const pool = getWorkerPool(state);
   const allocation = getAllocation(state);
   const totalAssigned = getTotalAssigned(state);
@@ -66,4 +67,4 @@ export function FactoryPanel({ state, onUpdate }) {
       </p>
     </div>
   );
-}
+});

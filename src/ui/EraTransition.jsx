@@ -24,9 +24,9 @@ const eraUnlocks = {
   5: { resources: ['Colonies', 'Exotic Materials'], features: ['Colony management'] },
   6: { resources: ['Star Systems', 'Dark Energy'], features: ['Star Chart'] },
   7: { resources: ['Megastructures', 'Stellar Forge Output'], features: ['Dyson Assembly'] },
-  8: { resources: ['Galactic Influence', 'Exotic Matter'], features: ['Weaving mini-game'] },
+  8: { resources: ['Galactic Influence', 'Exotic Matter'], features: ['Galactic Senate', 'Reality Weaving'] },
   9: { resources: ['Cosmic Power', 'Universal Constants'], features: ['Cosmic Tuning'] },
-  10: { resources: ['Reality Fragments', 'Quantum Echoes'], features: [] },
+  10: { resources: ['Reality Fragments', 'Quantum Echoes'], features: ['Reality Forge'] },
 };
 
 export function EraTransition({ era }) {

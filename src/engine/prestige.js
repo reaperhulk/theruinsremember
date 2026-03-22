@@ -212,8 +212,9 @@ export function performPrestige(state) {
     }
   }
 
-  // Persist achievements across prestige
+  // Persist achievements and reality keys across prestige
   newState.achievements = state.achievements || {};
+  newState.realityKeys = state.realityKeys || {};
 
   // Perfect Memory: keep mini-game progress
   if (hasPrestigeUpgrade(state, 'perfectMemory')) {

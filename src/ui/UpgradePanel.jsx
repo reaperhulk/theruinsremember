@@ -110,6 +110,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const [showPurchased, setShowPurchased] = useState(false);
   const [sortBy, setSortBy] = useState('default');
   const [filterType, setFilterType] = useState('all');
+  const [searchText, setSearchText] = useState('');
   const [flashId, setFlashId] = useState(null);
   const [chainFlash, setChainFlash] = useState(false);
   const flashTimerRef = useRef(null);
@@ -177,7 +178,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   });
 
   // Apply effect type filter
-  const filteredAvailable = filterType === 'all' ? sortedAvailable : sortedAvailable.filter(u =>
+  const typeFiltered = filterType === 'all' ? sortedAvailable : sortedAvailable.filter(u =>
     u.effects.some(e => {
       if (filterType === 'mult') return e.type === 'production_mult' || e.type === 'production_mult_all';
       if (filterType === 'add') return e.type === 'production_add';
@@ -186,6 +187,15 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
       return true;
     })
   );
+
+  // Apply text search filter
+  const searchLower = searchText.toLowerCase().trim();
+  const filteredAvailable = searchLower
+    ? typeFiltered.filter(u =>
+        u.name.toLowerCase().includes(searchLower) ||
+        u.description.toLowerCase().includes(searchLower)
+      )
+    : typeFiltered;
 
   const affordableCount = useMemo(() =>
     filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length,
@@ -256,6 +266,16 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           </button>
         );
       })()}
+      {available.length > 5 && (
+        <input
+          type="text"
+          placeholder="Search upgrades..."
+          value={searchText}
+          onChange={e => setSearchText(e.target.value)}
+          className="upgrade-search"
+          style={{ width: '100%', padding: '4px 8px', marginBottom: '4px', background: '#161820', border: '1px solid #2a2418', color: '#d8d0c8', fontFamily: 'inherit', fontSize: '0.8em', borderRadius: '3px', boxSizing: 'border-box' }}
+        />
+      )}
       {available.length > 0 && (
         <div className="upgrade-sort">
           <button className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>All</button>

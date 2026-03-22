@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { attemptDock, getDockingInfo, getIndicatorPosition } from '../engine/docking.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber } from './format.js';
 
-export function DockingPanel({ state, onUpdate }) {
+export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
   const [lastResult, setLastResult] = useState(null);
   const [lastReward, setLastReward] = useState(null);
   const [position, setPosition] = useState(0);
@@ -119,4 +119,4 @@ export function DockingPanel({ state, onUpdate }) {
       </p>
     </div>
   );
-}
+});

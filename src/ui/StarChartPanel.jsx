@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { getUnlockedSystems, getRoutes, createRoute, removeRoute, getRouteBonus, routeExists, getRouteStats } from '../engine/starChart.js';
 import { resources as resourceDefs } from '../data/resources.js';
 
 function resourceName(id) { return resourceDefs[id]?.name || id; }
 
-export function StarChartPanel({ state, onUpdate }) {
+export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) {
   const [selected, setSelected] = useState(null);
   const [hovered, setHovered] = useState(null);
   const systems = getUnlockedSystems(state);
@@ -131,4 +131,4 @@ export function StarChartPanel({ state, onUpdate }) {
       </p>
     </div>
   );
-}
+});

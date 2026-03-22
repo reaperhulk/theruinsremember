@@ -46,6 +46,10 @@ export function createInitialState() {
     dysonSegments: 0,
     // Cosmic Tuning (Era 9+)
     tuningScore: 0,
+    // Galactic Senate (Era 8+)
+    senate: { merchants: 0, scholars: 0, warriors: 0 },
+    // Reality Forge (Era 10+)
+    realityKeys: {},
     saveVersion: 2,
   };
 }

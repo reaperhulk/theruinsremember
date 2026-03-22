@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
 
-export function DysonPanel({ state, onUpdate }) {
+export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
   const [lastGain, setLastGain] = useState(null);
   const totalSegments = state.dysonSegments || 0;
 
@@ -63,4 +63,4 @@ export function DysonPanel({ state, onUpdate }) {
       )}
     </div>
   );
-}
+});

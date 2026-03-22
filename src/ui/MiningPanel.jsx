@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, memo } from 'react';
 import { mine, getGemChance } from '../engine/mining.js';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
 
-export function MiningPanel({ state, onUpdate }) {
+export const MiningPanel = memo(function MiningPanel({ state, onUpdate }) {
   const [lastMined, setLastMined] = useState(null);
   const prevStreakRef = useRef(state.miningStreak || 0);
   const [streakReset, setStreakReset] = useState(false);
@@ -74,4 +74,4 @@ export function MiningPanel({ state, onUpdate }) {
       </p>
     </div>
   );
-}
+});

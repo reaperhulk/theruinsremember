@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
 
-export function TuningPanel({ state, onUpdate }) {
+export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
   const [frequency, setFrequency] = useState(50);
   const [target, setTarget] = useState(50);
   const [result, setResult] = useState(null);
@@ -125,4 +125,4 @@ export function TuningPanel({ state, onUpdate }) {
       <p className="mining-hint">Adjust the slider to match the hidden target | Target changes every 30s | Perfect = 5x reward</p>
     </div>
   );
-}
+});

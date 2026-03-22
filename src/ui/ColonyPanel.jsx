@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { getAssignableColonies, getColonyAssignments, getTotalColoniesAssigned, assignColonies, getColonyBonus, getColonyStrategy } from '../engine/colonies.js';
 import { formatNumber } from './format.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -10,7 +11,7 @@ const FOCUS_TYPES = [
   { id: 'industry', label: 'Industry', desc: 'exotic +0.3, energy +5', color: '#ddaa66' },
 ];
 
-export function ColonyPanel({ state, onUpdate }) {
+export const ColonyPanel = memo(function ColonyPanel({ state, onUpdate }) {
   const maxColonies = getAssignableColonies(state);
   const assignments = getColonyAssignments(state);
   const totalAssigned = getTotalColoniesAssigned(state);
@@ -103,4 +104,4 @@ export function ColonyPanel({ state, onUpdate }) {
       <p className="mining-hint">Specialize x2 | Diversify x1.25 | Era bonus scales output</p>
     </div>
   );
-}
+});

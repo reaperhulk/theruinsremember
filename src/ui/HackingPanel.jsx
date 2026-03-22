@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { startHack, submitHack } from '../engine/hacking.js';
 
 const SYMBOLS = ['0', '1', '2', '3'];
 const SHOW_TIME = 2000; // ms to show sequence before hiding
 
-export function HackingPanel({ state, onUpdate }) {
+export const HackingPanel = memo(function HackingPanel({ state, onUpdate }) {
   const [playerInput, setPlayerInput] = useState([]);
   const [lastResult, setLastResult] = useState(null);
   const [sequenceVisible, setSequenceVisible] = useState(true);
@@ -145,4 +145,4 @@ export function HackingPanel({ state, onUpdate }) {
       <p className="mining-hint">Memorize the sequence, then reproduce it | Keys: 0-3 | Reward: multiplies Data &amp; Software production</p>
     </div>
   );
-}
+});
