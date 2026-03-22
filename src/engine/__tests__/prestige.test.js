@@ -30,8 +30,8 @@ describe('prestige', () => {
     for (let i = 0; i < 50; i++) state.tech[`fakeTech${i}`] = true;
     state.totalGems = 500;
     // Without cap: 1 + 10*0.5 + 200*0.05 + 50*0.1 + 500*0.02 = 1+5+10+5+10 = 31
-    // Should be capped to 15
-    expect(calculatePrestigeBonus(state)).toBe(15);
+    // Should be capped to 20
+    expect(calculatePrestigeBonus(state)).toBe(20);
   });
 
   it('includes gem bonus', () => {

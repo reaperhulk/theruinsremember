@@ -20,8 +20,8 @@ export function calculatePrestigeBonus(state) {
   }
 
   // Cap prestige bonus to prevent runaway multiplier growth
-  // 15x allows first prestige to feel meaningful while still capping exponential growth
-  return Math.min(bonus, 15);
+  // 20x gives Wisdom of Ages headroom to matter in late-game runs
+  return Math.min(bonus, 20);
 }
 
 // Calculate prestige points earned from current run

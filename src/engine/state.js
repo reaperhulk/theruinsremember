@@ -17,6 +17,12 @@ export function migrateState(saved) {
   if (!migrated.dysonSegments) migrated.dysonSegments = 0;
   if (!migrated.tuningScore) migrated.tuningScore = 0;
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
+  // Guard against broken resource fields from corrupt saves
+  for (const [id, r] of Object.entries(migrated.resources)) {
+    if (r.capMult <= 0) migrated.resources[id] = { ...migrated.resources[id], capMult: 1 };
+    if (r.rateMult <= 0) migrated.resources[id] = { ...migrated.resources[id], rateMult: 1 };
+    if (r.amount < 0) migrated.resources[id] = { ...migrated.resources[id], amount: 0 };
+  }
   migrated.saveVersion = fresh.saveVersion;
   return migrated;
 }
