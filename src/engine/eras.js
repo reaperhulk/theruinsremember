@@ -22,7 +22,7 @@ const ERA_MIN_UPGRADES = {
   1: 30,   // ~55% of ~55
   2: 35,   // ~63% of ~56
   3: 25,   // ~47% of ~53 — era 3 has bootstrapping delay (software/data start slow)
-  4: 38,   // ~66% of ~58
+  4: 35,   // ~60% of ~58 — rocketFuel/orbitalInfra bootstrapping is the natural gate
   5: 42,   // ~72% of ~58
   6: 38,   // ~66% of ~58 — lower to allow non-minigame paths
   7: 40,   // ~66% of ~61

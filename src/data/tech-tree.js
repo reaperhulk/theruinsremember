@@ -137,7 +137,7 @@ export const techTree = {
   },
   interplanetaryShip: {
     id: 'interplanetaryShip', name: 'Interplanetary Ship', era: 4,
-    cost: { orbitalInfra: 800, rocketFuel: 3000, steel: 3500, research: 6000 },
+    cost: { orbitalInfra: 500, rocketFuel: 2000, steel: 3000, research: 5000 },
     prerequisites: ['interplanetaryNav'],
     grantsEra: 5,
     description: 'The void between worlds holds wreckage from ships exactly like this one',
