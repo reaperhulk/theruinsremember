@@ -78,11 +78,14 @@ const resourceColorMap = {
 
 // --- Era 1: Planetfall ---
 function drawEra1(ctx, w, h, t, state) {
-  // Sky gradient (day cycle)
+  // Painterly sky gradient — deep blue-purple at top to warm sunrise at horizon
   const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.65);
-  skyGrad.addColorStop(0, '#3a8fd4');
-  skyGrad.addColorStop(0.6, '#87CEEB');
-  skyGrad.addColorStop(1, '#b5e8ff');
+  skyGrad.addColorStop(0, '#1a2040');
+  skyGrad.addColorStop(0.3, '#2a3055');
+  skyGrad.addColorStop(0.55, '#3a5070');
+  skyGrad.addColorStop(0.75, '#604830');
+  skyGrad.addColorStop(0.9, '#c07040');
+  skyGrad.addColorStop(1, '#e09050');
   ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, w, h);
 
@@ -96,12 +99,29 @@ function drawEra1(ctx, w, h, t, state) {
   ctx.arc(sunX, sunY, 12, 0, Math.PI * 2);
   ctx.fill();
 
-  // Animated clouds
+  // Animated clouds — back layer (slower, more translucent, higher)
+  for (let i = 0; i < 4; i++) {
+    const cx = ((t * (5 + i * 2) + i * 110) % (w + 120)) - 60;
+    const cy = 10 + i * 18;
+    const scale = 0.9 + i * 0.15;
+    ctx.fillStyle = `rgba(200,180,160,${0.12 + i * 0.03})`;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 30 * scale, 10 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cx - 18 * scale, cy + 3, 20 * scale, 8 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cx + 20 * scale, cy + 2, 22 * scale, 9 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Animated clouds — front layer (faster, brighter)
   for (let i = 0; i < 5; i++) {
     const cx = ((t * (12 + i * 3) + i * 80) % (w + 80)) - 40;
     const cy = 18 + i * 14;
     const scale = 0.6 + i * 0.12;
-    ctx.fillStyle = `rgba(255,255,255,${0.45 + i * 0.06})`;
+    ctx.fillStyle = `rgba(255,240,220,${0.35 + i * 0.06})`;
     ctx.beginPath();
     ctx.ellipse(cx, cy, 22 * scale, 8 * scale, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -113,21 +133,42 @@ function drawEra1(ctx, w, h, t, state) {
     ctx.fill();
   }
 
-  // Rolling hills (multiple layers)
-  const hillColors = ['#3d7a45', '#4a8c54', '#5a9e62'];
+  // Rolling hills (multiple layers) — alien terrain with color variation
+  const hillColors = [
+    ['#2a4a30', '#1e3825'],   // far hills: dark alien green
+    ['#3d6840', '#2d5535'],   // mid hills
+    ['#4a7a4a', '#3a6838'],   // near hills: mossy
+  ];
   for (let layer = 0; layer < 3; layer++) {
     const baseY = h * 0.58 + layer * 16;
-    ctx.fillStyle = hillColors[layer];
+    // Gradient per hill layer for depth
+    const hillGrad = ctx.createLinearGradient(0, baseY - 12, 0, baseY + 30);
+    hillGrad.addColorStop(0, hillColors[layer][0]);
+    hillGrad.addColorStop(1, hillColors[layer][1]);
+    ctx.fillStyle = hillGrad;
     ctx.beginPath();
     ctx.moveTo(0, h);
     for (let x = 0; x <= w; x += 2) {
       const y = baseY
         + Math.sin(x * 0.02 + layer * 2) * 12
-        + Math.sin(x * 0.04 + layer + t * 0.1) * 4;
+        + Math.sin(x * 0.04 + layer + t * 0.1) * 4
+        + Math.sin(x * 0.09 + layer * 3.7) * 3; // extra undulation for alien feel
       ctx.lineTo(x, y);
     }
     ctx.lineTo(w, h);
     ctx.closePath();
+    ctx.fill();
+  }
+
+  // Subtle ground texture — scattered rocks/pebbles on nearest hill
+  const rngGround = seededRandom(77);
+  for (let i = 0; i < 20; i++) {
+    const rx = rngGround() * w;
+    const ry = h * 0.74 + Math.sin(rx * 0.02 + 4) * 12 + rngGround() * 10;
+    const rr = 0.8 + rngGround() * 1.5;
+    ctx.fillStyle = `rgba(60,80,50,${0.2 + rngGround() * 0.15})`;
+    ctx.beginPath();
+    ctx.arc(rx, ry, rr, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -162,6 +203,34 @@ function drawEra1(ctx, w, h, t, state) {
   // Wrecked ship hull in background (half-buried)
   const wreckX = w * 0.7;
   const wreckGroundY = h * 0.68 + Math.sin(wreckX * 0.02 + 4) * 12;
+
+  // Cooling metal glow underneath the wreck
+  const glowPulse = 0.5 + 0.3 * Math.sin(t * 0.6);
+  const wreckGlow = ctx.createRadialGradient(wreckX, wreckGroundY, 5, wreckX, wreckGroundY, 45);
+  wreckGlow.addColorStop(0, `rgba(255,120,40,${0.15 * glowPulse})`);
+  wreckGlow.addColorStop(0.5, `rgba(255,80,20,${0.08 * glowPulse})`);
+  wreckGlow.addColorStop(1, 'rgba(255,60,10,0)');
+  ctx.fillStyle = wreckGlow;
+  ctx.beginPath();
+  ctx.arc(wreckX, wreckGroundY, 45, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Scattered debris around the crash site
+  const rngDebris = seededRandom(99);
+  for (let i = 0; i < 8; i++) {
+    const dx = wreckX - 40 + rngDebris() * 80;
+    const dy = wreckGroundY - 5 + rngDebris() * 15;
+    const dSize = 1 + rngDebris() * 2.5;
+    const dAngle = rngDebris() * Math.PI;
+    ctx.save();
+    ctx.translate(dx, dy);
+    ctx.rotate(dAngle);
+    ctx.fillStyle = `rgba(${100 + Math.floor(rngDebris() * 40)},${90 + Math.floor(rngDebris() * 30)},${100 + Math.floor(rngDebris() * 30)},0.6)`;
+    ctx.fillRect(-dSize, -dSize * 0.4, dSize * 2, dSize * 0.8);
+    ctx.restore();
+  }
+
+  // Main hull
   ctx.fillStyle = '#8a8a9a';
   ctx.beginPath();
   ctx.ellipse(wreckX, wreckGroundY, 28, 10, -0.15, 0, Math.PI);
@@ -170,6 +239,15 @@ function drawEra1(ctx, w, h, t, state) {
   ctx.beginPath();
   ctx.ellipse(wreckX, wreckGroundY, 28, 10, -0.15, Math.PI, Math.PI * 2);
   ctx.fill();
+
+  // Scorch marks on the hull
+  ctx.strokeStyle = 'rgba(40,30,20,0.3)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(wreckX - 15, wreckGroundY - 5);
+  ctx.quadraticCurveTo(wreckX - 5, wreckGroundY - 8, wreckX + 8, wreckGroundY - 3);
+  ctx.stroke();
+
   // Hull detail lines
   ctx.strokeStyle = '#5a5a6a';
   ctx.lineWidth = 0.8;
@@ -186,6 +264,20 @@ function drawEra1(ctx, w, h, t, state) {
   ctx.moveTo(wreckX + 10, wreckGroundY - 8);
   ctx.lineTo(wreckX + 16, wreckGroundY - 22);
   ctx.lineTo(wreckX + 20, wreckGroundY - 20);
+  ctx.stroke();
+
+  // Gouge/trench behind the wreck (crash furrow)
+  ctx.strokeStyle = 'rgba(50,40,30,0.25)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(wreckX + 28, wreckGroundY + 2);
+  ctx.quadraticCurveTo(wreckX + 50, wreckGroundY + 5, wreckX + 70, wreckGroundY + 8);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(50,40,30,0.12)';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(wreckX + 55, wreckGroundY + 6);
+  ctx.quadraticCurveTo(wreckX + 75, wreckGroundY + 10, wreckX + 90, wreckGroundY + 14);
   ctx.stroke();
 
   // Birds in the sky
@@ -244,36 +336,56 @@ function drawEra1(ctx, w, h, t, state) {
     ctx.stroke();
   }
 
-  // Smoke wisps from crash site
-  for (let p = 0; p < 5; p++) {
-    const age = ((t * 0.4 + p * 0.6) % 3);
-    const smokeX = wreckX + Math.sin(age * 1.5 + p) * (age * 4);
-    const smokeY = wreckGroundY - 8 - age * 18;
-    const size = 2 + age * 3;
-    const alpha = Math.max(0, 0.25 - age * 0.08);
-    ctx.fillStyle = `rgba(120,120,130,${alpha})`;
-    ctx.beginPath();
-    ctx.arc(smokeX, smokeY, size, 0, Math.PI * 2);
-    ctx.fill();
+  // Smoke trails from crash site — multiple plumes
+  for (let plume = 0; plume < 3; plume++) {
+    const plumeOffX = [-8, 5, 18][plume];
+    const plumeSpeed = [0.4, 0.3, 0.35][plume];
+    const plumeCount = [6, 5, 4][plume];
+    for (let p = 0; p < plumeCount; p++) {
+      const age = ((t * plumeSpeed + p * 0.5 + plume * 0.7) % 3.5);
+      const drift = Math.sin(age * 1.2 + plume * 2.1 + p) * (age * 5);
+      const smokeX = wreckX + plumeOffX + drift;
+      const smokeY = wreckGroundY - 8 - age * 20;
+      const size = 2 + age * 3.5;
+      const alpha = Math.max(0, 0.22 - age * 0.06);
+      // Dark smoke core
+      ctx.fillStyle = `rgba(80,80,90,${alpha * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(smokeX, smokeY, size * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+      // Lighter smoke edge
+      ctx.fillStyle = `rgba(140,135,130,${alpha})`;
+      ctx.beginPath();
+      ctx.arc(smokeX, smokeY, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
-  // Settlers walking
+  // Settlers walking — with heads, arms, and tools
   for (let i = 0; i < 6; i++) {
     const sx = ((t * (15 + i * 5) + i * 50) % (w + 20)) - 10;
     const groundY = h * 0.74 + Math.sin(sx * 0.02 + 4) * 12;
     const legPhase = Math.sin(t * 4 + i * 2);
-    // Body
-    ctx.fillStyle = '#6B3A2A';
-    ctx.beginPath();
-    ctx.arc(sx, groundY - 8, 3, 0, Math.PI * 2);
-    ctx.fill();
+    const armPhase = Math.sin(t * 4 + i * 2 + 1);
+    // Body (torso)
+    ctx.fillStyle = ['#6B3A2A', '#5A4A3A', '#4A3A2A', '#7A4530', '#554030', '#6A4028'][i];
+    ctx.fillRect(sx - 1.5, groundY - 11, 3, 6);
     // Head
     ctx.fillStyle = '#D4A574';
     ctx.beginPath();
     ctx.arc(sx, groundY - 13, 2.5, 0, Math.PI * 2);
     ctx.fill();
-    // Legs
+    // Arms
     ctx.strokeStyle = '#6B3A2A';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(sx, groundY - 9);
+    ctx.lineTo(sx - 3 - armPhase * 1.5, groundY - 6);
+    ctx.moveTo(sx, groundY - 9);
+    ctx.lineTo(sx + 3 + armPhase * 1.5, groundY - 6);
+    ctx.stroke();
+    // Legs
+    ctx.strokeStyle = '#5A3020';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.moveTo(sx, groundY - 5);
@@ -281,6 +393,35 @@ function drawEra1(ctx, w, h, t, state) {
     ctx.moveTo(sx, groundY - 5);
     ctx.lineTo(sx + legPhase * 2, groundY);
     ctx.stroke();
+    // Tool — alternate between pickaxe, spear, and carrying bundle
+    const toolType = i % 3;
+    ctx.strokeStyle = '#8B7355';
+    ctx.lineWidth = 0.8;
+    if (toolType === 0) {
+      // Pickaxe over shoulder
+      const toolTip = sx + 4 + armPhase;
+      ctx.beginPath();
+      ctx.moveTo(sx + 2, groundY - 7);
+      ctx.lineTo(toolTip, groundY - 16);
+      ctx.stroke();
+      ctx.strokeStyle = '#999';
+      ctx.beginPath();
+      ctx.moveTo(toolTip - 2, groundY - 16);
+      ctx.lineTo(toolTip + 2, groundY - 14);
+      ctx.stroke();
+    } else if (toolType === 1) {
+      // Walking staff / spear
+      ctx.beginPath();
+      ctx.moveTo(sx + 3, groundY - 8);
+      ctx.lineTo(sx + 4, groundY - 18);
+      ctx.stroke();
+    } else {
+      // Carrying bundle on back
+      ctx.fillStyle = 'rgba(140,110,70,0.7)';
+      ctx.beginPath();
+      ctx.arc(sx - 2, groundY - 10, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   // Production particles rising from buildings
@@ -320,12 +461,61 @@ function drawEra2(ctx, w, h, t, state) {
   ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // Ground
+  // Ground with cobblestone texture
   const groundGrad = ctx.createLinearGradient(0, h * 0.65, 0, h);
   groundGrad.addColorStop(0, '#5a4a3a');
   groundGrad.addColorStop(1, '#3a3025');
   ctx.fillStyle = groundGrad;
   ctx.fillRect(0, h * 0.65, w, h * 0.35);
+
+  // Cobblestone / industrial ground texture
+  const rngCobble = seededRandom(123);
+  for (let i = 0; i < 30; i++) {
+    const cx = rngCobble() * w;
+    const cy = h * 0.68 + rngCobble() * (h * 0.3);
+    const cr = 1.5 + rngCobble() * 2;
+    ctx.strokeStyle = `rgba(80,70,55,${0.15 + rngCobble() * 0.1})`;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Puddles (reflective spots)
+  const rngPuddle = seededRandom(456);
+  for (let i = 0; i < 5; i++) {
+    const px = 20 + rngPuddle() * (w - 40);
+    const py = h * 0.72 + rngPuddle() * (h * 0.18);
+    const pw = 6 + rngPuddle() * 10;
+    const ph = 2 + rngPuddle() * 3;
+    const puddleGrad = ctx.createRadialGradient(px, py, 0, px, py, pw);
+    puddleGrad.addColorStop(0, `rgba(${skyR + 40},${skyG + 30},${skyB + 20},0.15)`);
+    puddleGrad.addColorStop(1, 'rgba(60,50,40,0)');
+    ctx.fillStyle = puddleGrad;
+    ctx.beginPath();
+    ctx.ellipse(px, py, pw, ph, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Railway tracks across the bottom
+  const trackY = h * 0.82;
+  ctx.strokeStyle = 'rgba(100,90,75,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(0, trackY);
+  ctx.lineTo(w, trackY);
+  ctx.moveTo(0, trackY + 5);
+  ctx.lineTo(w, trackY + 5);
+  ctx.stroke();
+  // Railroad ties
+  ctx.strokeStyle = 'rgba(80,60,40,0.3)';
+  ctx.lineWidth = 2;
+  for (let rx = 0; rx < w; rx += 8) {
+    ctx.beginPath();
+    ctx.moveTo(rx, trackY - 1);
+    ctx.lineTo(rx, trackY + 6);
+    ctx.stroke();
+  }
 
   // Steel production rate affects smoke thickness
   const steelRate = state ? ((state.resources?.steel?.baseRate || 0) + (state.resources?.steel?.rateAdd || 0)) * (state.resources?.steel?.rateMult || 1) : 0;
@@ -343,14 +533,29 @@ function drawEra2(ctx, w, h, t, state) {
   ];
   const factories = allFactories.slice(0, factoryCount);
 
-  for (const f of factories) {
+  for (let fi = 0; fi < factories.length; fi++) {
+    const f = factories[fi];
     const baseY = h * 0.65;
-    // Building body
+
+    // Building body with slight variation per factory
     const bGrad = ctx.createLinearGradient(f.x, baseY - f.bh, f.x, baseY);
-    bGrad.addColorStop(0, '#666');
-    bGrad.addColorStop(1, '#444');
+    const shade = fi % 2 === 0 ? 0 : 15;
+    bGrad.addColorStop(0, `rgb(${102 + shade},${102 + shade},${102 + shade})`);
+    bGrad.addColorStop(1, `rgb(${68 + shade},${68 + shade},${68 + shade})`);
     ctx.fillStyle = bGrad;
     ctx.fillRect(f.x, baseY - f.bh, f.bw, f.bh);
+
+    // Roofline detail — sawtooth or flat depending on factory
+    if (fi % 3 === 0) {
+      ctx.fillStyle = '#5a5a5a';
+      for (let rx = f.x; rx < f.x + f.bw - 5; rx += 10) {
+        ctx.beginPath();
+        ctx.moveTo(rx, baseY - f.bh);
+        ctx.lineTo(rx + 5, baseY - f.bh - 6);
+        ctx.lineTo(rx + 10, baseY - f.bh);
+        ctx.fill();
+      }
+    }
 
     // Windows with furnace glow
     for (let row = 0; row < 3; row++) {
@@ -363,17 +568,24 @@ function drawEra2(ctx, w, h, t, state) {
       }
     }
 
-    // Smokestacks
+    // Smokestacks — varied heights
     for (let s = 0; s < f.stacks; s++) {
       const sx = f.x + 8 + s * (f.bw / (f.stacks + 1));
+      const stackH = 20 + (s % 2) * 8 + (fi % 3) * 4; // varied heights
+      const stackW = 5 + (s % 2);
+
+      // Stack body
       ctx.fillStyle = '#555';
-      ctx.fillRect(sx - 3, baseY - f.bh - 20, 6, 22);
+      ctx.fillRect(sx - stackW / 2, baseY - f.bh - stackH, stackW, stackH + 2);
+      // Stack cap
+      ctx.fillStyle = '#4a4a4a';
+      ctx.fillRect(sx - stackW / 2 - 1, baseY - f.bh - stackH - 2, stackW + 2, 3);
 
       // Smoke particles rising — thickness scales with steel production
       const smokeCount = Math.floor(4 + smokeDensity * 8);
       for (let p = 0; p < smokeCount; p++) {
         const age = ((t * 0.8 + p * 0.3 + s + f.x * 0.01) % 2.5);
-        const py = baseY - f.bh - 22 - age * 30;
+        const py = baseY - f.bh - stackH - 4 - age * 30;
         const px = sx + Math.sin(age * 2 + s) * (age * 6);
         const size = (3 + age * 4) * (0.6 + smokeDensity * 0.6);
         const alpha = Math.max(0, (0.3 + smokeDensity * 0.2) - age * 0.14);
@@ -381,6 +593,70 @@ function drawEra2(ctx, w, h, t, state) {
         ctx.beginPath();
         ctx.arc(px, py, size, 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      // Sparks from chimneys — occasional bright particles
+      if (smokeDensity > 0.1) {
+        const sparkCount = Math.floor(2 + smokeDensity * 4);
+        for (let sp = 0; sp < sparkCount; sp++) {
+          const sparkAge = ((t * 1.5 + sp * 0.7 + s * 1.3 + fi * 2.1) % 1.5);
+          if (sparkAge < 0.8) {
+            const sparkX = sx + Math.sin(sparkAge * 4 + sp * 3) * (sparkAge * 8);
+            const sparkY = baseY - f.bh - stackH - 4 - sparkAge * 25;
+            const sparkAlpha = Math.max(0, 0.8 - sparkAge * 1.2);
+            ctx.fillStyle = `rgba(255,${Math.floor(200 - sparkAge * 150)},${Math.floor(50 - sparkAge * 50)},${sparkAlpha})`;
+            ctx.beginPath();
+            ctx.arc(sparkX, sparkY, 0.8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+    }
+
+    // Water tower on every other factory
+    if (fi % 2 === 1 && fi < 4) {
+      const wtX = f.x + f.bw - 6;
+      const wtBaseY = baseY - f.bh;
+      // Legs
+      ctx.strokeStyle = '#666';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(wtX - 3, wtBaseY);
+      ctx.lineTo(wtX - 1, wtBaseY - 15);
+      ctx.moveTo(wtX + 3, wtBaseY);
+      ctx.lineTo(wtX + 1, wtBaseY - 15);
+      ctx.stroke();
+      // Tank
+      ctx.fillStyle = '#7a7a7a';
+      ctx.fillRect(wtX - 4, wtBaseY - 20, 8, 6);
+      ctx.fillStyle = '#6a6a6a';
+      ctx.beginPath();
+      ctx.ellipse(wtX, wtBaseY - 20, 4, 1.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Catwalk between adjacent factories
+    if (fi > 0 && fi < factories.length) {
+      const prevF = factories[fi - 1];
+      const cwY = baseY - Math.min(f.bh, prevF.bh) + 5;
+      const cwFromX = prevF.x + prevF.bw;
+      const cwToX = f.x;
+      if (cwToX > cwFromX && cwToX - cwFromX < 50) {
+        ctx.strokeStyle = 'rgba(120,120,120,0.4)';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(cwFromX, cwY);
+        ctx.lineTo(cwToX, cwY);
+        ctx.moveTo(cwFromX, cwY + 3);
+        ctx.lineTo(cwToX, cwY + 3);
+        ctx.stroke();
+        // Railing posts
+        for (let rx = cwFromX; rx <= cwToX; rx += 6) {
+          ctx.beginPath();
+          ctx.moveTo(rx, cwY);
+          ctx.lineTo(rx, cwY + 3);
+          ctx.stroke();
+        }
       }
     }
   }
@@ -464,10 +740,15 @@ function drawEra2(ctx, w, h, t, state) {
     }
   }
 
-  // Smog overlay
-  const smogAlpha = 0.08 + (1 - dayPhase) * 0.06;
-  ctx.fillStyle = `rgba(100,90,70,${smogAlpha})`;
-  ctx.fillRect(0, 0, w, h * 0.5);
+  // Pollution haze — gradient overlay that thickens with production
+  const hazeThickness = 0.06 + smokeDensity * 0.12 + (1 - dayPhase) * 0.06;
+  const hazeGrad = ctx.createLinearGradient(0, 0, 0, h * 0.55);
+  hazeGrad.addColorStop(0, `rgba(90,75,55,${hazeThickness * 1.2})`);
+  hazeGrad.addColorStop(0.4, `rgba(100,85,65,${hazeThickness * 0.8})`);
+  hazeGrad.addColorStop(0.7, `rgba(110,95,70,${hazeThickness * 0.4})`);
+  hazeGrad.addColorStop(1, 'rgba(110,95,70,0)');
+  ctx.fillStyle = hazeGrad;
+  ctx.fillRect(0, 0, w, h * 0.55);
 }
 
 // --- Era 3: Space Age ---
@@ -475,44 +756,110 @@ function drawEra3(ctx, w, h, t, state) {
   // Deep space background
   ctx.fillStyle = '#000012';
   ctx.fillRect(0, 0, w, h);
-  drawStarField(ctx, w, h, 80, 333, t);
+  // Colored star field — blue-white, yellow, and red stars
+  const starRng = seededRandom(333);
+  const spx = _parallaxX * 4, spy = _parallaxY * 3;
+  const starColors = [[200,220,255],[255,255,255],[255,240,200],[255,200,100],[255,150,120],[180,200,255]];
+  for (let i = 0; i < 80; i++) {
+    const baseX = starRng() * w, baseY = starRng() * h;
+    const baseSize = starRng() * 1.5 + 0.5;
+    const depth = 0.5 + starRng() * 0.5;
+    const ssx = baseX + spx * depth, ssy = baseY + spy * depth;
+    if (ssx < -5 || ssx > w + 5 || ssy < -5 || ssy > h + 5) continue;
+    const brightness = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(t * (1 + starRng() * 2) + starRng() * 6.28));
+    const col = starColors[Math.floor(starRng() * starColors.length)];
+    ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${brightness})`;
+    ctx.beginPath();
+    ctx.arc(ssx, ssy, baseSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   // Earth
   const ex = w * 0.32, ey = h * 0.55, er = 34;
-  // Atmosphere glow
-  const atmosGrad = ctx.createRadialGradient(ex, ey, er, ex, ey, er + 12);
-  atmosGrad.addColorStop(0, 'rgba(100,180,255,0.3)');
-  atmosGrad.addColorStop(0.5, 'rgba(100,180,255,0.1)');
-  atmosGrad.addColorStop(1, 'transparent');
-  ctx.fillStyle = atmosGrad;
+
+  // Outer atmospheric glow ring
+  const outerAtmos = ctx.createRadialGradient(ex, ey, er - 2, ex, ey, er + 18);
+  outerAtmos.addColorStop(0, 'rgba(80,160,255,0)');
+  outerAtmos.addColorStop(0.5, 'rgba(100,180,255,0.25)');
+  outerAtmos.addColorStop(0.75, 'rgba(120,200,255,0.15)');
+  outerAtmos.addColorStop(1, 'transparent');
+  ctx.fillStyle = outerAtmos;
   ctx.beginPath();
-  ctx.arc(ex, ey, er + 12, 0, Math.PI * 2);
+  ctx.arc(ex, ey, er + 18, 0, Math.PI * 2);
   ctx.fill();
-  // Planet body
+
+  // Planet body — ocean base
   const earthGrad = ctx.createRadialGradient(ex - 8, ey - 8, 2, ex, ey, er);
   earthGrad.addColorStop(0, '#5090d0');
-  earthGrad.addColorStop(0.3, '#3070b0');
-  earthGrad.addColorStop(0.6, '#2a6535');
-  earthGrad.addColorStop(0.8, '#3070b0');
+  earthGrad.addColorStop(0.4, '#3070b0');
+  earthGrad.addColorStop(0.8, '#2060a0');
   earthGrad.addColorStop(1, '#1a3060');
   ctx.fillStyle = earthGrad;
   ctx.beginPath();
   ctx.arc(ex, ey, er, 0, Math.PI * 2);
   ctx.fill();
-  // Cloud swirls on earth
+
+  // Continent patches as color blobs
   ctx.save();
   ctx.beginPath();
   ctx.arc(ex, ey, er, 0, Math.PI * 2);
   ctx.clip();
-  ctx.fillStyle = 'rgba(255,255,255,0.15)';
-  for (let i = 0; i < 6; i++) {
-    const cx = ex - 20 + ((t * 3 + i * 20) % (er * 2 + 10));
-    const cy = ey - 15 + i * 8;
+  const continentRng = seededRandom(4455);
+  const continents = [
+    { ox: -12, oy: -8, cw: 16, ch: 12 },
+    { ox: 6, oy: -14, cw: 14, ch: 10 },
+    { ox: 10, oy: -2, cw: 18, ch: 14 },
+    { ox: 18, oy: -10, cw: 12, ch: 8 },
+    { ox: -18, oy: 10, cw: 10, ch: 6 },
+    { ox: 14, oy: 12, cw: 14, ch: 8 },
+  ];
+  const cRot = t * 0.06;
+  for (const c of continents) {
+    const crx = ex + Math.cos(cRot) * c.ox - Math.sin(cRot) * c.oy;
+    const cry = ey + Math.sin(cRot) * c.ox * 0.3 + Math.cos(cRot) * c.oy;
+    const distFromCenter = Math.sqrt((crx - ex) ** 2 + (cry - ey) ** 2);
+    if (distFromCenter > er - 3) continue;
+    const green = 0.3 + continentRng() * 0.15;
+    ctx.fillStyle = `rgba(50,${Math.floor(120 + continentRng() * 60)},50,${green})`;
     ctx.beginPath();
-    ctx.ellipse(cx, cy, 12 + i * 2, 3, 0.3 * i, 0, Math.PI * 2);
+    ctx.ellipse(crx, cry, c.cw * 0.5, c.ch * 0.5, continentRng() * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    if (continentRng() > 0.5) {
+      ctx.fillStyle = 'rgba(160,140,80,0.2)';
+      ctx.beginPath();
+      ctx.ellipse(crx + 2, cry + 1, c.cw * 0.25, c.ch * 0.25, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  // Cloud swirls — multiple layers
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  for (let i = 0; i < 8; i++) {
+    const cloudX = ex - 20 + ((t * 3 + i * 18) % (er * 2 + 10));
+    const cloudY = ey - 18 + i * 7;
+    ctx.beginPath();
+    ctx.ellipse(cloudX, cloudY, 10 + i * 2.5, 2.5 + Math.sin(i) * 1, 0.2 * i, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.07)';
+  for (let i = 0; i < 4; i++) {
+    const wx = ex - 25 + ((t * 4 + i * 30) % (er * 2 + 20));
+    const wy = ey - 10 + i * 12;
+    ctx.beginPath();
+    ctx.ellipse(wx, wy, 18, 1.5, -0.15 * i, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.restore();
+
+  // Terminator shadow (day/night line)
+  const termGrad = ctx.createLinearGradient(ex - er, ey, ex + er, ey);
+  termGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  termGrad.addColorStop(0.6, 'rgba(0,0,0,0)');
+  termGrad.addColorStop(0.85, 'rgba(0,0,20,0.3)');
+  termGrad.addColorStop(1, 'rgba(0,0,20,0.5)');
+  ctx.fillStyle = termGrad;
+  ctx.beginPath();
+  ctx.arc(ex, ey, er, 0, Math.PI * 2);
+  ctx.fill();
 
   // Satellites orbiting
   for (let i = 0; i < 3; i++) {
@@ -535,16 +882,40 @@ function drawEra3(ctx, w, h, t, state) {
     ctx.fillRect(sx + 2, sy - 0.5, 3, 1);
   }
 
-  // ISS-like station
+  // ISS-like station — detailed with solar panels, docking ports, rotating section
   const issAngle = t * 0.12;
   const issX = ex + Math.cos(issAngle) * (er + 30);
   const issY = ey + Math.sin(issAngle) * (er + 30) * 0.4;
+  // Main truss
   ctx.fillStyle = '#ddd';
-  ctx.fillRect(issX - 8, issY - 1, 16, 2);
-  ctx.fillRect(issX - 1, issY - 5, 2, 10);
-  ctx.fillStyle = '#4488cc';
-  ctx.fillRect(issX - 12, issY - 3, 4, 6);
-  ctx.fillRect(issX + 8, issY - 3, 4, 6);
+  ctx.fillRect(issX - 10, issY - 1, 20, 2);
+  // Central module
+  ctx.fillStyle = '#bbc';
+  ctx.fillRect(issX - 3, issY - 4, 6, 8);
+  // Pressurized modules
+  ctx.fillStyle = '#ccd';
+  ctx.fillRect(issX - 1, issY - 6, 2, 3);
+  ctx.fillRect(issX - 1, issY + 3, 2, 3);
+  // Large gold solar panels (4 pairs)
+  ctx.fillStyle = '#c8a030';
+  ctx.fillRect(issX - 14, issY - 4, 4, 8);
+  ctx.fillRect(issX - 19, issY - 3, 4, 6);
+  ctx.fillRect(issX + 10, issY - 4, 4, 8);
+  ctx.fillRect(issX + 15, issY - 3, 4, 6);
+  // Docking ports
+  ctx.fillStyle = '#999';
+  ctx.beginPath();
+  ctx.arc(issX, issY - 7, 1.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(issX, issY + 7, 1.2, 0, Math.PI * 2);
+  ctx.fill();
+  // Rotating section
+  ctx.strokeStyle = 'rgba(200,200,220,0.6)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.ellipse(issX + 6, issY, 3, 3, t * 2, 0, Math.PI * 2);
+  ctx.stroke();
 
   // Rocket launch — frequency scales with rocketFuel production
   const fuelRate = state ? ((state.resources?.rocketFuel?.baseRate || 0) + (state.resources?.rocketFuel?.rateAdd || 0)) * (state.resources?.rocketFuel?.rateMult || 1) : 0;
@@ -555,16 +926,22 @@ function drawEra3(ctx, w, h, t, state) {
     const progress = Math.min(rocketCycle / 2.5, 1);
     const rx = w * 0.75;
     const ry = h * 0.9 - progress * h * 0.95;
-    // Exhaust trail
-    for (let p = 0; p < 12; p++) {
-      const trailY = ry + 8 + p * 4;
+    // Extended exhaust trail — fading particles behind the rocket
+    for (let p = 0; p < 25; p++) {
+      const trailY = ry + 8 + p * 5;
       if (trailY > h) break;
-      const alpha = Math.max(0, 0.5 - p * 0.04);
-      const spread = p * 1.5;
-      ctx.fillStyle = `rgba(255,${150 - p * 8},50,${alpha})`;
+      const alpha = Math.max(0, 0.6 - p * 0.025);
+      const spread = p * 1.8;
+      ctx.fillStyle = `rgba(255,${Math.max(0, 200 - p * 10)},${Math.max(0, 80 - p * 4)},${alpha})`;
       ctx.beginPath();
-      ctx.arc(rx + (Math.sin(p + t * 8) * spread * 0.3), trailY, 2 + spread * 0.3, 0, Math.PI * 2);
+      ctx.arc(rx + (Math.sin(p * 0.7 + t * 8) * spread * 0.25), trailY, 2.5 + spread * 0.2, 0, Math.PI * 2);
       ctx.fill();
+      if (p > 5) {
+        ctx.fillStyle = `rgba(200,200,220,${alpha * 0.3})`;
+        ctx.beginPath();
+        ctx.arc(rx + (Math.sin(p * 1.1 + t * 6) * spread * 0.4), trailY, 1 + spread * 0.15, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
     // Rocket body
     ctx.fillStyle = '#e8e8e8';
@@ -574,6 +951,8 @@ function drawEra3(ctx, w, h, t, state) {
     ctx.lineTo(rx - 4, ry + 6);
     ctx.closePath();
     ctx.fill();
+    ctx.fillStyle = '#aaa';
+    ctx.fillRect(rx - 3, ry, 6, 2);
     // Nose cone
     ctx.fillStyle = '#cc3333';
     ctx.beginPath();
@@ -581,6 +960,25 @@ function drawEra3(ctx, w, h, t, state) {
     ctx.lineTo(rx + 2, ry - 6);
     ctx.lineTo(rx - 2, ry - 6);
     ctx.closePath();
+    ctx.fill();
+    // Fins
+    ctx.fillStyle = '#cc3333';
+    ctx.beginPath();
+    ctx.moveTo(rx - 4, ry + 4);
+    ctx.lineTo(rx - 6, ry + 8);
+    ctx.lineTo(rx - 3, ry + 6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(rx + 4, ry + 4);
+    ctx.lineTo(rx + 6, ry + 8);
+    ctx.lineTo(rx + 3, ry + 6);
+    ctx.closePath();
+    ctx.fill();
+    // Engine glow
+    ctx.fillStyle = `rgba(255,200,50,${0.6 + 0.3 * Math.sin(t * 15)})`;
+    ctx.beginPath();
+    ctx.arc(rx, ry + 7, 2.5, 0, Math.PI * 2);
     ctx.fill();
   }
 }
@@ -596,6 +994,20 @@ function drawEra4(ctx, w, h, t, state) {
   // Sun with prominent glow and corona
   drawGlowCircle(ctx, cx, cy, 14, 'rgba(255,200,50,0.7)', 45);
   drawGlowCircle(ctx, cx, cy, 10, 'rgba(255,180,30,0.4)', 60);
+
+  // Corona rays extending outward
+  for (let r = 0; r < 12; r++) {
+    const rayAngle = r * (Math.PI * 2 / 12) + t * 0.05;
+    const rayLen = 18 + 8 * Math.sin(t * 0.7 + r * 1.3);
+    const rayAlpha = 0.06 + 0.04 * Math.sin(t * 1.5 + r);
+    ctx.strokeStyle = `rgba(255,220,100,${rayAlpha})`;
+    ctx.lineWidth = 2 + Math.sin(t + r) * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(rayAngle) * 15, cy + Math.sin(rayAngle) * 15);
+    ctx.lineTo(cx + Math.cos(rayAngle) * (15 + rayLen), cy + Math.sin(rayAngle) * (15 + rayLen));
+    ctx.stroke();
+  }
+
   const sunGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 14);
   sunGrad.addColorStop(0, '#fffef0');
   sunGrad.addColorStop(0.3, '#FFD700');
@@ -605,15 +1017,28 @@ function drawEra4(ctx, w, h, t, state) {
   ctx.beginPath();
   ctx.arc(cx, cy, 14, 0, Math.PI * 2);
   ctx.fill();
-  // Solar flares
-  for (let f = 0; f < 4; f++) {
-    const flareAngle = t * 0.3 + f * Math.PI * 0.5;
-    const flareLen = 6 + 4 * Math.sin(t * 2 + f * 1.5);
-    const fx = cx + Math.cos(flareAngle) * (14 + flareLen * 0.5);
-    const fy = cy + Math.sin(flareAngle) * (14 + flareLen * 0.5);
-    ctx.fillStyle = `rgba(255, 200, 50, ${0.15 + 0.1 * Math.sin(t * 3 + f)})`;
+
+  // Animated solar prominences — arcs of fire rising and falling
+  for (let f = 0; f < 5; f++) {
+    const promAngle = f * (Math.PI * 2 / 5) + t * 0.15;
+    const promHeight = 5 + 6 * Math.sin(t * 1.2 + f * 2.0);
+    const promBase1x = cx + Math.cos(promAngle - 0.15) * 14;
+    const promBase1y = cy + Math.sin(promAngle - 0.15) * 14;
+    const promBase2x = cx + Math.cos(promAngle + 0.15) * 14;
+    const promBase2y = cy + Math.sin(promAngle + 0.15) * 14;
+    const promPeakx = cx + Math.cos(promAngle) * (14 + promHeight);
+    const promPeaky = cy + Math.sin(promAngle) * (14 + promHeight);
+    const promAlpha = 0.15 + 0.1 * Math.sin(t * 2 + f);
+    ctx.strokeStyle = `rgba(255,180,50,${promAlpha})`;
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.arc(fx, fy, flareLen * 0.4, 0, Math.PI * 2);
+    ctx.moveTo(promBase1x, promBase1y);
+    ctx.quadraticCurveTo(promPeakx, promPeaky, promBase2x, promBase2y);
+    ctx.stroke();
+    // Glow at peak
+    ctx.fillStyle = `rgba(255,200,80,${promAlpha * 0.6})`;
+    ctx.beginPath();
+    ctx.arc(promPeakx, promPeaky, 1.5, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -630,24 +1055,30 @@ function drawEra4(ctx, w, h, t, state) {
     { r: 120, size: 3.8, color: '#4466cc', speed: 0.06 * prodScale, name: 'neptune' },
   ];
 
-  // Orbit lines
+  // Orbit lines — dotted circles showing solar system structure
+  ctx.setLineDash([3, 5]);
   for (const p of planets) {
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
     ctx.lineWidth = 0.5;
     ctx.beginPath();
     ctx.ellipse(cx, cy, p.r, p.r * 0.38, 0, 0, Math.PI * 2);
     ctx.stroke();
   }
+  ctx.setLineDash([]);
 
-  // Asteroid belt
+  // Asteroid belt — visible band of scattered rocks
   const rng = seededRandom(777);
-  for (let i = 0; i < 40; i++) {
-    const aR = 65 + rng() * 10;
+  for (let i = 0; i < 80; i++) {
+    const aR = 64 + rng() * 12;
     const aAngle = rng() * Math.PI * 2 + t * 0.15;
     const ax = cx + Math.cos(aAngle) * aR;
     const ay = cy + Math.sin(aAngle) * aR * 0.38;
-    ctx.fillStyle = `rgba(180,170,150,${0.2 + rng() * 0.3})`;
-    ctx.fillRect(ax, ay, 1, 1);
+    const aSize = 0.5 + rng() * 1.2;
+    const aBright = 0.15 + rng() * 0.35;
+    ctx.fillStyle = `rgba(${150 + Math.floor(rng() * 50)},${140 + Math.floor(rng() * 40)},${120 + Math.floor(rng() * 40)},${aBright})`;
+    ctx.beginPath();
+    ctx.arc(ax, ay, aSize, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   // Draw planets
@@ -669,7 +1100,7 @@ function drawEra4(ctx, w, h, t, state) {
     }
     ctx.stroke();
 
-    // Planet
+    // Planet with unique appearance per type
     const pGrad = ctx.createRadialGradient(px - p.size * 0.3, py - p.size * 0.3, 0, px, py, p.size);
     pGrad.addColorStop(0, '#fff');
     pGrad.addColorStop(0.3, p.color);
@@ -679,12 +1110,81 @@ function drawEra4(ctx, w, h, t, state) {
     ctx.arc(px, py, p.size, 0, Math.PI * 2);
     ctx.fill();
 
-    // Saturn rings
+    // Gas giant bands (Jupiter and Saturn)
+    if (p.name === 'jupiter' || p.name === 'saturn') {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(px, py, p.size, 0, Math.PI * 2);
+      ctx.clip();
+      const bandColors = p.name === 'jupiter'
+        ? ['rgba(180,120,60,0.2)', 'rgba(200,160,80,0.15)', 'rgba(160,100,50,0.2)']
+        : ['rgba(200,180,100,0.15)', 'rgba(180,160,80,0.12)', 'rgba(210,190,120,0.15)'];
+      for (let b = 0; b < bandColors.length; b++) {
+        ctx.fillStyle = bandColors[b];
+        ctx.fillRect(px - p.size, py - p.size + b * (p.size * 0.5), p.size * 2, p.size * 0.3);
+      }
+      // Jupiter Great Red Spot
+      if (p.name === 'jupiter') {
+        ctx.fillStyle = 'rgba(200,80,40,0.25)';
+        ctx.beginPath();
+        ctx.ellipse(px + p.size * 0.3, py + p.size * 0.2, 2, 1.3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // Ice world shimmer (Uranus and Neptune)
+    if (p.name === 'uranus' || p.name === 'neptune') {
+      const iceAlpha = 0.1 + 0.08 * Math.sin(t * 2 + (p.name === 'uranus' ? 0 : 3));
+      ctx.fillStyle = `rgba(180,220,255,${iceAlpha})`;
+      ctx.beginPath();
+      ctx.arc(px, py, p.size * 0.85, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Mars surface detail
+    if (p.name === 'mars') {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(px, py, p.size, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.fillStyle = 'rgba(180,80,40,0.2)';
+      ctx.beginPath();
+      ctx.ellipse(px - 0.5, py - 0.5, p.size * 0.4, p.size * 0.3, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      // Polar cap
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.beginPath();
+      ctx.ellipse(px, py - p.size * 0.7, p.size * 0.4, p.size * 0.15, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Saturn rings — multiple concentric rings
     if (p.rings) {
-      ctx.strokeStyle = 'rgba(200,180,120,0.5)';
+      ctx.strokeStyle = 'rgba(210,190,130,0.45)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.ellipse(px, py, p.size + 4, 2, 0.3, 0, Math.PI * 2);
+      ctx.ellipse(px, py, p.size + 3, 1.5, 0.3, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(190,170,110,0.35)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.ellipse(px, py, p.size + 5, 2.2, 0.3, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(170,150,100,0.25)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.ellipse(px, py, p.size + 7, 3, 0.3, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Uranus faint ring
+    if (p.name === 'uranus') {
+      ctx.strokeStyle = 'rgba(150,200,220,0.2)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.ellipse(px, py, p.size + 3, 1.2, 1.2, 0, Math.PI * 2);
       ctx.stroke();
     }
 
@@ -720,6 +1220,28 @@ function drawEra5(ctx, w, h, t, state) {
   ctx.fillStyle = '#030010';
   ctx.fillRect(0, 0, w, h);
 
+  // Colorful nebula patches in background — gas clouds in purple, blue, and orange
+  const nebRng5 = seededRandom(5050);
+  const nebulaColors = [
+    [120, 60, 180], [60, 80, 200], [200, 100, 40],
+    [80, 120, 200], [160, 50, 140], [180, 80, 60],
+  ];
+  for (let i = 0; i < 8; i++) {
+    const nx = nebRng5() * w;
+    const ny = nebRng5() * h;
+    const nr = 25 + nebRng5() * 60;
+    const col = nebulaColors[Math.floor(nebRng5() * nebulaColors.length)];
+    const nebAlpha = 0.04 + 0.03 * Math.sin(t * 0.2 + i * 1.5);
+    const nebGrad = ctx.createRadialGradient(nx, ny, 0, nx, ny, nr);
+    nebGrad.addColorStop(0, `rgba(${col[0]},${col[1]},${col[2]},${nebAlpha * 1.5})`);
+    nebGrad.addColorStop(0.4, `rgba(${col[0]},${col[1]},${col[2]},${nebAlpha})`);
+    nebGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = nebGrad;
+    ctx.beginPath();
+    ctx.arc(nx, ny, nr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   // Parallax star layers
   for (let layer = 0; layer < 3; layer++) {
     const speed = 0.05 + layer * 0.08;
@@ -738,28 +1260,44 @@ function drawEra5(ctx, w, h, t, state) {
     }
   }
 
-  // Warp speed lines
+  // Animated warp speed lines — streaks from center outward, FTL travel effect
   const warpIntensity = 0.5 + 0.5 * Math.sin(t * 0.3);
-  if (warpIntensity > 0.4) {
+  {
     ctx.save();
     const warpCx = w * 0.5, warpCy = h * 0.5;
-    for (let i = 0; i < 20; i++) {
+    // Continuous warp streaks (always visible, intensity varies)
+    for (let i = 0; i < 35; i++) {
       const rng2 = seededRandom(i * 13 + 7);
       const angle = rng2() * Math.PI * 2;
-      const startR = 10 + rng2() * 30;
-      const len = 20 + rng2() * 60;
+      const startR = 5 + rng2() * 25;
+      const len = 25 + rng2() * 80;
       const endR = startR + len;
-      const alpha = warpIntensity * 0.3 * rng2();
-      ctx.strokeStyle = `rgba(180,200,255,${alpha})`;
-      ctx.lineWidth = 0.5 + rng2();
+      const baseAlpha = 0.05 + warpIntensity * 0.25 * rng2();
+      // Cycle through phases for animation
+      const phase = (t * 2.5 + i * 0.4) % 3;
+      const s = startR + phase * 20;
+      const e = Math.min(endR, s + len * 0.7);
+      // Color varies: mostly blue-white, some purple
+      const colorMix = rng2();
+      const cr = colorMix < 0.3 ? 180 : colorMix < 0.6 ? 150 : 200;
+      const cg = colorMix < 0.3 ? 200 : colorMix < 0.6 ? 150 : 180;
+      const cb = 255;
+      ctx.strokeStyle = `rgba(${cr},${cg},${cb},${baseAlpha})`;
+      ctx.lineWidth = 0.5 + rng2() * 1.5;
       ctx.beginPath();
-      const phase = (t * 2 + i * 0.5) % 3;
-      const s = startR + phase * 15;
-      const e = Math.min(endR, s + len * 0.6);
       ctx.moveTo(warpCx + Math.cos(angle) * s, warpCy + Math.sin(angle) * s);
       ctx.lineTo(warpCx + Math.cos(angle) * e, warpCy + Math.sin(angle) * e);
       ctx.stroke();
     }
+    // Bright center convergence point
+    const convAlpha = 0.05 + warpIntensity * 0.1;
+    const convGrad = ctx.createRadialGradient(warpCx, warpCy, 0, warpCx, warpCy, 15);
+    convGrad.addColorStop(0, `rgba(200,220,255,${convAlpha})`);
+    convGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = convGrad;
+    ctx.beginPath();
+    ctx.arc(warpCx, warpCy, 15, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
   }
 
@@ -1445,20 +1983,60 @@ function drawDigitalAge(ctx, w, h, t, state) {
   ctx.fillStyle = '#0a0e1a';
   ctx.fillRect(0, 0, w, h);
 
-  // Grid lines (circuit traces) — density scales with upgrade count
+  // PCB-style circuit traces — varying widths with solder points at intersections
   const gridSpacing = Math.max(10, 20 - Math.floor(Object.keys(state?.upgrades || {}).length / 8));
-  ctx.strokeStyle = 'rgba(0, 200, 100, 0.08)';
-  ctx.lineWidth = 1;
+  const rngTrace = seededRandom(33);
+
+  // Vertical traces — varied widths
   for (let x = 0; x < w; x += gridSpacing) {
+    const traceW = rngTrace() < 0.3 ? 2 : (rngTrace() < 0.6 ? 1.5 : 0.8);
+    const traceAlpha = 0.05 + rngTrace() * 0.06;
+    ctx.strokeStyle = `rgba(0, 200, 100, ${traceAlpha})`;
+    ctx.lineWidth = traceW;
     ctx.beginPath();
     ctx.moveTo(x, 0);
     ctx.lineTo(x, h);
     ctx.stroke();
   }
+  // Horizontal traces — varied widths
   for (let y = 0; y < h; y += gridSpacing) {
+    const traceW = rngTrace() < 0.3 ? 2 : (rngTrace() < 0.6 ? 1.5 : 0.8);
+    const traceAlpha = 0.05 + rngTrace() * 0.06;
+    ctx.strokeStyle = `rgba(0, 200, 100, ${traceAlpha})`;
+    ctx.lineWidth = traceW;
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  // Solder points at select intersections
+  const rngSolder = seededRandom(55);
+  for (let gx = 0; gx < w; gx += gridSpacing) {
+    for (let gy = 0; gy < h; gy += gridSpacing) {
+      if (rngSolder() < 0.2) {
+        const pulse = 0.5 + 0.3 * Math.sin(t * 2 + gx * 0.1 + gy * 0.1);
+        ctx.fillStyle = `rgba(0, 255, 120, ${0.15 + pulse * 0.1})`;
+        ctx.beginPath();
+        ctx.arc(gx, gy, 1.5 + pulse * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  // Right-angle trace segments (PCB routing)
+  const rngRoute = seededRandom(88);
+  ctx.strokeStyle = 'rgba(0, 180, 100, 0.12)';
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i < 8; i++) {
+    const startX = Math.floor(rngRoute() * (w / gridSpacing)) * gridSpacing;
+    const startY = Math.floor(rngRoute() * (h / gridSpacing)) * gridSpacing;
+    const midX = startX + (rngRoute() < 0.5 ? 1 : -1) * gridSpacing * Math.ceil(rngRoute() * 3);
+    const endY = startY + (rngRoute() < 0.5 ? 1 : -1) * gridSpacing * Math.ceil(rngRoute() * 2);
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(midX, startY); // horizontal
+    ctx.lineTo(midX, endY);   // then vertical (right angle)
     ctx.stroke();
   }
 
@@ -1493,13 +2071,32 @@ function drawDigitalAge(ctx, w, h, t, state) {
     ctx.fill();
   }
 
-  // Flowing data packets along traces
-  for (let i = 0; i < 8; i++) {
-    const speed = 40 + i * 15;
-    const y = gridSpacing + (i % 7) * gridSpacing;
-    const x = ((t * speed + i * 80) % (w + 20)) - 10;
-    ctx.fillStyle = `rgba(100, 200, 255, ${0.6 + 0.4 * Math.sin(t * 5 + i)})`;
-    ctx.fillRect(x, y - 1, 6, 2);
+  // Flowing data packets along traces — horizontal and vertical
+  for (let i = 0; i < 10; i++) {
+    const speed = 30 + i * 12;
+    const isVertical = i % 3 === 0;
+    const alpha = 0.5 + 0.4 * Math.sin(t * 5 + i);
+    if (isVertical) {
+      const x = gridSpacing + (i % 8) * gridSpacing;
+      const y = ((t * speed + i * 60) % (h + 20)) - 10;
+      // Packet with trail
+      ctx.fillStyle = `rgba(100, 200, 255, ${alpha * 0.3})`;
+      ctx.fillRect(x - 1, y - 8, 2, 8);
+      ctx.fillStyle = `rgba(100, 220, 255, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      const y = gridSpacing + (i % 7) * gridSpacing;
+      const x = ((t * speed + i * 80) % (w + 20)) - 10;
+      // Packet with trail
+      ctx.fillStyle = `rgba(100, 200, 255, ${alpha * 0.3})`;
+      ctx.fillRect(x - 8, y - 1, 8, 2);
+      ctx.fillStyle = `rgba(100, 220, 255, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   // Central server/globe
@@ -1537,6 +2134,84 @@ function drawDigitalAge(ctx, w, h, t, state) {
     const by = ((t * 20 + i * 40) % (h + 20)) - 10;
     ctx.fillText(i % 2 ? '01' : '10', bx, h - by);
   }
+
+  // CRT scanline overlay — subtle horizontal lines
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.04)';
+  ctx.lineWidth = 1;
+  for (let sy = 0; sy < h; sy += 3) {
+    ctx.beginPath();
+    ctx.moveTo(0, sy);
+    ctx.lineTo(w, sy);
+    ctx.stroke();
+  }
+
+  // Screen bloom — faint glow at center
+  const bloomGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, 0, w * 0.5, h * 0.5, w * 0.6);
+  bloomGrad.addColorStop(0, 'rgba(0, 100, 60, 0.04)');
+  bloomGrad.addColorStop(0.5, 'rgba(0, 80, 50, 0.02)');
+  bloomGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = bloomGrad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Holographic wireframe cube — floating and rotating
+  const cubeX = w * 0.15;
+  const cubeY = h * 0.3;
+  const cubeSize = 12;
+  const ca = t * 0.8;
+  const cosA = Math.cos(ca), sinA = Math.sin(ca);
+  const cosB = Math.cos(ca * 0.6), sinB = Math.sin(ca * 0.6);
+  // Project 3D cube vertices to 2D
+  const cubeVerts = [[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
+  const projected = cubeVerts.map(([vx, vy, vz]) => {
+    // Rotate Y then X
+    const rx = vx * cosA - vz * sinA;
+    const rz = vx * sinA + vz * cosA;
+    const ry2 = vy * cosB - rz * sinB;
+    return [cubeX + rx * cubeSize, cubeY + ry2 * cubeSize];
+  });
+  const cubeEdges = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+  const cubePulse = 0.3 + 0.2 * Math.sin(t * 2);
+  ctx.strokeStyle = `rgba(0, 200, 255, ${cubePulse})`;
+  ctx.lineWidth = 0.8;
+  for (const [a, b] of cubeEdges) {
+    ctx.beginPath();
+    ctx.moveTo(projected[a][0], projected[a][1]);
+    ctx.lineTo(projected[b][0], projected[b][1]);
+    ctx.stroke();
+  }
+
+  // Spinning data ring (holographic)
+  const ringX = w * 0.82;
+  const ringY = h * 0.35;
+  const ringR = 10;
+  const ringAngle = t * 1.2;
+  ctx.save();
+  ctx.translate(ringX, ringY);
+  ctx.rotate(ringAngle);
+  ctx.scale(1, 0.35);
+  ctx.strokeStyle = `rgba(0, 255, 200, ${0.2 + 0.15 * Math.sin(t * 3)})`;
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.arc(0, 0, ringR, 0, Math.PI * 2);
+  ctx.stroke();
+  // Second ring offset
+  ctx.strokeStyle = `rgba(100, 200, 255, ${0.15 + 0.1 * Math.sin(t * 3 + 1)})`;
+  ctx.beginPath();
+  ctx.arc(0, 0, ringR + 4, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // Second holographic ring at different position and tilt
+  ctx.save();
+  ctx.translate(w * 0.3, h * 0.7);
+  ctx.rotate(-ringAngle * 0.7);
+  ctx.scale(0.4, 1);
+  ctx.strokeStyle = `rgba(0, 255, 150, ${0.15 + 0.1 * Math.sin(t * 2.5)})`;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(0, 0, 14, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
 }
 
 // --- Era 7 (new): Dyson Era ---
@@ -1563,63 +2238,181 @@ function drawDysonEra(ctx, w, h, t, state) {
   ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2);
   ctx.fill();
 
-  // Dyson sphere rings — count and completeness scale with upgrades + dyson segments
+  // Dyson sphere — wireframe lattice around the star
   const segmentBoost = state ? Math.min(0.5, (state.dysonSegments || 0) / 100) : 0;
   const completion = state ? Math.min(1, Object.keys(state.upgrades || {}).length / 50 + segmentBoost) : 0;
   const arcCount = Math.floor(completion * 8) + 2;
+
+  // Wireframe lattice rings
   for (let i = 0; i < arcCount; i++) {
     const ringR = starR + 15 + i * 8;
     const angle = t * (0.2 + i * 0.15) + i * 1.25;
     const tilt = 0.2 + i * 0.15;
     const pulse = 0.5 + 0.3 * Math.sin(t * 2 + i);
-    // Later rings are partial arcs based on completion
     const arcSpan = i < 2 ? Math.PI * 2 : Math.PI * 2 * Math.min(1, completion * 1.5);
 
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(angle);
     ctx.scale(1, tilt);
+
+    // Main ring structure
     ctx.strokeStyle = `rgba(255, 200, 50, ${0.2 + pulse * 0.3})`;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(0, 0, ringR, 0, arcSpan);
     ctx.stroke();
 
-    // Collector panels on ring
+    // Lattice cross-struts between this ring and adjacent
+    if (i > 0) {
+      const prevR = starR + 15 + (i - 1) * 8;
+      const strutCount = 6 + i * 2;
+      const visibleStruts = Math.ceil(strutCount * Math.min(1, completion * 1.3));
+      for (let s = 0; s < visibleStruts; s++) {
+        const sa = (s / strutCount) * arcSpan;
+        if (sa > arcSpan) break;
+        ctx.strokeStyle = `rgba(200,180,80,${0.08 + pulse * 0.1})`;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(sa) * prevR, Math.sin(sa) * prevR);
+        ctx.lineTo(Math.cos(sa) * ringR, Math.sin(sa) * ringR);
+        ctx.stroke();
+      }
+    }
+
+    // Collector panels on ring — glowing energy collection panels
     const panelCount = 4 + i * 2;
     const visiblePanels = i < 2 ? panelCount : Math.ceil(panelCount * completion);
     for (let j = 0; j < visiblePanels; j++) {
       const pa = (j / panelCount) * Math.PI * 2;
       if (pa > arcSpan) break;
-      const px = Math.cos(pa) * ringR;
-      const py = Math.sin(pa) * ringR;
-      ctx.fillStyle = `rgba(100, 200, 255, ${0.3 + pulse * 0.4})`;
-      ctx.fillRect(px - 2, py - 1, 4, 2);
+      const ppx = Math.cos(pa) * ringR;
+      const ppy = Math.sin(pa) * ringR;
+      // Panel glow
+      const panelGlow = 0.3 + pulse * 0.4;
+      ctx.fillStyle = `rgba(100, 200, 255, ${panelGlow})`;
+      ctx.fillRect(ppx - 2.5, ppy - 1.5, 5, 3);
+      // Panel highlight
+      ctx.fillStyle = `rgba(150, 230, 255, ${panelGlow * 0.6})`;
+      ctx.fillRect(ppx - 1.5, ppy - 0.5, 3, 1);
     }
     ctx.restore();
   }
 
-  // Energy beams from panels to star
-  const beamCount = 6;
+  // Energy beams from sphere to collection points — animated pulsing power
+  const beamCount = 8;
   for (let i = 0; i < beamCount; i++) {
     const angle = t * 0.5 + (i / beamCount) * Math.PI * 2;
-    const fromR = starR + 50;
+    const fromR = starR + 50 + completion * 20;
     const fx = cx + Math.cos(angle) * fromR;
     const fy = cy + Math.sin(angle) * fromR * 0.3;
-    ctx.strokeStyle = `rgba(255, 200, 50, ${0.1 + 0.1 * Math.sin(t * 4 + i)})`;
-    ctx.lineWidth = 0.5;
+    const beamPulse = 0.5 + 0.5 * Math.sin(t * 4 + i * 0.8);
+
+    // Beam glow (wider, dimmer)
+    ctx.strokeStyle = `rgba(255, 220, 80, ${0.04 + 0.06 * beamPulse})`;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(fx, fy);
     ctx.lineTo(cx, cy);
     ctx.stroke();
+
+    // Beam core (narrow, brighter)
+    ctx.strokeStyle = `rgba(255, 200, 50, ${0.1 + 0.15 * beamPulse})`;
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(fx, fy);
+    ctx.lineTo(cx, cy);
+    ctx.stroke();
+
+    // Energy pulse traveling along beam
+    const pulseT = (t * 1.5 + i * 0.5) % 1;
+    const pulsex = lerp(fx, cx, pulseT);
+    const pulsey = lerp(fy, cy, pulseT);
+    ctx.fillStyle = `rgba(255, 240, 100, ${0.4 + 0.3 * beamPulse})`;
+    ctx.beginPath();
+    ctx.arc(pulsex, pulsey, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Collection point glow at beam origin
+    ctx.fillStyle = `rgba(100, 200, 255, ${0.15 + 0.1 * beamPulse})`;
+    ctx.beginPath();
+    ctx.arc(fx, fy, 3, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  // Megastructure indicator (large arc at edge)
-  ctx.strokeStyle = 'rgba(100, 150, 255, 0.2)';
-  ctx.lineWidth = 3;
+  // Orbiting megastructures — habitats, factories, research stations
+  const megaRng = seededRandom(8888);
+  const megaTypes = [
+    { label: 'habitat', color: [100, 220, 150] },
+    { label: 'factory', color: [220, 180, 80] },
+    { label: 'research', color: [120, 160, 255] },
+    { label: 'dock', color: [200, 200, 200] },
+    { label: 'array', color: [180, 100, 255] },
+  ];
+  const megaCount = Math.min(8, 3 + Math.floor(completion * 5));
+  for (let m = 0; m < megaCount; m++) {
+    const megaAngle = t * (0.08 + m * 0.03) + m * 1.8;
+    const megaOrbitR = starR + 65 + m * 10;
+    const megaTilt = 0.3 + m * 0.1;
+    const mx = cx + Math.cos(megaAngle) * megaOrbitR;
+    const my = cy + Math.sin(megaAngle) * megaOrbitR * megaTilt;
+    const mType = megaTypes[m % megaTypes.length];
+    const mPulse = 0.5 + 0.5 * Math.sin(t * 2 + m * 1.2);
+
+    // Structure body
+    ctx.fillStyle = `rgba(${mType.color[0]},${mType.color[1]},${mType.color[2]},${0.4 + mPulse * 0.3})`;
+    if (mType.label === 'habitat') {
+      // Ring-shaped habitat
+      ctx.strokeStyle = ctx.fillStyle;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(mx, my, 4, 2, megaAngle * 0.5, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = `rgba(${mType.color[0]},${mType.color[1]},${mType.color[2]},0.3)`;
+      ctx.beginPath();
+      ctx.arc(mx, my, 1, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (mType.label === 'factory') {
+      // Blocky factory
+      ctx.fillRect(mx - 3, my - 2, 6, 4);
+      ctx.fillStyle = `rgba(255,150,50,${0.3 + mPulse * 0.3})`;
+      ctx.fillRect(mx - 1, my - 1, 2, 2);
+    } else if (mType.label === 'research') {
+      // Dish-shaped research station
+      ctx.beginPath();
+      ctx.arc(mx, my, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = `rgba(${mType.color[0]},${mType.color[1]},${mType.color[2]},0.5)`;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(mx, my - 3);
+      ctx.lineTo(mx, my - 6);
+      ctx.stroke();
+    } else {
+      // Generic structure
+      ctx.beginPath();
+      ctx.arc(mx, my, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Structure running lights
+    ctx.fillStyle = `rgba(255,255,255,${0.3 + mPulse * 0.5})`;
+    ctx.beginPath();
+    ctx.arc(mx, my, 0.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Outer megastructure arc indicators
+  ctx.strokeStyle = `rgba(100, 150, 255, ${0.1 + 0.1 * Math.sin(t * 0.5)})`;
+  ctx.lineWidth = 2;
   const arcAngle = t * 0.1;
   ctx.beginPath();
-  ctx.arc(cx, cy, 80, arcAngle, arcAngle + Math.PI * 0.6);
+  ctx.arc(cx, cy, 85 + completion * 15, arcAngle, arcAngle + Math.PI * 0.5);
+  ctx.stroke();
+  ctx.strokeStyle = `rgba(100, 180, 255, ${0.08 + 0.08 * Math.sin(t * 0.5 + 1)})`;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 90 + completion * 15, arcAngle + Math.PI, arcAngle + Math.PI * 1.4);
   ctx.stroke();
 }
 
