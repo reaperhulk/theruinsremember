@@ -21,13 +21,13 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 const ERA_MIN_UPGRADES = {
   1: 30,   // ~55% of ~55
   2: 35,   // ~63% of ~56
-  3: 30,   // ~57% of ~53 — era 3 has bootstrapping delay (software/data start at 0)
+  3: 25,   // ~47% of ~53 — era 3 has bootstrapping delay (software/data start slow)
   4: 38,   // ~66% of ~58
   5: 42,   // ~72% of ~58
-  6: 44,   // ~76% of ~58
+  6: 38,   // ~66% of ~58 — lower to allow non-minigame paths
   7: 40,   // ~66% of ~61
-  8: 44,   // ~73% of ~60
-  9: 46,   // ~75% of ~61
+  8: 42,   // ~70% of ~60
+  9: 44,   // ~72% of ~61
   10: 42,  // ~71% of ~59
 };
 
@@ -39,11 +39,11 @@ const ERA_MIN_TIME = {
   2: 30,    // 30s
   3: 60,    // 1 min
   4: 90,    // 1.5 min
-  5: 120,   // 2 min
-  6: 180,   // 3 min
-  7: 120,   // 2 min
-  8: 240,   // 4 min
-  9: 300,   // 5 min
+  5: 150,   // 2.5 min
+  6: 210,   // 3.5 min
+  7: 240,   // 4 min
+  8: 300,   // 5 min
+  9: 360,   // 6 min
   10: 0,    // era 10 is the final era, no gate
 };
 

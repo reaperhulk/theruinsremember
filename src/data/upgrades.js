@@ -529,8 +529,8 @@ export const upgrades = {
   // Era 6: Interstellar
   warpDrive: {
     id: 'warpDrive', name: 'Warp Drive', era: 6,
-    cost: { darkEnergy: 60, research: 250, exoticMaterials: 120, steel: 1000 },
-    effects: [{ type: 'production_add', target: 'starSystems', value: 0.1 }, { type: 'production_mult', target: 'exoticMaterials', value: 1.5 }, { type: 'cap_mult', target: 'starSystems', value: 3 }],
+    cost: { exoticMaterials: 200, research: 400, colonies: 15, steel: 1000 },
+    effects: [{ type: 'production_add', target: 'starSystems', value: 0.3 }, { type: 'production_add', target: 'darkEnergy', value: 0.2 }, { type: 'cap_mult', target: 'starSystems', value: 3 }],
     description: 'Warp equations scratched into the oldest ruin. They knew where you would go',
     prerequisites: ['fusionPower'],
   },
@@ -676,10 +676,11 @@ export const upgrades = {
   // Era 8: Galactic
   wormholeNetwork: {
     id: 'wormholeNetwork', name: 'Wormhole Network', era: 8,
-    cost: { galacticInfluence: 200, darkEnergy: 300, exoticMaterials: 300, food: 2000 },
+    cost: { megastructures: 30, darkEnergy: 300, exoticMaterials: 300, food: 2000 },
     effects: [
       { type: 'production_mult', target: 'starSystems', value: 10 },
       { type: 'production_add', target: 'exoticMatter', value: 0.5 },
+      { type: 'production_add', target: 'galacticInfluence', value: 0.3 },
     ],
     description: 'Wormholes already threaded through spacetime, collapsed but intact. You reopen them',
     prerequisites: ['matrioshkaBrain', 'neuronStar'],

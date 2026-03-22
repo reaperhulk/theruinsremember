@@ -76,7 +76,7 @@ export const techTree = {
   // Era 3 → 4 (Digital Age → Space Age)
   globalNetwork: {
     id: 'globalNetwork', name: 'Global Network', era: 3,
-    cost: { software: 100, data: 60 },
+    cost: { software: 60, data: 40 },
     prerequisites: [],
     grantsEra: null,
     description: 'A planet-spanning network — the buried cables were already there, waiting for current',
@@ -102,7 +102,7 @@ export const techTree = {
   },
   spaceProgram: {
     id: 'spaceProgram', name: 'Space Program', era: 3,
-    cost: { software: 200, data: 120, research: 500 },
+    cost: { software: 120, data: 80, research: 400 },
     prerequisites: ['globalNetwork'],
     grantsEra: 4,
     description: 'The launch pad foundation was ancient. We just built on top of it',
