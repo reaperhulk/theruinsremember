@@ -81,7 +81,7 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
                 {faction.label}: {count}
               </span>
               <span className="line-bonus" style={{ color: isMaj ? '#ffdd44' : '#888' }}>
-                {faction.desc}{isMaj ? ' (x2!)' : ''}
+                {faction.desc}{isMaj ? ' (x2!)' : ''} {count > 0 && `[+${formatNumber(count * (faction.id === 'merchants' ? 0.5 : faction.id === 'scholars' ? 0.3 : 0.2) * (isMaj ? 2 : 1))}/s]`}
               </span>
               <div className="line-controls">
                 <button

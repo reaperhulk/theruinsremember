@@ -49,6 +49,22 @@ export const achievements = [
   { id: 'routeMaster', name: 'Route Master', description: 'Create 5 star routes', check: s => (s.starRoutes?.length || 0) >= 5, reward: 2 },
   { id: 'colonyManager', name: 'Colony Manager', description: 'Assign 10+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 10; }, reward: 2 },
 
+  // Dyson Assembly achievements
+  { id: 'dysonBuilder10', name: 'Sphere Architect', description: 'Assemble 10 Dyson segments', check: s => (s.dysonSegments || 0) >= 10, reward: 3 },
+  { id: 'dysonBuilder100', name: 'Sphere Master', description: 'Assemble 100 Dyson segments', check: s => (s.dysonSegments || 0) >= 100, reward: 10 },
+
+  // Cosmic Tuning achievements
+  { id: 'cosmicTuner5', name: 'Frequency Finder', description: 'Score 5 perfect tunes', check: s => (s.tuningScore || 0) >= 5, reward: 3 },
+  { id: 'cosmicTuner25', name: 'Harmonic Master', description: 'Score 25 perfect tunes', check: s => (s.tuningScore || 0) >= 25, reward: 10 },
+
+  // Senate achievements
+  { id: 'senator10', name: 'Junior Senator', description: 'Make 10 senate allocations', check: s => { const a = s.senate || {}; return (a.merchants || 0) + (a.scholars || 0) + (a.warriors || 0) >= 10; }, reward: 3 },
+  { id: 'senator50', name: 'Grand Senator', description: 'Make 50 senate allocations', check: s => { const a = s.senate || {}; return (a.merchants || 0) + (a.scholars || 0) + (a.warriors || 0) >= 50; }, reward: 10 },
+
+  // Reality Forge achievements
+  { id: 'realityForger3', name: 'Key Smith', description: 'Forge 3 reality keys', check: s => { const k = s.realityKeys || {}; return Object.values(k).reduce((sum, v) => sum + v, 0) >= 3; }, reward: 5 },
+  { id: 'realityForger10', name: 'Reality Architect', description: 'Forge 10 reality keys', check: s => { const k = s.realityKeys || {}; return Object.values(k).reduce((sum, v) => sum + v, 0) >= 10; }, reward: 15 },
+
   // Combo achievements
   { id: 'dockCombo5', name: 'Docking Ace', description: 'Reach a 5x docking combo', check: s => (s.dockingCombo || 0) >= 5, reward: 3 },
   { id: 'weaveCombo3', name: 'Reality Artist', description: 'Reach a 3x weave combo', check: s => (s.weaveCombo || 0) >= 3, reward: 3 },

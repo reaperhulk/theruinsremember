@@ -14,7 +14,7 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
       if (!sf?.unlocked || !mg?.unlocked) return null;
       const sfRate = (sf.baseRate + sf.rateAdd) * sf.rateMult * (s.prestigeMultiplier || 1);
       const mgRate = (mg.baseRate + mg.rateAdd) * mg.rateMult * (s.prestigeMultiplier || 1);
-      const milestoneBonus = 1 + (s.dysonSegments || 0) / 100; // +1% per segment
+      const milestoneBonus = 1 + Math.min(0.5, (s.dysonSegments || 0) / 100); // +1% per segment, capped at +50%
       const sfGain = Math.max(1, sfRate * 5 * milestoneBonus);
       const mgGain = Math.max(1, mgRate * 2 * milestoneBonus);
       setLastGain({ sf: sfGain, mg: mgGain });
@@ -59,7 +59,7 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
       <p className="mining-hint">Click to assemble | Rewards scale with production rate | Every 10 segments = milestone</p>
       {milestone > 0 && (
         <div style={{ fontSize: '0.75em', color: '#d08030', marginTop: '4px' }}>
-          Milestones reached: {milestone} | Bonus: +{milestone * 10}% assembly value
+          Milestones reached: {milestone} | Bonus: +{Math.min(50, milestone * 10)}% assembly value (max 50%)
         </div>
       )}
     </div>

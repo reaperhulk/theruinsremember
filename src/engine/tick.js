@@ -122,14 +122,23 @@ export function tick(state, dt) {
   // Random events (Era 3+)
   const { state: afterEvent, event } = checkForEvent(newState, dt);
   if (event) {
-    newState = {
-      ...afterEvent,
-      eventLog: [...(afterEvent.eventLog || []), {
-        message: `${event.name}: ${event.description}`,
-        time: afterEvent.totalTime,
-        ...(event.isLore ? { isLore: true } : {}),
-      }].slice(-20),
-    };
+    // Skip lore events already seen this run
+    if (event.isLore && afterEvent.seenLoreEvents?.[event.id]) {
+      newState = afterEvent;
+    } else {
+      newState = {
+        ...afterEvent,
+        eventLog: [...(afterEvent.eventLog || []), {
+          message: `${event.name}: ${event.description}`,
+          time: afterEvent.totalTime,
+          ...(event.isLore ? { isLore: true } : {}),
+        }].slice(-20),
+      };
+      // Track lore events so they only fire once per run
+      if (event.isLore) {
+        newState.seenLoreEvents = { ...(newState.seenLoreEvents || {}), [event.id]: true };
+      }
+    }
   } else {
     newState = afterEvent;
   }
