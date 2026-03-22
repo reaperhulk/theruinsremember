@@ -273,22 +273,34 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         </div>
       )}
       {(() => {
-        const affordableNonRepeatable = available.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
+        const affordableNonRepeatable = filteredAvailable.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
+        // Capture current filter/hidden state for the onClick handler
+        const currentFilterType = filterType;
+        const currentHidden = state.hiddenUpgrades || {};
         return available.length > 0 && (
           <button
             className="gather-btn"
             style={{ width: '100%', marginBottom: '4px', padding: '4px', fontSize: '0.8em' }}
             disabled={affordableNonRepeatable.length === 0}
             onClick={() => onUpdate(s => {
-              // Recompute from live state to avoid stale captures
+              // Recompute from live state, respecting current filter + hidden
               let current = s;
               let bought = 0;
-              // Loop multiple passes — buying one upgrade can unlock prerequisites for the next
+              const hidden = current.hiddenUpgrades || {};
               for (let pass = 0; pass < 10; pass++) {
                 const avail = getAvailableUpgrades(current);
                 let boughtThisPass = 0;
                 for (const u of avail) {
                   if (u.repeatable) continue;
+                  if (hidden[u.id]) continue;
+                  // Respect the active effect-type filter
+                  if (currentFilterType !== 'all' && !u.effects.some(e => {
+                    if (currentFilterType === 'mult') return e.type === 'production_mult' || e.type === 'production_mult_all';
+                    if (currentFilterType === 'add') return e.type === 'production_add';
+                    if (currentFilterType === 'cap') return e.type === 'cap_mult';
+                    if (currentFilterType === 'unlock') return e.type === 'unlock_resource';
+                    return true;
+                  })) continue;
                   if (!canAfford(current, getUpgradeCost(current, u.id))) continue;
                   const next = purchaseUpgrade(current, u.id);
                   if (next) { current = next; bought++; boughtThisPass++; }
