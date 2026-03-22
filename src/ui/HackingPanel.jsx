@@ -90,7 +90,7 @@ export const HackingPanel = memo(function HackingPanel({ state, onUpdate }) {
       <div style={{ height: '6px', background: '#222', borderRadius: '3px', margin: '4px 0' }} title={`Difficulty ${difficulty}/10 — longer sequences, less time to memorize`}>
         <div style={{
           height: '100%',
-          width: `${(difficulty / 10) * 100}%`,
+          width: `${Math.min(100, (difficulty / 10) * 100)}%`,
           background: difficulty >= 8 ? '#ff4444' : difficulty >= 5 ? '#ffaa44' : '#44aa44',
           borderRadius: '3px',
           transition: 'width 0.3s ease',
@@ -141,6 +141,16 @@ export const HackingPanel = memo(function HackingPanel({ state, onUpdate }) {
             {difficulty > 0 && <span style={{ color: '#888' }}> (difficulty {difficulty})</span>}
           </div>
         </div>
+      )}
+      {state.hackMastery && (
+        <p style={{ fontSize: '0.75em', color: '#ffcc44', marginTop: '4px' }}>
+          MASTERY: Final encryption cracked. Permanent 1.5x research boost active.
+        </p>
+      )}
+      {difficulty >= 10 && !state.hackMastery && (
+        <p style={{ fontSize: '0.75em', color: '#ff8844', marginTop: '4px' }}>
+          Max difficulty reached! Complete one more hack for a special reward.
+        </p>
       )}
       <p className="mining-hint">Memorize the sequence, then reproduce it | Keys: 0-3 | Reward: multiplies Data &amp; Software production</p>
     </div>

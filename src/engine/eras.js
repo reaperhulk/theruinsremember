@@ -55,14 +55,6 @@ export function checkEraTransition(state) {
 
   if (!gatingTech) return null;
 
-  // Require mini-game engagement for era advancement (soft gate)
-  const miniGameActive = (state.totalGems || 0) > 0 || // mining
-    Object.values(state.factoryAllocation || {}).some(v => v > 0) || // factory
-    (state.hackSuccesses || 0) > 0 || // hacking
-    (state.dockingAttempts || 0) > 0 || // docking
-    Object.values(state.colonyAssignments || {}).some(v => v > 0); // colony
-  if (!miniGameActive && state.era >= 2) return null; // Can't advance without using at least 1 mini-game
-
   // Require a minimum number of upgrades purchased in the current era
   const minUpgrades = getMinUpgradesForEra(state.era);
   const currentUpgrades = countEraUpgrades(state, state.era);

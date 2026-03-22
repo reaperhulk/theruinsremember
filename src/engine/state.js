@@ -83,6 +83,8 @@ export function createInitialState() {
     senate: { merchants: 0, scholars: 0, warriors: 0 },
     // Reality Forge (Era 10+)
     realityKeys: {},
+    // Hacking mastery (one-time max difficulty reward, resets on prestige)
+    hackMastery: false,
     // Lore event deduplication
     seenLoreEvents: {},
     saveVersion: 2,

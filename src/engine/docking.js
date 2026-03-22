@@ -2,9 +2,9 @@
 // Timing-based click game: hit the target zone for bonus resources.
 // The docking indicator moves back and forth; click when it's in the zone.
 
-const ZONE_SIZE = 0.25;      // 25% of the bar is the target zone
-const PERFECT_ZONE = 0.08;   // 8% center for perfect dock
-const BASE_SPEED = 1.5;      // cycles per second at era 4
+const ZONE_SIZE = 0.30;      // 30% of the bar is the target zone
+const PERFECT_ZONE = 0.10;   // 10% center for perfect dock
+const BASE_SPEED = 0.6;      // cycles per second at era 4 (~1.7s full sweep)
 
 // Resource rewards for docking — now calculated dynamically based on production rates
 const REWARD_MISS = {};
@@ -13,7 +13,7 @@ const COOLDOWN = 2; // seconds between dock attempts
 // Calculate indicator position (0-1) based on time.
 // Speed increases slightly with era for higher difficulty.
 export function getIndicatorPosition(time, era = 4) {
-  const speed = BASE_SPEED + (era - 4) * 0.15;
+  const speed = BASE_SPEED * (1 + (era - 4) * 0.05); // +5% per era above 4
   return (Math.sin(time * speed * Math.PI * 2) + 1) / 2;
 }
 

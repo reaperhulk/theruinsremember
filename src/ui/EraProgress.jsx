@@ -106,6 +106,21 @@ export function EraProgress({ state }) {
     .filter(([id]) => state.resources[id]?.unlocked)
     .reduce((sum, [, rate]) => sum + Math.max(0, rate), 0);
 
+  // Orbital Resonance mini-game bonus tracking
+  const hasOrbitalResonance = !!state.upgrades?.orbitalResonance;
+  let miniGameCount = 0;
+  if (hasOrbitalResonance || state.era >= 4) {
+    if ((state.totalGems || 0) > 0) miniGameCount++;
+    if ((state.factoryAllocation?.steel || 0) > 0 || (state.factoryAllocation?.electronics || 0) > 0) miniGameCount++;
+    if ((state.hackSuccesses || 0) > 0) miniGameCount++;
+    if ((state.dockingAttempts || 0) > 0) miniGameCount++;
+    if ((state.colonyAssignments?.growth || 0) > 0 || (state.colonyAssignments?.science || 0) > 0) miniGameCount++;
+    if ((state.starRoutes?.length || 0) > 0) miniGameCount++;
+    if ((state.totalWeaves || 0) > 0) miniGameCount++;
+  }
+  // Check if orbitalResonance is available but not yet purchased
+  const orbResAvailable = !hasOrbitalResonance && state.era >= 4 && upgradeDefs.orbitalResonance;
+
   // Detect significant production rate increases for flash effect
   const prevTotalRateRef = useRef(0);
   const [rateFlash, setRateFlash] = useState(false);
@@ -180,6 +195,16 @@ export function EraProgress({ state }) {
           );
         })()}
       </div>
+      {hasOrbitalResonance && miniGameCount > 0 && (
+        <p style={{ fontSize: '0.75em', color: '#aaddff', marginTop: '4px' }}>
+          Orbital Resonance: {miniGameCount} mini-game{miniGameCount !== 1 ? 's' : ''} active (+{miniGameCount * 10}% all production)
+        </p>
+      )}
+      {orbResAvailable && !hasOrbitalResonance && miniGameCount > 0 && (
+        <p style={{ fontSize: '0.75em', color: '#886', marginTop: '4px' }}>
+          Tip: Buy Orbital Resonance to gain +10% production per active mini-game ({miniGameCount} active = +{miniGameCount * 10}%)
+        </p>
+      )}
     </div>
   );
 }

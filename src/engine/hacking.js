@@ -66,7 +66,7 @@ export function submitHack(state, playerSequence) {
     const newState = {
       ...state,
       hackChallenge: null,
-      hackDifficulty: (state.hackDifficulty || 0) + 1,
+      hackDifficulty: Math.min(10, (state.hackDifficulty || 0) + 1),
       hackSuccesses: (state.hackSuccesses || 0) + 1,
       activeEffects: [...(state.activeEffects || []), effect],
     };
@@ -81,6 +81,21 @@ export function submitHack(state, playerSequence) {
         const r = newState.resources[targetId];
         newState.resources = { ...newState.resources, [targetId]: { ...r, rateMult: r.rateMult * 1.01 } };
       }
+    }
+
+    // Hack Mastery: one-time reward for completing max difficulty
+    if (newState.hackDifficulty >= 10 && !newState.hackMastery) {
+      newState.hackMastery = true;
+      // Permanent 1.5x research multiplier
+      const r = newState.resources.research;
+      if (r) {
+        newState.resources = { ...newState.resources, research: { ...r, rateMult: r.rateMult * 1.5 } };
+      }
+      newState.eventLog = [...(newState.eventLog || []), {
+        message: 'HACK MASTERY: You cracked the final encryption. The ancient data yields a permanent 1.5x research boost.',
+        time: newState.totalTime,
+        isLore: true,
+      }].slice(-20);
     }
 
     return {
