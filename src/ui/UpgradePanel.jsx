@@ -273,19 +273,29 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         </div>
       )}
       {(() => {
-        const affordableNonRepeatable = filteredAvailable.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
+        const affordableNonRepeatable = available.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
         return available.length > 0 && (
           <button
             className="gather-btn"
             style={{ width: '100%', marginBottom: '4px', padding: '4px', fontSize: '0.8em' }}
             disabled={affordableNonRepeatable.length === 0}
             onClick={() => onUpdate(s => {
+              // Recompute from live state to avoid stale captures
               let current = s;
-              for (const u of affordableNonRepeatable) {
-                const next = purchaseUpgrade(current, u.id);
-                if (next) current = next;
+              let bought = 0;
+              // Loop multiple passes — buying one upgrade can unlock prerequisites for the next
+              for (let pass = 0; pass < 10; pass++) {
+                const avail = getAvailableUpgrades(current);
+                let boughtThisPass = 0;
+                for (const u of avail) {
+                  if (u.repeatable) continue;
+                  if (!canAfford(current, getUpgradeCost(current, u.id))) continue;
+                  const next = purchaseUpgrade(current, u.id);
+                  if (next) { current = next; bought++; boughtThisPass++; }
+                }
+                if (boughtThisPass === 0) break;
               }
-              return current;
+              return bought > 0 ? current : null;
             })}
           >
             {affordableNonRepeatable.length > 0 ? `Buy All Affordable (${affordableNonRepeatable.length} upgrades, ${countEffects(affordableNonRepeatable)} effects)` : 'No affordable upgrades'}
