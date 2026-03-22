@@ -26,15 +26,15 @@ export function getNetRate(state, resourceId) {
   const grossRate = getEffectiveRate(state, resourceId);
   if (resourceId === 'food') {
     const laborRate = getEffectiveRate(state, 'labor');
-    return grossRate - laborRate * 0.8;
+    return grossRate - laborRate * 1.0;
   }
   if (resourceId === 'energy') {
     const elecRate = getEffectiveRate(state, 'electronics');
-    return grossRate - elecRate * 0.3;
+    return grossRate - elecRate * 0.4;
   }
   if (resourceId === 'rocketFuel' && state.era >= 4) {
     const orbRate = getEffectiveRate(state, 'orbitalInfra');
-    return grossRate - orbRate * 0.6;
+    return grossRate - orbRate * 0.7;
   }
   if (resourceId === 'exoticMaterials' && state.era >= 5) {
     const colonyRate = getEffectiveRate(state, 'colonies');

@@ -10,10 +10,10 @@ import { checkComboReset } from './weaving.js';
 import { purchaseUpgrade, getUpgradeCost } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
-// Resource consumption rates — high enough to create real tension
-const FOOD_PER_LABOR = 0.8;       // Food consumed per labor/s
-const ENERGY_PER_ELECTRONICS = 0.3; // Energy consumed per electronics/s
-const FUEL_PER_ORBITAL = 0.6;     // Fuel consumed per orbitalInfra/s
+// Resource consumption rates — moderate tension without breaking non-minigame paths
+const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
+const ENERGY_PER_ELECTRONICS = 0.4; // Energy consumed per electronics/s
+const FUEL_PER_ORBITAL = 0.7;     // Fuel consumed per orbitalInfra/s
 
 // Apply a fractional production bonus to all producing resources, respecting caps
 function applyProductionBonus(state, fraction, dt) {

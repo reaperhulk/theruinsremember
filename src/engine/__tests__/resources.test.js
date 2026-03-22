@@ -143,24 +143,24 @@ describe('resources', () => {
     it('subtracts food consumed by labor', () => {
       const state = createInitialState();
       state.resources.labor = { ...state.resources.labor, unlocked: true, rateAdd: 2, rateMult: 1 };
-      // labor effective rate = (baseRate 0 + rateAdd 2) * 1 * 1 = 2
+      // labor effective rate = (baseRate 0.2 + rateAdd 2) * 1 * 1 = 2.2
       // food gross = (1.5 + 0) * 1 * 1 = 1.5
-      // food net = 1.5 - 2 * 0.8 = 1.5 - 1.6 = -0.1
+      // food net = 1.5 - 2.2 * 1.0 = 1.5 - 2.2 = -0.7
       const grossFood = getEffectiveRate(state, 'food');
       const netFood = getNetRate(state, 'food');
       expect(netFood).toBeLessThan(grossFood);
-      expect(netFood).toBeCloseTo(grossFood - 2 * 0.8, 5);
-      expect(netFood).toBeCloseTo(-0.1, 5);
+      expect(netFood).toBeCloseTo(grossFood - 2.2 * 1.0, 5);
     });
 
     it('subtracts energy consumed by electronics', () => {
       const state = createInitialState();
       state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 3, rateMult: 1 };
-      // electronics effective rate = (0 + 3) * 1 * 1 = 3
+      // electronics effective rate = (0.1 + 3) * 1 * 1 = 3.1
       // energy gross = (0.5 + 0) * 1 * 1 = 0.5
-      // energy net = 0.5 - 3 * 0.3 = 0.5 - 0.9 = -0.4
+      // energy net = 0.5 - 3.1 * 0.5 = 0.5 - 1.55 = -1.05
       const netEnergy = getNetRate(state, 'energy');
-      expect(netEnergy).toBeCloseTo(-0.4, 5);
+      // energy net = 0.5 - 3.1 * 0.4 = 0.5 - 1.24 = -0.74
+      expect(netEnergy).toBeCloseTo(-0.74, 5);
     });
   });
 });
