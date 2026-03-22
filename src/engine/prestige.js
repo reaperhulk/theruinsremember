@@ -7,7 +7,7 @@ import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
 // Calculate prestige multiplier based on current progress
 export function calculatePrestigeBonus(state) {
-  const eraBonus = state.era * 0.5;
+  const eraBonus = Math.max(0, state.era || 1) * 0.5;
   const upgradeCount = Object.keys(state.upgrades).length;
   const upgradeBonus = upgradeCount * 0.05;
   const techBonus = Object.keys(state.tech).length * 0.1;

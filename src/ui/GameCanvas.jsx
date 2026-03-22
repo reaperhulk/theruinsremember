@@ -280,6 +280,21 @@ function drawEra1(ctx, w, h, t, state) {
   ctx.quadraticCurveTo(wreckX + 75, wreckGroundY + 10, wreckX + 90, wreckGroundY + 14);
   ctx.stroke();
 
+  // Fireflies / lightning bugs in the evening sky — tiny yellow dots that blink
+  const fireflyRng = seededRandom(142);
+  for (let i = 0; i < 8; i++) {
+    const fx = fireflyRng() * w;
+    const fy = h * 0.45 + fireflyRng() * (h * 0.35);
+    const blinkPhase = Math.sin(t * (1.5 + fireflyRng() * 3) + fireflyRng() * 6.28);
+    if (blinkPhase > 0.3) {
+      const ffAlpha = (blinkPhase - 0.3) * 0.7;
+      ctx.fillStyle = `rgba(255,240,80,${ffAlpha})`;
+      ctx.beginPath();
+      ctx.arc(fx + Math.sin(t * 0.5 + i) * 3, fy + Math.cos(t * 0.7 + i) * 2, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
   // Birds in the sky
   for (let i = 0; i < 4; i++) {
     const bx = ((t * (8 + i * 4) + i * 70) % (w + 60)) - 30;
@@ -661,6 +676,38 @@ function drawEra2(ctx, w, h, t, state) {
     }
   }
 
+  // Clock tower silhouette on first factory
+  if (factories.length > 0) {
+    const cf = factories[0];
+    const ctX = cf.x + cf.bw - 4;
+    const ctBaseY = h * 0.65 - cf.bh;
+    ctx.fillStyle = '#4a4a4a';
+    ctx.fillRect(ctX - 3, ctBaseY - 22, 6, 22);
+    // Belfry top
+    ctx.beginPath();
+    ctx.moveTo(ctX - 5, ctBaseY - 22);
+    ctx.lineTo(ctX, ctBaseY - 30);
+    ctx.lineTo(ctX + 5, ctBaseY - 22);
+    ctx.closePath();
+    ctx.fill();
+    // Clock face
+    ctx.fillStyle = 'rgba(255,240,200,0.6)';
+    ctx.beginPath();
+    ctx.arc(ctX, ctBaseY - 14, 3, 0, Math.PI * 2);
+    ctx.fill();
+    // Clock hands
+    const hrAngle = (t * 0.1) % (Math.PI * 2);
+    const minAngle = (t * 0.8) % (Math.PI * 2);
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(ctX, ctBaseY - 14);
+    ctx.lineTo(ctX + Math.sin(hrAngle) * 1.8, ctBaseY - 14 - Math.cos(hrAngle) * 1.8);
+    ctx.moveTo(ctX, ctBaseY - 14);
+    ctx.lineTo(ctX + Math.sin(minAngle) * 2.5, ctBaseY - 14 - Math.cos(minAngle) * 2.5);
+    ctx.stroke();
+  }
+
   // Conveyor belt at bottom
   const beltY = h * 0.78;
   ctx.fillStyle = '#333';
@@ -916,6 +963,25 @@ function drawEra3(ctx, w, h, t, state) {
   ctx.beginPath();
   ctx.ellipse(issX + 6, issY, 3, 3, t * 2, 0, Math.PI * 2);
   ctx.stroke();
+  // Satellite dishes that slowly rotate
+  for (let d = 0; d < 2; d++) {
+    const dishX = issX + (d === 0 ? -8 : 8);
+    const dishY = issY + (d === 0 ? -5 : 5);
+    const dishAngle = t * 0.3 + d * Math.PI;
+    ctx.save();
+    ctx.translate(dishX, dishY);
+    ctx.rotate(dishAngle);
+    ctx.strokeStyle = '#bbb';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.arc(0, 0, 2.5, -0.8, 0.8);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, 2);
+    ctx.stroke();
+    ctx.restore();
+  }
 
   // Rocket launch — frequency scales with rocketFuel production
   const fuelRate = state ? ((state.resources?.rocketFuel?.baseRate || 0) + (state.resources?.rocketFuel?.rateAdd || 0)) * (state.resources?.rocketFuel?.rateMult || 1) : 0;
@@ -1197,6 +1263,30 @@ function drawEra4(ctx, w, h, t, state) {
       ctx.fill();
     }
 
+    // Comet with tail that occasionally crosses the solar system
+    if (p.name === 'neptune') {
+      const cometCycle = (t * 0.06) % 6;
+      if (cometCycle < 3) {
+        const cometProgress = cometCycle / 3;
+        const cometX = w * (1.1 - cometProgress * 1.3);
+        const cometY = h * 0.1 + cometProgress * h * 0.7;
+        // Tail
+        for (let tc = 0; tc < 8; tc++) {
+          const tailAlpha = 0.3 - tc * 0.035;
+          if (tailAlpha <= 0) break;
+          ctx.fillStyle = `rgba(200,220,255,${tailAlpha})`;
+          ctx.beginPath();
+          ctx.arc(cometX + tc * 4, cometY - tc * 2.5, 1.5 - tc * 0.12, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Head
+        ctx.fillStyle = 'rgba(255,255,240,0.9)';
+        ctx.beginPath();
+        ctx.arc(cometX, cometY, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
     // Colony dots on planets when colony count > 10
     const colonyCount = state.resources?.colonies?.amount || 0;
     if (colonyCount > 10) {
@@ -1379,6 +1469,26 @@ function drawEra5(ctx, w, h, t, state) {
     ctx.fill();
   }
 
+  // Distant supernova flashes — brief bright flares at random positions
+  const novaRng = seededRandom(7654);
+  for (let i = 0; i < 3; i++) {
+    const nx = novaRng() * w;
+    const ny = novaRng() * h;
+    const novaPhase = (t * 0.15 + i * 2.3) % 5;
+    if (novaPhase < 0.4) {
+      const novaAlpha = novaPhase < 0.2 ? novaPhase / 0.2 : 1 - (novaPhase - 0.2) / 0.2;
+      const novaR = 2 + novaAlpha * 6;
+      const novaGrad = ctx.createRadialGradient(nx, ny, 0, nx, ny, novaR);
+      novaGrad.addColorStop(0, `rgba(255,255,220,${novaAlpha * 0.8})`);
+      novaGrad.addColorStop(0.5, `rgba(255,200,100,${novaAlpha * 0.3})`);
+      novaGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = novaGrad;
+      ctx.beginPath();
+      ctx.arc(nx, ny, novaR, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
   // Colony ships moving between systems
   for (let i = 0; i < 3; i++) {
     const rng3 = seededRandom(i * 31);
@@ -1499,6 +1609,36 @@ function drawEra6(ctx, w, h, t, state) {
       }
     }
   }
+
+  // Quasar jet — narrow beam of light perpendicular to the galaxy disc
+  const jetPulse = 0.5 + 0.3 * Math.sin(t * 1.5);
+  const jetAlpha = 0.08 + 0.06 * jetPulse;
+  // Top jet
+  const jetGrad1 = ctx.createLinearGradient(cx, cy, cx, cy - 70);
+  jetGrad1.addColorStop(0, `rgba(150,180,255,${jetAlpha * 1.5})`);
+  jetGrad1.addColorStop(0.3, `rgba(120,150,255,${jetAlpha})`);
+  jetGrad1.addColorStop(1, 'transparent');
+  ctx.fillStyle = jetGrad1;
+  ctx.beginPath();
+  ctx.moveTo(cx - 2, cy);
+  ctx.lineTo(cx - 5, cy - 70);
+  ctx.lineTo(cx + 5, cy - 70);
+  ctx.lineTo(cx + 2, cy);
+  ctx.closePath();
+  ctx.fill();
+  // Bottom jet
+  const jetGrad2 = ctx.createLinearGradient(cx, cy, cx, cy + 70);
+  jetGrad2.addColorStop(0, `rgba(150,180,255,${jetAlpha * 1.5})`);
+  jetGrad2.addColorStop(0.3, `rgba(120,150,255,${jetAlpha})`);
+  jetGrad2.addColorStop(1, 'transparent');
+  ctx.fillStyle = jetGrad2;
+  ctx.beginPath();
+  ctx.moveTo(cx - 2, cy);
+  ctx.lineTo(cx - 5, cy + 70);
+  ctx.lineTo(cx + 5, cy + 70);
+  ctx.lineTo(cx + 2, cy);
+  ctx.closePath();
+  ctx.fill();
 
   // --- SECTOR NODES: Small galaxy cluster groups instead of single circles ---
   const sectorNodes = [];
@@ -1705,10 +1845,15 @@ function drawIntergalactic(ctx, w, h, t, state) {
     }
   }
 
-  // Galaxy cluster nodes — tiny galaxy sprites showing each dot is a galaxy
+  // Galaxy cluster nodes — tiny galaxy sprites with redshift (farther = more red)
   for (let ni = 0; ni < nodes.length; ni++) {
     const node = nodes[ni];
-    const hue = (node.x * 2 + node.y + t * 10) % 360;
+    const distFromCenter = Math.sqrt((node.x - w * 0.5) ** 2 + (node.y - h * 0.5) ** 2);
+    const maxDist = Math.sqrt((w * 0.5) ** 2 + (h * 0.5) ** 2);
+    const redshiftAmount = Math.min(1, distFromCenter / maxDist);
+    // Shift hue toward red (0) for distant galaxies
+    const baseHue = (node.x * 2 + node.y + t * 10) % 360;
+    const hue = baseHue * (1 - redshiftAmount * 0.7) + redshiftAmount * 15;
     // Node glow
     drawGlowCircle(ctx, node.x, node.y, node.size * 0.3, `hsla(${hue},70%,60%,0.5)`, node.size * 1.8);
     // Tiny galaxy sprite — a few dots in a mini-spiral pattern
@@ -1929,6 +2074,26 @@ function drawMultiverse(ctx, w, h, t, state) {
     ctx.restore();
   }
 
+  // Glitch effects — small rectangles of displaced pixels suggesting unstable reality
+  const glitchSeed = Math.floor(t * 4);
+  const glitchRng = seededRandom(glitchSeed);
+  const glitchChance = glitchRng();
+  if (glitchChance < 0.25) {
+    const glitchCount = 1 + Math.floor(glitchRng() * 3);
+    for (let g = 0; g < glitchCount; g++) {
+      const gx = glitchRng() * w;
+      const gy = glitchRng() * h;
+      const gw = 8 + glitchRng() * 30;
+      const gh = 2 + glitchRng() * 5;
+      const gHue = Math.floor(glitchRng() * 360);
+      ctx.fillStyle = `hsla(${gHue},80%,60%,${0.08 + glitchRng() * 0.12})`;
+      ctx.fillRect(gx, gy, gw, gh);
+      // Offset copy for displacement feel
+      ctx.fillStyle = `hsla(${(gHue + 180) % 360},60%,50%,${0.05 + glitchRng() * 0.08})`;
+      ctx.fillRect(gx + 3, gy + 1, gw * 0.7, gh);
+    }
+  }
+
   // --- NEXUS: complex rotating multi-ring structure with energy inflow ---
   const totalProd = state ? Object.values(state.resources || {})
     .filter(r => r.unlocked)
@@ -2003,6 +2168,20 @@ function drawDigitalAge(ctx, w, h, t, state) {
   // Dark background with circuit-board feel
   ctx.fillStyle = '#0a0e1a';
   ctx.fillRect(0, 0, w, h);
+
+  // Matrix-style falling code characters — very faint behind the board
+  ctx.font = '8px monospace';
+  const matrixChars = '01ABCDEF><{}[]';
+  for (let col = 0; col < 12; col++) {
+    const mx = 8 + col * (w / 12);
+    for (let row = 0; row < 6; row++) {
+      const my = ((t * (30 + col * 5) + row * 25) % (h + 20)) - 10;
+      const charIdx = Math.floor((t * 3 + col * 7 + row * 13) % matrixChars.length);
+      const mAlpha = 0.03 + 0.02 * Math.sin(t * 2 + col + row);
+      ctx.fillStyle = `rgba(0, 255, 100, ${mAlpha})`;
+      ctx.fillText(matrixChars[charIdx], mx, my);
+    }
+  }
 
   // PCB-style circuit traces — varying widths with solder points at intersections
   const gridSpacing = Math.max(10, 20 - Math.floor(Object.keys(state?.upgrades || {}).length / 8));
@@ -2421,6 +2600,24 @@ function drawDysonEra(ctx, w, h, t, state) {
     ctx.beginPath();
     ctx.arc(mx, my, 0.8, 0, Math.PI * 2);
     ctx.fill();
+  }
+
+  // Star field twinkling through gaps in the Dyson sphere
+  const gapRng = seededRandom(3939);
+  for (let i = 0; i < 12; i++) {
+    const gAngle = gapRng() * Math.PI * 2;
+    const gDist = starR + 20 + gapRng() * 50;
+    const gx = cx + Math.cos(gAngle) * gDist;
+    const gy = cy + Math.sin(gAngle) * gDist * 0.4;
+    const gTwinkle = 0.1 + 0.25 * Math.sin(t * (2 + gapRng() * 3) + gapRng() * 6.28);
+    // Only show when completion is partial (gaps exist)
+    const gapAlpha = gTwinkle * (1 - completion * 0.8);
+    if (gapAlpha > 0.02) {
+      ctx.fillStyle = `rgba(200,220,255,${gapAlpha})`;
+      ctx.beginPath();
+      ctx.arc(gx, gy, 0.6 + gapRng() * 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   // Outer megastructure arc indicators

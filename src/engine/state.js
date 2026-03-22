@@ -19,9 +19,14 @@ export function migrateState(saved) {
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
   // Guard against broken resource fields from corrupt saves
   for (const [id, r] of Object.entries(migrated.resources)) {
-    if (r.capMult <= 0) migrated.resources[id] = { ...migrated.resources[id], capMult: 1 };
-    if (r.rateMult <= 0) migrated.resources[id] = { ...migrated.resources[id], rateMult: 1 };
-    if (r.amount < 0) migrated.resources[id] = { ...migrated.resources[id], amount: 0 };
+    if (!Number.isFinite(r.capMult) || r.capMult <= 0) migrated.resources[id] = { ...migrated.resources[id], capMult: 1 };
+    if (!Number.isFinite(r.rateMult) || r.rateMult <= 0) migrated.resources[id] = { ...migrated.resources[id], rateMult: 1 };
+    if (!Number.isFinite(r.rateAdd)) migrated.resources[id] = { ...migrated.resources[id], rateAdd: 0 };
+    if (!Number.isFinite(r.amount) || r.amount < 0) migrated.resources[id] = { ...migrated.resources[id], amount: 0 };
+  }
+  // Guard prestige multiplier against NaN/Infinity from corrupted saves
+  if (!Number.isFinite(migrated.prestigeMultiplier) || migrated.prestigeMultiplier <= 0) {
+    migrated.prestigeMultiplier = 1;
   }
   migrated.saveVersion = fresh.saveVersion;
   return migrated;
