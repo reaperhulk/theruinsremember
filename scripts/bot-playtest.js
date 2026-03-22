@@ -724,6 +724,7 @@ function runScenario(opts) {
   let prestigesDone = 0;
   let currentCycleStart = 0;
   let reachedTargetAt = null;
+  let lastTotalResources = 0;
 
   for (let t = 0; t < maxTicks; t++) {
     const prevState = state;
@@ -806,14 +807,25 @@ function runScenario(opts) {
       detectBottlenecks(state, collector);
     }
 
-    // Stuck detection (no new upgrades/tech for 5 minutes)
+    // Stuck detection (no new upgrades/tech for extended period)
+    // Uses 5-min windows; requires 6 consecutive windows (30 min) with no progress.
+    // Also checks if total resource amount is growing — slow accumulation isn't stuck.
     if (t % 300 === 0) {
       const currentCount = Object.keys(state.upgrades || {}).length + Object.keys(state.tech || {}).length;
+      const totalResources = Object.values(state.resources)
+        .filter(r => r.unlocked)
+        .reduce((sum, r) => sum + r.amount, 0);
       if (currentCount === lastProgressCount) {
-        stuckCounter++;
-        if (stuckCounter >= 3) {
+        // Check if resources are still growing (passive accumulation)
+        if (lastTotalResources > 0 && totalResources > lastTotalResources * 1.01) {
+          // Resources growing > 1% — not truly stuck, just slow
+          stuckCounter = Math.max(0, stuckCounter - 1);
+        } else {
+          stuckCounter++;
+        }
+        if (stuckCounter >= 6) {
           if (!quiet) {
-            log(`  STUCK at era ${state.era} after ${fmtTime(state.totalTime)} — no progress for 15 min`);
+            log(`  STUCK at era ${state.era} after ${fmtTime(state.totalTime)} — no progress for 30 min`);
             printResourceSnapshot(state);
           }
           break;
@@ -822,6 +834,7 @@ function runScenario(opts) {
         stuckCounter = 0;
       }
       lastProgressCount = currentCount;
+      lastTotalResources = totalResources;
     }
 
     // Verbose output every 60s

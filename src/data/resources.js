@@ -33,17 +33,17 @@ export const resources = {
   megastructures: { id: 'megastructures', name: 'Megastructures', era: 7, baseCap: 2000, baseRate: 0.03, description: 'Massive stellar-scale constructions' },
   stellarForge: { id: 'stellarForge', name: 'Stellar Forge Output', era: 7, baseCap: 2000, baseRate: 0.05, description: 'Output from star-powered forges' },
 
-  // Era 8: Galactic
-  galacticInfluence: { id: 'galacticInfluence', name: 'Galactic Influence', era: 8, baseCap: 100000, baseRate: 0.1, description: 'Political power across the galaxy' },
-  exoticMatter: { id: 'exoticMatter', name: 'Exotic Matter', era: 8, baseCap: 10000, baseRate: 0.05, description: 'Matter with unusual properties' },
+  // Era 8: Galactic — higher base rates for passive/noMinigames bootstrapping
+  galacticInfluence: { id: 'galacticInfluence', name: 'Galactic Influence', era: 8, baseCap: 100000, baseRate: 0.3, description: 'Political power across the galaxy' },
+  exoticMatter: { id: 'exoticMatter', name: 'Exotic Matter', era: 8, baseCap: 10000, baseRate: 0.2, description: 'Matter with unusual properties' },
 
   // Era 9: Intergalactic
-  cosmicPower: { id: 'cosmicPower', name: 'Cosmic Power', era: 9, baseCap: 20000, baseRate: 0.03, description: 'Energy from the cosmos itself' },
-  universalConstants: { id: 'universalConstants', name: 'Universal Constants', era: 9, baseCap: 5000, baseRate: 0.02, description: 'Manipulable laws of physics' },
+  cosmicPower: { id: 'cosmicPower', name: 'Cosmic Power', era: 9, baseCap: 20000, baseRate: 0.1, description: 'Energy from the cosmos itself' },
+  universalConstants: { id: 'universalConstants', name: 'Universal Constants', era: 9, baseCap: 5000, baseRate: 0.08, description: 'Manipulable laws of physics' },
 
   // Era 10: Multiverse
-  realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 10, baseCap: 10000, baseRate: 0.02, description: 'Shards of alternate realities' },
-  quantumEchoes: { id: 'quantumEchoes', name: 'Quantum Echoes', era: 10, baseCap: 20000, baseRate: 0.01, description: 'Resonances from parallel universes' },
+  realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 10, baseCap: 10000, baseRate: 0.05, description: 'Shards of alternate realities' },
+  quantumEchoes: { id: 'quantumEchoes', name: 'Quantum Echoes', era: 10, baseCap: 20000, baseRate: 0.03, description: 'Resonances from parallel universes' },
 };
 
 export function getResourcesForEra(era) {

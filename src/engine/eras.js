@@ -21,14 +21,14 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 const ERA_MIN_UPGRADES = {
   1: 30,   // ~55% of ~55
   2: 35,   // ~63% of ~56
-  3: 25,   // ~47% of ~53 — higher min forces more upgrades, boosting production for era 4
-  4: 35,   // ~60% of ~58 — rocketFuel/orbitalInfra bootstrapping is the natural gate
-  5: 42,   // ~72% of ~58
-  6: 38,   // ~66% of ~58 — lower to allow non-minigame paths
-  7: 40,   // ~66% of ~61
-  8: 42,   // ~70% of ~60
-  9: 44,   // ~72% of ~61
-  10: 42,  // ~71% of ~59
+  3: 25,   // ~47% of ~53 — bootstrapping delay
+  4: 35,   // ~60% of ~58 — rocketFuel bootstrapping gate
+  5: 38,   // ~66% of ~58
+  6: 35,   // ~60% of ~58 — lower for non-minigame paths
+  7: 35,   // ~57% of ~61
+  8: 30,   // ~50% of ~60 — GI/exoticMatter bootstrapping; time gate is the real gate
+  9: 30,   // ~49% of ~61 — cosmicPower bootstrapping; time gate is the real gate
+  10: 35,  // ~59% of ~59
 };
 
 // Minimum time (seconds) that must be spent in an era before transition.
