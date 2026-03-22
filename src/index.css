@@ -1111,6 +1111,12 @@ canvas:hover {
   border: 1px solid #444;
   font-family: inherit;
   font-size: 0.9em;
+  color-scheme: dark;
+}
+
+.trade-row select option {
+  background: #1a1a2e;
+  color: #e0e0e0;
 }
 
 .trade-preview {
