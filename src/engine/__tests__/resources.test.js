@@ -23,6 +23,20 @@ describe('resources', () => {
       // (baseRate 1.5 + rateAdd 1) * rateMult 2 * prestige 1 = 5
       expect(getEffectiveRate(state, 'food')).toBeCloseTo(5, 5);
     });
+
+    it('applies reality key bonus correctly', () => {
+      const state = createInitialState();
+      state.realityKeys = { temporal: 5, spatial: 5 }; // 10 total = +10%
+      // food: (baseRate 1.5 + 0) * 1 * prestige 1 * 1.10 = 1.65
+      expect(getEffectiveRate(state, 'food')).toBeCloseTo(1.65, 5);
+    });
+
+    it('applies reality key bonus with zero keys', () => {
+      const state = createInitialState();
+      state.realityKeys = {};
+      // No bonus: (baseRate 1.5 + 0) * 1 * 1 * 1.0 = 1.5
+      expect(getEffectiveRate(state, 'food')).toBeCloseTo(1.5, 5);
+    });
   });
 
   describe('calculateProduction', () => {

@@ -111,17 +111,16 @@ export const events = {
     name: 'Stellar Harvest',
     description: 'The star shudders and releases a cache of pre-refined metals from its corona. As if it had been storing them. As if it knew you were coming.',
     minEra: 7,
-    type: 'timed',
-    duration: 40,
-    effect: { resourceId: 'stellarForge', rateMultBonus: 4 },
+    type: 'instant',
+    effect: { resourceId: 'stellarForge', amount: 20 },
   },
   megastructureRuinDiscovery: {
     id: 'megastructureRuinDiscovery',
     name: 'Ruin Discovery',
-    description: 'Engineers disassemble a ruin and find construction techniques preserved like a lesson left for them.',
+    description: 'Engineers disassemble a ruin and find construction techniques preserved like a lesson left for them. Dark energy residue coats every surface.',
     minEra: 7,
     type: 'instant',
-    effect: { resourceId: 'megastructures', amount: 5 },
+    effect: { resourceId: 'darkEnergy', amount: 40 },
   },
 
   darkMatterSurge: {

@@ -291,4 +291,24 @@ describe('tick', () => {
     // Food: 1.5 * 1.20 = 1.8
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount * 1.20, 1);
   });
+
+  it('Dyson auto-assembly caps at 500 segments', () => {
+    const state = createInitialState();
+    state.era = 7;
+    state.dysonSegments = 498;
+    state.totalTicks = 59; // Will be 60 on next tick (auto-assembly fires at %60===0)
+    const after = tick(state, 1);
+    // autoRate = Math.min(10, Math.floor(498/10)) = 10, but capped at 500
+    expect(after.dysonSegments).toBeLessThanOrEqual(500);
+  });
+
+  it('Dyson auto-assembly does not exceed 500 even with high segment count', () => {
+    const state = createInitialState();
+    state.era = 7;
+    state.dysonSegments = 500;
+    state.totalTicks = 59;
+    const after = tick(state, 1);
+    // At 500, auto-assembly should not trigger (guard: < 500)
+    expect(after.dysonSegments).toBe(500);
+  });
 });

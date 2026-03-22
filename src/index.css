@@ -1920,6 +1920,20 @@ canvas:hover {
   .toast {
     font-size: 0.8em;
   }
+
+  /* Mini-game sub-tab buttons need adequate touch targets */
+  .mini-game-tabs button {
+    min-height: 36px;
+    padding: 6px 8px !important;
+    font-size: 0.75em !important;
+  }
+
+  /* Upgrade search input needs adequate height for touch */
+  .upgrade-search {
+    min-height: 44px;
+    padding: 10px 8px !important;
+    font-size: 0.9em !important;
+  }
 }
 
 /* Mini-game visual feedback animations */

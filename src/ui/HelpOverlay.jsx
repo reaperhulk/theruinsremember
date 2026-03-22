@@ -1,4 +1,14 @@
+import { useEffect } from 'react';
+
 export function HelpOverlay({ onClose }) {
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [onClose]);
+
   return (
     <div className="era-transition-overlay" onClick={onClose} style={{ zIndex: 1003 }}>
       <div className="era-transition-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto', textAlign: 'left', fontSize: '0.85em' }}>
@@ -15,7 +25,7 @@ export function HelpOverlay({ onClose }) {
           <p><strong>Canvas:</strong> Click glowing orbs, ruins, and deposits for bonuses. Buildings appear as you progress.</p>
           <p><strong>Keyboard:</strong> 1-6: tabs | Space: mine | D: dock | 0-3: hack | Arrows: tune | ?: this help</p>
         </div>
-        <p style={{ textAlign: 'center', color: '#555', marginTop: '12px', fontSize: '0.8em' }}>Click outside to close</p>
+        <p style={{ textAlign: 'center', color: '#555', marginTop: '12px', fontSize: '0.8em' }}>Click outside or press Escape to close</p>
       </div>
     </div>
   );
