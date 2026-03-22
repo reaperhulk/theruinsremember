@@ -877,7 +877,7 @@ canvas:hover {
   border-right: 1px solid #4a8a4a;
 }
 
-.dock-perfect {
+.dock-bar .dock-perfect {
   position: absolute;
   top: 0;
   height: 100%;
