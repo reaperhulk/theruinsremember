@@ -1128,6 +1128,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'universalConstants', value: 0.2 },
       { type: 'production_add', target: 'darkEnergy', value: 12 },
+      { type: 'production_mult', target: 'cosmicPower', value: 1.5 },
     ],
     description: 'In the void between galaxies, you find cairns of dark matter — trail markers left by something that walked this path before you.',
     prerequisites: ['intergalacticHighway', 'realityScanner'],
@@ -1228,6 +1229,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'research', value: 9.6 },
       { type: 'production_add', target: 'data', value: 3 },
+      { type: 'production_mult', target: 'stellarForge', value: 1.5 },
     ],
     description: 'Sensors detect echoes of previous observations — the same measurements, taken by the same instruments, eons ago',
     prerequisites: ['matrioshkaBrain', 'stellarAccelerator'],
@@ -1751,6 +1753,7 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'darkEnergy', value: 8 },
       { type: 'production_add', target: 'cosmicPower', value: 1 },
+      { type: 'production_mult', target: 'exoticMatter', value: 1.5 },
     ],
     description: 'Dark matter flows through conduits shaped by the collapse of the previous iteration — the channels remember',
     prerequisites: ['matterReplicators', 'neutroniumRefinery'],
@@ -2161,7 +2164,7 @@ export const upgrades = {
 
   // Era 4
   marsOutpost: { id: 'marsOutpost', name: 'Mars Outpost', era: 4, cost: { rocketFuel: 25, steel: 35, food: 30 }, effects: [{ type: 'production_add', target: 'research', value: 1.5 }, { type: 'production_add', target: 'exoticMaterials', value: 0.5 }], description: 'A Martian outpost yields research and exotic materials', prerequisites: ['marsRover'] },
-  orbitalRefinery: { id: 'orbitalRefinery', name: 'Orbital Refinery', era: 4, cost: { orbitalInfra: 12, steel: 28, energy: 20 }, effects: [{ type: 'production_add', target: 'steel', value: 1.2 }, { type: 'production_add', target: 'exoticMaterials', value: 1.0 }], description: 'The refinery\'s smelting chambers match the composition of precursor alloys — as if the facility was built to recreate a specific recipe from memory', prerequisites: ['spaceDebrisCollector','zeroGManufacturing'] },
+  orbitalRefinery: { id: 'orbitalRefinery', name: 'Orbital Refinery', era: 4, cost: { orbitalInfra: 12, steel: 28, energy: 20 }, effects: [{ type: 'production_add', target: 'steel', value: 1.2 }, { type: 'production_add', target: 'exoticMaterials', value: 1.0 }, { type: 'production_mult', target: 'rocketFuel', value: 1.5 }], description: 'The refinery\'s smelting chambers match the composition of precursor alloys — as if the facility was built to recreate a specific recipe from memory', prerequisites: ['spaceDebrisCollector','zeroGManufacturing'] },
   lightSail: { id: 'lightSail', name: 'Light Sail', era: 4, cost: { electronics: 18, rocketFuel: 12, research: 20 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'rocketFuel', value: 0.6 }], description: 'Light sails boost energy and fuel output', prerequisites: ['solarArrays','solarSail'] },
 
   // Era 5
@@ -2479,7 +2482,7 @@ export const upgrades = {
   fortifiedGranary: { id: 'fortifiedGranary', name: 'Fortified Granary', era: 1, cost: { food: 30, materials: 22, labor: 14 }, effects: [{ type: 'production_add', target: 'food', value: 0.5 }, { type: 'cap_mult', target: 'food', value: 2 }], description: 'Reinforced grain stores double food capacity and boost output', prerequisites: ['granary', 'watchTower'] },
 
   // Era 2: cross-link steel/electronics chains and deepen automation path
-  industrialBoiler: { id: 'industrialBoiler', name: 'Industrial Boiler', era: 2, cost: { steel: 22, energy: 20, materials: 18 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.8 }], description: 'High-pressure boilers cross-feed energy into steel production', prerequisites: ['steamTurbine', 'ironWorks'] },
+  industrialBoiler: { id: 'industrialBoiler', name: 'Industrial Boiler', era: 2, cost: { steel: 22, energy: 20, materials: 18 }, effects: [{ type: 'production_add', target: 'energy', value: 0.6 }, { type: 'production_add', target: 'steel', value: 0.8 }, { type: 'production_mult', target: 'electronics', value: 1.3 }], description: 'High-pressure boilers cross-feed energy into steel production', prerequisites: ['steamTurbine', 'ironWorks'] },
   precisionLathe: { id: 'precisionLathe', name: 'Precision Lathe', era: 2, cost: { electronics: 15, steel: 18, labor: 18 }, effects: [{ type: 'production_add', target: 'electronics', value: 0.4 }, { type: 'production_add', target: 'steel', value: 0.8 }], description: 'Precision machining links electronics and steel output', prerequisites: ['microchipFab', 'steelRefinery'] },
   mechanizedMill: { id: 'mechanizedMill', name: 'Mechanized Mill', era: 2, cost: { steel: 15, food: 22, energy: 14 }, effects: [{ type: 'production_add', target: 'food', value: 0.5 }, { type: 'production_add', target: 'labor', value: 0.8 }], description: 'Machine-powered mills boost food and free up labor', prerequisites: ['industrialFarming', 'electricMotor'] },
 
