@@ -11,8 +11,17 @@ describe('achievements', () => {
     const firstGem = newAchievements.find(a => a.id === 'firstGem');
     expect(firstGem).toBeTruthy();
     expect(after.achievements.firstGem).toBe(true);
-    // Achievements award prestige points based on their reward field
-    expect(after.prestigePoints).toBe(1); // firstGem has reward: 1
+    // Without achievementHunter, no prestige points from achievements
+    expect(after.prestigePoints || 0).toBe(0);
+  });
+
+  it('awards prestige points with achievementHunter upgrade', () => {
+    const state = createInitialState();
+    state.totalGems = 1;
+    state.prestigeUpgrades = { achievementHunter: true };
+    const { state: after } = checkAchievements(state);
+    // firstGem reward: 1, with 1.5x multiplier = floor(1.5) = 1
+    expect(after.prestigePoints).toBe(1);
   });
 
   it('does not re-award already earned achievements', () => {

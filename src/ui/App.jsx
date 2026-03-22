@@ -110,7 +110,7 @@ export function App() {
       `Prestige Points: +${summary.points} (total: ${summary.totalPoints})`,
       `Cycle: #${summary.prestigeCount}`,
       '',
-      'KEPT: Achievements, prestige upgrades, multiplier, lifetime stats',
+      'KEPT: Achievements, prestige upgrades, multiplier, reality keys, lifetime stats',
       'LOST: All resources, upgrades, tech, era progress, mini-game state',
       ...milestones,
       '',
