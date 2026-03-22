@@ -377,7 +377,7 @@ export function tick(state, dt) {
 
   // Mechanic: compoundingTick — production compounds slightly each tick
   if (newState.upgrades?.infiniteLoop) {
-    newState = applyProductionBonus(newState, 0.001 * dt, dt);
+    newState = applyProductionBonus(newState, 0.001, dt);
   }
 
   // Dyson auto-assembly: every 60 ticks (~1 min at 1 tick/s), auto-add segments based on existing count
