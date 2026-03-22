@@ -212,7 +212,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
       })()}
 
       <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-        Achievements ({earnedCount}/{achievementList.length} — {achievementList.filter(a => a.earned).reduce((s, a) => s + (a.reward || 0), 0)} pts earned)
+        Achievements ({earnedCount}/{achievementList.length})
         <button
           onClick={() => setShowEarned(v => !v)}
           style={{ fontSize: '0.7em', padding: '1px 6px', cursor: 'pointer', background: '#222', border: '1px solid #444', color: '#aaa', borderRadius: '3px', fontFamily: 'inherit' }}
@@ -223,17 +223,23 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
       <div className="achievement-progress-bar">
         <div className="achievement-progress-fill" style={{ width: `${Math.floor(earnedCount / achievementList.length * 100)}%` }} />
       </div>
-      {!showEarned && (
-        <div className="achievement-list" style={{ marginBottom: '6px' }}>
-          <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '2px' }}>Locked ({achievementList.length - earnedCount} remaining):</div>
-          {achievementList.filter(a => !a.earned).map(a => (
-            <div key={a.id} className="achievement locked" style={{ opacity: 0.7 }}>
-              <span className="achievement-name">? {a.name}</span>
-              <span className="achievement-desc">{a.description} (+{a.reward}pts)</span>
+      {!showEarned && (() => {
+        const lockedAchievements = achievementList.filter(a => !a.earned).sort((a, b) => (a.reward || 0) - (b.reward || 0)).slice(0, 15);
+        const totalLocked = achievementList.length - earnedCount;
+        return (
+          <div className="achievement-list" style={{ marginBottom: '6px' }}>
+            <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '2px' }}>
+              {totalLocked > 15 ? `Showing 15 of ${totalLocked} locked (easiest first)` : `Locked (${totalLocked} remaining)`}:
             </div>
-          ))}
-        </div>
-      )}
+            {lockedAchievements.map(a => (
+              <div key={a.id} className="achievement locked" style={{ opacity: 0.7 }}>
+                <span className="achievement-name">? {a.name}</span>
+                <span className="achievement-desc">{a.description}</span>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
       {showEarned && (
         <>
           {achievementList.filter(a => !a.earned).length > 0 && achievementList.filter(a => !a.earned).length <= 20 && (
@@ -242,7 +248,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
               {achievementList.filter(a => !a.earned).slice(0, 3).map(a => (
                 <div key={a.id} className="achievement locked" style={{ opacity: 0.7 }}>
                   <span className="achievement-name">? {a.name}</span>
-                  <span className="achievement-desc">{a.description} (+{a.reward}pts)</span>
+                  <span className="achievement-desc">{a.description}</span>
                 </div>
               ))}
             </div>
@@ -251,13 +257,13 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
             {achievementList.filter(a => a.earned).map(a => (
               <div key={a.id} className="achievement earned">
                 <span className="achievement-name">{a.name}</span>
-                <span className="achievement-desc">{a.description} (+{a.reward}pts)</span>
+                <span className="achievement-desc">{a.description}</span>
               </div>
             ))}
             {achievementList.length - earnedCount > 0 && (
               <div className="achievement locked">
                 <span className="achievement-name">+ {achievementList.length - earnedCount} hidden</span>
-                <span className="achievement-desc">Keep playing to discover them! ({achievementList.filter(a => !a.earned).reduce((s, a) => s + (a.reward || 0), 0)} pts remaining)</span>
+                <span className="achievement-desc">Keep playing to discover them!</span>
               </div>
             )}
           </div>

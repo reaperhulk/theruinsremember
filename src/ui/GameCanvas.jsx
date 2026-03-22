@@ -974,6 +974,31 @@ function drawEra6(ctx, w, h, t, state) {
     ctx.arc(n.x, n.y, (2 + pulse) * nodeScale, 0, Math.PI * 2);
     ctx.fill();
   }
+
+  // Senate faction-colored particles when a faction has majority
+  const senate = state?.senate || {};
+  const senateTotal = (senate.merchants || 0) + (senate.scholars || 0) + (senate.warriors || 0);
+  if (senateTotal > 0) {
+    const factionColors = { merchants: [221, 170, 68], scholars: [136, 187, 238], warriors: [238, 102, 68] };
+    const maxCount = Math.max(senate.merchants || 0, senate.scholars || 0, senate.warriors || 0);
+    const majorityFaction = Object.entries(senate).find(([, v]) => v === maxCount && maxCount > 0);
+    if (majorityFaction) {
+      const [fid] = majorityFaction;
+      const col = factionColors[fid] || [200, 200, 200];
+      const pCount = Math.min(12, maxCount * 2);
+      for (let i = 0; i < pCount; i++) {
+        const angle = t * 0.6 + (i / pCount) * Math.PI * 2;
+        const dist = 60 + 20 * Math.sin(t * 0.8 + i);
+        const px = cx + Math.cos(angle) * dist * 1.2;
+        const py = cy + Math.sin(angle) * dist * 0.5;
+        const alpha = 0.3 + 0.3 * Math.sin(t * 3 + i * 1.5);
+        ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${alpha})`;
+        ctx.beginPath();
+        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
 }
 
 // --- Era 7: Intergalactic ---
@@ -1538,8 +1563,9 @@ function drawDysonEra(ctx, w, h, t, state) {
   ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2);
   ctx.fill();
 
-  // Dyson sphere rings — count and completeness scale with upgrades
-  const completion = state ? Math.min(1, Object.keys(state.upgrades || {}).length / 50) : 0;
+  // Dyson sphere rings — count and completeness scale with upgrades + dyson segments
+  const segmentBoost = state ? Math.min(0.5, (state.dysonSegments || 0) / 100) : 0;
+  const completion = state ? Math.min(1, Object.keys(state.upgrades || {}).length / 50 + segmentBoost) : 0;
   const arcCount = Math.floor(completion * 8) + 2;
   for (let i = 0; i < arcCount; i++) {
     const ringR = starR + 15 + i * 8;

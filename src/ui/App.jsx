@@ -209,13 +209,13 @@ export function App() {
     return (
       <>
         {availableMiniGames.length > 1 && (
-          <div className="mini-game-tabs" style={{ display: 'flex', flexWrap: 'wrap', gap: '2px', marginBottom: '6px' }}>
+          <div className="mini-game-tabs" style={{ display: 'flex', gap: '2px', marginBottom: '6px', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
             {availableMiniGames.map(g => (
               <button
                 key={g.id}
                 className={`tab-btn ${activeMiniGame === g.id ? 'active' : ''}`}
                 onClick={() => setActiveMiniGame(g.id)}
-                style={{ fontSize: '0.7em', padding: '2px 6px', minWidth: 'auto' }}
+                style={{ padding: '3px 6px', fontSize: '0.7em', whiteSpace: 'nowrap', minWidth: 'auto' }}
                 aria-label={`Switch to ${g.label} mini-game`}
                 title={`${g.label}: ${g.desc}`}
               >

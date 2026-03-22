@@ -62,6 +62,11 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
           Milestones reached: {milestone} | Bonus: +{Math.min(50, milestone * 10)}% assembly value (max 50%)
         </div>
       )}
+      {totalSegments > 0 && (
+        <div style={{ fontSize: '0.75em', color: '#888', marginTop: '4px' }}>
+          Auto-assembly: {Math.min(10, Math.floor(totalSegments / 10))} segments/min (max 10/min)
+        </div>
+      )}
     </div>
   );
 });

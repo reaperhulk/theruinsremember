@@ -399,6 +399,14 @@ export function tick(state, dt) {
     }
   }
 
+  // Dyson auto-assembly: every 60 ticks (~1 min at 1 tick/s), auto-add segments based on existing count
+  if (newState.era >= 7 && (newState.dysonSegments || 0) > 0 && newState.totalTicks % 60 === 0) {
+    const autoRate = Math.min(10, Math.floor((newState.dysonSegments || 0) / 10));
+    if (autoRate > 0) {
+      newState = { ...newState, dysonSegments: (newState.dysonSegments || 0) + autoRate };
+    }
+  }
+
   // Check achievements (every 60 ticks to reduce overhead)
   if (newState.totalTicks % 60 === 0) {
     const { state: afterAchievements, newAchievements } = checkAchievements(newState);
@@ -408,7 +416,7 @@ export function tick(state, dt) {
         eventLog: [
           ...(afterAchievements.eventLog || []),
           ...newAchievements.map(a => ({
-            message: `Achievement: ${a.name} — ${a.description} (+${a.reward} prestige pts)`,
+            message: `Achievement: ${a.name} — ${a.description}`,
             time: afterAchievements.totalTime,
           })),
         ].slice(-20),
