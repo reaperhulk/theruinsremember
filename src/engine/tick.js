@@ -236,7 +236,7 @@ export function tick(state, dt) {
 
   // Auto-purchase earlier era upgrades when in era 5+
   if (newState.era >= 5 && newState.totalTicks % 60 === 0) {
-    const autoPurchaseEra = Math.max(1, newState.era - 3); // Auto-buy eras 1-2 when in era 5, 1-3 when in era 6, etc.
+    const autoPurchaseEra = Math.max(1, newState.era - 1); // Auto-buy all prior era upgrades
     for (const def of Object.values(upgradeDefs)) {
       if (def.era > autoPurchaseEra) continue;
       if (def.repeatable) continue;

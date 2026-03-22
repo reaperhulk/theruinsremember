@@ -54,12 +54,12 @@ describe('upgrades', () => {
       const state = createInitialState();
       state.era = 3;
       state.upgrades = { tools: true, basicPower: true, foundry: true, assemblyLines: true, computingLab: true, internet: true };
-      state.resources.electronics = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 200 };
-      state.resources.energy = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0.1, cap: 100 };
-      state.resources.steel = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 300 };
-      state.resources.data = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 200 };
-      state.resources.software = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 300 };
-      state.resources.research = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 500 };
+      state.resources.electronics = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 200 };
+      state.resources.energy = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0.1, cap: 100 };
+      state.resources.steel = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 300 };
+      state.resources.data = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 200 };
+      state.resources.software = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 300 };
+      state.resources.research = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 500 };
       return state;
     }
 
@@ -168,9 +168,9 @@ describe('upgrades', () => {
 
     it('applies unlock_resource and production_add effects', () => {
       const state = createInitialState();
-      state.resources.materials.amount = 500;
-      state.resources.energy.amount = 500;
-      state.resources.food.amount = 500;
+      state.resources.materials.amount = 5000;
+      state.resources.energy.amount = 5000;
+      state.resources.food.amount = 5000;
       state.upgrades.basicPower = true;
       state.upgrades.tools = true;
       const after = purchaseUpgrade(state, 'foundry');
@@ -185,11 +185,11 @@ describe('upgrades', () => {
       state.era = 2;
       // Set up prereqs
       state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true, assemblyLines: true, computingLab: true, telephoneNetwork: true, printingPress: true };
-      state.resources.electronics.amount = 100;
+      state.resources.electronics.amount = 100000;
       state.resources.electronics.unlocked = true;
-      state.resources.steel.amount = 100;
+      state.resources.steel.amount = 100000;
       state.resources.steel.unlocked = true;
-      state.resources.research.amount = 100;
+      state.resources.research.amount = 100000;
       state.resources.research.unlocked = true;
       const after = purchaseUpgrade(state, 'automation');
       expect(after).not.toBeNull();
@@ -203,9 +203,9 @@ describe('upgrades', () => {
       const state = createInitialState();
       state.era = 3;
       state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true, assemblyLines: true, computingLab: true };
-      state.resources.electronics.amount = 500;
+      state.resources.electronics.amount = 500000;
       state.resources.electronics.unlocked = true;
-      state.resources.research.amount = 500;
+      state.resources.research.amount = 500000;
       state.resources.research.unlocked = true;
       state.resources.software = { amount: 0, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1 };
 
@@ -277,12 +277,12 @@ describe('upgrades', () => {
       const state = createInitialState();
       state.era = 3;
       state.upgrades = { tools: true, basicPower: true, foundry: true, assemblyLines: true, computingLab: true, internet: true };
-      state.resources.electronics = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 200 };
-      state.resources.energy = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0.1, cap: 100 };
-      state.resources.steel = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 300 };
-      state.resources.data = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 200 };
-      state.resources.software = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 300 };
-      state.resources.research = { amount: 5000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 500 };
+      state.resources.electronics = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 200 };
+      state.resources.energy = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0.1, cap: 100 };
+      state.resources.steel = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 300 };
+      state.resources.data = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 200 };
+      state.resources.software = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 300 };
+      state.resources.research = { amount: 5000000, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1, baseRate: 0, cap: 500 };
       return state;
     }
 

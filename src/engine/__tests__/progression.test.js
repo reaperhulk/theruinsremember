@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { createInitialState } from '../state.js';
 import { tick } from '../tick.js';
-import { purchaseUpgrade } from '../upgrades.js';
-import { unlockTech } from '../tech.js';
+import { purchaseUpgrade, getUpgradeCost } from '../upgrades.js';
+import { unlockTech, getTechCost } from '../tech.js';
 import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 import { techTree } from '../../data/tech-tree.js';
 import { getMinUpgradesForEra } from '../eras.js';
@@ -13,9 +13,12 @@ function giveAndBuy(state, type, id) {
   const def = defs[id];
   if (!def) throw new Error(`Unknown ${type}: ${id}`);
 
+  // Get the actual (era-scaled) cost
+  const cost = type === 'upgrade' ? getUpgradeCost(state, id) : getTechCost(def);
+
   // Give enough resources
   const newRes = { ...state.resources };
-  for (const [resId, amount] of Object.entries(def.cost)) {
+  for (const [resId, amount] of Object.entries(cost)) {
     if (newRes[resId]) {
       newRes[resId] = { ...newRes[resId], amount: newRes[resId].amount + amount + 10, unlocked: true };
     }

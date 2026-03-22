@@ -1,5 +1,6 @@
 import { techTree } from '../data/tech-tree.js';
 import { spend } from './resources.js';
+import { applyEraCostScaling } from './upgrades.js';
 
 // Unlock a tech node. Returns new state or null.
 export function unlockTech(state, techId) {
@@ -16,7 +17,10 @@ export function unlockTech(state, techId) {
   // Check mutual exclusion
   if (def.excludes && state.tech[def.excludes]) return null;
 
-  const afterSpend = spend(state, def.cost);
+  // Apply era-based cost multiplier (only for earlier-era resources)
+  const cost = applyEraCostScaling(def.cost, def.era);
+
+  const afterSpend = spend(state, cost);
   if (!afterSpend) return null;
 
   let newState = {
@@ -51,6 +55,11 @@ export function unlockTech(state, techId) {
   return newState;
 }
 
+// Get the scaled cost for a tech node (with era multiplier applied)
+export function getTechCost(def) {
+  return applyEraCostScaling(def.cost, def.era);
+}
+
 // Get available tech nodes
 export function getAvailableTech(state) {
   return Object.values(techTree).filter(def => {
@@ -61,5 +70,5 @@ export function getAvailableTech(state) {
       if (!state.tech[prereq]) return false;
     }
     return true;
-  });
+  }).map(def => ({ ...def, cost: getTechCost(def) }));
 }

@@ -1,5 +1,30 @@
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
+import { resources as resourceDefs } from '../data/resources.js';
 import { spend } from './resources.js';
+
+// Era-based cost multiplier to keep pace with exponential production growth
+export const ERA_COST_MULTIPLIERS = {
+  1: 1, 2: 70, 3: 150, 4: 500, 5: 2000, 6: 10000, 7: 4000000, 8: 60000000, 9: 40000000, 10: 1000000000000,
+};
+
+// Apply era-based cost scaling per resource:
+// - Earlier-era resources: full multiplier (player has high production)
+// - Same-era resources: square root of multiplier (moderate scaling for new resources)
+export function applyEraCostScaling(baseCost, upgradeEra) {
+  const eraMult = ERA_COST_MULTIPLIERS[upgradeEra] || 1;
+  if (eraMult <= 1) return baseCost;
+  const sameEraMult = Math.ceil(Math.sqrt(eraMult));
+  const scaled = {};
+  for (const [resource, amount] of Object.entries(baseCost)) {
+    const resourceEra = resourceDefs[resource]?.era || 1;
+    if (resourceEra < upgradeEra) {
+      scaled[resource] = Math.ceil(amount * eraMult);
+    } else {
+      scaled[resource] = Math.ceil(amount * sameEraMult);
+    }
+  }
+  return scaled;
+}
 
 // Apply upgrade effects to state
 function applyEffects(state, effects) {
@@ -77,6 +102,9 @@ export function getUpgradeCost(state, upgradeId) {
     }
     baseCost = discounted;
   }
+
+  // Apply era-based cost multiplier (only for earlier-era resources)
+  baseCost = applyEraCostScaling(baseCost, def.era);
 
   if (!def.repeatable) return baseCost;
   const count = typeof state.upgrades[upgradeId] === 'number' ? state.upgrades[upgradeId] : 0;

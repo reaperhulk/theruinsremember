@@ -3250,31 +3250,8 @@ export const upgrades = {
   },
 };
 
-// Balance scaling: multiply upgrade costs by era-dependent factors
-// This accounts for exponential production growth from multiplicative upgrades
-const ERA_COST_SCALE = {
-  1: 1,       // Era 1: base costs are fine (clicking-gated)
-  2: 2,       // Era 2: double costs
-  3: 3,       // Era 3: 3x costs
-  4: 5,       // Era 4: smooth step from 3 (was 8 — too steep a jump)
-  5: 7,       // Era 5: smooth step from 5 (new resources + high base costs)
-  6: 10,      // Era 6: interstellar scale, multipliers from era 5 compensate
-  7: 12,      // Era 7: smooth step from 10 (base costs already high)
-  8: 15,      // Era 8: smooth from 12 (base costs are very large)
-  9: 18,      // Era 9: smooth from 15 (no more drop — was 12, felt trivial after era 8)
-  10: 22,     // Era 10: smooth from 18 (endgame, but base costs are extreme already)
-};
-
-// Apply scaling to all upgrade costs
-for (const upgrade of Object.values(upgrades)) {
-  const scale = ERA_COST_SCALE[upgrade.era] || 1;
-  if (scale === 1) continue;
-  const scaledCost = {};
-  for (const [resource, amount] of Object.entries(upgrade.cost)) {
-    scaledCost[resource] = Math.ceil(amount * scale);
-  }
-  upgrade.cost = scaledCost;
-}
+// Note: era-based cost scaling is now handled in the engine (upgrades.js ERA_COST_MULTIPLIERS)
+// to keep data definitions as clean base values.
 
 export function getUpgradesForEra(era) {
   return Object.values(upgrades).filter(u => u.era <= era);
