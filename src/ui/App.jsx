@@ -163,17 +163,17 @@ export function App() {
 
   // Mini-game definitions with era requirements
   const miniGameDefs = [
-    { id: 'mining', label: 'Mining', era: 1 },
-    { id: 'factory', label: 'Factory', era: 2 },
-    { id: 'hacking', label: 'Hacking', era: 3 },
-    { id: 'docking', label: 'Docking', era: 4 },
-    { id: 'colony', label: 'Colonies', era: 5 },
-    { id: 'starChart', label: 'Star Chart', era: 6 },
-    { id: 'dyson', label: 'Dyson', era: 7 },
-    { id: 'senate', label: 'Senate', era: 8 },
-    { id: 'weaving', label: 'Weaving', era: 8 },
-    { id: 'tuning', label: 'Tuning', era: 9 },
-    { id: 'realityForge', label: 'Forge', era: 10 },
+    { id: 'mining', label: 'Mining', era: 1, desc: 'Click to mine materials and find gems' },
+    { id: 'factory', label: 'Factory', era: 2, desc: 'Assign workers to production lines' },
+    { id: 'hacking', label: 'Hacking', era: 3, desc: 'Memory puzzle for data/software boost' },
+    { id: 'docking', label: 'Docking', era: 4, desc: 'Timing game for fuel and infra' },
+    { id: 'colony', label: 'Colonies', era: 5, desc: 'Manage colony focus for bonuses' },
+    { id: 'starChart', label: 'Star Chart', era: 6, desc: 'Connect systems for passive bonuses' },
+    { id: 'dyson', label: 'Dyson', era: 7, desc: 'Build sphere segments for forge output' },
+    { id: 'senate', label: 'Senate', era: 8, desc: 'Allocate influence to factions' },
+    { id: 'weaving', label: 'Weaving', era: 8, desc: 'Match reality fragments for boosts' },
+    { id: 'tuning', label: 'Tuning', era: 9, desc: 'Match cosmic frequencies for power' },
+    { id: 'realityForge', label: 'Forge', era: 10, desc: 'Craft keys for permanent bonuses' },
   ];
 
   const availableMiniGames = miniGameDefs.filter(g => state.era >= g.era);
@@ -217,6 +217,7 @@ export function App() {
                 onClick={() => setActiveMiniGame(g.id)}
                 style={{ fontSize: '0.7em', padding: '2px 6px', minWidth: 'auto' }}
                 aria-label={`Switch to ${g.label} mini-game`}
+                title={`${g.label}: ${g.desc}`}
               >
                 {g.label}
               </button>

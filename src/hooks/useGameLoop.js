@@ -17,6 +17,7 @@ function migrateState(saved) {
   // Ensure new state fields exist
   if (!migrated.dysonSegments) migrated.dysonSegments = 0;
   if (!migrated.tuningScore) migrated.tuningScore = 0;
+  if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
   migrated.saveVersion = fresh.saveVersion;
   return migrated;
 }
