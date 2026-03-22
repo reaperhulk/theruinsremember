@@ -270,4 +270,25 @@ describe('tick', () => {
     const after = tick(state, 1);
     expect(after.resources.energy.amount).toBe(0);
   });
+
+  it('initial state includes new mini-game fields', () => {
+    const state = createInitialState();
+    expect(state.dysonSegments).toBe(0);
+    expect(state.tuningScore).toBe(0);
+    expect(state.senate).toBeDefined();
+    expect(state.senate.merchants).toBe(0);
+    expect(state.senate.scholars).toBe(0);
+    expect(state.senate.warriors).toBe(0);
+    expect(state.realityKeys).toBeDefined();
+    expect(Object.keys(state.realityKeys).length).toBe(0);
+  });
+
+  it('reality key bonus at 1% per key affects production', () => {
+    const state = createInitialState();
+    state.realityKeys = { temporal: 10, spatial: 10 }; // 20 keys = +20%
+    const baseTick = tick(createInitialState(), 1);
+    const bonusTick = tick(state, 1);
+    // Food: 1.5 * 1.20 = 1.8
+    expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount * 1.20, 1);
+  });
 });

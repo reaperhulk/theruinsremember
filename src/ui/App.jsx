@@ -52,6 +52,7 @@ function getAvailableTabs(era) {
 export function App() {
   const { state, updateState, resetSave, offlineReport, dismissOfflineReport } = useGameLoop(initialState);
   const [activeTab, setActiveTab] = useState('upgrades');
+  const [activeMiniGame, setActiveMiniGame] = useState('mining');
   const [shakeClass, setShakeClass] = useState('');
   const [flashClass, setFlashClass] = useState('');
   const [hintsDismissed, setHintsDismissed] = useState(false);
@@ -159,21 +160,67 @@ export function App() {
   const affordableTech = getAvailableTech(state).filter(t => canAfford(state, t.cost)).length;
   const activeEffectCount = (state.activeEffects || []).length;
 
-  // Get the active mini-game panel based on era
+  // Mini-game definitions with era requirements
+  const miniGameDefs = [
+    { id: 'mining', label: 'Mining', era: 1 },
+    { id: 'factory', label: 'Factory', era: 2 },
+    { id: 'hacking', label: 'Hacking', era: 3 },
+    { id: 'docking', label: 'Docking', era: 4 },
+    { id: 'colony', label: 'Colonies', era: 5 },
+    { id: 'starChart', label: 'Star Chart', era: 6 },
+    { id: 'dyson', label: 'Dyson', era: 7 },
+    { id: 'senate', label: 'Senate', era: 8 },
+    { id: 'weaving', label: 'Weaving', era: 8 },
+    { id: 'tuning', label: 'Tuning', era: 9 },
+    { id: 'realityForge', label: 'Forge', era: 10 },
+  ];
+
+  const availableMiniGames = miniGameDefs.filter(g => state.era >= g.era);
+
+  // Auto-select newest mini-game when a new era unlocks one
+  useEffect(() => {
+    const available = miniGameDefs.filter(g => state.era >= g.era);
+    if (available.length > 0 && !available.find(g => g.id === activeMiniGame)) {
+      setActiveMiniGame(available[available.length - 1].id);
+    }
+  }, [state.era]);
+
+  // Render the selected mini-game panel
   const getMiniGamePanel = () => {
-    const panels = [];
-    panels.push(<MiningPanel key="mining" state={state} onUpdate={updateState} />);
-    if (state.era >= 2) panels.push(<FactoryPanel key="factory" state={state} onUpdate={updateState} />);
-    if (state.era >= 3) panels.push(<HackingPanel key="hacking" state={state} onUpdate={updateState} />);
-    if (state.era >= 4) panels.push(<DockingPanel key="docking" state={state} onUpdate={updateState} />);
-    if (state.era >= 5) panels.push(<ColonyPanel key="colony" state={state} onUpdate={updateState} />);
-    if (state.era >= 6) panels.push(<StarChartPanel key="starChart" state={state} onUpdate={updateState} />);
-    if (state.era >= 7) panels.push(<DysonPanel key="dyson" state={state} onUpdate={updateState} />);
-    if (state.era >= 8) panels.push(<SenatePanel key="senate" state={state} onUpdate={updateState} />);
-    if (state.era >= 8) panels.push(<WeavingPanel key="weaving" state={state} onUpdate={updateState} />);
-    if (state.era >= 9) panels.push(<TuningPanel key="tuning" state={state} onUpdate={updateState} />);
-    if (state.era >= 10) panels.push(<RealityForgePanel key="realityForge" state={state} onUpdate={updateState} />);
-    return panels;
+    const miniGameComponents = {
+      mining: <MiningPanel key="mining" state={state} onUpdate={updateState} />,
+      factory: <FactoryPanel key="factory" state={state} onUpdate={updateState} />,
+      hacking: <HackingPanel key="hacking" state={state} onUpdate={updateState} />,
+      docking: <DockingPanel key="docking" state={state} onUpdate={updateState} />,
+      colony: <ColonyPanel key="colony" state={state} onUpdate={updateState} />,
+      starChart: <StarChartPanel key="starChart" state={state} onUpdate={updateState} />,
+      dyson: <DysonPanel key="dyson" state={state} onUpdate={updateState} />,
+      senate: <SenatePanel key="senate" state={state} onUpdate={updateState} />,
+      weaving: <WeavingPanel key="weaving" state={state} onUpdate={updateState} />,
+      tuning: <TuningPanel key="tuning" state={state} onUpdate={updateState} />,
+      realityForge: <RealityForgePanel key="realityForge" state={state} onUpdate={updateState} />,
+    };
+
+    return (
+      <>
+        {availableMiniGames.length > 1 && (
+          <div className="mini-game-tabs" style={{ display: 'flex', flexWrap: 'wrap', gap: '2px', marginBottom: '6px' }}>
+            {availableMiniGames.map(g => (
+              <button
+                key={g.id}
+                className={`tab-btn ${activeMiniGame === g.id ? 'active' : ''}`}
+                onClick={() => setActiveMiniGame(g.id)}
+                style={{ fontSize: '0.7em', padding: '2px 6px', minWidth: 'auto' }}
+                aria-label={`Switch to ${g.label} mini-game`}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {miniGameComponents[activeMiniGame] || miniGameComponents.mining}
+      </>
+    );
   };
 
   return (

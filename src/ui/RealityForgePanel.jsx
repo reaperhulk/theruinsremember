@@ -3,17 +3,17 @@ import { formatNumber } from './format.js';
 import { playClick, playUpgrade } from './AudioManager.js';
 
 const RECIPES = [
-  { id: 'temporal', label: 'Temporal Key', fragments: 50, echoes: 20, color: '#ff8866', desc: '+2% all production' },
-  { id: 'spatial', label: 'Spatial Key', fragments: 30, echoes: 40, color: '#66aaff', desc: '+2% all production' },
-  { id: 'causal', label: 'Causal Key', fragments: 40, echoes: 30, color: '#88dd88', desc: '+2% all production' },
-  { id: 'quantum', label: 'Quantum Key', fragments: 20, echoes: 50, color: '#dd88ff', desc: '+2% all production' },
+  { id: 'temporal', label: 'Temporal Key', fragments: 50, echoes: 20, color: '#ff8866', desc: '+1% all production' },
+  { id: 'spatial', label: 'Spatial Key', fragments: 30, echoes: 40, color: '#66aaff', desc: '+1% all production' },
+  { id: 'causal', label: 'Causal Key', fragments: 40, echoes: 30, color: '#88dd88', desc: '+1% all production' },
+  { id: 'quantum', label: 'Quantum Key', fragments: 20, echoes: 50, color: '#dd88ff', desc: '+1% all production' },
 ];
 
 export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpdate }) {
   const [lastForged, setLastForged] = useState(null);
   const keys = state.realityKeys || {};
   const totalKeys = Object.values(keys).reduce((s, v) => s + v, 0);
-  const bonus = totalKeys * 2;
+  const bonus = totalKeys * 1;
 
   const handleForge = (recipe) => {
     playClick();
@@ -56,11 +56,11 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
       </p>
       {lastForged && (
         <div className="hack-result success" style={{ marginBottom: '4px' }}>
-          Forged {lastForged}! +2% all production permanently!
+          Forged {lastForged}! +1% all production permanently!
         </div>
       )}
       <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '6px' }}>
-        Each key grants a permanent +2% to all production. Keys persist through prestige.
+        Each key grants a permanent +1% to all production. Keys persist through prestige.
       </div>
       <div className="factory-lines">
         {RECIPES.map(recipe => {
@@ -97,7 +97,7 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
         </div>
       )}
       <p className="mining-hint">
-        Forge reality keys from fragments + echoes | Each key = permanent +2% all production | Keys survive prestige
+        Forge reality keys from fragments + echoes | Each key = permanent +1% all production | Keys survive prestige
       </p>
     </div>
   );

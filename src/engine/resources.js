@@ -6,7 +6,7 @@ export function getEffectiveRate(state, resourceId) {
   if (!r || !r.unlocked) return 0;
   const def = resourceDefs[resourceId];
   if (!def) return 0;
-  const realityKeyBonus = 1 + (Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0) * 0.02);
+  const realityKeyBonus = 1 + (Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0) * 0.01);
   return (def.baseRate + r.rateAdd) * r.rateMult * state.prestigeMultiplier * realityKeyBonus;
 }
 

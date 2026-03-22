@@ -179,20 +179,18 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                           return <><span className="rate-active" />+{formatNumber(r.rate)}/s</>;
                         })() : ''}
                       </span>
-                      {r.rate <= 0 && (
-                        <span className="resource-gather" style={{ position: 'relative' }}>
-                          <button
-                            className="gather-btn"
-                            onClick={() => handleGather(r.id, r.rateMult > 1 ? r.rateMult : 1)}
-                            aria-label={`Gather ${r.def?.name || r.id}. +${r.rateMult > 1 ? formatNumber(r.rateMult) : '1'}`}
-                          >
-                            +{r.rateMult > 1 ? formatNumber(r.rateMult) : '1'}
-                          </button>
-                          {floats.filter(f => f.resourceId === r.id).map(f => (
-                            <span key={f.id} className="gather-float">{f.text}</span>
-                          ))}
-                        </span>
-                      )}
+                      <span className="resource-gather" style={{ position: 'relative', opacity: r.rate > 0 ? 0.3 : 1 }}>
+                        <button
+                          className="gather-btn"
+                          onClick={() => handleGather(r.id, r.rateMult > 1 ? r.rateMult : 1)}
+                          aria-label={`Gather ${r.def?.name || r.id}. +${r.rateMult > 1 ? formatNumber(r.rateMult) : '1'}`}
+                        >
+                          +{r.rateMult > 1 ? formatNumber(r.rateMult) : '1'}
+                        </button>
+                        {floats.filter(f => f.resourceId === r.id).map(f => (
+                          <span key={f.id} className="gather-float">{f.text}</span>
+                        ))}
+                      </span>
                     </div>
                     {expandedResource === r.id && (() => {
                       const baseRate = r.def?.baseRate || 0;

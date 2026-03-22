@@ -19,6 +19,8 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
   const majority = FACTIONS.find(f => senate[f.id] === maxCount && maxCount > 0);
   const hasMajority = majority && FACTIONS.filter(f => senate[f.id] === maxCount).length === 1;
 
+  const ALLOCATE_COST = 5; // galacticInfluence spent per allocation click
+
   const handleAllocate = (factionId, delta) => {
     playClick();
     onUpdate(s => {
@@ -30,8 +32,15 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
       const max = Math.max(3, Math.floor((s.resources.galacticInfluence?.amount || 0) / 50) + 3);
       if (newTotal > max) return null;
 
-      // Apply resource bonuses based on allocation
+      // Spend galacticInfluence on each allocation (adding costs, removing is free)
       const resources = { ...s.resources };
+      if (delta > 0) {
+        const gi = resources.galacticInfluence;
+        if (!gi || gi.amount < ALLOCATE_COST) return null;
+        resources.galacticInfluence = { ...gi, amount: gi.amount - ALLOCATE_COST };
+      }
+
+      // Apply resource bonuses based on allocation
       for (const f of FACTIONS) {
         const count = newSenate[f.id] || 0;
         if (count > 0 && resources[f.resource]?.unlocked) {
@@ -77,9 +86,9 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
                   aria-label={`Remove influence from ${faction.label}`}
                 >-</button>
                 <button
-                  disabled={available <= 0}
+                  disabled={available <= 0 || (state.resources.galacticInfluence?.amount || 0) < ALLOCATE_COST}
                   onClick={() => handleAllocate(faction.id, 1)}
-                  aria-label={`Add influence to ${faction.label}`}
+                  aria-label={`Add influence to ${faction.label} (costs ${ALLOCATE_COST} GI)`}
                 >+</button>
               </div>
             </div>
@@ -88,11 +97,11 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
       </div>
       {totalInfluence > 0 && (
         <div style={{ fontSize: '0.75em', color: '#888', marginTop: '4px' }}>
-          Allocating influence grants resources per click. Majority faction gets x2 bonus.
+          Allocating influence costs {ALLOCATE_COST} Galactic Influence per click. Majority faction gets x2 bonus.
         </div>
       )}
       <p className="mining-hint">
-        Allocate influence to factions | Majority faction gets x2 | Max influence scales with Galactic Influence resource
+        Allocate influence to factions (costs {ALLOCATE_COST} GI each) | Majority faction gets x2 | Max slots scale with GI
       </p>
     </div>
   );
