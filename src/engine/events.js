@@ -145,10 +145,21 @@ export function getTimedRateMultiplier(state, resourceId) {
   const activeEffects = state.activeEffects || [];
   let mult = 1;
   for (const ae of activeEffects) {
-    // Support 'all' target that multiplies every resource
-    const matches = ae.effect.resourceId === resourceId || ae.effect.resourceId === 'all';
-    if (matches && ae.effect.rateMultBonus) {
-      mult *= ae.effect.rateMultBonus;
+    // Support singular .effect format (events, docking)
+    if (ae.effect) {
+      const matches = ae.effect.resourceId === resourceId || ae.effect.resourceId === 'all';
+      if (matches && ae.effect.rateMultBonus) {
+        mult *= ae.effect.rateMultBonus;
+      }
+    }
+    // Support plural .effects array format (hacking)
+    if (ae.effects) {
+      for (const eff of ae.effects) {
+        const matches = eff.resourceId === resourceId || eff.resourceId === 'all';
+        if (matches && eff.rateMultBonus) {
+          mult *= eff.rateMultBonus;
+        }
+      }
     }
   }
   mult = Math.max(0.25, mult);
