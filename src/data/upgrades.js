@@ -529,8 +529,8 @@ export const upgrades = {
   // Era 6: Interstellar
   warpDrive: {
     id: 'warpDrive', name: 'Warp Drive', era: 6,
-    cost: { exoticMaterials: 200, research: 400, colonies: 15, steel: 1000 },
-    effects: [{ type: 'production_add', target: 'starSystems', value: 0.3 }, { type: 'production_add', target: 'darkEnergy', value: 0.2 }, { type: 'cap_mult', target: 'starSystems', value: 3 }],
+    cost: { starSystems: 2, darkEnergy: 3, research: 200, steel: 500 },
+    effects: [{ type: 'production_add', target: 'starSystems', value: 0.5 }, { type: 'production_add', target: 'darkEnergy', value: 0.3 }, { type: 'production_mult', target: 'starSystems', value: 3 }, { type: 'cap_mult', target: 'starSystems', value: 3 }],
     description: 'Warp equations scratched into the oldest ruin. They knew where you would go',
     prerequisites: ['fusionPower'],
   },

@@ -747,7 +747,7 @@ function runScenario(opts) {
     state = botPrestigeUpgrades(state, profileDef, t, rng);
 
     // Tick the engine
-    state = tick(state, DT);
+    state = tick(state, DT, rng);
 
     // Track era transitions
     if (state.era !== lastEra) {

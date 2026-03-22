@@ -30,8 +30,9 @@ function applyProductionBonus(state, fraction, dt) {
   return updated;
 }
 
-// Core game loop: advance state by dt seconds
-export function tick(state, dt) {
+// Core game loop: advance state by dt seconds.
+// Optional rng parameter for deterministic bot/testing runs.
+export function tick(state, dt, rng = Math.random) {
   const rates = calculateProduction(state);
 
   // Add mini-game bonuses to production rates
@@ -168,7 +169,7 @@ export function tick(state, dt) {
   newState = checkComboReset(newState);
 
   // Random events (Era 3+)
-  const { state: afterEvent, event } = checkForEvent(newState, dt);
+  const { state: afterEvent, event } = checkForEvent(newState, dt, rng());
   if (event) {
     // Skip lore events already seen this run
     if (event.isLore && afterEvent.seenLoreEvents?.[event.id]) {
@@ -195,7 +196,7 @@ export function tick(state, dt) {
   if (newState.prestigeUpgrades && newState.prestigeUpgrades.autoClicker) {
     const autoMineTimer = (newState.autoMineTimer || 0) + dt;
     if (autoMineTimer >= 1) {
-      const { state: minedState, foundGem } = mine(newState, Math.random(), { skipCooldown: true });
+      const { state: minedState, foundGem } = mine(newState, rng(), { skipCooldown: true });
       newState = {
         ...minedState,
         autoMineTimer: autoMineTimer - 1,

@@ -25,9 +25,9 @@ export const resources = {
   colonies: { id: 'colonies', name: 'Colonies', era: 5, baseCap: 2000, baseRate: 0.05, description: 'Off-world settlements' },
   exoticMaterials: { id: 'exoticMaterials', name: 'Exotic Materials', era: 5, baseCap: 3000, baseRate: 0.08, description: 'Rare space resources' },
 
-  // Era 6: Interstellar
-  starSystems: { id: 'starSystems', name: 'Star Systems', era: 6, baseCap: 5000, baseRate: 0.05, description: 'Colonized star systems' },
-  darkEnergy: { id: 'darkEnergy', name: 'Dark Energy', era: 6, baseCap: 5000, baseRate: 0.08, description: 'Mysterious cosmic force' },
+  // Era 6: Interstellar — higher base rates for passive/noMinigames bootstrapping
+  starSystems: { id: 'starSystems', name: 'Star Systems', era: 6, baseCap: 5000, baseRate: 0.2, description: 'Colonized star systems' },
+  darkEnergy: { id: 'darkEnergy', name: 'Dark Energy', era: 6, baseCap: 5000, baseRate: 0.3, description: 'Mysterious cosmic force' },
 
   // Era 7: Dyson Era
   megastructures: { id: 'megastructures', name: 'Megastructures', era: 7, baseCap: 2000, baseRate: 0.03, description: 'Massive stellar-scale constructions' },
