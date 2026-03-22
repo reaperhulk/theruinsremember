@@ -658,6 +658,8 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'energy', value: 18 },
       { type: 'production_add', target: 'darkEnergy', value: 1 },
+      { type: 'cap_mult', target: 'megastructures', value: 2 },
+      { type: 'cap_mult', target: 'stellarForge', value: 2 },
     ],
     description: 'Push a star across the void — gravitational scars from previous passages mark the path',
     prerequisites: ['dysonSphere', 'nicollDysonBeam'],
@@ -738,6 +740,8 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'research', value: 16 },
       { type: 'production_add', target: 'data', value: 60 },
+      { type: 'cap_mult', target: 'galacticInfluence', value: 2 },
+      { type: 'cap_mult', target: 'exoticMatter', value: 2 },
     ],
     description: 'Particles vibrate to parallel timelines. Each warning was sent by you',
     prerequisites: ['darkMatterHarvest', 'quantumFabric'],
@@ -832,7 +836,11 @@ export const upgrades = {
   dimensionalAnchors: {
     id: 'dimensionalAnchors', name: 'Dimensional Anchors', era: 10,
     cost: { realityFragments: 100, exoticMatter: 150, darkEnergy: 200 },
-    effects: [{ type: 'production_add', target: 'quantumEchoes', value: 1 }],
+    effects: [
+      { type: 'production_add', target: 'quantumEchoes', value: 1 },
+      { type: 'cap_mult', target: 'realityFragments', value: 3 },
+      { type: 'cap_mult', target: 'quantumEchoes', value: 3 },
+    ],
     description: 'Anchors lock with a click of recognition. Parallel universes reach back toward you',
     prerequisites: ['realityWeaving'],
   },
@@ -999,6 +1007,8 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'exoticMatter', value: 150 },
       { type: 'production_add', target: 'darkEnergy', value: 150 },
+      { type: 'production_mult', target: 'realityFragments', value: 3 },
+      { type: 'production_mult', target: 'quantumEchoes', value: 3 },
     ],
     description: 'At the center of every reality sits the same singularity — a wound in spacetime that never heals because we keep reopening it',
     prerequisites: ['omniscienceEngine', 'infinityWell'],
@@ -1106,6 +1116,8 @@ export const upgrades = {
     effects: [
       { type: 'production_add', target: 'universalConstants', value: 0.5 },
       { type: 'production_add', target: 'exoticMatter', value: 12 },
+      { type: 'cap_mult', target: 'cosmicPower', value: 2 },
+      { type: 'cap_mult', target: 'universalConstants', value: 2 },
     ],
     description: 'Entropy is not random — it follows a script written by every previous iteration, optimized for your arrival',
     prerequisites: ['entropyReversal'],
