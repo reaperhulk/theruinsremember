@@ -219,7 +219,10 @@ const SCENARIOS = {
 
 function botMine(state, profile, t, rng) {
   if (!profile.mine) return state;
-  const { state: afterMine } = mine(state, rng(), { skipCooldown: true });
+  const { state: afterMine, foundGem } = mine(state, rng(), { skipCooldown: true });
+  if (foundGem) {
+    return { ...afterMine, totalGems: (afterMine.totalGems || 0) + 1 };
+  }
   return afterMine;
 }
 
