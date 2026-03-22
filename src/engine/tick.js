@@ -7,6 +7,8 @@ import { getRouteBonus } from './starChart.js';
 import { mine } from './mining.js';
 import { checkAchievements } from './achievements.js';
 import { checkComboReset } from './weaving.js';
+import { purchaseUpgrade, getUpgradeCost } from './upgrades.js';
+import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 // Resource consumption rates — moderate tension without breaking non-minigame paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
@@ -233,6 +235,24 @@ export function tick(state, dt, rng = Math.random) {
     };
   }
 
+
+  // Auto-purchase earlier era upgrades when in era 3+.
+  // Critical for game balance: cross-era costs grow faster than caps,
+  // so upgrades MUST be bought while costs are still affordable.
+  if (newState.era >= 3 && newState.totalTicks % 30 === 0) {
+    const autoPurchaseEra = Math.max(1, newState.era - 1);
+    for (const def of Object.values(upgradeDefs)) {
+      if (def.era > autoPurchaseEra) continue;
+      if (def.repeatable) continue;
+      if (newState.upgrades[def.id]) continue;
+      if (def.prerequisites.some(p => !newState.upgrades[p])) continue;
+      const result = purchaseUpgrade(newState, def.id);
+      if (result) {
+        newState = result;
+        break; // One per tick to avoid lag
+      }
+    }
+  }
 
   // Auto-gather (prestige milestone: 3+ prestiges)
   if (newState.autoGather && newState.totalTicks % 20 === 0) {
