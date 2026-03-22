@@ -4,6 +4,7 @@ import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber } from './format.js';
+import { playUpgrade } from './AudioManager.js';
 
 function resourceName(id) {
   return resourceDefs[id]?.name || id;
@@ -63,6 +64,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
   const unlocked = Object.keys(state.tech || {});
 
   const handleUnlock = useCallback((techId) => {
+    playUpgrade();
     setFlashId(techId);
     onUpdate(s => unlockTech(s, techId));
     const tech = techTree[techId];

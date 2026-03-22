@@ -6,6 +6,7 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 import { formatNumber } from './format.js';
 import { LORE_UPGRADE_IDS } from '../data/lore.js';
+import { playUpgrade } from './AudioManager.js';
 
 const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 
@@ -117,6 +118,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const [newUpgradeIds, setNewUpgradeIds] = useState(new Set());
 
   const handlePurchase = useCallback((upgradeId) => {
+    playUpgrade();
     setFlashId(upgradeId);
     onUpdate(s => {
       const result = purchaseUpgrade(s, upgradeId);
@@ -273,16 +275,18 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         {filteredAvailable.length === 0 && upcoming.length > 0 && (
           <p className="empty-message">Buy prerequisites to unlock {upcoming.length} upcoming upgrade{upcoming.length > 1 ? 's' : ''}</p>
         )}
-        {filteredAvailable.map(upgrade => {
+        {(() => { let firstAffordableFound = false; return filteredAvailable.map(upgrade => {
           const cost = getUpgradeCost(state, upgrade.id);
           const affordable = canAfford(state, cost);
           const count = typeof state.upgrades[upgrade.id] === 'number' ? state.upgrades[upgrade.id] : 0;
           const progress = affordable ? 1 : getAffordProgress(state, cost);
           const isMechanic = !!upgrade.mechanic;
+          const isFirstHighlight = affordable && !firstAffordableFound && Object.keys(state.upgrades).length === 0;
+          if (affordable && !firstAffordableFound) firstAffordableFound = true;
           return (
             <div key={upgrade.id} className="upgrade-row">
             <button
-              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''} ${LORE_UPGRADE_ID_SET.has(upgrade.id) ? 'lore-upgrade' : ''} ${isMechanic ? 'mechanic-upgrade' : ''} ${newUpgradeIds.has(upgrade.id) ? 'new-upgrade' : ''}`}
+              className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === upgrade.id ? 'purchase-flash' : ''} ${LORE_UPGRADE_ID_SET.has(upgrade.id) ? 'lore-upgrade' : ''} ${isMechanic ? 'mechanic-upgrade' : ''} ${newUpgradeIds.has(upgrade.id) ? 'new-upgrade' : ''} ${isFirstHighlight ? 'first-upgrade-highlight' : ''}`}
               disabled={!affordable}
               onClick={() => handlePurchase(upgrade.id)}
               title={`${upgrade.description}\nEffects: ${formatEffects(upgrade.effects)}`}
@@ -342,7 +346,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
             )}
             </div>
           );
-        })}
+        }); })()}
       </div>
       {upcoming.length > 0 && (
         <div className="upcoming-section">

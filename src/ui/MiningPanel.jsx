@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { mine, getGemChance } from '../engine/mining.js';
 import { formatNumber } from './format.js';
+import { playClick } from './AudioManager.js';
 
 export function MiningPanel({ state, onUpdate }) {
   const [lastMined, setLastMined] = useState(null);
@@ -12,6 +13,7 @@ export function MiningPanel({ state, onUpdate }) {
   const autoMine = state.prestigeUpgrades?.autoClicker;
 
   const handleMine = () => {
+    playClick();
     const beforeMats = state.resources.materials?.amount || 0;
     onUpdate(s => {
       const { state: newState, foundGem } = mine(s);

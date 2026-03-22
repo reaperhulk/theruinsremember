@@ -15,7 +15,10 @@ import { DockingPanel } from './DockingPanel.jsx';
 import { ColonyPanel } from './ColonyPanel.jsx';
 import { StarChartPanel } from './StarChartPanel.jsx';
 import { WeavingPanel } from './WeavingPanel.jsx';
+import { DysonPanel } from './DysonPanel.jsx';
+import { TuningPanel } from './TuningPanel.jsx';
 import { TradingPanel } from './TradingPanel.jsx';
+import { setMuted, isMuted } from './AudioManager.js';
 import { StatsPanel } from './StatsPanel.jsx';
 import { PrestigePanel } from './PrestigePanel.jsx';
 import { EraTransition } from './EraTransition.jsx';
@@ -49,8 +52,15 @@ export function App() {
   const [shakeClass, setShakeClass] = useState('');
   const [flashClass, setFlashClass] = useState('');
   const [hintsDismissed, setHintsDismissed] = useState(false);
+  const [audioMuted, setAudioMuted] = useState(() => localStorage.getItem('audioMuted') === 'true');
   const prevEventsRef = useRef(state.eventLog?.length || 0);
   const prevPerfectsRef = useRef(state.dockingPerfects || 0);
+
+  // Sync audio muted state
+  useEffect(() => {
+    setMuted(audioMuted);
+    localStorage.setItem('audioMuted', audioMuted);
+  }, [audioMuted]);
 
   // Screen shake on perfect dock
   useEffect(() => {
@@ -154,7 +164,9 @@ export function App() {
     if (state.era >= 4) panels.push(<DockingPanel key="docking" state={state} onUpdate={updateState} />);
     if (state.era >= 5) panels.push(<ColonyPanel key="colony" state={state} onUpdate={updateState} />);
     if (state.era >= 6) panels.push(<StarChartPanel key="starChart" state={state} onUpdate={updateState} />);
+    if (state.era >= 7) panels.push(<DysonPanel key="dyson" state={state} onUpdate={updateState} />);
     if (state.era >= 8) panels.push(<WeavingPanel key="weaving" state={state} onUpdate={updateState} />);
+    if (state.era >= 9) panels.push(<TuningPanel key="tuning" state={state} onUpdate={updateState} />);
     return panels;
   };
 
@@ -168,6 +180,9 @@ export function App() {
               Prestige (x{prestigeBonus.toFixed(1)} bonus)
             </button>
           )}
+          <button className="reset-btn" aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'} onClick={() => setAudioMuted(m => !m)} title={audioMuted ? 'Sound OFF' : 'Sound ON'}>
+            {audioMuted ? 'Sound OFF' : 'Sound ON'}
+          </button>
           <button className="reset-btn" aria-label="Export save file" onClick={() => {
             const save = localStorage.getItem('incremental-game-save');
             if (save) {
@@ -248,7 +263,7 @@ export function App() {
               return (
                 <button
                   key={tab.id}
-                  className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+                  className={`tab-btn ${activeTab === tab.id ? 'active' : ''} ${tab.id === 'mini' && state.totalGems === 0 && state.era >= 1 && (state.totalTime || 0) < 120 ? 'mini-game-pulse' : ''}`}
                   onClick={() => setActiveTab(tab.id)}
                   title={`Press ${tab.key}`}
                   role="tab"

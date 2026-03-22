@@ -2,6 +2,7 @@ import { useRef, useEffect, useCallback } from 'react';
 import { mine } from '../engine/mining.js';
 import { gather, getEffectiveCap, getEffectiveRate } from '../engine/resources.js';
 import { countEraUpgrades, getMinUpgradesForEra } from '../engine/eras.js';
+import { playClick } from './AudioManager.js';
 
 // --- Shared Helpers ---
 
@@ -592,16 +593,29 @@ function drawEra4(ctx, w, h, t, state) {
 
   const cx = w * 0.5, cy = h * 0.5;
 
-  // Sun with glow
-  drawGlowCircle(ctx, cx, cy, 10, 'rgba(255,200,50,0.6)', 30);
-  const sunGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 12);
-  sunGrad.addColorStop(0, '#fff8e0');
-  sunGrad.addColorStop(0.5, '#FFD700');
-  sunGrad.addColorStop(1, '#ff8800');
+  // Sun with prominent glow and corona
+  drawGlowCircle(ctx, cx, cy, 14, 'rgba(255,200,50,0.7)', 45);
+  drawGlowCircle(ctx, cx, cy, 10, 'rgba(255,180,30,0.4)', 60);
+  const sunGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 14);
+  sunGrad.addColorStop(0, '#fffef0');
+  sunGrad.addColorStop(0.3, '#FFD700');
+  sunGrad.addColorStop(0.7, '#ff9900');
+  sunGrad.addColorStop(1, '#ff6600');
   ctx.fillStyle = sunGrad;
   ctx.beginPath();
-  ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+  ctx.arc(cx, cy, 14, 0, Math.PI * 2);
   ctx.fill();
+  // Solar flares
+  for (let f = 0; f < 4; f++) {
+    const flareAngle = t * 0.3 + f * Math.PI * 0.5;
+    const flareLen = 6 + 4 * Math.sin(t * 2 + f * 1.5);
+    const fx = cx + Math.cos(flareAngle) * (14 + flareLen * 0.5);
+    const fy = cy + Math.sin(flareAngle) * (14 + flareLen * 0.5);
+    ctx.fillStyle = `rgba(255, 200, 50, ${0.15 + 0.1 * Math.sin(t * 3 + f)})`;
+    ctx.beginPath();
+    ctx.arc(fx, fy, flareLen * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   // Planets with orbit trails — speed scales with player progress
   const prodScale = state ? Math.min(2, 1 + Object.keys(state.upgrades || {}).length * 0.01) : 1;
@@ -861,6 +875,23 @@ function drawEra5(ctx, w, h, t, state) {
 function drawEra6(ctx, w, h, t, state) {
   ctx.fillStyle = '#020008';
   ctx.fillRect(0, 0, w, h);
+
+  // Nebula clouds in background — distinct purple/blue haze
+  const nebRng = seededRandom(611);
+  for (let i = 0; i < 5; i++) {
+    const nx = nebRng() * w;
+    const ny = nebRng() * h;
+    const nr = 30 + nebRng() * 50;
+    const hue = 240 + nebRng() * 60;
+    const nebGrad = ctx.createRadialGradient(nx, ny, 0, nx, ny, nr);
+    nebGrad.addColorStop(0, `hsla(${hue},60%,25%,${0.06 + 0.03 * Math.sin(t * 0.3 + i)})`);
+    nebGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = nebGrad;
+    ctx.beginPath();
+    ctx.arc(nx, ny, nr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   drawStarField(ctx, w, h, 40, 600, t);
 
   const cx = w * 0.5, cy = h * 0.5;
@@ -1259,6 +1290,19 @@ function drawIntergalactic(ctx, w, h, t, state) {
   ctx.beginPath();
   ctx.arc(cx, cy, 25, 0, Math.PI * 2);
   ctx.fill();
+
+  // Expanding cosmic ripples — rings emanating from void
+  for (let r = 0; r < 3; r++) {
+    const rippleR = ((t * 8 + r * 40) % 120);
+    const rippleAlpha = Math.max(0, 0.15 - rippleR / 800);
+    if (rippleAlpha > 0) {
+      ctx.strokeStyle = `rgba(150,100,255,${rippleAlpha})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rippleR, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
 }
 
 // --- Era 10: Multiverse ---
@@ -1894,6 +1938,7 @@ export function GameCanvas({ state, onUpdate }) {
       const dy = cy - orb.y;
       if (dx * dx + dy * dy <= 15 * 15) {
         // Hit the bonus orb!
+        playClick();
         spawnParticles(particlesRef.current, orb.x, orb.y, 20, 'rgba(255,221,68,1)', 80);
 
         if (orb.type === 'burst') {
@@ -1951,6 +1996,7 @@ export function GameCanvas({ state, onUpdate }) {
       const rdy = cy - ruin.y;
       if (rdx * rdx + rdy * rdy <= 16 * 16) {
         ruin.discovered = true;
+        playClick();
         spawnParticles(particlesRef.current, ruin.x, ruin.y, 15, 'rgba(200,170,100,1)', 60);
         const loreText = ruinLore[Math.floor(Math.random() * ruinLore.length)];
         floatingTextsRef.current.push({ x: ruin.x, y: ruin.y, label: 'Ancient Ruins!', startTime: performance.now() });
@@ -1986,6 +2032,7 @@ export function GameCanvas({ state, onUpdate }) {
       const ddx = cx - dep.x;
       const ddy = cy - dep.y;
       if (ddx * ddx + ddy * ddy <= 14 * 14) {
+        playClick();
         spawnParticles(particlesRef.current, dep.x, dep.y, 12, dep.color || 'rgba(255,255,255,1)', 50);
         const resLabel = dep.resourceId.replace(/([A-Z])/g, ' $1').trim();
         floatingTextsRef.current.push({ x: dep.x, y: dep.y, label: `+${Math.floor(dep.amount)} ${resLabel}`, startTime: performance.now() });

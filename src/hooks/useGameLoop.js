@@ -14,7 +14,10 @@ function migrateState(saved) {
       migrated.resources[id] = { ...freshR, ...migrated.resources[id] };
     }
   }
-  migrated.saveVersion = 2;
+  // Ensure new state fields exist
+  if (!migrated.dysonSegments) migrated.dysonSegments = 0;
+  if (!migrated.tuningScore) migrated.tuningScore = 0;
+  migrated.saveVersion = fresh.saveVersion;
   return migrated;
 }
 

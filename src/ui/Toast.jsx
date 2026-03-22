@@ -13,10 +13,18 @@ export function Toast({ state }) {
   const prevEventsRef = useRef(state.eventLog?.length || 0);
   const milestonesHitRef = useRef({});
   const capWarningsRef = useRef({});
+  const prevUpgradeCountRef = useRef(Object.keys(state.upgrades || {}).length);
   const idRef = useRef(0);
 
   useEffect(() => {
     const newToasts = [];
+
+    // First upgrade congratulation
+    const upgradeCount = Object.keys(state.upgrades || {}).length;
+    if (upgradeCount === 1 && prevUpgradeCountRef.current === 0) {
+      newToasts.push({ id: ++idRef.current, text: 'First upgrade! Production doubled.', type: 'milestone' });
+    }
+    prevUpgradeCountRef.current = upgradeCount;
 
     // Era transition
     if (state.era > prevEraRef.current) {

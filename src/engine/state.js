@@ -42,6 +42,10 @@ export function createInitialState() {
     prestigePoints: 0,
     prestigeUpgrades: {},
     achievements: {},
+    // Dyson Assembly (Era 7+)
+    dysonSegments: 0,
+    // Cosmic Tuning (Era 9+)
+    tuningScore: 0,
     saveVersion: 2,
   };
 }

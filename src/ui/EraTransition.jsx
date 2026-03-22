@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { eraNames } from '../engine/eras.js';
 import { resources as resourceDefs } from '../data/resources.js';
+import { playEraTransition } from './AudioManager.js';
 
 const eraLore = {
   1: "The last ship breaks apart on entry. In the wreckage, you find metal fragments too precise to be natural. Someone was here before.",
@@ -22,9 +23,9 @@ const eraUnlocks = {
   4: { resources: ['Rocket Fuel', 'Orbital Infrastructure'], features: ['Docking mini-game', 'Trading'] },
   5: { resources: ['Colonies', 'Exotic Materials'], features: ['Colony management'] },
   6: { resources: ['Star Systems', 'Dark Energy'], features: ['Star Chart'] },
-  7: { resources: ['Megastructures', 'Stellar Forge Output'], features: [] },
+  7: { resources: ['Megastructures', 'Stellar Forge Output'], features: ['Dyson Assembly'] },
   8: { resources: ['Galactic Influence', 'Exotic Matter'], features: ['Weaving mini-game'] },
-  9: { resources: ['Cosmic Power', 'Universal Constants'], features: [] },
+  9: { resources: ['Cosmic Power', 'Universal Constants'], features: ['Cosmic Tuning'] },
   10: { resources: ['Reality Fragments', 'Quantum Echoes'], features: [] },
 };
 
@@ -50,6 +51,7 @@ export function EraTransition({ era }) {
       prevEraRef.current = era;
       setVisible(true);
       setFadingOut(false);
+      playEraTransition();
 
       const displayTime = 3000 + era * 500;
       fadeTimerRef.current = setTimeout(() => setFadingOut(true), displayTime - 1000);
