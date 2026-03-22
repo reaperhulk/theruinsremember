@@ -1,15 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { createInitialState } from '../state.js';
 import { tick } from '../tick.js';
-import { purchaseUpgrade, getAvailableUpgrades } from '../upgrades.js';
-import { unlockTech, getAvailableTech } from '../tech.js';
-import { canAfford } from '../resources.js';
+import { purchaseUpgrade } from '../upgrades.js';
+import { unlockTech } from '../tech.js';
+import { upgrades as upgradeDefs } from '../../data/upgrades.js';
+import { techTree } from '../../data/tech-tree.js';
 
 // Helper: give enough resources to buy something, then buy it
 function giveAndBuy(state, type, id) {
-  const defs = type === 'upgrade'
-    ? require('../../data/upgrades.js').upgrades
-    : require('../../data/tech-tree.js').techTree;
+  const defs = type === 'upgrade' ? upgradeDefs : techTree;
   const def = defs[id];
   if (!def) throw new Error(`Unknown ${type}: ${id}`);
 

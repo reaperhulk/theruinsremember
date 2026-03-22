@@ -19,7 +19,7 @@ describe('achievements', () => {
     const state = createInitialState();
     state.totalGems = 1;
     state.achievements = { firstGem: true };
-    const { state: after, newAchievements } = checkAchievements(state);
+    const { newAchievements } = checkAchievements(state);
     const firstGem = newAchievements.find(a => a.id === 'firstGem');
     expect(firstGem).toBeUndefined();
   });

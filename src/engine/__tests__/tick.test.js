@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { tick } from '../tick.js';
 import { createInitialState } from '../state.js';
+import { upgrades as allUpgradeDefs } from '../../data/upgrades.js';
 
 describe('tick', () => {
   it('advances resources by their production rates', () => {
@@ -251,9 +252,8 @@ describe('tick', () => {
     // Should have auto-purchased one non-repeatable upgrade from era <= 2
     const newUpgrades = Object.keys(after.upgrades).filter(id => !state.upgrades[id]);
     if (newUpgrades.length > 0) {
-      const { upgrades: upgradeDefs } = require('../../data/upgrades.js');
       for (const id of newUpgrades) {
-        const def = upgradeDefs[id];
+        const def = allUpgradeDefs[id];
         if (def) {
           expect(def.era).toBeLessThanOrEqual(2); // era 5 - 3 = era 2 max
           expect(def.repeatable).toBeFalsy();

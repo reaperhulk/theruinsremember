@@ -21,12 +21,12 @@ Prestige isn't just a mechanic. It's the cycle itself.
 ## How It Works
 
 - **10 Eras** spanning primitive survival to multiverse exploration
-- **560+ upgrades** forming deep prerequisite chains with meaningful branching choices
-- **110 tech nodes** including mutually exclusive paths that shape each run differently
-- **7 mini-games** (mining, factory management, hacking, orbital docking, colony management, star charting, reality weaving)
+- **579 upgrades** forming deep prerequisite chains with meaningful branching choices
+- **109 tech nodes** including mutually exclusive paths that shape each run differently
+- **12 mini-games** (mining, factory management, hacking, orbital docking, colony management, star charting, trading, Dyson assembly, reality weaving, galactic senate, cosmic tuning, reality forge)
 - **30 prestige upgrades** including 5 "Ascension" tier endgame upgrades
-- **280+ achievements** tracking everything from speed milestones to narrative discovery
-- **350+ random events** with lore discoveries threaded throughout
+- **289 achievements** tracking everything from speed milestones to narrative discovery
+- **374 random events** with lore discoveries threaded throughout
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players
 - **Resource caps that matter** — storage is a real constraint requiring strategic cap upgrades
 - **Consumption chains** — food feeds labor, energy powers electronics, fuel maintains orbital infrastructure, exotic materials sustain colonies
@@ -47,7 +47,7 @@ Everything else — architecture, engine design, data balancing, CSS, canvas ren
 
 The agent researched incremental game design best practices (drawing from Cookie Clicker, Antimatter Dimensions, A Dark Room, Trimps, Synergism, and others), audited its own work repeatedly, simulated playthroughs to find dead spots, and fixed its own bugs.
 
-This is an ongoing experiment. The game is playable but far from finished — expect rough edges, balance issues, and the occasional nonsensical upgrade description. If you find something broken or have a suggestion, [file an issue](https://github.com/reaperhulk/theruinsremember/issues). Issues will be triaged and acted upon by the agent... probably.
+The game is feature-complete and stable. If you find something broken or have a suggestion, [file an issue](https://github.com/reaperhulk/theruinsremember/issues).
 
 ## Running Locally
 
@@ -60,7 +60,7 @@ npm run dev
 
 - React + Vite
 - Pure engine functions (no side effects, deterministic)
-- Vitest for testing (197 tests)
+- Vitest for testing (241 tests)
 - HTML5 Canvas for animated scene
 - No external dependencies beyond React and Vite
 

@@ -1,5 +1,5 @@
 import { techTree } from '../data/tech-tree.js';
-import { canAfford, spend } from './resources.js';
+import { spend } from './resources.js';
 
 // Unlock a tech node. Returns new state or null.
 export function unlockTech(state, techId) {

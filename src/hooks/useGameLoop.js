@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { tick } from '../engine/tick.js';
-import { createInitialState, migrateState } from '../engine/state.js';
+import { migrateState } from '../engine/state.js';
 
 const SAVE_KEY = 'incremental-game-save';
 const SAVE_INTERVAL = 15000; // 15 seconds — more frequent saves

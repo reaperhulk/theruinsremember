@@ -15,6 +15,21 @@ const FOOD_PER_LABOR = 0.8;       // Food consumed per labor/s
 const ENERGY_PER_ELECTRONICS = 0.3; // Energy consumed per electronics/s
 const FUEL_PER_ORBITAL = 0.6;     // Fuel consumed per orbitalInfra/s
 
+// Apply a fractional production bonus to all producing resources, respecting caps
+function applyProductionBonus(state, fraction, dt) {
+  let updated = state;
+  for (const [id, r] of Object.entries(updated.resources)) {
+    if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
+      const rate = (r.baseRate + r.rateAdd) * r.rateMult * (updated.prestigeMultiplier || 1);
+      const bonus = rate * fraction * dt;
+      const cap = getEffectiveCap(updated, id);
+      const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
+      updated = { ...updated, resources: { ...updated.resources, [id]: { ...r, amount: newAmount } } };
+    }
+  }
+  return updated;
+}
+
 // Core game loop: advance state by dt seconds
 export function tick(state, dt) {
   const rates = calculateProduction(state);
@@ -249,31 +264,14 @@ export function tick(state, dt) {
   if (newState.upgrades?.communalEffort) {
     const upgradeCount = Object.keys(newState.upgrades).length;
     const bonusFraction = Math.min(0.5, upgradeCount * 0.005);
-    for (const [id, r] of Object.entries(newState.resources)) {
-      if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
-        const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
-        const bonus = rate * bonusFraction * dt;
-        const cap = getEffectiveCap(newState, id);
-        const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
-        newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
-      }
-    }
+    newState = applyProductionBonus(newState, bonusFraction, dt);
   }
 
   // Mechanic: productionPulse — double production for 10s every 60s
   if (newState.upgrades?.overclockProtocol) {
     const cyclePos = (newState.totalTime || 0) % 60;
     if (cyclePos < 10) {
-      for (const [id, r] of Object.entries(newState.resources)) {
-        if (r.unlocked) {
-          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
-          if (rate > 0) {
-            const cap = getEffectiveCap(newState, id);
-            const bonus = rate * dt;
-            newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: Math.min(r.amount + bonus, cap > 0 ? cap : Infinity) } } };
-          }
-        }
-      }
+      newState = applyProductionBonus(newState, 1, dt);
     }
   }
 
@@ -299,16 +297,7 @@ export function tick(state, dt) {
   if (newState.upgrades?.recursiveOptimizer) {
     const eraBonus = Math.pow(1.1, (newState.era || 1) - 1);
     if (eraBonus > 1) {
-      const bonusFraction = (eraBonus - 1); // extra fraction on top of base
-      for (const [id, r] of Object.entries(newState.resources)) {
-        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
-          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
-          const bonus = rate * bonusFraction * dt;
-          const cap = getEffectiveCap(newState, id);
-          const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
-          newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
-        }
-      }
+      newState = applyProductionBonus(newState, eraBonus - 1, dt);
     }
   }
 
@@ -324,15 +313,7 @@ export function tick(state, dt) {
     if ((newState.totalWeaves || 0) > 0) miniCount++;
 
     if (miniCount > 0) {
-      const bonus = miniCount * 0.10;
-      for (const [id, r] of Object.entries(newState.resources)) {
-        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
-          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
-          const extra = rate * bonus * dt;
-          const cap = getEffectiveCap(newState, id);
-          newState.resources[id] = { ...r, amount: Math.min(r.amount + extra, cap > 0 ? cap : Infinity) };
-        }
-      }
+      newState = applyProductionBonus(newState, miniCount * 0.10, dt);
     }
   }
 
@@ -340,15 +321,7 @@ export function tick(state, dt) {
   if (newState.upgrades?.warpEcho) {
     const routes = newState.starRoutes?.length || 0;
     if (routes > 0) {
-      const bonus = routes * 0.03;
-      for (const [id, r] of Object.entries(newState.resources)) {
-        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
-          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
-          const extra = rate * bonus * dt;
-          const cap = getEffectiveCap(newState, id);
-          newState.resources[id] = { ...r, amount: Math.min(r.amount + extra, cap > 0 ? cap : Infinity) };
-        }
-      }
+      newState = applyProductionBonus(newState, routes * 0.03, dt);
     }
   }
 
@@ -356,15 +329,7 @@ export function tick(state, dt) {
   if (newState.upgrades?.galacticMemory) {
     const prestigeBonus = (newState.prestigeCount || 0) * 0.05;
     if (prestigeBonus > 0) {
-      for (const [id, r] of Object.entries(newState.resources)) {
-        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
-          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
-          const bonus = rate * prestigeBonus * dt;
-          const cap = getEffectiveCap(newState, id);
-          const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
-          newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
-        }
-      }
+      newState = applyProductionBonus(newState, prestigeBonus, dt);
     }
   }
 
@@ -373,30 +338,13 @@ export function tick(state, dt) {
     const unlockedCount = Object.values(newState.resources).filter(r => r.unlocked).length;
     const diversityMult = Math.pow(1.05, unlockedCount) - 1;
     if (diversityMult > 0) {
-      for (const [id, r] of Object.entries(newState.resources)) {
-        if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
-          const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
-          const bonus = rate * diversityMult * dt;
-          const cap = getEffectiveCap(newState, id);
-          const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
-          newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
-        }
-      }
+      newState = applyProductionBonus(newState, diversityMult, dt);
     }
   }
 
   // Mechanic: compoundingTick — production compounds slightly each tick
   if (newState.upgrades?.infiniteLoop) {
-    const compoundBonus = 1 + 0.001 * dt;
-    for (const [id, r] of Object.entries(newState.resources)) {
-      if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
-        const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
-        const bonus = rate * (compoundBonus - 1) * dt;
-        const cap = getEffectiveCap(newState, id);
-        const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
-        newState = { ...newState, resources: { ...newState.resources, [id]: { ...r, amount: newAmount } } };
-      }
-    }
+    newState = applyProductionBonus(newState, 0.001 * dt, dt);
   }
 
   // Dyson auto-assembly: every 60 ticks (~1 min at 1 tick/s), auto-add segments based on existing count

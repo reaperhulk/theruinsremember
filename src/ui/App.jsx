@@ -22,7 +22,7 @@ import { SenatePanel } from './SenatePanel.jsx';
 import { RealityForgePanel } from './RealityForgePanel.jsx';
 import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
-import { setMuted, isMuted } from './AudioManager.js';
+import { setMuted } from './AudioManager.js';
 import { StatsPanel } from './StatsPanel.jsx';
 import { PrestigePanel } from './PrestigePanel.jsx';
 import { EraTransition } from './EraTransition.jsx';
@@ -255,7 +255,7 @@ export function App() {
               const blob = new Blob([save], { type: 'application/json' });
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
-              a.href = url; a.download = 'planet-to-multiverse-save.json';
+              a.href = url; a.download = 'the-ruins-remember-save.json';
               a.click(); URL.revokeObjectURL(url);
             }
           }}>

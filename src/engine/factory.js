@@ -65,7 +65,6 @@ export function getFactoryBonus(state) {
   const prestigeMult = (hasFactoryExpert ? 2 : 1) * (hasSavant ? 1.5 : 1);
   // Full capacity bonus: x2 when all worker slots used
   const totalAssigned = LINES.reduce((sum, l) => sum + (alloc[l] || 0), 0);
-  const maxWorkers = getMaxWorkers(state);
   const pool = getWorkerPool(state);
   const fullCapacity = totalAssigned >= pool && pool >= 3 ? 2 : 1;
   // Era scaling: base rate per worker increases with era

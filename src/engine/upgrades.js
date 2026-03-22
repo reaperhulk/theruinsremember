@@ -1,5 +1,5 @@
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
-import { canAfford, spend } from './resources.js';
+import { spend } from './resources.js';
 
 // Apply upgrade effects to state
 function applyEffects(state, effects) {
