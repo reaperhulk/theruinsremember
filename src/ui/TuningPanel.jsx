@@ -59,6 +59,7 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
     }
   };
 
+  const distance = Math.abs(frequency - target);
   const resultColors = { perfect: '#ffdd44', good: '#88dd88', ok: '#aaaaaa', miss: '#ff6666' };
   const resultTexts = { perfect: 'PERFECT TUNE!', good: 'Good match', ok: 'Partial tune', miss: 'Off frequency' };
 
@@ -70,24 +71,46 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
       </p>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8em', marginBottom: '6px' }}>
         <span>Your frequency: <strong style={{ color: '#aaddff' }}>{frequency}</strong></span>
-        <span>Target: <strong style={{ color: '#ffdd44' }}>???</strong> (match to tune)</span>
+        <span style={{ color: distance <= 2 ? '#ffdd44' : distance <= 8 ? '#88dd88' : distance <= 20 ? '#aaaaaa' : '#ff6666' }}>
+          Distance: <strong>{distance}</strong>
+          {distance <= 2 ? ' (perfect zone!)' : distance <= 8 ? ' (close!)' : distance <= 20 ? ' (getting warmer)' : ' (far)'}
+        </span>
       </div>
       <div style={{ position: 'relative', height: '20px', background: '#111', border: '1px solid #333', marginBottom: '6px' }}>
-        {/* Target zone indicator (hidden exact position, shown as glow) */}
+        {/* Target zone indicator — wide glow */}
         <div style={{
           position: 'absolute',
-          left: `${target - 5}%`,
-          width: '10%',
+          left: `${Math.max(0, target - 10)}%`,
+          width: `${Math.min(20, 100 - Math.max(0, target - 10))}%`,
           height: '100%',
-          background: 'rgba(255, 221, 68, 0.15)',
+          background: 'rgba(255, 221, 68, 0.08)',
           borderRadius: '2px',
         }} />
+        {/* Good zone */}
         <div style={{
           position: 'absolute',
-          left: `${target - 1}%`,
-          width: '2%',
+          left: `${Math.max(0, target - 4)}%`,
+          width: `${Math.min(8, 100 - Math.max(0, target - 4))}%`,
           height: '100%',
-          background: 'rgba(255, 221, 68, 0.3)',
+          background: 'rgba(136, 221, 136, 0.15)',
+        }} />
+        {/* Perfect zone */}
+        <div style={{
+          position: 'absolute',
+          left: `${Math.max(0, target - 1)}%`,
+          width: `${Math.min(2, 100 - Math.max(0, target - 1))}%`,
+          height: '100%',
+          background: 'rgba(255, 221, 68, 0.35)',
+        }} />
+        {/* Target marker */}
+        <div style={{
+          position: 'absolute',
+          left: `${target}%`,
+          width: '2px',
+          height: '100%',
+          background: '#ffdd44',
+          transform: 'translateX(-1px)',
+          opacity: 0.6,
         }} />
         {/* Player frequency indicator */}
         <div style={{
@@ -122,7 +145,7 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
           <>Tune Frequency</>
         )}
       </button>
-      <p className="mining-hint">Adjust the slider to match the hidden target | Target changes every 30s | Perfect = 5x reward</p>
+      <p className="mining-hint">Adjust the slider to match the yellow target marker | Target changes every 30s | Perfect (dist &le; 2) = 5x reward</p>
     </div>
   );
 });

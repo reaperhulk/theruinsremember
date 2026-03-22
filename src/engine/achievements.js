@@ -2,11 +2,6 @@
 
 import { achievements } from '../data/achievements.js';
 
-// Get list of earned achievement IDs from state
-export function getEarnedAchievements(state) {
-  return state.achievements || {};
-}
-
 // Check all achievements and award any newly completed ones.
 // Returns { state, newAchievements } where newAchievements is an array of newly earned.
 export function checkAchievements(state) {

@@ -53,6 +53,7 @@ export function App() {
   const { state, updateState, resetSave, offlineReport, dismissOfflineReport } = useGameLoop(initialState);
   const [activeTab, setActiveTab] = useState('upgrades');
   const [activeMiniGame, setActiveMiniGame] = useState('mining');
+  const prevEraRef = useRef(state.era);
   const [shakeClass, setShakeClass] = useState('');
   const [flashClass, setFlashClass] = useState('');
   const [hintsDismissed, setHintsDismissed] = useState(false);
@@ -177,11 +178,15 @@ export function App() {
 
   const availableMiniGames = miniGameDefs.filter(g => state.era >= g.era);
 
-  // Auto-select newest mini-game when a new era unlocks one
+  // Auto-select newest mini-game only when the era actually changes
   useEffect(() => {
-    const available = miniGameDefs.filter(g => state.era >= g.era);
-    if (available.length > 0 && !available.find(g => g.id === activeMiniGame)) {
-      setActiveMiniGame(available[available.length - 1].id);
+    if (state.era !== prevEraRef.current) {
+      const available = miniGameDefs.filter(g => state.era >= g.era);
+      const newGames = available.filter(g => g.era === state.era);
+      if (newGames.length > 0) {
+        setActiveMiniGame(newGames[newGames.length - 1].id);
+      }
+      prevEraRef.current = state.era;
     }
   }, [state.era]);
 

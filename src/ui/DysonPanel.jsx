@@ -14,8 +14,9 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
       if (!sf?.unlocked || !mg?.unlocked) return null;
       const sfRate = (sf.baseRate + sf.rateAdd) * sf.rateMult * (s.prestigeMultiplier || 1);
       const mgRate = (mg.baseRate + mg.rateAdd) * mg.rateMult * (s.prestigeMultiplier || 1);
-      const sfGain = Math.max(1, sfRate * 2);
-      const mgGain = Math.max(1, mgRate * 0.5);
+      const milestoneBonus = 1 + (s.dysonSegments || 0) / 100; // +1% per segment
+      const sfGain = Math.max(1, sfRate * 5 * milestoneBonus);
+      const mgGain = Math.max(1, mgRate * 2 * milestoneBonus);
       setLastGain({ sf: sfGain, mg: mgGain });
       setTimeout(() => setLastGain(null), 800);
       return {

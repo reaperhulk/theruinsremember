@@ -63,8 +63,3 @@ export function getAvailableTech(state) {
     return true;
   });
 }
-
-// Get unlocked tech
-export function getUnlockedTech(state) {
-  return Object.keys(state.tech).map(id => techTree[id]).filter(Boolean);
-}
