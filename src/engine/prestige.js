@@ -5,23 +5,25 @@ import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
-// Calculate prestige multiplier based on current progress
+// Calculate prestige multiplier based on current progress.
+// This is an ADDITIVE bonus to the cumulative multiplier, not multiplicative.
+// Each prestige adds a flat bonus (e.g., +4x) rather than multiplying (e.g., 20x * 20x).
+// This prevents runaway exponential growth while still rewarding deep runs.
 export function calculatePrestigeBonus(state) {
-  const eraBonus = Math.max(0, state.era || 1) * 0.5;
+  const eraBonus = Math.max(0, state.era || 1) * 0.3;
   const upgradeCount = Object.keys(state.upgrades).length;
-  const upgradeBonus = upgradeCount * 0.05;
-  const techBonus = Object.keys(state.tech).length * 0.1;
-  const gemBonus = (state.totalGems || 0) * 0.02;
+  const upgradeBonus = upgradeCount * 0.02;
+  const techBonus = Object.keys(state.tech).length * 0.05;
+  const gemBonus = (state.totalGems || 0) * 0.01;
   let bonus = 1 + eraBonus + upgradeBonus + techBonus + gemBonus;
 
-  // Wisdom of Ages: +20% bonus per prestige
+  // Wisdom of Ages: +15% bonus per prestige
   if (hasPrestigeUpgrade(state, 'wisdomOfAges')) {
-    bonus += (state.prestigeCount || 0) * 0.2;
+    bonus += (state.prestigeCount || 0) * 0.15;
   }
 
-  // Cap prestige bonus to prevent runaway multiplier growth
-  // 20x gives Wisdom of Ages headroom to matter in late-game runs
-  return Math.min(bonus, 20);
+  // Cap individual prestige bonus at 10x
+  return Math.min(bonus, 10);
 }
 
 // Calculate prestige points earned from current run
@@ -49,7 +51,7 @@ export function calculatePrestigePoints(state) {
 // Get a summary of what the prestige will give
 export function getPrestigeSummary(state) {
   const bonus = calculatePrestigeBonus(state);
-  const newMultiplier = state.prestigeMultiplier * bonus;
+  const newMultiplier = state.prestigeMultiplier + bonus;
   const points = calculatePrestigePoints(state);
   return {
     currentMultiplier: state.prestigeMultiplier,
@@ -100,15 +102,16 @@ export function getPrestigeShop(state) {
 // Perform a prestige reset. Returns fresh state with multiplier, lifetime stats, and prestige upgrades.
 export function performPrestige(state) {
   const bonus = calculatePrestigeBonus(state);
-  const newMultiplier = state.prestigeMultiplier * bonus;
+  // Additive prestige: each prestige adds the bonus to the cumulative multiplier
+  const newMultiplier = state.prestigeMultiplier + bonus;
   const points = calculatePrestigePoints(state);
 
   const freshState = createInitialState();
 
-  // Head Start: x2 starting multiplier
+  // Head Start: +50% of current multiplier (additive, not x2)
   let startMult = newMultiplier;
   if (hasPrestigeUpgrade(state, 'headStart')) {
-    startMult *= 2;
+    startMult += newMultiplier * 0.5;
   }
 
   const newState = {

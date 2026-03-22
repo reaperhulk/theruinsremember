@@ -6,9 +6,9 @@ describe('prestige', () => {
   it('calculates bonus based on era (base component)', () => {
     const state = createInitialState();
     state.era = 8;
-    // 1 + era*0.5 + upgrades*0.05 + tech*0.1 + gems*0.02
-    // = 1 + 4 + 0 + 0 + 0 = 5
-    expect(calculatePrestigeBonus(state)).toBe(5);
+    // 1 + era*0.3 + upgrades*0.02 + tech*0.05 + gems*0.01
+    // = 1 + 2.4 + 0 + 0 + 0 = 3.4
+    expect(calculatePrestigeBonus(state)).toBeCloseTo(3.4);
   });
 
   it('includes upgrade and tech bonuses', () => {
@@ -16,41 +16,40 @@ describe('prestige', () => {
     state.era = 2;
     state.upgrades = { tools: true, irrigation: true }; // 2 upgrades
     state.tech = { metallurgy: true }; // 1 tech
-    // 1 + 2*0.5 + 2*0.05 + 1*0.1 + 0 = 1 + 1 + 0.1 + 0.1 = 2.2
-    expect(calculatePrestigeBonus(state)).toBeCloseTo(2.2);
+    // 1 + 2*0.3 + 2*0.02 + 1*0.05 + 0 = 1 + 0.6 + 0.04 + 0.05 = 1.69
+    expect(calculatePrestigeBonus(state)).toBeCloseTo(1.69);
   });
 
-  it('caps prestige bonus at 15x', () => {
+  it('caps prestige bonus at 10x', () => {
     const state = createInitialState();
     state.era = 10;
-    // Give tons of upgrades, tech, and gems to push bonus way above 15
     state.upgrades = {};
     for (let i = 0; i < 200; i++) state.upgrades[`fake${i}`] = true;
     state.tech = {};
     for (let i = 0; i < 50; i++) state.tech[`fakeTech${i}`] = true;
     state.totalGems = 500;
-    // Without cap: 1 + 10*0.5 + 200*0.05 + 50*0.1 + 500*0.02 = 1+5+10+5+10 = 31
-    // Should be capped to 20
-    expect(calculatePrestigeBonus(state)).toBe(20);
+    // Without cap: 1 + 10*0.3 + 200*0.02 + 50*0.05 + 500*0.01 = 1+3+4+2.5+5 = 15.5
+    // Should be capped to 10
+    expect(calculatePrestigeBonus(state)).toBe(10);
   });
 
   it('includes gem bonus', () => {
     const state = createInitialState();
     state.era = 1;
     state.totalGems = 10;
-    // 1 + 0.5 + 0 + 0 + 10*0.02 = 1.7
-    expect(calculatePrestigeBonus(state)).toBeCloseTo(1.7);
+    // 1 + 0.3 + 0 + 0 + 10*0.01 = 1.4
+    expect(calculatePrestigeBonus(state)).toBeCloseTo(1.4);
   });
 
-  it('resets state with increased multiplier', () => {
+  it('resets state with increased multiplier (additive)', () => {
     const state = createInitialState();
     state.era = 4;
     state.resources.food.amount = 100;
     const after = performPrestige(state);
     expect(after.era).toBe(1);
     expect(after.resources.food.amount).toBe(0);
-    // bonus = 1 + 4*0.5 = 3, mult = 1 * 3 = 3
-    expect(after.prestigeMultiplier).toBe(3);
+    // bonus = 1 + 4*0.3 = 2.2, mult = 1 + 2.2 = 3.2 (additive)
+    expect(after.prestigeMultiplier).toBeCloseTo(3.2);
   });
 
   it('tracks prestige count and lifetime stats', () => {
@@ -89,8 +88,8 @@ describe('prestige', () => {
     state.prestigeMultiplier = 2;
     const summary = getPrestigeSummary(state);
     expect(summary.currentMultiplier).toBe(2);
-    expect(summary.bonus).toBe(4); // 1 + 6*0.5
-    expect(summary.newMultiplier).toBe(8); // 2 * 4
+    expect(summary.bonus).toBeCloseTo(2.8); // 1 + 6*0.3
+    expect(summary.newMultiplier).toBeCloseTo(4.8); // 2 + 2.8 (additive)
     expect(summary.prestigeCount).toBe(1);
   });
 
@@ -178,13 +177,15 @@ describe('prestige', () => {
       expect(after.resources.food.amount).toBe(100);
     });
 
-    it('Head Start doubles starting multiplier', () => {
+    it('Head Start adds 50% of multiplier', () => {
       const state = createInitialState();
       state.era = 4;
       state.prestigeUpgrades = { headStart: true };
-      const bonus = calculatePrestigeBonus(state); // 3
+      const bonus = calculatePrestigeBonus(state); // 2.2
+      const newMult = state.prestigeMultiplier + bonus; // 1 + 2.2 = 3.2
       const after = performPrestige(state);
-      expect(after.prestigeMultiplier).toBe(bonus * 2);
+      // headStart adds 50% of newMult: 3.2 + 3.2*0.5 = 4.8
+      expect(after.prestigeMultiplier).toBeCloseTo(newMult + newMult * 0.5);
     });
 
     it('Deep Pockets triples all caps', () => {

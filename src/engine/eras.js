@@ -18,18 +18,33 @@ import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 // Minimum upgrades purchased in the current era before transition is allowed.
-// ~40% of available upgrades per era must be bought. This forces real engagement.
 const ERA_MIN_UPGRADES = {
-  1: 30,   // ~58% of ~52
-  2: 35,   // ~66% of ~53
-  3: 35,   // ~69% of ~51
-  4: 38,   // ~68% of ~56
-  5: 38,   // ~68% of ~56
-  6: 38,   // ~67% of ~57
-  7: 40,   // ~67% of ~60
-  8: 40,   // ~69% of ~58
-  9: 42,   // ~71% of ~59
-  10: 42,  // ~74% of ~57
+  1: 30,   // ~55% of ~55
+  2: 35,   // ~63% of ~56
+  3: 35,   // ~66% of ~53
+  4: 38,   // ~66% of ~58
+  5: 42,   // ~72% of ~58
+  6: 44,   // ~76% of ~58
+  7: 40,   // ~66% of ~61
+  8: 44,   // ~73% of ~60
+  9: 46,   // ~75% of ~61
+  10: 42,  // ~71% of ~59
+};
+
+// Minimum time (seconds) that must be spent in an era before transition.
+// Scales up for later eras to ensure each era feels meaningful.
+// Prestige reduces these by 10% per prestige count (min 30% of base).
+const ERA_MIN_TIME = {
+  1: 0,     // no minimum — era 1 is the intro
+  2: 30,    // 30s
+  3: 60,    // 1 min
+  4: 90,    // 1.5 min
+  5: 120,   // 2 min
+  6: 180,   // 3 min
+  7: 120,   // 2 min
+  8: 240,   // 4 min
+  9: 300,   // 5 min
+  10: 0,    // era 10 is the final era, no gate
 };
 
 export function getMinUpgradesForEra(era) {
@@ -41,6 +56,15 @@ export function countEraUpgrades(state, era) {
   return Object.keys(state.upgrades || {}).filter(
     id => upgradeDefs[id] && upgradeDefs[id].era === era
   ).length;
+}
+
+// Get minimum time required in an era before transition, accounting for prestige.
+export function getMinTimeForEra(era, prestigeCount = 0) {
+  const base = ERA_MIN_TIME[era] || 0;
+  if (base === 0) return 0;
+  // Prestige reduces min time by 10% per prestige (min 30% of base)
+  const reduction = Math.min(0.7, prestigeCount * 0.1);
+  return Math.floor(base * (1 - reduction));
 }
 
 // Check if state qualifies for an era transition. Returns next era number or null.
@@ -59,6 +83,12 @@ export function checkEraTransition(state) {
   const minUpgrades = getMinUpgradesForEra(state.era);
   const currentUpgrades = countEraUpgrades(state, state.era);
   if (currentUpgrades < minUpgrades) return null;
+
+  // Require minimum time spent in the current era
+  const eraStartTime = state.eraStartTime || 0;
+  const timeInEra = state.totalTime - eraStartTime;
+  const minTime = getMinTimeForEra(state.era, state.prestigeCount || 0);
+  if (timeInEra < minTime) return null;
 
   return nextEra;
 }

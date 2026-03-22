@@ -9,11 +9,11 @@ export const ERA_COST_MULTIPLIERS = {
 
 // Apply era-based cost scaling per resource:
 // - Earlier-era resources: full multiplier (player has high production)
-// - Same-era resources: square root of multiplier (moderate scaling for new resources)
+// - Same-era resources: eraMult^0.7 (steeper scaling to prevent trivial same-era purchases)
 export function applyEraCostScaling(baseCost, upgradeEra) {
   const eraMult = ERA_COST_MULTIPLIERS[upgradeEra] || 1;
   if (eraMult <= 1) return baseCost;
-  const sameEraMult = Math.ceil(Math.sqrt(eraMult));
+  const sameEraMult = Math.ceil(Math.pow(eraMult, 0.7));
   const scaled = {};
   for (const [resource, amount] of Object.entries(baseCost)) {
     const resourceEra = resourceDefs[resource]?.era || 1;

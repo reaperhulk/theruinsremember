@@ -1,39 +1,22 @@
 import { useState, memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
+import { assembleDysonSegment, getDysonStats } from '../engine/dyson.js';
 
 export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
   const [lastGain, setLastGain] = useState(null);
-  const totalSegments = state.dysonSegments || 0;
+  const { segments: totalSegments, completion, milestone, nextMilestone, autoRate } = getDysonStats(state);
 
   const handleAssemble = () => {
     playClick();
     onUpdate(s => {
-      const sf = s.resources.stellarForge;
-      const mg = s.resources.megastructures;
-      if (!sf?.unlocked || !mg?.unlocked) return null;
-      const sfRate = (sf.baseRate + sf.rateAdd) * sf.rateMult * (s.prestigeMultiplier || 1);
-      const mgRate = (mg.baseRate + mg.rateAdd) * mg.rateMult * (s.prestigeMultiplier || 1);
-      const milestoneBonus = 1 + Math.min(0.5, (s.dysonSegments || 0) / 100); // +1% per segment, capped at +50%
-      const sfGain = Math.max(1, sfRate * 5 * milestoneBonus);
-      const mgGain = Math.max(1, mgRate * 2 * milestoneBonus);
-      setLastGain({ sf: sfGain, mg: mgGain });
+      const result = assembleDysonSegment(s);
+      if (!result) return null;
+      setLastGain({ sf: result.sfGain, mg: result.mgGain });
       setTimeout(() => setLastGain(null), 800);
-      return {
-        ...s,
-        dysonSegments: Math.min(500, (s.dysonSegments || 0) + 1),
-        resources: {
-          ...s.resources,
-          stellarForge: { ...sf, amount: sf.amount + sfGain },
-          megastructures: { ...mg, amount: mg.amount + mgGain },
-        },
-      };
+      return result.state;
     });
   };
-
-  const completion = Math.min(100, Math.floor(totalSegments / 10) * 10);
-  const milestone = Math.floor(totalSegments / 10);
-  const nextMilestone = (milestone + 1) * 10;
 
   return (
     <div className="panel dyson-panel">
@@ -64,7 +47,7 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
       )}
       {totalSegments > 0 && (
         <div style={{ fontSize: '0.75em', color: '#888', marginTop: '4px' }}>
-          Auto-assembly: {Math.min(10, Math.floor(totalSegments / 10))} segments/min (max 10/min)
+          Auto-assembly: {autoRate} segments/min (max 10/min)
         </div>
       )}
     </div>

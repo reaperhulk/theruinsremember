@@ -61,6 +61,7 @@ export function App() {
   const [audioMuted, setAudioMuted] = useState(() => localStorage.getItem('audioMuted') === 'true');
   const [victoryDismissed, setVictoryDismissed] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState(null);
   const prevEventsRef = useRef(state.eventLog?.length || 0);
   const prevPerfectsRef = useRef(state.dockingPerfects || 0);
 
@@ -116,8 +117,11 @@ export function App() {
       '',
       '"We tried to stop. We could not. Neither will you."',
     ].filter(Boolean).join('\n');
-    if (!confirm(msg)) return;
-    updateState(s => performPrestige(s));
+    setConfirmDialog({
+      lines: msg.split('\n'),
+      onConfirm: () => { updateState(s => performPrestige(s)); setConfirmDialog(null); },
+      onCancel: () => setConfirmDialog(null),
+    });
   };
 
   // Keyboard shortcuts
@@ -288,7 +292,13 @@ export function App() {
           }}>
             Import
           </button>
-          <button className="reset-btn" aria-label="Hard reset all progress" onClick={() => { if (confirm('Hard reset?\nThis erases ALL progress including prestige upgrades!')) resetSave(); }}>
+          <button className="reset-btn" aria-label="Hard reset all progress" onClick={() => {
+            setConfirmDialog({
+              lines: ['Hard reset?', 'This erases ALL progress including prestige upgrades!'],
+              onConfirm: () => { resetSave(); setConfirmDialog(null); },
+              onCancel: () => setConfirmDialog(null),
+            });
+          }}>
             Reset
           </button>
         </div>
@@ -371,6 +381,21 @@ export function App() {
       {showHelp && <HelpOverlay onClose={() => setShowHelp(false)} />}
       {!victoryDismissed && (state.gameComplete || state.trueEnding) && (
         <VictoryScreen state={state} onDismiss={() => setVictoryDismissed(true)} />
+      )}
+      {confirmDialog && (
+        <div className="confirm-overlay" onClick={confirmDialog.onCancel}>
+          <div className="confirm-dialog" onClick={e => e.stopPropagation()} role="alertdialog" aria-modal="true" aria-label="Confirmation">
+            <div className="confirm-body">
+              {confirmDialog.lines.map((line, i) => (
+                <div key={i} style={line === '' ? { height: '0.5em' } : undefined}>{line}</div>
+              ))}
+            </div>
+            <div className="confirm-actions">
+              <button className="confirm-yes" onClick={confirmDialog.onConfirm} autoFocus>Confirm</button>
+              <button className="confirm-no" onClick={confirmDialog.onCancel}>Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
       <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#444', padding: '8px 0 4px' }}>
         v1.0 — Era {state.era} | {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.achievements || {}).length} achievements

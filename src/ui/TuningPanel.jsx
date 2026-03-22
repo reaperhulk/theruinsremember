@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
+import { getTuningQuality, applyTuning } from '../engine/tuning.js';
 
 export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
   const [frequency, setFrequency] = useState(50);
@@ -24,37 +25,18 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
   const handleTune = useCallback(() => {
     playClick();
     const diff = Math.abs(frequency - target);
-    let quality;
-    if (diff <= 2) quality = 'perfect';
-    else if (diff <= 8) quality = 'good';
-    else if (diff <= 20) quality = 'ok';
-    else quality = 'miss';
-
-    const multiplier = quality === 'perfect' ? 5 : quality === 'good' ? 2 : quality === 'ok' ? 1 : 0;
+    const quality = getTuningQuality(diff);
 
     setResult(quality);
     setTimeout(() => setResult(null), 1500);
 
-    if (multiplier > 0) {
+    if (quality !== 'miss') {
       onUpdate(s => {
-        const cp = s.resources.cosmicPower;
-        const uc = s.resources.universalConstants;
-        if (!cp?.unlocked || !uc?.unlocked) return null;
-        const cpRate = (cp.baseRate + cp.rateAdd) * cp.rateMult * (s.prestigeMultiplier || 1);
-        const ucRate = (uc.baseRate + uc.rateAdd) * uc.rateMult * (s.prestigeMultiplier || 1);
-        const cpGain = Math.max(1, cpRate * multiplier);
-        const ucGain = Math.max(0.5, ucRate * multiplier * 0.5);
-        setLastTune({ cp: cpGain, uc: ucGain });
+        const tuneResult = applyTuning(s, quality);
+        if (!tuneResult) return null;
+        setLastTune({ cp: tuneResult.cpGain, uc: tuneResult.ucGain });
         setTimeout(() => setLastTune(null), 800);
-        return {
-          ...s,
-          tuningScore: (s.tuningScore || 0) + multiplier,
-          resources: {
-            ...s.resources,
-            cosmicPower: { ...cp, amount: cp.amount + cpGain },
-            universalConstants: { ...uc, amount: uc.amount + ucGain },
-          },
-        };
+        return tuneResult.state;
       });
     }
   }, [frequency, target, onUpdate]);

@@ -146,14 +146,14 @@ export const techTree = {
   // Era 5 → 6 (Solar System → Interstellar)
   advancedPropulsion: {
     id: 'advancedPropulsion', name: 'Advanced Propulsion', era: 5,
-    cost: { research: 5000, exoticMaterials: 200, energy: 50000 },
+    cost: { research: 15000, exoticMaterials: 800, energy: 50000 },
     prerequisites: [],
     grantsEra: null,
     description: 'The engine schematics were carved into the oldest ruin — someone wanted us to find them',
   },
   ftlResearch: {
     id: 'ftlResearch', name: 'FTL Research', era: 5,
-    cost: { research: 10000, exoticMaterials: 500, colonies: 40 },
+    cost: { research: 40000, exoticMaterials: 2000, colonies: 80 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: 6,
     description: 'The math was always impossible — until we found it scratched into a dead ship\'s hull',
@@ -162,14 +162,14 @@ export const techTree = {
   // Era 6 → 7 (Interstellar → Dyson Era)
   galacticCartography: {
     id: 'galacticCartography', name: 'Galactic Cartography', era: 6,
-    cost: { starSystems: 30, research: 3000, darkEnergy: 300 },
+    cost: { starSystems: 80, research: 80000, darkEnergy: 1000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Every dead beacon we relight adds another pin to a map someone drew long before us',
   },
   megaEngineering: {
     id: 'megaEngineering', name: 'Mega Engineering', era: 6,
-    cost: { starSystems: 80, darkEnergy: 1000, research: 10000 },
+    cost: { starSystems: 200, darkEnergy: 3000, research: 200000 },
     prerequisites: ['galacticCartography'],
     grantsEra: 7,
     description: 'Half-built Dyson scaffolding orbits every dead star you visit — someone was building this before',
@@ -194,14 +194,14 @@ export const techTree = {
   // Era 8 → 9 (Galactic → Intergalactic)
   cosmicEngineering: {
     id: 'cosmicEngineering', name: 'Cosmic Engineering', era: 8,
-    cost: { exoticMatter: 1500, galacticInfluence: 80000, research: 1000000 },
+    cost: { exoticMatter: 5000, galacticInfluence: 150000, research: 5000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'The ruins at galactic center are tools, not monuments — and they still work',
   },
   intergalacticBeacon: {
     id: 'intergalacticBeacon', name: 'Intergalactic Beacon', era: 8,
-    cost: { exoticMatter: 4000, galacticInfluence: 80000, cosmicPower: 80 },
+    cost: { exoticMatter: 15000, galacticInfluence: 300000, cosmicPower: 2000 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: 9,
     description: 'The signal format was familiar — it matched the distress call that brought us here',
@@ -210,14 +210,14 @@ export const techTree = {
   // Era 9 → 10 (Intergalactic → Multiverse)
   realityScience: {
     id: 'realityScience', name: 'Reality Science', era: 9,
-    cost: { universalConstants: 10, cosmicPower: 10000, research: 2000000 },
+    cost: { universalConstants: 80, cosmicPower: 60000, research: 10000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Reality has seams. The prior civilization found them. So have we',
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
-    cost: { universalConstants: 30, cosmicPower: 30000, realityFragments: 15 },
+    cost: { universalConstants: 200, cosmicPower: 150000, realityFragments: 100 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
     description: 'The signatures are identical to ours — every universe, the same collapse, the same rebirth',

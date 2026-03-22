@@ -2046,3 +2046,69 @@ canvas:hover {
   cursor: pointer;
   border: 2px solid #50b098;
 }
+
+/* Confirm dialog */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.confirm-dialog {
+  background: #1a1a2e;
+  border: 1px solid #c8a040;
+  border-radius: 8px;
+  padding: 16px 20px;
+  max-width: 420px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  color: #d8d0c8;
+  font-size: 0.85em;
+  line-height: 1.5;
+}
+
+.confirm-body {
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.confirm-yes,
+.confirm-no {
+  padding: 6px 16px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.confirm-yes {
+  background: #8b2020;
+  color: #fff;
+  border-color: #a03030;
+}
+
+.confirm-yes:hover {
+  background: #a03030;
+}
+
+.confirm-no {
+  background: #2a2a3e;
+  color: #d8d0c8;
+}
+
+.confirm-no:hover {
+  background: #3a3a4e;
+}

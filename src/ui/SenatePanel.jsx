@@ -1,64 +1,20 @@
 import { memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
-
-const FACTIONS = [
-  { id: 'merchants', label: 'Merchant Guild', color: '#ddaa44', desc: 'Exotic Matter +1.0/s per influence', resource: 'exoticMatter' },
-  { id: 'scholars', label: 'Scholar Enclave', color: '#88bbee', desc: 'Galactic Influence +0.6/s per influence', resource: 'galacticInfluence' },
-  { id: 'warriors', label: 'Warrior Caste', color: '#ee6644', desc: 'Star Systems +0.4/s per influence', resource: 'starSystems' },
-];
+import { allocateSenateInfluence, getSenateInfo } from '../engine/senate.js';
 
 export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
-  const senate = state.senate || { merchants: 0, scholars: 0, warriors: 0 };
-  const totalInfluence = senate.merchants + senate.scholars + senate.warriors;
-  const maxInfluence = Math.max(3, Math.floor((state.resources.galacticInfluence?.amount || 0) / 50) + 3);
-  const available = maxInfluence - totalInfluence;
+  const { senate, totalInfluence, maxInfluence, available, allocateCost, majorityFaction, factions } = getSenateInfo(state);
 
-  // Find majority faction
-  const maxCount = Math.max(senate.merchants, senate.scholars, senate.warriors);
-  const majority = FACTIONS.find(f => senate[f.id] === maxCount && maxCount > 0);
-  const hasMajority = majority && FACTIONS.filter(f => senate[f.id] === maxCount).length === 1;
-
-  // Cost scales with total allocations: first 10 cost 5, next 10 ~8, next 10 ~11, etc.
-  const getAllocateCost = (total) => Math.ceil(5 * Math.pow(1.5, total / 10));
-  const allocateCost = getAllocateCost(totalInfluence);
+  const FACTION_UI = {
+    merchants: { label: 'Merchant Guild', color: '#ddaa44', desc: 'Exotic Matter +1.0/s per influence' },
+    scholars: { label: 'Scholar Enclave', color: '#88bbee', desc: 'Galactic Influence +0.6/s per influence' },
+    warriors: { label: 'Warrior Caste', color: '#ee6644', desc: 'Star Systems +0.4/s per influence' },
+  };
 
   const handleAllocate = (factionId, delta) => {
     playClick();
-    onUpdate(s => {
-      const sen = s.senate || { merchants: 0, scholars: 0, warriors: 0 };
-      const current = sen[factionId] || 0;
-      const newVal = Math.max(0, current + delta);
-      const newSenate = { ...sen, [factionId]: newVal };
-      const newTotal = newSenate.merchants + newSenate.scholars + newSenate.warriors;
-      const max = Math.max(3, Math.floor((s.resources.galacticInfluence?.amount || 0) / 50) + 3);
-      if (newTotal > max) return null;
-
-      // Spend galacticInfluence on each allocation (adding costs, removing is free)
-      const resources = { ...s.resources };
-      if (delta > 0) {
-        const currentTotal = (sen.merchants || 0) + (sen.scholars || 0) + (sen.warriors || 0);
-        const cost = Math.ceil(5 * Math.pow(1.5, currentTotal / 10));
-        const gi = resources.galacticInfluence;
-        if (!gi || gi.amount < cost) return null;
-        resources.galacticInfluence = { ...gi, amount: gi.amount - cost };
-      }
-
-      // Apply resource bonuses based on allocation
-      for (const f of FACTIONS) {
-        const count = newSenate[f.id] || 0;
-        if (count > 0 && resources[f.resource]?.unlocked) {
-          const r = resources[f.resource];
-          const isMaj = FACTIONS.filter(ff => (newSenate[ff.id] || 0) === Math.max(newSenate.merchants, newSenate.scholars, newSenate.warriors)).length === 1
-            && (newSenate[f.id] || 0) === Math.max(newSenate.merchants, newSenate.scholars, newSenate.warriors);
-          const mult = isMaj ? 2 : 1;
-          const gain = count * (f.id === 'merchants' ? 1.0 : f.id === 'scholars' ? 0.6 : 0.4) * mult;
-          resources[f.resource] = { ...r, amount: r.amount + gain };
-        }
-      }
-
-      return { ...s, senate: newSenate, resources };
-    });
+    onUpdate(s => allocateSenateInfluence(s, factionId, delta));
   };
 
   return (
@@ -69,30 +25,31 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
       </p>
       <div className="dock-info">
         <span>Influence: {available}/{maxInfluence} available</span>
-        {hasMajority && <span style={{ color: majority.color }}>Majority: {majority.label} (x2)</span>}
+        {majorityFaction && <span style={{ color: FACTION_UI[majorityFaction].color }}>Majority: {FACTION_UI[majorityFaction].label} (x2)</span>}
       </div>
       <div className="factory-lines">
-        {FACTIONS.map(faction => {
+        {factions.map(faction => {
           const count = senate[faction.id] || 0;
-          const isMaj = hasMajority && majority.id === faction.id;
+          const isMaj = majorityFaction === faction.id;
+          const ui = FACTION_UI[faction.id];
           return (
             <div key={faction.id} className="factory-line">
-              <span className="line-label" style={{ color: faction.color }}>
-                {faction.label}: {count}
+              <span className="line-label" style={{ color: ui.color }}>
+                {ui.label}: {count}
               </span>
               <span className="line-bonus" style={{ color: isMaj ? '#ffdd44' : '#888' }}>
-                {faction.desc}{isMaj ? ' (x2!)' : ''} {count > 0 && `[+${formatNumber(count * (faction.id === 'merchants' ? 1.0 : faction.id === 'scholars' ? 0.6 : 0.4) * (isMaj ? 2 : 1))}/s]`}
+                {ui.desc}{isMaj ? ' (x2!)' : ''} {count > 0 && `[+${formatNumber(count * faction.rate * (isMaj ? 2 : 1))}/s]`}
               </span>
               <div className="line-controls">
                 <button
                   disabled={count <= 0}
                   onClick={() => handleAllocate(faction.id, -1)}
-                  aria-label={`Remove influence from ${faction.label}`}
+                  aria-label={`Remove influence from ${ui.label}`}
                 >-</button>
                 <button
                   disabled={available <= 0 || (state.resources.galacticInfluence?.amount || 0) < allocateCost}
                   onClick={() => handleAllocate(faction.id, 1)}
-                  aria-label={`Add influence to ${faction.label} (costs ${allocateCost} GI)`}
+                  aria-label={`Add influence to ${ui.label} (costs ${allocateCost} GI)`}
                   title={`Costs ${formatNumber(allocateCost)} GI`}
                 >+</button>
               </div>

@@ -7,7 +7,7 @@ describe('eras', () => {
   describe('getMinUpgradesForEra', () => {
     it('returns configured minimum per era', () => {
       expect(getMinUpgradesForEra(1)).toBe(30);
-      expect(getMinUpgradesForEra(5)).toBe(38);
+      expect(getMinUpgradesForEra(5)).toBe(42);
       expect(getMinUpgradesForEra(10)).toBe(42);
     });
   });

@@ -54,6 +54,8 @@ describe('progression integration', () => {
   it('can progress from Era 2 to Era 3 (Digital Age)', () => {
     let state = createInitialState();
     state.era = 2;
+    state.totalTime = 600; // ensure min time-in-era is met
+    state.eraStartTime = 0;
     state.totalGems = 1; // mini-game engagement
     // Mark era 1 upgrades as done
     state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true };
@@ -85,6 +87,8 @@ describe('progression integration', () => {
   it('can progress from Era 3 (Digital Age) to Era 4 (Space Age)', () => {
     let state = createInitialState();
     state.era = 3;
+    state.totalTime = 600; // ensure min time-in-era is met
+    state.eraStartTime = 0;
     state.totalGems = 1; // mini-game engagement
     state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true, assemblyLines: true, powerGrid: true, computingLab: true };
     state.tech = { metallurgy: true, industrialRevolution: true, advancedComputing: true, digitalRevolution: true };
