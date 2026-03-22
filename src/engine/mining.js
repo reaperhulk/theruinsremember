@@ -8,6 +8,7 @@ const BASE_GEM_CHANCE = 0.1;       // 10% base
 const STREAK_BONUS = 0.02;         // +2% per consecutive miss
 const MAX_GEM_CHANCE = 0.5;        // 50% cap
 const GEM_MULTIPLIER = 5;          // gem gives 5x materials
+const MINE_COOLDOWN = 0.5;         // seconds between manual mines
 
 // Calculate current gem chance based on mining streak
 export function getGemChance(state) {
@@ -19,9 +20,14 @@ export function getGemChance(state) {
 
 // Perform a mine action. Returns { state, foundGem }.
 // `roll` is an optional 0-1 number for deterministic testing; defaults to Math.random().
-export function mine(state, roll = Math.random()) {
+export function mine(state, roll = Math.random(), { skipCooldown = false } = {}) {
   const r = state.resources.materials;
   if (!r || !r.unlocked) return { state, foundGem: false };
+
+  // Cooldown check (skipped for auto-mine)
+  if (!skipCooldown && (state.totalTime || 0) - (state.lastMineTime || 0) < MINE_COOLDOWN) {
+    return { state, foundGem: false };
+  }
 
   // First mine is always a big hit
   if ((state.miningStreak || 0) === 0 && (state.totalGems || 0) === 0) {
@@ -31,6 +37,7 @@ export function mine(state, roll = Math.random()) {
         ...state,
         resources: { ...state.resources, materials: { ...r, amount: r.amount + firstMineAmount } },
         miningStreak: 1,
+        lastMineTime: state.totalTime || 0,
       },
       foundGem: false,
     };
@@ -56,6 +63,7 @@ export function mine(state, roll = Math.random()) {
   const newState = {
     ...state,
     miningStreak: foundGem ? 0 : (state.miningStreak || 0) + 1,
+    lastMineTime: state.totalTime || 0,
     resources: {
       ...state.resources,
       materials: {

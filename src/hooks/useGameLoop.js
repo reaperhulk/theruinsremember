@@ -19,14 +19,16 @@ export function useGameLoop(initialState) {
         const elapsed = (now - parsed.lastSaved) / 1000;
         const migrated = migrateState(parsed);
         if (elapsed > 10) {
-          // Cap offline time at 24 hours (infinitePatience removes the cap)
-          const maxOffline = (parsed.prestigeUpgrades?.infinitePatience) ? 604800 : 86400; // 7 days or 24 hours
+          // Cap offline time: 4h for first run, 24h for prestiged, 7d with infinitePatience
+          const maxOffline = (parsed.prestigeUpgrades?.infinitePatience) ? 604800 :
+                             (parsed.prestigeCount > 0) ? 86400 : 14400; // 7 days, 24 hours, or 4 hours
           const offlineDt = Math.min(elapsed, maxOffline);
           const before = migrated;
 
           // Process offline in chunks for proper event/achievement checking
           const chunkSize = 60;
-          const maxChunks = (parsed.prestigeUpgrades?.infinitePatience) ? 10080 : 1440; // 7 days or 24 hours of chunks
+          const maxChunks = (parsed.prestigeUpgrades?.infinitePatience) ? 10080 :
+                            (parsed.prestigeCount > 0) ? 1440 : 240; // 7 days, 24 hours, or 4 hours of chunks
           const chunks = Math.min(Math.floor(offlineDt / chunkSize), maxChunks);
           let tickState = migrated;
           for (let i = 0; i < chunks; i++) {

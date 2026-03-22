@@ -75,7 +75,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
   // Show unlocked techs count
   const unlockedCount = unlocked.length;
 
-  const affordableTechs = available.filter(t => canAfford(state, t.cost));
+  const affordableTechs = available.filter(t => canAfford(state, t.cost) && !t.excludes && !t.grantsEra);
 
   if (available.length === 0) {
     return (
@@ -125,10 +125,11 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
       )}
       {affordableTechs.length >= 2 && (
         <button
-          className="buy-all-btn"
+          className="gather-btn"
+          style={{ width: '100%', marginBottom: '4px', padding: '4px', fontSize: '0.8em' }}
           onClick={() => onUpdate(s => {
             let current = s;
-            for (const tech of available.filter(t => canAfford(current, t.cost))) {
+            for (const tech of available.filter(t => canAfford(current, t.cost) && !t.excludes && !t.grantsEra)) {
               const next = unlockTech(current, tech.id);
               if (next) current = next;
             }

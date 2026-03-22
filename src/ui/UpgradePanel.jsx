@@ -247,7 +247,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         </div>
       )}
       {(() => {
-        const affordableNonRepeatable = filteredAvailable.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
+        const affordableNonRepeatable = filteredAvailable.filter(u => !u.repeatable && u.era === state.era && canAfford(state, getUpgradeCost(state, u.id)));
         return available.length > 0 && (
           <button
             className="gather-btn"

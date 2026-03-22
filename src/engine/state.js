@@ -56,6 +56,7 @@ export function createInitialState() {
     // Mining mini-game (Era 1+)
     miningStreak: 0,    // consecutive clicks without gem
     totalGems: 0,       // lifetime gems found
+    lastMineTime: 0,    // cooldown tracking for manual mines
     // Events system (Era 3+)
     activeEffects: [],  // [{ id, endsAt, description }]
     eventLog: [],       // [{ message, time }] — last 10 events

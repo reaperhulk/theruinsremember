@@ -7,12 +7,22 @@ export const MiningPanel = memo(function MiningPanel({ state, onUpdate }) {
   const [lastMined, setLastMined] = useState(null);
   const prevStreakRef = useRef(state.miningStreak || 0);
   const [streakReset, setStreakReset] = useState(false);
+  const [onCooldown, setOnCooldown] = useState(false);
+  const cooldownRef = useRef(null);
   const streak = state.miningStreak || 0;
   const gems = state.totalGems || 0;
   const chance = getGemChance(state) * 100;
   const autoMine = state.prestigeUpgrades?.autoClicker;
 
   const handleMine = () => {
+    // Check cooldown client-side to provide immediate feedback
+    const timeSinceLast = (state.totalTime || 0) - (state.lastMineTime || 0);
+    if (timeSinceLast < 0.5) {
+      setOnCooldown(true);
+      clearTimeout(cooldownRef.current);
+      cooldownRef.current = setTimeout(() => setOnCooldown(false), 500);
+      return;
+    }
     playClick();
     const beforeMats = state.resources.materials?.amount || 0;
     onUpdate(s => {
@@ -60,6 +70,8 @@ export const MiningPanel = memo(function MiningPanel({ state, onUpdate }) {
       </div>
       <button className="mine-btn" onClick={handleMine} aria-label={`Mine for materials. ${chance.toFixed(0)}% gem chance.`} style={{
         background: `linear-gradient(90deg, #2a4a2a ${chance}%, #1a3a1a ${chance}%)`,
+        opacity: onCooldown ? 0.5 : 1,
+        transition: 'opacity 0.2s',
       }}>
         {lastMined ? (
           <span style={{ color: lastMined.gem ? '#ffdd44' : '#88dd88', fontWeight: lastMined.gem ? 'bold' : 'normal' }}>

@@ -195,7 +195,7 @@ export function tick(state, dt) {
   if (newState.prestigeUpgrades && newState.prestigeUpgrades.autoClicker) {
     const autoMineTimer = (newState.autoMineTimer || 0) + dt;
     if (autoMineTimer >= 1) {
-      const { state: minedState, foundGem } = mine(newState);
+      const { state: minedState, foundGem } = mine(newState, Math.random(), { skipCooldown: true });
       newState = {
         ...minedState,
         autoMineTimer: autoMineTimer - 1,

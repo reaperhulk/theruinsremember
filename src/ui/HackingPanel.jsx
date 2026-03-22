@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { startHack, submitHack } from '../engine/hacking.js';
 
 const SYMBOLS = ['0', '1', '2', '3'];
-const SHOW_TIME = 2000; // ms to show sequence before hiding
+const SHOW_TIME = 3000; // ms to show sequence before hiding
 
 export const HackingPanel = memo(function HackingPanel({ state, onUpdate }) {
   const [playerInput, setPlayerInput] = useState([]);
@@ -21,7 +21,7 @@ export const HackingPanel = memo(function HackingPanel({ state, onUpdate }) {
   // Also run a countdown timer so the player knows how long they have
   useEffect(() => {
     if (challenge) {
-      const hideMs = Math.max(1000, SHOW_TIME - difficulty * 100);
+      const hideMs = Math.max(1500, SHOW_TIME - difficulty * 50);
       setSequenceVisible(true);
       setCountdown(hideMs / 1000);
 

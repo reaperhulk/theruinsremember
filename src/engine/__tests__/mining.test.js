@@ -30,6 +30,7 @@ describe('mining', () => {
   describe('mine', () => {
     it('first mine gives +20 materials burst', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       const before = state.resources.materials.amount;
       const { state: after, foundGem } = mine(state, 0.99);
       expect(foundGem).toBe(false);
@@ -39,6 +40,7 @@ describe('mining', () => {
 
     it('gathers materials on a normal click (no gem)', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       state.miningStreak = 1; // bypass first-mine burst
       state.totalGems = 1;
       const before = state.resources.materials.amount;
@@ -51,6 +53,7 @@ describe('mining', () => {
 
     it('gathers 5x materials when gem is found', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       state.miningStreak = 5; // ensure gem chance > 0.01
       state.totalGems = 1;
       const before = state.resources.materials.amount;
@@ -64,15 +67,17 @@ describe('mining', () => {
 
     it('increments streak on miss', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       // First mine (burst) sets streak to 1
       const { state: after } = mine(state, 0.99);
       expect(after.miningStreak).toBe(1);
+      after.totalTime += 1; // advance past cooldown
       const { state: after2 } = mine(after, 0.99);
       expect(after2.miningStreak).toBe(2);
     });
 
     it('resets streak on gem find', () => {
-      const state = { ...createInitialState(), miningStreak: 10, totalGems: 1 };
+      const state = { ...createInitialState(), miningStreak: 10, totalGems: 1, totalTime: 10 };
       const { state: after, foundGem } = mine(state, 0.01);
       expect(foundGem).toBe(true);
       expect(after.miningStreak).toBe(0);
@@ -80,6 +85,7 @@ describe('mining', () => {
 
     it('applies rateMult to mine output', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       state.miningStreak = 1;
       state.totalGems = 1;
       state.resources.materials.rateMult = 3;
@@ -92,6 +98,7 @@ describe('mining', () => {
 
     it('applies prestige multiplier', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       state.miningStreak = 1;
       state.totalGems = 1;
       state.prestigeMultiplier = 2;
@@ -104,6 +111,7 @@ describe('mining', () => {
 
     it('gem + rateMult + prestige stack correctly', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       state.miningStreak = 5;
       state.totalGems = 1;
       state.resources.materials.rateMult = 2;
@@ -119,13 +127,14 @@ describe('mining', () => {
     it('streak increases gem chance so previously-miss roll becomes a hit', () => {
       // At streak 0: chance = 0.1, roll 0.15 => miss
       // At streak 5: chance = 0.2, roll 0.15 => hit
-      const state = { ...createInitialState(), miningStreak: 5 };
+      const state = { ...createInitialState(), miningStreak: 5, totalTime: 10 };
       const { foundGem } = mine(state, 0.15);
       expect(foundGem).toBe(true);
     });
 
     it('does not modify original state', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       const originalAmount = state.resources.materials.amount;
       mine(state, 0.99);
       expect(state.resources.materials.amount).toBe(originalAmount);
@@ -142,6 +151,7 @@ describe('mining', () => {
 
     it('first mine burst gives exactly 20 materials on a fresh state', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       const initialAmount = state.resources.materials.amount;
       expect(initialAmount).toBe(0);
       const { state: after, foundGem } = mine(state, 0.99);
@@ -151,8 +161,10 @@ describe('mining', () => {
 
     it('first mine burst only fires once', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       const first = mine(state, 0.99);
       expect(first.state.resources.materials.amount).toBeGreaterThanOrEqual(20); // Burst
+      first.state.totalTime += 1; // advance past cooldown
       const second = mine(first.state, 0.99);
       // Second mine should NOT give burst (miningStreak > 0)
       expect(second.state.resources.materials.amount - first.state.resources.materials.amount).toBeLessThan(20);
@@ -160,6 +172,7 @@ describe('mining', () => {
 
     it('mine output scales with rateAdd', () => {
       const state = createInitialState();
+      state.totalTime = 10;
       state.miningStreak = 1; // Skip first-mine burst
       state.totalGems = 1;
       state.resources.materials.rateAdd = 5;
@@ -171,6 +184,7 @@ describe('mining', () => {
 
       // Compare with base state (rateAdd=0)
       const baseState = createInitialState();
+      baseState.totalTime = 10;
       baseState.miningStreak = 1;
       baseState.totalGems = 1;
       // fullRate = (0.8 + 0) * 1 * 1 = 0.8, rateScale = max(1, 0.8) = 1

@@ -55,6 +55,23 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
               />
             );
           })}
+          {/* Show potential connection lines when a system is selected */}
+          {selected && systems.map(sys => {
+            if (sys.id === selected) return null;
+            if (routeExists(state, selected, sys.id)) return null;
+            const fromSys = systems.find(s => s.id === selected);
+            if (!fromSys) return null;
+            return (
+              <line
+                key={`potential-${sys.id}`}
+                x1={fromSys.x * 100} y1={fromSys.y * 100}
+                x2={sys.x * 100} y2={sys.y * 100}
+                stroke="#ffdd44" strokeWidth="0.5"
+                strokeDasharray="2,2"
+                opacity={0.3}
+              />
+            );
+          })}
           {systems.map(sys => {
             const isHovered = hovered === sys.id;
             const isSelected = selected === sys.id;

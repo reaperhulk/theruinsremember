@@ -2,8 +2,8 @@
 // Timing-based click game: hit the target zone for bonus resources.
 // The docking indicator moves back and forth; click when it's in the zone.
 
-const ZONE_SIZE = 0.2;       // 20% of the bar is the target zone
-const PERFECT_ZONE = 0.05;   // 5% center for perfect dock
+const ZONE_SIZE = 0.25;      // 25% of the bar is the target zone
+const PERFECT_ZONE = 0.08;   // 8% center for perfect dock
 const BASE_SPEED = 1.5;      // cycles per second at era 4
 
 // Resource rewards for docking — now calculated dynamically based on production rates

@@ -103,8 +103,8 @@ describe('docking', () => {
   it('getDockingInfo returns zone details', () => {
     const state = makeEra4State();
     const info = getDockingInfo(state);
-    expect(info.zoneSize).toBe(0.2);
-    expect(info.perfectSize).toBe(0.05);
+    expect(info.zoneSize).toBe(0.25);
+    expect(info.perfectSize).toBe(0.08);
     expect(info.attempts).toBe(0);
   });
 
