@@ -153,7 +153,7 @@ export const techTree = {
   },
   ftlResearch: {
     id: 'ftlResearch', name: 'FTL Research', era: 5,
-    cost: { research: 40000, exoticMaterials: 2000, colonies: 80 },
+    cost: { research: 80000, exoticMaterials: 8000, colonies: 200 },
     prerequisites: ['advancedPropulsion'],
     grantsEra: 6,
     description: 'The math was always impossible — until we found it scratched into a dead ship\'s hull',
@@ -169,7 +169,7 @@ export const techTree = {
   },
   megaEngineering: {
     id: 'megaEngineering', name: 'Mega Engineering', era: 6,
-    cost: { starSystems: 200, darkEnergy: 3000, research: 200000 },
+    cost: { starSystems: 500, darkEnergy: 8000, research: 500000 },
     prerequisites: ['galacticCartography'],
     grantsEra: 7,
     description: 'Half-built Dyson scaffolding orbits every dead star you visit — someone was building this before',
@@ -185,7 +185,7 @@ export const techTree = {
   },
   galacticNetwork: {
     id: 'galacticNetwork', name: 'Galactic Network', era: 7,
-    cost: { megastructures: 300, stellarForge: 1000, research: 800000 },
+    cost: { megastructures: 800, stellarForge: 3000, research: 2000000 },
     prerequisites: ['galacticAscendancy'],
     grantsEra: 8,
     description: 'The network was never offline — just dormant, waiting for someone to remember the access code',
@@ -201,7 +201,7 @@ export const techTree = {
   },
   intergalacticBeacon: {
     id: 'intergalacticBeacon', name: 'Intergalactic Beacon', era: 8,
-    cost: { exoticMatter: 15000, galacticInfluence: 300000, cosmicPower: 2000 },
+    cost: { exoticMatter: 40000, galacticInfluence: 800000, cosmicPower: 5000 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: 9,
     description: 'The signal format was familiar — it matched the distress call that brought us here',
@@ -217,7 +217,7 @@ export const techTree = {
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
-    cost: { universalConstants: 200, cosmicPower: 150000, realityFragments: 100 },
+    cost: { universalConstants: 600, cosmicPower: 400000, realityFragments: 300 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
     description: 'The signatures are identical to ours — every universe, the same collapse, the same rebirth',

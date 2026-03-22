@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { eraNames, ERA_COUNT, getMinUpgradesForEra, countEraUpgrades } from '../engine/eras.js';
+import { eraNames, ERA_COUNT, getMinUpgradesForEra, countEraUpgrades, checkEraTransition } from '../engine/eras.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
+import { techTree } from '../data/tech-tree.js';
 import { calculateProduction } from '../engine/resources.js';
 import { formatNumber, formatTime } from './format.js';
 
@@ -143,16 +144,18 @@ export function EraProgress({ state }) {
           Tip: Click the +1 buttons to gather resources, then buy upgrades on the right
         </p>
       )}
-      {!isMaxEra && !upgradesMet && (
-        <p className="era-hint">
-          Buy {minUpgrades - eraUpgradeCount} more upgrades, then research ★ tech to advance
-        </p>
-      )}
-      {!isMaxEra && upgradesMet && (
-        <p className="era-hint" style={{ color: '#88ff88' }}>
-          Research starred (★) technologies to advance to the next era
-        </p>
-      )}
+      {!isMaxEra && (() => {
+        const nextEra = state.era + 1;
+        const gatingTech = Object.values(techTree).find(t => t.grantsEra === nextEra && state.tech[t.id]);
+        const readyToTransition = upgradesMet && gatingTech;
+        if (readyToTransition) {
+          return <p className="era-hint" style={{ color: '#88ff88' }}>Era transition imminent...</p>;
+        }
+        if (!upgradesMet) {
+          return <p className="era-hint">Buy {minUpgrades - eraUpgradeCount} more upgrades, then research ★ tech to advance</p>;
+        }
+        return <p className="era-hint" style={{ color: '#88ff88' }}>Research starred (★) technologies to advance to the next era</p>;
+      })()}
       {!isMaxEra && (
         <>
           <p className="era-hint" style={{ color: upgradesMet ? '#88ff88' : '#ffcc44' }}>

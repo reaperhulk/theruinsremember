@@ -23,29 +23,16 @@ const ERA_MIN_UPGRADES = {
   2: 35,   // ~63% of ~56
   3: 25,   // ~47% of ~53 — bootstrapping delay
   4: 35,   // ~60% of ~58 — rocketFuel bootstrapping gate
-  5: 38,   // ~66% of ~58
-  6: 35,   // ~60% of ~58 — lower for non-minigame paths
-  7: 35,   // ~57% of ~61
-  8: 30,   // ~50% of ~60 — GI/exoticMatter bootstrapping; time gate is the real gate
-  9: 30,   // ~49% of ~61 — cosmicPower bootstrapping; time gate is the real gate
+  5: 42,   // ~72% of ~58
+  6: 40,   // ~69% of ~58
+  7: 40,   // ~66% of ~61
+  8: 38,   // ~63% of ~60
+  9: 38,   // ~62% of ~61
   10: 35,  // ~59% of ~59
 };
 
-// Minimum time (seconds) that must be spent in an era before transition.
-// Scales up for later eras to ensure each era feels meaningful.
-// Prestige reduces these by 10% per prestige count (min 30% of base).
-const ERA_MIN_TIME = {
-  1: 0,     // no minimum — era 1 is the intro
-  2: 30,    // 30s
-  3: 120,   // 2 min
-  4: 90,    // 1.5 min
-  5: 150,   // 2.5 min
-  6: 210,   // 3.5 min
-  7: 240,   // 4 min
-  8: 300,   // 5 min
-  9: 360,   // 6 min
-  10: 0,    // era 10 is the final era, no gate
-};
+// Time gates removed — era pacing is now fully organic via upgrade/tech costs.
+// Kept the function signature for backward compatibility but always returns 0.
 
 export function getMinUpgradesForEra(era) {
   return ERA_MIN_UPGRADES[era] || 10;
@@ -58,13 +45,10 @@ export function countEraUpgrades(state, era) {
   ).length;
 }
 
-// Get minimum time required in an era before transition, accounting for prestige.
+// Get minimum time required in an era before transition.
+// Returns 0 — pacing is handled by upgrade/tech costs, not artificial time gates.
 export function getMinTimeForEra(era, prestigeCount = 0) {
-  const base = ERA_MIN_TIME[era] || 0;
-  if (base === 0) return 0;
-  // Prestige reduces min time by 10% per prestige (min 30% of base)
-  const reduction = Math.min(0.7, prestigeCount * 0.1);
-  return Math.floor(base * (1 - reduction));
+  return 0;
 }
 
 // Check if state qualifies for an era transition. Returns next era number or null.
