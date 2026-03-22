@@ -141,6 +141,36 @@ describe('mining', () => {
       expect(state.miningStreak).toBe(0);
     });
 
+    it('mining cooldown blocks rapid mines', () => {
+      const state = createInitialState();
+      state.totalTime = 10;
+      state.miningStreak = 1;
+      state.totalGems = 1;
+      const first = mine(state, 0.99);
+      // Second mine within 0.5s should be blocked (same totalTime = 0s gap)
+      const second = mine(first.state, 0.99);
+      expect(second.state.resources.materials.amount).toBe(first.state.resources.materials.amount);
+    });
+
+    it('mining cooldown allows mine after sufficient time', () => {
+      const state = createInitialState();
+      state.totalTime = 10;
+      state.miningStreak = 1;
+      state.totalGems = 1;
+      const first = mine(state, 0.99);
+      // Advance past cooldown
+      first.state.totalTime += 1;
+      const second = mine(first.state, 0.99);
+      expect(second.state.resources.materials.amount).toBeGreaterThan(first.state.resources.materials.amount);
+    });
+
+    it('first mine bypasses cooldown even at time 0', () => {
+      const state = createInitialState();
+      state.totalTime = 0;
+      const result = mine(state, 0.99);
+      expect(result.state.resources.materials.amount).toBeGreaterThan(state.resources.materials.amount);
+    });
+
     it('returns unchanged state if materials locked', () => {
       const state = createInitialState();
       state.resources.materials.unlocked = false;
