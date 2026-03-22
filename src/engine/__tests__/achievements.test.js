@@ -11,8 +11,8 @@ describe('achievements', () => {
     const firstGem = newAchievements.find(a => a.id === 'firstGem');
     expect(firstGem).toBeTruthy();
     expect(after.achievements.firstGem).toBe(true);
-    // Achievements no longer award prestige points directly
-    expect(after.prestigePoints || 0).toBe(0);
+    // Achievements award prestige points based on their reward field
+    expect(after.prestigePoints).toBe(1); // firstGem has reward: 1
   });
 
   it('does not re-award already earned achievements', () => {

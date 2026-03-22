@@ -22,10 +22,21 @@ export function checkAchievements(state) {
 
   if (newAchievements.length === 0) return { state, newAchievements: [] };
 
+  // Award prestige points for newly earned achievements
+  const hasAchievementHunter = state.prestigeUpgrades && state.prestigeUpgrades.achievementHunter;
+  const rewardMult = hasAchievementHunter ? 1.5 : 1;
+  let pointsEarned = 0;
+  for (const a of newAchievements) {
+    if (a.reward) {
+      pointsEarned += Math.floor(a.reward * rewardMult);
+    }
+  }
+
   return {
     state: {
       ...state,
       achievements: earned,
+      prestigePoints: (state.prestigePoints || 0) + pointsEarned,
     },
     newAchievements,
   };
