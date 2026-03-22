@@ -21,7 +21,7 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 const ERA_MIN_UPGRADES = {
   1: 30,   // ~55% of ~55
   2: 35,   // ~63% of ~56
-  3: 35,   // ~66% of ~53
+  3: 30,   // ~57% of ~53 — era 3 has bootstrapping delay (software/data start at 0)
   4: 38,   // ~66% of ~58
   5: 42,   // ~72% of ~58
   6: 44,   // ~76% of ~58

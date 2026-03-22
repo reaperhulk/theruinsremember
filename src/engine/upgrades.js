@@ -7,13 +7,20 @@ export const ERA_COST_MULTIPLIERS = {
   1: 1, 2: 70, 3: 150, 4: 500, 5: 2000, 6: 10000, 7: 4000000, 8: 60000000, 9: 40000000, 10: 1000000000000,
 };
 
+// Same-era cost exponent per era. Early eras use gentler scaling (sqrt-like),
+// later eras use steeper scaling to prevent instant transitions.
+const SAME_ERA_EXPONENT = {
+  1: 0.5, 2: 0.5, 3: 0.5, 4: 0.5, 5: 0.55, 6: 0.6, 7: 0.6, 8: 0.65, 9: 0.65, 10: 0.65,
+};
+
 // Apply era-based cost scaling per resource:
 // - Earlier-era resources: full multiplier (player has high production)
-// - Same-era resources: eraMult^0.7 (steeper scaling to prevent trivial same-era purchases)
+// - Same-era resources: eraMult^exponent (era-dependent, steeper in late game)
 export function applyEraCostScaling(baseCost, upgradeEra) {
   const eraMult = ERA_COST_MULTIPLIERS[upgradeEra] || 1;
   if (eraMult <= 1) return baseCost;
-  const sameEraMult = Math.ceil(Math.pow(eraMult, 0.7));
+  const exponent = SAME_ERA_EXPONENT[upgradeEra] || 0.6;
+  const sameEraMult = Math.ceil(Math.pow(eraMult, exponent));
   const scaled = {};
   for (const [resource, amount] of Object.entries(baseCost)) {
     const resourceEra = resourceDefs[resource]?.era || 1;

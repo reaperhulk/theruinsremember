@@ -194,7 +194,7 @@ export const techTree = {
   // Era 8 → 9 (Galactic → Intergalactic)
   cosmicEngineering: {
     id: 'cosmicEngineering', name: 'Cosmic Engineering', era: 8,
-    cost: { exoticMatter: 5000, galacticInfluence: 150000, research: 5000000 },
+    cost: { exoticMatter: 5000, galacticInfluence: 150000, research: 2000000 },
     prerequisites: [],
     grantsEra: null,
     description: 'The ruins at galactic center are tools, not monuments — and they still work',
