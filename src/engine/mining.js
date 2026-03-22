@@ -24,12 +24,7 @@ export function mine(state, roll = Math.random(), { skipCooldown = false } = {})
   const r = state.resources.materials;
   if (!r || !r.unlocked) return { state, foundGem: false };
 
-  // Cooldown check (skipped for auto-mine)
-  if (!skipCooldown && (state.totalTime || 0) - (state.lastMineTime || 0) < MINE_COOLDOWN) {
-    return { state, foundGem: false };
-  }
-
-  // First mine is always a big hit
+  // First mine is always a big hit (bypass cooldown for the very first mine)
   if ((state.miningStreak || 0) === 0 && (state.totalGems || 0) === 0) {
     const firstMineAmount = 20; // Big burst to hook the player
     return {
@@ -41,6 +36,11 @@ export function mine(state, roll = Math.random(), { skipCooldown = false } = {})
       },
       foundGem: false,
     };
+  }
+
+  // Cooldown check (skipped for auto-mine)
+  if (!skipCooldown && (state.totalTime || 0) - (state.lastMineTime || 0) < MINE_COOLDOWN) {
+    return { state, foundGem: false };
   }
 
   const chance = getGemChance(state);

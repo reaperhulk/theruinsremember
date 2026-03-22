@@ -262,7 +262,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
               return current;
             })}
           >
-            {affordableNonRepeatable.length > 0 ? `Buy All Affordable (${affordableNonRepeatable.length} upgrades, ${countEffects(affordableNonRepeatable)} effects)` : 'No affordable upgrades'}
+            {affordableNonRepeatable.length > 0 ? `Buy All Affordable (${affordableNonRepeatable.length} upgrades, ${countEffects(affordableNonRepeatable)} effects, era ${state.era} only)` : 'No affordable upgrades'}
           </button>
         );
       })()}
