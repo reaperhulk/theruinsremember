@@ -122,7 +122,7 @@ export function App() {
 
   // Keyboard shortcuts
   const handleKeyDown = useCallback((e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA' || document.activeElement?.tagName === 'SELECT') return;
     const tabs = getAvailableTabs(state.era);
     const tabByKey = tabs.find(t => t.key === e.key);
     if (tabByKey) {

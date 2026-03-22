@@ -1,0 +1,23 @@
+import { describe, it, expect } from 'vitest';
+import { createInitialState, migrateState } from '../state.js';
+
+describe('migrateState', () => {
+  it('fills missing fields from fresh state', () => {
+    const oldSave = { era: 3, resources: { food: { unlocked: true, amount: 100 } } };
+    const migrated = migrateState(oldSave);
+    expect(migrated.era).toBe(3);
+    expect(migrated.resources.food.amount).toBe(100);
+    expect(migrated.dysonSegments).toBe(0);
+    expect(migrated.seenLoreEvents).toEqual({});
+    expect(migrated.realityKeys).toBeDefined();
+  });
+
+  it('preserves existing data', () => {
+    const state = createInitialState();
+    state.era = 5;
+    state.upgrades = { tools: true };
+    const migrated = migrateState(state);
+    expect(migrated.era).toBe(5);
+    expect(migrated.upgrades.tools).toBe(true);
+  });
+});
