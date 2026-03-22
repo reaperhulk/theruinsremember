@@ -87,6 +87,8 @@ export function createInitialState() {
     hackMastery: false,
     // Lore event deduplication
     seenLoreEvents: {},
+    // UI: hidden repeatable upgrades
+    hiddenUpgrades: {},
     saveVersion: 2,
   };
 }

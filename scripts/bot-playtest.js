@@ -199,6 +199,28 @@ const PROFILES = {
       'cycleMastery',
     ],
   },
+  casual: {
+    description: 'Simulates a regular player: gathers infrequently, misses docks, skips some mini-games.',
+    mine: true, gather: true, gatherInterval: 15,
+    buyUpgrades: true, buyTech: true,
+    factory: true, factoryStrategy: 'balanced',
+    hacking: true, hackInterval: 60,
+    docking: true, dockInterval: 5, dockAccuracy: 0.15,
+    colonies: true, colonyStrategy: 'growth',
+    starChart: true,
+    weaving: false, weaveInterval: 0,
+    trading: false, tradeStrategy: 'bottleneck',
+    dysonAssembly: true,
+    cosmicTuning: true,
+    senateFocus: 'merchants',
+    realityForge: true,
+    buyPrestigeUpgrades: true,
+    prestigeUpgradeOrder: [
+      'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
+      'autoClicker', 'factoryExpert', 'dockingPro', 'hackMaster',
+      'wisdomOfAges', 'quantumMemory', 'cosmicInsight',
+    ],
+  },
 };
 
 // ─── Built-in Scenarios ─────────────────────────────────────────────────────
@@ -213,6 +235,7 @@ const SCENARIOS = {
   regression:   { profile: 'optimal',      prestige: 0,  targetEra: 5,  maxTime: 1800,  purpose: 'Quick pacing sanity check' },
   earlyGame:    { profile: 'optimal',      prestige: 0,  targetEra: 3,  maxTime: 900,   purpose: 'Era 1-3 pacing detail' },
   lateGame:     { profile: 'optimal',      prestige: 2,  targetEra: 10, maxTime: 14400, prestigeAtEra: 7, purpose: 'Late-game with prestige' },
+  casual:       { profile: 'casual',       prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Standard casual player experience' },
 };
 
 // ─── Bot Action Functions ───────────────────────────────────────────────────

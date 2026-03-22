@@ -108,6 +108,7 @@ function getAffordProgress(state, cost) {
 
 export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const [showPurchased, setShowPurchased] = useState(false);
+  const [showHidden, setShowHidden] = useState(false);
   const [sortBy, setSortBy] = useState('default');
   const [filterType, setFilterType] = useState('all');
   const [searchText, setSearchText] = useState('');
@@ -117,6 +118,15 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const chainTimerRef = useRef(null);
   const seenUpgradeIdsRef = useRef(new Set());
   const [newUpgradeIds, setNewUpgradeIds] = useState(new Set());
+
+  const handleToggleHide = useCallback((upgradeId) => {
+    onUpdate(s => {
+      const hidden = { ...(s.hiddenUpgrades || {}) };
+      if (hidden[upgradeId]) delete hidden[upgradeId];
+      else hidden[upgradeId] = true;
+      return { ...s, hiddenUpgrades: hidden };
+    });
+  }, [onUpdate]);
 
   const handlePurchase = useCallback((upgradeId) => {
     playUpgrade();
@@ -190,12 +200,19 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
 
   // Apply text search filter
   const searchLower = searchText.toLowerCase().trim();
-  const filteredAvailable = searchLower
+  const searchFiltered = searchLower
     ? typeFiltered.filter(u =>
         u.name.toLowerCase().includes(searchLower) ||
         u.description.toLowerCase().includes(searchLower)
       )
     : typeFiltered;
+
+  // Apply hidden upgrade filter
+  const hiddenUpgrades = state.hiddenUpgrades || {};
+  const hiddenCount = searchFiltered.filter(u => hiddenUpgrades[u.id]).length;
+  const filteredAvailable = showHidden
+    ? searchFiltered
+    : searchFiltered.filter(u => !hiddenUpgrades[u.id]);
 
   const affordableCount = useMemo(() =>
     filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length,
@@ -225,6 +242,15 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
             onClick={() => setShowPurchased(!showPurchased)}
           >
             {showPurchased ? ' (hide owned)' : ` (${purchased.length} owned)`}
+          </span>
+        )}
+        {hiddenCount > 0 && (
+          <span
+            className="toggle-purchased"
+            onClick={() => setShowHidden(!showHidden)}
+            style={{ marginLeft: '4px' }}
+          >
+            {showHidden ? ' (apply hidden)' : ` (${hiddenCount} hidden)`}
           </span>
         )}
       </h2>
@@ -362,6 +388,16 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 style={{ fontSize: '0.8em', padding: '4px 8px' }}
               >
                 Max
+              </button>
+            )}
+            {upgrade.repeatable && (
+              <button
+                className="upgrade-btn"
+                onClick={(e) => { e.stopPropagation(); handleToggleHide(upgrade.id); }}
+                title={hiddenUpgrades[upgrade.id] ? 'Show this upgrade' : 'Hide this upgrade'}
+                style={{ fontSize: '0.7em', padding: '2px 6px', opacity: 0.6, minWidth: 'auto' }}
+              >
+                {hiddenUpgrades[upgrade.id] ? 'Show' : 'Hide'}
               </button>
             )}
             </div>
