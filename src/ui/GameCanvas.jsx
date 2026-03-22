@@ -1435,57 +1435,84 @@ function drawEra6(ctx, w, h, t, state) {
   const cx = w * 0.5, cy = h * 0.5;
   const rotation = t * 0.04;
 
-  // Spiral galaxy
-  // Bright core
-  drawGlowCircle(ctx, cx, cy, 5, 'rgba(255,240,200,0.8)', 25);
-  drawGlowCircle(ctx, cx, cy, 3, 'rgba(255,255,240,0.9)', 12);
+  // --- GALAXY: Impressive spiral with dust lanes, bright core, 4 arms ---
 
-  // Spiral arms
-  for (let arm = 0; arm < 2; arm++) {
-    const armOffset = arm * Math.PI;
-    for (let i = 0; i < 200; i++) {
-      const dist = 8 + i * 0.5;
-      const angle = rotation + armOffset + dist * 0.08;
-      const spread = (0.8 + Math.sin(i * 0.3) * 0.5) * (dist * 0.04);
+  // Central bulge — large golden glow
+  const bulgeGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 35);
+  bulgeGrad.addColorStop(0, 'rgba(255,245,200,0.9)');
+  bulgeGrad.addColorStop(0.15, 'rgba(255,230,160,0.6)');
+  bulgeGrad.addColorStop(0.4, 'rgba(255,200,100,0.2)');
+  bulgeGrad.addColorStop(0.7, 'rgba(200,150,80,0.05)');
+  bulgeGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = bulgeGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+  ctx.fill();
 
-      const rng = seededRandom(arm * 1000 + i);
-      const offsetX = (rng() - 0.5) * spread * 8;
-      const offsetY = (rng() - 0.5) * spread * 8;
+  // Bright core point
+  drawGlowCircle(ctx, cx, cy, 3, 'rgba(255,255,240,0.95)', 10);
 
-      const x = cx + Math.cos(angle) * dist * 1.2 + offsetX;
-      const y = cy + Math.sin(angle) * dist * 0.5 + offsetY;
+  // 4 spiral arms with stars and dust lanes
+  for (let arm = 0; arm < 4; arm++) {
+    const armOffset = arm * Math.PI * 0.5;
+    const armRng = seededRandom(arm * 2000 + 50);
+    for (let i = 0; i < 70; i++) {
+      const dist = 10 + i * 1.1;
+      const angle = rotation + armOffset + dist * 0.07;
+      const spread = (0.6 + Math.sin(i * 0.2) * 0.3) * (dist * 0.035);
+
+      const ox = (armRng() - 0.5) * spread * 7;
+      const oy = (armRng() - 0.5) * spread * 7;
+
+      const x = cx + Math.cos(angle) * dist * 1.2 + ox;
+      const y = cy + Math.sin(angle) * dist * 0.45 + oy;
 
       if (x < -5 || x > w + 5 || y < -5 || y > h + 5) continue;
 
-      const distFromCenter = Math.sqrt((x - cx) ** 2 + ((y - cy) * 2) ** 2);
-      const brightness = Math.max(0.05, 0.5 - distFromCenter / 200);
-      const size = 0.5 + rng() * 1.2;
+      const distFromCenter = Math.sqrt((x - cx) ** 2 + ((y - cy) * 2.2) ** 2);
+      const brightness = Math.max(0.04, 0.55 - distFromCenter / 180);
+      const size = 0.4 + armRng() * 1.0;
 
-      // Color varies: blue-white near center, red-orange further out
-      const colorT = Math.min(1, dist / 100);
-      const r = Math.floor(lerp(200, 255, colorT));
-      const g = Math.floor(lerp(210, 180, colorT));
-      const b = Math.floor(lerp(255, 150, colorT));
+      // Color: blue-white inner, yellow middle, red-orange outer
+      const colorT = Math.min(1, dist / 90);
+      const r = Math.floor(lerp(190, 255, colorT));
+      const g = Math.floor(lerp(200, 170, colorT));
+      const b = Math.floor(lerp(255, 130, colorT));
 
       ctx.fillStyle = `rgba(${r},${g},${b},${brightness})`;
       ctx.beginPath();
       ctx.arc(x, y, size, 0, Math.PI * 2);
       ctx.fill();
+
+      // Dust lanes — dark reddish-brown patches trailing each arm
+      if (i % 10 === 0 && armRng() > 0.4) {
+        const dustAngle = angle - 0.12;
+        const dustDist = dist + 2;
+        const dx2 = cx + Math.cos(dustAngle) * dustDist * 1.2 + ox * 0.5;
+        const dy2 = cy + Math.sin(dustAngle) * dustDist * 0.45 + oy * 0.5;
+        const dustAlpha = 0.04 + 0.02 * Math.sin(t * 0.2 + i);
+        const dustR = 3 + armRng() * 4;
+        ctx.fillStyle = `rgba(40,15,10,${dustAlpha})`;
+        ctx.beginPath();
+        ctx.arc(dx2, dy2, dustR, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
   }
 
-  // Network lines between key sectors
+  // --- SECTOR NODES: Small galaxy cluster groups instead of single circles ---
   const sectorNodes = [];
   const sRng = seededRandom(42);
   for (let i = 0; i < 8; i++) {
     const angle = rotation + i * Math.PI * 0.25;
-    const dist = 25 + sRng() * 50;
+    const dist = 30 + sRng() * 50;
     sectorNodes.push({
       x: cx + Math.cos(angle) * dist * 1.2,
       y: cy + Math.sin(angle) * dist * 0.5,
     });
   }
 
+  // Network lines between sectors
   for (let i = 0; i < sectorNodes.length; i++) {
     for (let j = i + 1; j < sectorNodes.length; j++) {
       const dx = sectorNodes[i].x - sectorNodes[j].x;
@@ -1502,14 +1529,65 @@ function drawEra6(ctx, w, h, t, state) {
     }
   }
 
-  // Glowing key system nodes — size scales with galactic influence
+  // Draw sector nodes as tiny galaxy clusters (groups of glowing dots)
   const giAmount = state?.resources?.galacticInfluence?.amount || 0;
   const nodeScale = 1 + Math.min(giAmount / 500, 1.5);
-  for (const n of sectorNodes) {
-    const pulse = 0.5 + 0.5 * Math.sin(t * 2 + n.x);
-    ctx.fillStyle = `rgba(100,220,255,${0.3 + pulse * 0.5})`;
+  for (let ni = 0; ni < sectorNodes.length; ni++) {
+    const n = sectorNodes[ni];
+    const clusterRng = seededRandom(ni * 300 + 77);
+    const clusterSize = (3 + Math.sin(t * 2 + n.x) * 1) * nodeScale;
+    // Cluster glow
+    const glowAlpha = 0.15 + 0.1 * Math.sin(t * 2 + ni);
+    drawGlowCircle(ctx, n.x, n.y, clusterSize * 0.5, `rgba(100,200,255,${glowAlpha})`, clusterSize * 2.5);
+    // 5-7 tiny dots forming a mini cluster
+    const dotCount = 5 + Math.floor(clusterRng() * 3);
+    for (let d = 0; d < dotCount; d++) {
+      const dx = (clusterRng() - 0.5) * clusterSize * 2;
+      const dy = (clusterRng() - 0.5) * clusterSize * 2;
+      const dotAlpha = 0.4 + 0.4 * Math.sin(t * 3 + d + ni);
+      const dotSize = 0.4 + clusterRng() * 0.6;
+      ctx.fillStyle = `rgba(180,220,255,${dotAlpha})`;
+      ctx.beginPath();
+      ctx.arc(n.x + dx, n.y + dy, dotSize, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // --- WORMHOLES: Glowing pulsing rings at fixed positions ---
+  const wormholes = [
+    { x: w * 0.22, y: h * 0.38, r: 8 },
+    { x: w * 0.78, y: h * 0.42, r: 7 },
+    { x: w * 0.55, y: h * 0.72, r: 6 },
+  ];
+  for (let wi = 0; wi < wormholes.length; wi++) {
+    const wh = wormholes[wi];
+    const pulseR = wh.r * (1 + 0.15 * Math.sin(t * 3 + wi * 2));
+    const whHue = (t * 30 + wi * 120) % 360;
+    // Outer distortion glow
+    const distGrad = ctx.createRadialGradient(wh.x, wh.y, pulseR * 0.5, wh.x, wh.y, pulseR * 2.5);
+    distGrad.addColorStop(0, `hsla(${whHue},80%,60%,0.15)`);
+    distGrad.addColorStop(0.6, `hsla(${whHue + 30},60%,40%,0.05)`);
+    distGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = distGrad;
     ctx.beginPath();
-    ctx.arc(n.x, n.y, (2 + pulse) * nodeScale, 0, Math.PI * 2);
+    ctx.arc(wh.x, wh.y, pulseR * 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    // Glowing ring
+    ctx.strokeStyle = `hsla(${whHue},90%,70%,${0.4 + 0.2 * Math.sin(t * 4 + wi)})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(wh.x, wh.y, pulseR, 0, Math.PI * 2);
+    ctx.stroke();
+    // Inner ring
+    ctx.strokeStyle = `hsla(${whHue},80%,80%,${0.25 + 0.15 * Math.sin(t * 5 + wi)})`;
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.arc(wh.x, wh.y, pulseR * 0.6, 0, Math.PI * 2);
+    ctx.stroke();
+    // Dark center (event horizon)
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.beginPath();
+    ctx.arc(wh.x, wh.y, pulseR * 0.35, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -1790,18 +1868,39 @@ function drawIntergalactic(ctx, w, h, t, state) {
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, w, h);
 
-  drawStarField(ctx, w, h, 30, 500, t);
-
-  // Cosmic web — filaments connecting galaxy clusters
-  const nodes = [];
-  const nodeRng = seededRandom(999);
-  for (let i = 0; i < 12; i++) {
-    nodes.push({ x: nodeRng() * w, y: nodeRng() * h, size: 3 + nodeRng() * 8 });
+  // --- VOID REGIONS: dark patches of nothingness between filaments ---
+  const voidRng = seededRandom(1234);
+  for (let i = 0; i < 6; i++) {
+    const vx = voidRng() * w;
+    const vy = voidRng() * h;
+    const vr = 25 + voidRng() * 40;
+    const voidGradPatch = ctx.createRadialGradient(vx, vy, 0, vx, vy, vr);
+    voidGradPatch.addColorStop(0, 'rgba(0,0,2,0.4)');
+    voidGradPatch.addColorStop(0.6, 'rgba(0,0,5,0.15)');
+    voidGradPatch.addColorStop(1, 'transparent');
+    ctx.fillStyle = voidGradPatch;
+    ctx.beginPath();
+    ctx.arc(vx, vy, vr, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  // Draw filaments between nearby nodes — brightness scales with cosmicPower
+  drawStarField(ctx, w, h, 30, 500, t);
+
+  // --- COSMIC WEB: filaments with varied thickness and galaxy sprites at nodes ---
+  const nodes = [];
+  const nodeRng = seededRandom(999);
+  for (let i = 0; i < 14; i++) {
+    nodes.push({
+      x: nodeRng() * w, y: nodeRng() * h,
+      size: 3 + nodeRng() * 8,
+      mass: 0.3 + nodeRng() * 0.7, // mass determines filament thickness
+    });
+  }
+
   const cpAmount = state?.resources?.cosmicPower?.amount || 0;
   const filamentBoost = 1 + Math.min(cpAmount / 200, 3);
+
+  // Draw filaments with varied thickness based on combined node mass
   for (let i = 0; i < nodes.length; i++) {
     for (let j = i + 1; j < nodes.length; j++) {
       const dx = nodes[i].x - nodes[j].x;
@@ -1810,39 +1909,83 @@ function drawIntergalactic(ctx, w, h, t, state) {
       if (dist < w * 0.4) {
         const alpha = (1 - dist / (w * 0.4)) * 0.12 * filamentBoost;
         const pulse = 0.5 + 0.5 * Math.sin(t * 0.5 + i + j);
-        ctx.strokeStyle = `rgba(100,60,200,${Math.min(alpha * pulse, 0.8)})`;
-        ctx.lineWidth = 2;
+        const combinedMass = nodes[i].mass + nodes[j].mass;
+        const thickness = 0.5 + combinedMass * 1.5;
+        // Outer glow strand
+        ctx.strokeStyle = `rgba(80,40,180,${Math.min(alpha * pulse * 0.4, 0.3)})`;
+        ctx.lineWidth = thickness + 3;
         ctx.beginPath();
         ctx.moveTo(nodes[i].x, nodes[i].y);
         const mx = (nodes[i].x + nodes[j].x) / 2 + Math.sin(t * 0.3 + i) * 10;
         const my = (nodes[i].y + nodes[j].y) / 2 + Math.cos(t * 0.4 + j) * 8;
         ctx.quadraticCurveTo(mx, my, nodes[j].x, nodes[j].y);
         ctx.stroke();
+        // Core strand
+        ctx.strokeStyle = `rgba(120,80,220,${Math.min(alpha * pulse, 0.8)})`;
+        ctx.lineWidth = thickness;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.quadraticCurveTo(mx, my, nodes[j].x, nodes[j].y);
+        ctx.stroke();
       }
     }
   }
 
-  // Galaxy cluster nodes with glow
-  for (const node of nodes) {
+  // Galaxy cluster nodes — tiny galaxy sprites showing each dot is a galaxy
+  for (let ni = 0; ni < nodes.length; ni++) {
+    const node = nodes[ni];
     const hue = (node.x * 2 + node.y + t * 10) % 360;
-    drawGlowCircle(ctx, node.x, node.y, node.size * 0.3, `hsla(${hue},70%,60%,0.6)`, node.size * 1.5);
-    ctx.fillStyle = `hsla(${hue},80%,80%,0.7)`;
+    // Node glow
+    drawGlowCircle(ctx, node.x, node.y, node.size * 0.3, `hsla(${hue},70%,60%,0.5)`, node.size * 1.8);
+    // Tiny galaxy sprite — a few dots in a mini-spiral pattern
+    const gRng = seededRandom(ni * 500 + 123);
+    for (let s = 0; s < 8; s++) {
+      const sDist = 1 + s * node.size * 0.08;
+      const sAngle = t * 0.05 + ni + s * 0.8;
+      const sx = node.x + Math.cos(sAngle) * sDist;
+      const sy = node.y + Math.sin(sAngle) * sDist * 0.5;
+      const sAlpha = 0.3 + 0.3 * Math.sin(t * 2 + s + ni);
+      ctx.fillStyle = `hsla(${hue},60%,75%,${sAlpha})`;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 0.3 + gRng() * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Bright core of galaxy sprite
+    ctx.fillStyle = `hsla(${hue},80%,85%,0.6)`;
     ctx.beginPath();
-    ctx.arc(node.x, node.y, node.size * 0.4, 0, Math.PI * 2);
+    ctx.arc(node.x, node.y, node.size * 0.2, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // Gravitational lensing arcs near center
+  // --- GRAVITATIONAL LENSING: Einstein rings with distorted background stars ---
   const cx = w * 0.5, cy = h * 0.5;
   for (let arc = 0; arc < 4; arc++) {
-    const arcAngle = t * 0.1 + arc * Math.PI / 2;
-    const arcR = 30 + arc * 12;
-    const hue = (arc * 90 + t * 20) % 360;
-    ctx.strokeStyle = `hsla(${hue},60%,60%,${0.08 + 0.05 * Math.sin(t + arc)})`;
+    const arcAngle = t * 0.08 + arc * Math.PI / 2;
+    const arcR = 28 + arc * 14;
+    const hue = (arc * 80 + t * 15) % 360;
+    // Outer diffuse arc (Einstein ring glow)
+    ctx.strokeStyle = `hsla(${hue},50%,55%,${0.04 + 0.03 * Math.sin(t + arc)})`;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(cx, cy, arcR, arcAngle, arcAngle + Math.PI * 0.7);
+    ctx.stroke();
+    // Core arc
+    ctx.strokeStyle = `hsla(${hue},65%,65%,${0.1 + 0.06 * Math.sin(t + arc)})`;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.arc(cx, cy, arcR, arcAngle, arcAngle + Math.PI * 0.6);
+    ctx.arc(cx, cy, arcR, arcAngle, arcAngle + Math.PI * 0.7);
     ctx.stroke();
+    // Distorted background star dots along the arc
+    for (let sd = 0; sd < 4; sd++) {
+      const sdAngle = arcAngle + (sd / 4) * Math.PI * 0.7;
+      const sdx = cx + Math.cos(sdAngle) * arcR + Math.sin(t * 2 + sd) * 1.5;
+      const sdy = cy + Math.sin(sdAngle) * arcR + Math.cos(t * 2 + sd) * 1.5;
+      const sdAlpha = 0.15 + 0.1 * Math.sin(t * 3 + sd + arc);
+      ctx.fillStyle = `hsla(${hue + 20},40%,80%,${sdAlpha})`;
+      ctx.beginPath();
+      ctx.arc(sdx, sdy, 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   // Central void attractor
@@ -1854,7 +1997,7 @@ function drawIntergalactic(ctx, w, h, t, state) {
   ctx.arc(cx, cy, 25, 0, Math.PI * 2);
   ctx.fill();
 
-  // Expanding cosmic ripples — rings emanating from void
+  // Expanding cosmic ripples
   for (let r = 0; r < 3; r++) {
     const rippleR = ((t * 8 + r * 40) % 120);
     const rippleAlpha = Math.max(0, 0.15 - rippleR / 800);
@@ -1894,87 +2037,191 @@ function drawMultiverse(ctx, w, h, t, state) {
   // Distant stars visible through reality tears
   drawStarField(ctx, w, h, 25, 1010, t);
 
-  // Quantum interference pattern
-  for (let x = 0; x < w; x += 4) {
+  // Quantum interference pattern (reduced iterations)
+  for (let x = 0; x < w; x += 6) {
     const wave1 = Math.sin(x * 0.05 + t * 2) * 0.5;
     const wave2 = Math.sin(x * 0.08 - t * 1.5) * 0.3;
     const intensity = Math.abs(wave1 + wave2);
     if (intensity > 0.3) {
       ctx.fillStyle = `rgba(200,100,255,${intensity * 0.08})`;
-      ctx.fillRect(x, 0, 3, h);
+      ctx.fillRect(x, 0, 4, h);
     }
   }
 
-  // Reality bubbles — each is a "universe", count scales with realityFragments
+  // --- DIMENSIONAL RIFTS: jagged tears with alternate reality colors bleeding through ---
+  const riftRng = seededRandom(4040);
+  for (let rift = 0; rift < 4; rift++) {
+    const startX = riftRng() * w;
+    const startY = riftRng() * h * 0.3 + h * 0.1;
+    const riftHue = (rift * 90 + t * 25) % 360;
+    const altHue = (riftHue + 180) % 360;
+    const flickerAlpha = 0.15 + 0.25 * Math.abs(Math.sin(t * 4 + rift * 1.7));
+    const segments = 6 + Math.floor(riftRng() * 4);
+
+    // Color bleed from alternate reality behind the rift
+    let rx = startX, ry = startY;
+    const riftPath = [{ x: rx, y: ry }];
+    const innerRng = seededRandom(rift * 100 + 500);
+    for (let s = 0; s < segments; s++) {
+      rx += (innerRng() - 0.4) * 18 + Math.sin(t * 2.5 + s) * 4;
+      ry += 8 + innerRng() * 12;
+      riftPath.push({ x: rx, y: ry });
+    }
+
+    // Glow behind rift — alternate reality color
+    ctx.strokeStyle = `hsla(${altHue},70%,55%,${flickerAlpha * 0.35})`;
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(riftPath[0].x, riftPath[0].y);
+    for (let s = 1; s < riftPath.length; s++) ctx.lineTo(riftPath[s].x, riftPath[s].y);
+    ctx.stroke();
+
+    // Mid glow
+    ctx.strokeStyle = `hsla(${riftHue},80%,65%,${flickerAlpha * 0.5})`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(riftPath[0].x, riftPath[0].y);
+    for (let s = 1; s < riftPath.length; s++) ctx.lineTo(riftPath[s].x, riftPath[s].y);
+    ctx.stroke();
+
+    // Sharp rift line
+    ctx.strokeStyle = `hsla(${riftHue},90%,85%,${flickerAlpha})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(riftPath[0].x, riftPath[0].y);
+    for (let s = 1; s < riftPath.length; s++) ctx.lineTo(riftPath[s].x, riftPath[s].y);
+    ctx.stroke();
+  }
+
+  // --- REALITY BUBBLES: each shows a tiny glimpse of a different era ---
+  // Era color themes for bubble interiors
+  const eraThemes = [
+    { colors: ['#e09050', '#604830', '#1a2040'], label: 'planet' },     // era 1 planetfall
+    { colors: ['#8B4513', '#D2691E', '#FF6347'], label: 'industry' },   // era 2 industry
+    { colors: ['#0a0e1a', '#00ff88', '#4488ff'], label: 'digital' },    // era 3 digital
+    { colors: ['#1a1a3a', '#4444aa', '#88aaff'], label: 'space' },      // era 4 space
+    { colors: ['#0a0a2a', '#FFD700', '#FF8C00'], label: 'solar' },      // era 5 solar system
+    { colors: ['#0a0020', '#6644cc', '#aa88ff'], label: 'stellar' },    // era 6 interstellar
+    { colors: ['#080015', '#ff6600', '#ffcc00'], label: 'dyson' },      // era 7 dyson
+    { colors: ['#020008', '#6688ff', '#aaccff'], label: 'galaxy' },     // era 8 galactic
+    { colors: ['#050012', '#6030c0', '#9966ff'], label: 'cosmic' },     // era 9 intergalactic
+  ];
+
   const rfAmount = state?.resources?.realityFragments?.amount || 0;
-  const bubbleCount = Math.min(3 + Math.floor(rfAmount / 50), 12);
+  const bubbleCount = Math.min(3 + Math.floor(rfAmount / 50), 10);
   const bubbleRng = seededRandom(1010);
   for (let i = 0; i < bubbleCount; i++) {
     const bx = bubbleRng() * w;
     const by = bubbleRng() * h;
-    const br = 10 + bubbleRng() * 25;
-    const breathe = 1 + 0.1 * Math.sin(t * 1.2 + i * 0.8);
+    const br = 12 + bubbleRng() * 22;
+    const breathe = 1 + 0.08 * Math.sin(t * 1.2 + i * 0.8);
+    const eraIdx = i % eraThemes.length;
+    const theme = eraThemes[eraIdx];
     const hue = (i * 45 + t * 15) % 360;
+    const bR = br * breathe;
 
     // Membrane
-    ctx.strokeStyle = `hsla(${hue},70%,60%,${0.15 + 0.1 * Math.sin(t * 2 + i)})`;
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = `hsla(${hue},70%,60%,${0.2 + 0.1 * Math.sin(t * 2 + i)})`;
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.arc(bx, by, br * breathe, 0, Math.PI * 2);
+    ctx.arc(bx, by, bR, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Interior glow
-    const bubbleGrad = ctx.createRadialGradient(bx, by, 0, bx, by, br * breathe);
-    bubbleGrad.addColorStop(0, `hsla(${hue},80%,70%,0.12)`);
-    bubbleGrad.addColorStop(0.7, `hsla(${hue},60%,40%,0.04)`);
-    bubbleGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = bubbleGrad;
+    // Interior — era-themed color gradient suggesting that era's scene
+    ctx.save();
     ctx.beginPath();
-    ctx.arc(bx, by, br * breathe, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.arc(bx, by, bR * 0.95, 0, Math.PI * 2);
+    ctx.clip();
 
-    // Mini stars inside bubble
-    for (let s = 0; s < 5; s++) {
-      const sx = bx + (bubbleRng() - 0.5) * br * 1.2;
-      const sy = by + (bubbleRng() - 0.5) * br * 1.2;
-      const dd = Math.sqrt((sx - bx) ** 2 + (sy - by) ** 2);
-      if (dd < br * breathe * 0.9) {
-        const twinkle = 0.3 + 0.7 * Math.sin(t * 5 + s + i);
-        ctx.fillStyle = `rgba(255,255,255,${twinkle * 0.5})`;
-        ctx.beginPath();
-        ctx.arc(sx, sy, 0.5 + bubbleRng() * 0.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
+    const bubbleGrad = ctx.createLinearGradient(bx - bR, by - bR, bx + bR, by + bR);
+    bubbleGrad.addColorStop(0, theme.colors[0]);
+    bubbleGrad.addColorStop(0.5, theme.colors[1]);
+    bubbleGrad.addColorStop(1, theme.colors[2]);
+    ctx.globalAlpha = 0.12 + 0.04 * Math.sin(t * 1.5 + i);
+    ctx.fillStyle = bubbleGrad;
+    ctx.fillRect(bx - bR, by - bR, bR * 2, bR * 2);
+    ctx.globalAlpha = 1;
+
+    // A few tiny detail dots inside
+    for (let s = 0; s < 4; s++) {
+      const sx = bx + (bubbleRng() - 0.5) * bR * 1.4;
+      const sy = by + (bubbleRng() - 0.5) * bR * 1.4;
+      const twinkle = 0.2 + 0.5 * Math.sin(t * 4 + s + i);
+      ctx.fillStyle = `rgba(255,255,255,${twinkle * 0.4})`;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 0.4 + bubbleRng() * 0.5, 0, Math.PI * 2);
+      ctx.fill();
     }
+    ctx.restore();
   }
 
-  // Central nexus — the convergence point of all realities
-  // Pulse speed scales with total production rate, suggesting the cycle accelerates
+  // --- NEXUS: complex rotating multi-ring structure with energy inflow ---
   const totalProd = state ? Object.values(state.resources || {})
     .filter(r => r.unlocked)
     .reduce((sum, r) => sum + Math.max(0, (r.baseRate + r.rateAdd) * r.rateMult), 0) : 0;
-  const nexusPulseSpeed = 1 + Math.min(3, totalProd * 0.005); // 1x to 4x speed
+  const nexusPulseSpeed = 1 + Math.min(3, totalProd * 0.005);
   const cx = w * 0.5, cy = h * 0.5;
-  for (let ring = 0; ring < 6; ring++) {
-    const rr = 8 + ring * 7;
-    const ringSpeed = (ring % 2 === 0 ? 1 : -1) * (1 + ring * 0.3) * nexusPulseSpeed;
-    const hue = (ring * 60 + t * 30 * nexusPulseSpeed) % 360;
-    ctx.strokeStyle = `hsla(${hue},80%,65%,${0.2 - ring * 0.025})`;
-    ctx.lineWidth = 1.5;
+
+  // Energy streams flowing from bubbles toward nexus
+  const streamRng = seededRandom(1010);
+  for (let i = 0; i < Math.min(bubbleCount, 6); i++) {
+    // Recompute bubble positions deterministically
+    const sbx = streamRng() * w;
+    const sby = streamRng() * h;
+    streamRng(); // skip br
+    const streamT = ((t * 0.3 + i * 0.17) % 1);
+    const sx = lerp(sbx, cx, streamT);
+    const sy = lerp(sby, cy, streamT);
+    const streamAlpha = 0.15 + 0.15 * Math.sin(t * 3 + i);
+    const sHue = (i * 60 + t * 20) % 360;
+    ctx.fillStyle = `hsla(${sHue},70%,70%,${streamAlpha})`;
     ctx.beginPath();
-    ctx.ellipse(cx, cy, rr, rr * 0.6, t * ringSpeed * 0.1, 0, Math.PI * 2);
+    ctx.arc(sx, sy, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Multi-layer rotating rings (8 layers for dramatic effect)
+  for (let ring = 0; ring < 8; ring++) {
+    const rr = 6 + ring * 6;
+    const ringSpeed = (ring % 2 === 0 ? 1 : -1) * (1 + ring * 0.25) * nexusPulseSpeed;
+    const hue = (ring * 45 + t * 25 * nexusPulseSpeed) % 360;
+    const tilt = 0.3 + ring * 0.08;
+    ctx.strokeStyle = `hsla(${hue},80%,65%,${0.22 - ring * 0.02})`;
+    ctx.lineWidth = 1.5 - ring * 0.1;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rr, rr * tilt, t * ringSpeed * 0.1, 0, Math.PI * 2);
     ctx.stroke();
   }
 
-  // Nexus core — pulses faster with production
-  const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 12);
-  coreGrad.addColorStop(0, `rgba(255,255,255,${0.5 + 0.3 * Math.sin(t * 3 * nexusPulseSpeed)})`);
-  coreGrad.addColorStop(0.5, `rgba(200,100,255,0.2)`);
+  // Nexus core — bright pulsing center
+  const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 14);
+  coreGrad.addColorStop(0, `rgba(255,255,255,${0.6 + 0.3 * Math.sin(t * 3 * nexusPulseSpeed)})`);
+  coreGrad.addColorStop(0.3, `rgba(220,150,255,0.3)`);
+  coreGrad.addColorStop(0.6, `rgba(150,80,220,0.1)`);
   coreGrad.addColorStop(1, 'transparent');
   ctx.fillStyle = coreGrad;
   ctx.beginPath();
-  ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+  ctx.arc(cx, cy, 14, 0, Math.PI * 2);
   ctx.fill();
+
+  // --- INFINITY SYMBOL: particle trails forming an infinity/lemniscate around nexus ---
+  const infParticles = 20;
+  for (let i = 0; i < infParticles; i++) {
+    const phase = (i / infParticles) * Math.PI * 2 + t * 0.8 * nexusPulseSpeed;
+    // Lemniscate of Bernoulli parametric: x = a*cos(t)/(1+sin^2(t)), y = a*sin(t)*cos(t)/(1+sin^2(t))
+    const sinP = Math.sin(phase);
+    const cosP = Math.cos(phase);
+    const denom = 1 + sinP * sinP;
+    const infScale = 28;
+    const ix = cx + (infScale * cosP) / denom;
+    const iy = cy + (infScale * sinP * cosP) / (denom * 1.3);
+    const iAlpha = 0.2 + 0.3 * Math.sin(t * 2 + i * 0.5);
+    const iHue = (i * 18 + t * 40) % 360;
+    ctx.fillStyle = `hsla(${iHue},80%,75%,${iAlpha})`;
+    ctx.beginPath();
+    ctx.arc(ix, iy, 0.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
 // --- Era 3 (new): Digital Age ---
