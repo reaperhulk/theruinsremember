@@ -8,10 +8,10 @@ export const resources = {
   materials: { id: 'materials', name: 'Materials', era: 1, baseCap: 5000, baseRate: 0.8, description: 'Raw building materials' },
   energy: { id: 'energy', name: 'Energy', era: 1, baseCap: 5000, baseRate: 0.5, description: 'Power supply' },
 
-  // Era 2: Industrialization
-  steel: { id: 'steel', name: 'Steel', era: 2, baseCap: 5000, baseRate: 0, description: 'Refined metal alloy' },
-  electronics: { id: 'electronics', name: 'Electronics', era: 2, baseCap: 3000, baseRate: 0, description: 'Electronic components' },
-  research: { id: 'research', name: 'Research', era: 2, baseCap: 10000, baseRate: 0, description: 'Scientific knowledge' },
+  // Era 2: Industrialization — small base rates for bootstrapping
+  steel: { id: 'steel', name: 'Steel', era: 2, baseCap: 5000, baseRate: 0.15, description: 'Refined metal alloy' },
+  electronics: { id: 'electronics', name: 'Electronics', era: 2, baseCap: 3000, baseRate: 0.1, description: 'Electronic components' },
+  research: { id: 'research', name: 'Research', era: 2, baseCap: 10000, baseRate: 0.2, description: 'Scientific knowledge' },
 
   // Era 3: Digital Age — base rate balances bootstrapping vs meaningful duration
   software: { id: 'software', name: 'Software', era: 3, baseCap: 1500, baseRate: 0.2, description: 'Digital programs and algorithms' },
