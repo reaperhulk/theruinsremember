@@ -1846,6 +1846,10 @@ canvas:hover {
     height: 120px;
   }
 
+  .star-svg .star-label {
+    display: none;
+  }
+
   .offline-report {
     padding: 12px;
   }

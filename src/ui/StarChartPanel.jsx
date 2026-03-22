@@ -88,6 +88,7 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
               <text
                 x={sys.x * 100} y={sys.y * 100 - 4}
                 fill="#aaddff" fontSize="3" textAnchor="middle"
+                className="star-label"
                 style={{ pointerEvents: 'none' }}
               >{sys.name}</text>
               {(isHovered || isSelected) && (
