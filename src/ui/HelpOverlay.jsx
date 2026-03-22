@@ -1,17 +1,29 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export function HelpOverlay({ onClose }) {
+  const contentRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
   useEffect(() => {
+    previousFocusRef.current = document.activeElement;
+    if (contentRef.current) {
+      contentRef.current.focus();
+    }
     const handleKey = (e) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      if (previousFocusRef.current && previousFocusRef.current.focus) {
+        previousFocusRef.current.focus();
+      }
+    };
   }, [onClose]);
 
   return (
-    <div className="era-transition-overlay" onClick={onClose} style={{ zIndex: 1003 }}>
-      <div className="era-transition-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto', textAlign: 'left', fontSize: '0.85em' }}>
+    <div className="era-transition-overlay" onClick={onClose} style={{ zIndex: 1003 }} role="dialog" aria-modal="true" aria-label="How to Play">
+      <div className="era-transition-content" ref={contentRef} tabIndex={-1} onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto', textAlign: 'left', fontSize: '0.85em', outline: 'none' }}>
         <h2 style={{ color: '#c8a040', marginBottom: '12px', textAlign: 'center' }}>How to Play</h2>
         <div style={{ color: '#bbb', lineHeight: '1.5' }}>
           <p><strong>Goal:</strong> Advance through 10 eras of civilization, discovering the ruins of those who came before.</p>

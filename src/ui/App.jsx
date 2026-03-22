@@ -215,13 +215,15 @@ export function App() {
     return (
       <>
         {availableMiniGames.length > 1 && (
-          <div className="mini-game-tabs" style={{ display: 'flex', gap: '2px', marginBottom: '6px', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
+          <div className="mini-game-tabs" role="tablist" aria-label="Mini-game tabs" style={{ display: 'flex', gap: '2px', marginBottom: '6px', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
             {availableMiniGames.map(g => (
               <button
                 key={g.id}
                 className={`tab-btn ${activeMiniGame === g.id ? 'active' : ''}`}
                 onClick={() => setActiveMiniGame(g.id)}
                 style={{ padding: '3px 6px', fontSize: '0.7em', whiteSpace: 'nowrap', minWidth: 'auto' }}
+                role="tab"
+                aria-selected={activeMiniGame === g.id}
                 aria-label={`Switch to ${g.label} mini-game`}
                 title={`${g.label}: ${g.desc}`}
               >
@@ -307,7 +309,7 @@ export function App() {
         </div>
       )}
 
-      <div className="game-layout">
+      <main className="game-layout">
         <div className="left-column">
           <GameCanvas state={state} onUpdate={updateState} />
           <ResourcePanel state={state} onUpdate={updateState} />
@@ -363,7 +365,7 @@ export function App() {
             )}
           </div>
         </div>
-      </div>
+      </main>
       {showHelp && <HelpOverlay onClose={() => setShowHelp(false)} />}
       {!victoryDismissed && (state.gameComplete || state.trueEnding) && (
         <VictoryScreen state={state} onDismiss={() => setVictoryDismissed(true)} />

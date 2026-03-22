@@ -128,7 +128,7 @@ g[role="button"]:focus-visible {
 }
 
 .resource-era-header.old-era {
-  color: #666;
+  color: #777;
 }
 
 .resource-era-header.current-era {
@@ -137,7 +137,7 @@ g[role="button"]:focus-visible {
 }
 
 .collapsed-summary {
-  color: #555;
+  color: #777;
   font-size: 0.9em;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -252,7 +252,7 @@ g[role="button"]:focus-visible {
 }
 
 .purchased-desc {
-  color: #555;
+  color: #777;
 }
 
 .upcoming-section {
@@ -289,7 +289,7 @@ g[role="button"]:focus-visible {
 }
 
 .upcoming-desc {
-  color: #555;
+  color: #777;
   font-size: 0.9em;
 }
 
@@ -1070,7 +1070,7 @@ canvas:hover {
 }
 
 .event-time {
-  color: #555;
+  color: #777;
   margin-right: 4px;
 }
 

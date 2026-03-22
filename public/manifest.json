@@ -1,0 +1,16 @@
+{
+  "name": "The Ruins Remember",
+  "short_name": "Ruins",
+  "start_url": "./",
+  "display": "standalone",
+  "theme_color": "#0d0d1a",
+  "background_color": "#0d0d1a",
+  "description": "An incremental game spanning 10 eras of civilization, from planetfall to the multiverse.",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

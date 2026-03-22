@@ -145,7 +145,7 @@ export function EraProgress({ state }) {
             {upgradesMet ? ' ✓' : ''}
           </p>
           {!upgradesMet && (
-            <div className="upgrade-progress-bar" style={{ margin: '2px 0 4px' }}>
+            <div className="upgrade-progress-bar" role="progressbar" aria-valuenow={eraUpgradeCount} aria-valuemin={0} aria-valuemax={minUpgrades} aria-label="Era upgrade progress" style={{ margin: '2px 0 4px' }}>
               <div className={`upgrade-progress-fill ${eraUpgradeCount / minUpgrades > 0.8 ? 'almost' : ''}`} style={{ width: `${Math.floor(eraUpgradeCount / minUpgrades * 100)}%` }} />
             </div>
           )}

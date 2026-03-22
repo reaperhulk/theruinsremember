@@ -77,6 +77,9 @@ export function EraTransition({ era }) {
       className={`era-transition-overlay ${fadingOut ? 'fading' : ''}`}
       onClick={dismiss}
       style={{ cursor: 'pointer' }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Era ${era}: ${eraNames[era]}`}
     >
       <div className="era-transition-content">
         <div className="era-transition-label">ERA {era}</div>

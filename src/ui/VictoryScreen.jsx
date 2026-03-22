@@ -6,7 +6,7 @@ export function VictoryScreen({ state, onDismiss }) {
   const isTrueEnding = !!state.trueEnding;
 
   return (
-    <div className="era-transition-overlay" onClick={onDismiss} style={{ zIndex: 1002 }}>
+    <div className="era-transition-overlay" onClick={onDismiss} style={{ zIndex: 1002 }} role="dialog" aria-modal="true" aria-label={isTrueEnding ? 'The Eternal Return' : 'The Cycle Completes'}>
       <div className="era-transition-content" style={{ maxWidth: '500px' }}>
         <h2 style={{ fontSize: '1.5em', color: isTrueEnding ? '#e8c040' : '#c8a040', marginBottom: '16px' }}>
           {isTrueEnding ? 'The Eternal Return' : 'The Cycle Completes'}
