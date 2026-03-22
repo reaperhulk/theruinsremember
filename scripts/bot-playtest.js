@@ -492,8 +492,8 @@ function botCosmicTuning(state, profile, t, rng) {
 
 function botSenate(state, profile, t, rng) {
   if (!profile.senateFocus || state.era < 8) return state;
-  // Allocate every 60s
-  if (t % 60 !== 0) return state;
+  // Allocate every 10s — senate slots open as GI accumulates
+  if (t % 10 !== 0) return state;
 
   const senate = state.senate || { merchants: 0, scholars: 0, warriors: 0 };
   const totalInfluence = senate.merchants + senate.scholars + senate.warriors;
@@ -723,6 +723,7 @@ function runScenario(opts) {
   let lastProgressCount = 0;
   let prestigesDone = 0;
   let currentCycleStart = 0;
+  let reachedTargetAt = null;
 
   for (let t = 0; t < maxTicks; t++) {
     const prevState = state;
@@ -837,12 +838,15 @@ function runScenario(opts) {
       logWrite(`  [${fmtTime(state.totalTime)}] Era ${state.era} | ${upgCount} upgrades, ${techCount} techs\r`);
     }
 
-    // Done?
+    // Done? Run 120 more ticks in the target era to exercise late-game systems
     if (state.era >= targetEra) {
-      if (!quiet) {
-        log(`  Reached era ${targetEra} at ${fmtTime(state.totalTime)}`);
+      if (!reachedTargetAt) {
+        reachedTargetAt = t;
+        if (!quiet) {
+          log(`  Reached era ${targetEra} at ${fmtTime(state.totalTime)}`);
+        }
       }
-      break;
+      if (t - reachedTargetAt >= 120) break;
     }
   }
 

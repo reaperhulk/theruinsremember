@@ -3,7 +3,7 @@
 
 export const resources = {
   // Era 1: Planetfall — caps high enough for era 2+ scaled costs
-  labor: { id: 'labor', name: 'Labor', era: 1, baseCap: 2000, baseRate: 0, description: 'Manual workforce' },
+  labor: { id: 'labor', name: 'Labor', era: 1, baseCap: 2000, baseRate: 0.2, description: 'Manual workforce' },
   food: { id: 'food', name: 'Food', era: 1, baseCap: 5000, baseRate: 1.5, description: 'Sustenance for settlers' },
   materials: { id: 'materials', name: 'Materials', era: 1, baseCap: 5000, baseRate: 0.8, description: 'Raw building materials' },
   energy: { id: 'energy', name: 'Energy', era: 1, baseCap: 5000, baseRate: 0.5, description: 'Power supply' },
@@ -13,9 +13,9 @@ export const resources = {
   electronics: { id: 'electronics', name: 'Electronics', era: 2, baseCap: 3000, baseRate: 0, description: 'Electronic components' },
   research: { id: 'research', name: 'Research', era: 2, baseCap: 10000, baseRate: 0, description: 'Scientific knowledge' },
 
-  // Era 3: Digital Age — small base rate to help bootstrapping
-  software: { id: 'software', name: 'Software', era: 3, baseCap: 1500, baseRate: 0.1, description: 'Digital programs and algorithms' },
-  data: { id: 'data', name: 'Data', era: 3, baseCap: 1000, baseRate: 0.15, description: 'Collected and processed information' },
+  // Era 3: Digital Age — base rate balances bootstrapping vs meaningful duration
+  software: { id: 'software', name: 'Software', era: 3, baseCap: 1500, baseRate: 0.2, description: 'Digital programs and algorithms' },
+  data: { id: 'data', name: 'Data', era: 3, baseCap: 1000, baseRate: 0.25, description: 'Collected and processed information' },
 
   // Era 4: Space Age — moderate base rate to help bootstrapping
   rocketFuel: { id: 'rocketFuel', name: 'Rocket Fuel', era: 4, baseCap: 5000, baseRate: 0.3, description: 'Propellant for rockets' },

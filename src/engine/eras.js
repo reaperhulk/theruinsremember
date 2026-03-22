@@ -37,7 +37,7 @@ const ERA_MIN_UPGRADES = {
 const ERA_MIN_TIME = {
   1: 0,     // no minimum — era 1 is the intro
   2: 30,    // 30s
-  3: 60,    // 1 min
+  3: 120,   // 2 min
   4: 90,    // 1.5 min
   5: 150,   // 2.5 min
   6: 210,   // 3.5 min

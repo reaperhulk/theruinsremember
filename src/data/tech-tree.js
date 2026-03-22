@@ -111,7 +111,7 @@ export const techTree = {
   // Era 4 → 5 (Space Age → Solar System)
   interplanetaryNav: {
     id: 'interplanetaryNav', name: 'Interplanetary Navigation', era: 4,
-    cost: { research: 3500, rocketFuel: 1200, orbitalInfra: 350 },
+    cost: { research: 2500, rocketFuel: 600, orbitalInfra: 200 },
     prerequisites: [],
     grantsEra: null,
     description: 'Star charts etched in the wreckage — coordinates we somehow already knew',
