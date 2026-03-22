@@ -137,6 +137,8 @@ export function App() {
     }
     if (e.code === 'Space') {
       e.preventDefault();
+      // Check cooldown client-side to avoid unnecessary state updates
+      if ((state.totalTime || 0) - (state.lastMineTime || 0) < 0.5) return;
       updateState(s => {
         const result = mine(s);
         const newState = {

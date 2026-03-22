@@ -20,16 +20,16 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 // Minimum upgrades purchased in the current era before transition is allowed.
 // ~40% of available upgrades per era must be bought. This forces real engagement.
 const ERA_MIN_UPGRADES = {
-  1: 15,  // was 10, of ~52 = 29%
-  2: 20,  // was 12, of ~53 = 38%
-  3: 22,  // was 14, of ~51 = 43%
-  4: 25,  // was 16, of ~56 = 45%
-  5: 25,  // was 18, of ~56 = 45%
-  6: 25,  // was 18, of ~57 = 44%
-  7: 28,  // was 20, of ~60 = 47%
-  8: 28,  // was 20, of ~59 = 47%
-  9: 30,  // was 22, of ~60 = 50%
-  10: 30, // was 25, of ~57 = 53%
+  1: 30,   // ~58% of ~52
+  2: 35,   // ~66% of ~53
+  3: 35,   // ~69% of ~51
+  4: 38,   // ~68% of ~56
+  5: 38,   // ~68% of ~56
+  6: 38,   // ~67% of ~57
+  7: 40,   // ~67% of ~60
+  8: 40,   // ~69% of ~58
+  9: 42,   // ~71% of ~59
+  10: 42,  // ~74% of ~57
 };
 
 export function getMinUpgradesForEra(era) {
@@ -54,6 +54,14 @@ export function checkEraTransition(state) {
   );
 
   if (!gatingTech) return null;
+
+  // Require mini-game engagement for era advancement (soft gate)
+  const miniGameActive = (state.totalGems || 0) > 0 || // mining
+    Object.values(state.factoryAllocation || {}).some(v => v > 0) || // factory
+    (state.hackSuccesses || 0) > 0 || // hacking
+    (state.dockingAttempts || 0) > 0 || // docking
+    Object.values(state.colonyAssignments || {}).some(v => v > 0); // colony
+  if (!miniGameActive && state.era >= 2) return null; // Can't advance without using at least 1 mini-game
 
   // Require a minimum number of upgrades purchased in the current era
   const minUpgrades = getMinUpgradesForEra(state.era);

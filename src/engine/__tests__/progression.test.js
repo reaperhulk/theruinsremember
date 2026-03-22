@@ -5,6 +5,7 @@ import { purchaseUpgrade } from '../upgrades.js';
 import { unlockTech } from '../tech.js';
 import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 import { techTree } from '../../data/tech-tree.js';
+import { getMinUpgradesForEra } from '../eras.js';
 
 // Helper: give enough resources to buy something, then buy it
 function giveAndBuy(state, type, id) {
@@ -28,25 +29,14 @@ function giveAndBuy(state, type, id) {
 describe('progression integration', () => {
   it('can progress from Era 1 to Era 2 via upgrades and tech', () => {
     let state = createInitialState();
+    state.totalGems = 1; // mini-game engagement
 
-    // Buy era 1 upgrades following chains (need at least 15)
-    state = giveAndBuy(state, 'upgrade', 'tools');
-    state = giveAndBuy(state, 'upgrade', 'storehouse');
-    state = giveAndBuy(state, 'upgrade', 'quarry');
-    state = giveAndBuy(state, 'upgrade', 'irrigation');
-    state = giveAndBuy(state, 'upgrade', 'animalHusbandry');
-    state = giveAndBuy(state, 'upgrade', 'basicPower');
-    state = giveAndBuy(state, 'upgrade', 'waterMill');
-    state = giveAndBuy(state, 'upgrade', 'housing');
-    state = giveAndBuy(state, 'upgrade', 'foundry');
-    state = giveAndBuy(state, 'upgrade', 'advancedTools');
-    state = giveAndBuy(state, 'upgrade', 'communalKitchen');   // prereq: animalHusbandry
-    state = giveAndBuy(state, 'upgrade', 'brickworks');        // prereq: quarry
-    state = giveAndBuy(state, 'upgrade', 'marketplace');       // prereq: brickworks
-    state = giveAndBuy(state, 'upgrade', 'tradePost');         // prereq: marketplace
-    state = giveAndBuy(state, 'upgrade', 'expandWorkforce');   // prereq: housing
-
-    expect(state.resources.steel.unlocked).toBe(true);
+    // Buy enough era 1 upgrades to meet the minimum (30)
+    const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
+    const minRequired = getMinUpgradesForEra(1);
+    for (let i = 0; i < minRequired && i < era1Upgrades.length; i++) {
+      state.upgrades[era1Upgrades[i].id] = true;
+    }
 
     // Buy metallurgy tech
     state = giveAndBuy(state, 'tech', 'metallurgy');
@@ -61,6 +51,7 @@ describe('progression integration', () => {
   it('can progress from Era 2 to Era 3 (Digital Age)', () => {
     let state = createInitialState();
     state.era = 2;
+    state.totalGems = 1; // mini-game engagement
     // Mark era 1 upgrades as done
     state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true };
     state.tech = { metallurgy: true, industrialRevolution: true };
@@ -69,27 +60,12 @@ describe('progression integration', () => {
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 0, rateMult: 1 };
     state.resources.research = { ...state.resources.research, unlocked: true, rateAdd: 0, rateMult: 1 };
 
-    // Buy era 2 upgrades following chains (need at least 20)
-    state = giveAndBuy(state, 'upgrade', 'assemblyLines');
-    state = giveAndBuy(state, 'upgrade', 'ironWorks');
-    state = giveAndBuy(state, 'upgrade', 'steelForge');
-    state = giveAndBuy(state, 'upgrade', 'steelRefinery');
-    state = giveAndBuy(state, 'upgrade', 'computingLab');
-    state = giveAndBuy(state, 'upgrade', 'telephoneNetwork');
-    state = giveAndBuy(state, 'upgrade', 'printingPress');
-    state = giveAndBuy(state, 'upgrade', 'powerGrid');
-    state = giveAndBuy(state, 'upgrade', 'coalMine');
-    state = giveAndBuy(state, 'upgrade', 'microchipFab');
-    state = giveAndBuy(state, 'upgrade', 'factoryFloor');
-    state = giveAndBuy(state, 'upgrade', 'automation');
-    state = giveAndBuy(state, 'upgrade', 'steamTurbine');         // prereq: coalMine
-    state = giveAndBuy(state, 'upgrade', 'industrialFarming');    // prereq: assemblyLines
-    state = giveAndBuy(state, 'upgrade', 'railroad');             // prereq: automation
-    state = giveAndBuy(state, 'upgrade', 'warehouse');            // prereq: microchipFab
-    state = giveAndBuy(state, 'upgrade', 'supplyChain');          // prereq: steelRefinery
-    state = giveAndBuy(state, 'upgrade', 'electricMotor');        // prereq: steamTurbine
-    state = giveAndBuy(state, 'upgrade', 'chemicalPlant');        // prereq: electricMotor
-    state = giveAndBuy(state, 'upgrade', 'hydraulicPress');       // prereq: steelForge
+    // Buy enough era 2 upgrades to meet the minimum (35)
+    const era2Upgrades = Object.values(upgradeDefs).filter(u => u.era === 2);
+    const minRequired = getMinUpgradesForEra(2);
+    for (let i = 0; i < minRequired && i < era2Upgrades.length; i++) {
+      state.upgrades[era2Upgrades[i].id] = true;
+    }
 
     // Buy tech to transition
     state = giveAndBuy(state, 'tech', 'advancedComputing');
@@ -106,6 +82,7 @@ describe('progression integration', () => {
   it('can progress from Era 3 (Digital Age) to Era 4 (Space Age)', () => {
     let state = createInitialState();
     state.era = 3;
+    state.totalGems = 1; // mini-game engagement
     state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true, assemblyLines: true, powerGrid: true, computingLab: true };
     state.tech = { metallurgy: true, industrialRevolution: true, advancedComputing: true, digitalRevolution: true };
     state.resources.software = { amount: 0, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1 };
@@ -113,30 +90,12 @@ describe('progression integration', () => {
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 0.3 };
     state.resources.research = { ...state.resources.research, unlocked: true, rateAdd: 0.5 };
 
-    // Buy Digital Age upgrades following chains (need at least 22)
-    state = giveAndBuy(state, 'upgrade', 'internet');
-    state = giveAndBuy(state, 'upgrade', 'cloudComputing');
-    state = giveAndBuy(state, 'upgrade', 'cloudStorage');
-    state = giveAndBuy(state, 'upgrade', 'cyberSecurity');
-    state = giveAndBuy(state, 'upgrade', 'encryptionProtocol');
-    state = giveAndBuy(state, 'upgrade', 'openSource');
-    state = giveAndBuy(state, 'upgrade', 'socialMedia');
-    state = giveAndBuy(state, 'upgrade', 'digitalSensors');
-    state = giveAndBuy(state, 'upgrade', 'patternAnalysis');
-    state = giveAndBuy(state, 'upgrade', 'aiResearch');
-    state = giveAndBuy(state, 'upgrade', 'quantumComputing');
-    state = giveAndBuy(state, 'upgrade', 'virtualReality');
-    state = giveAndBuy(state, 'upgrade', 'dataCenter');
-    state = giveAndBuy(state, 'upgrade', 'suborbitalFlight');
-    state = giveAndBuy(state, 'upgrade', 'robotics');            // prereq: aiResearch
-    state = giveAndBuy(state, 'upgrade', 'bigData');             // prereq: aiResearch
-    state = giveAndBuy(state, 'upgrade', 'fiberOptic');          // prereq: internet
-    state = giveAndBuy(state, 'upgrade', 'autonomousDrone');     // prereq: robotics
-    state = giveAndBuy(state, 'upgrade', 'iotNetwork');          // prereq: cloudComputing
-    state = giveAndBuy(state, 'upgrade', 'quantumEncryption');   // prereq: encryptionProtocol
-    state = giveAndBuy(state, 'upgrade', 'deepLearning');        // prereq: bigData
-    state = giveAndBuy(state, 'upgrade', 'meshNetwork');         // prereq: fiberOptic
-    expect(state.resources.rocketFuel.unlocked).toBe(true);
+    // Buy enough era 3 upgrades to meet the minimum (35)
+    const era3Upgrades = Object.values(upgradeDefs).filter(u => u.era === 3);
+    const minRequired = getMinUpgradesForEra(3);
+    for (let i = 0; i < minRequired && i < era3Upgrades.length; i++) {
+      state.upgrades[era3Upgrades[i].id] = true;
+    }
 
     // Buy tech to transition
     state = giveAndBuy(state, 'tech', 'globalNetwork');

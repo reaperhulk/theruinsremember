@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, memo } from 'react';
 import { getAvailableTech, unlockTech } from '../engine/tech.js';
-import { canAfford, getEffectiveRate } from '../engine/resources.js';
+import { canAfford, getEffectiveRate, getEffectiveCap } from '../engine/resources.js';
 import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber } from './format.js';
@@ -16,12 +16,17 @@ function CostDisplay({ cost, state }) {
       {Object.entries(cost).map(([id, amount], i) => {
         const have = state.resources[id]?.amount || 0;
         const enough = have >= amount;
+        const cap = getEffectiveCap(state, id);
+        const capBlocked = cap > 0 && amount > cap;
         return (
           <span key={id}>
             {i > 0 && ', '}
-            <span style={{ color: enough ? '#88cc88' : '#ff6666', fontWeight: enough ? 'normal' : 'bold' }}>
+            <span style={{ color: enough ? '#88cc88' : capBlocked ? '#ff8844' : '#ff6666', fontWeight: enough ? 'normal' : 'bold' }}>
               {resourceName(id)}: {formatNumber(amount)}
-              {!enough && <span style={{ fontWeight: 'normal', fontSize: '0.85em', color: '#cc8888' }}> ({formatNumber(have)})</span>}
+              {!enough && <span style={{ fontWeight: 'normal', fontSize: '0.85em', color: capBlocked ? '#cc8844' : '#cc8888' }}> ({formatNumber(have)})</span>}
+              {capBlocked && (
+                <span style={{ fontSize: '0.6em', color: '#ff8844' }}> cap:{formatNumber(cap)}</span>
+              )}
             </span>
           </span>
         );
@@ -125,8 +130,9 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
       )}
       {affordableTechs.length >= 2 && (
         <button
-          className="gather-btn"
-          style={{ width: '100%', marginBottom: '4px', padding: '4px', fontSize: '0.8em' }}
+          className={`upgrade-sort-btn`}
+          style={{ width: '100%', marginBottom: '4px', padding: '3px 6px', fontSize: '0.75em', background: '#1a1a2a', border: '1px solid #333', color: '#888', cursor: 'pointer', fontFamily: 'inherit' }}
+          disabled={affordableTechs.length === 0}
           onClick={() => onUpdate(s => {
             let current = s;
             for (const tech of available.filter(t => canAfford(current, t.cost) && !t.excludes && !t.grantsEra)) {
@@ -136,7 +142,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
             return current;
           })}
         >
-          Research All Affordable ({affordableTechs.length})
+          Research All ({affordableTechs.length})
         </button>
       )}
       <div className="tech-list">
@@ -164,6 +170,17 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
                 {tech.grantsEra && <span className="era-gate"> ★ Era {tech.grantsEra}</span>}
               </div>
               <div className="tech-cost"><CostDisplay cost={tech.cost} state={state} /></div>
+              {!affordable && (() => {
+                const blockedResources = Object.entries(tech.cost).filter(([resourceId, amount]) => {
+                  const cap = getEffectiveCap(state, resourceId);
+                  return cap > 0 && amount > cap;
+                }).map(([resourceId]) => resourceName(resourceId));
+                return blockedResources.length > 0 ? (
+                  <div style={{ fontSize: '0.7em', color: '#ff8844', marginTop: '2px' }}>
+                    Cap too low — buy cap upgrades for {blockedResources.join(', ')}
+                  </div>
+                ) : null;
+              })()}
               <div className="tech-desc">{tech.description}</div>
               {tech.effects && tech.effects.length > 0 && (
                 <div className="upgrade-effects">
