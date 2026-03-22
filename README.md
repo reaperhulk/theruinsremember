@@ -5,7 +5,7 @@
 <h1 align="center">The Ruins Remember</h1>
 
 <p align="center">
-  <strong><a href="https://reaperhulk.github.io/theruinsremember/">Play it now</a></strong>
+  <strong><a href="https://langui.sh/theruinsremember">Play it now</a></strong>
 </p>
 
 An incremental/idle game about the last survivors of humanity crash-landing on a new planet and rebuilding civilization from scratch — only to discover that someone has done all of this before.
