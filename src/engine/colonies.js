@@ -70,6 +70,10 @@ export function getColonyBonus(state) {
   const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
   const savantMult = hasSavant ? 1.5 : 1;
 
+  // Terraform Sync mechanic: colony focus assignments multiply output by 1.5x
+  const hasTerraformSync = !!state.upgrades?.terraformSync;
+  const terraformMult = hasTerraformSync ? 1.5 : 1;
+
   const bonus = {};
   for (const focus of FOCUS_TYPES) {
     const count = assignments[focus] || 0;
@@ -79,7 +83,7 @@ export function getColonyBonus(state) {
         // Scale with the resource's production multiplier so colonies stay relevant
         const r = state.resources[resource];
         const resourceMult = r ? (r.rateMult || 1) : 1;
-        bonus[resource] = (bonus[resource] || 0) + count * rate * resourceMult * focusMult * eraScale * savantMult;
+        bonus[resource] = (bonus[resource] || 0) + count * rate * resourceMult * focusMult * eraScale * savantMult * terraformMult;
       }
     }
   }
