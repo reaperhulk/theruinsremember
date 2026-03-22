@@ -129,6 +129,8 @@ describe('tick', () => {
   it('energy is consumed by electronics production', () => {
     const state = createInitialState();
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 3, rateMult: 1 };
+    // Give enough energy so throttling doesn't kick in
+    state.resources.energy = { ...state.resources.energy, amount: 10 };
     // Electronics effective rate = (baseRate 0 + rateAdd 3) * 1 * 1 = 3/s
     // Energy consumed = 3 * 0.3 = 0.9/s
     // Energy gross rate = (baseRate 0.5 + 0) * 1 * 1 = 0.5/s
@@ -137,7 +139,7 @@ describe('tick', () => {
     const after = tick(state, 1);
     // Energy added 0.5 then consumed 0.9, net = energyBefore + 0.5 - 0.9 = energyBefore - 0.4
     expect(after.resources.energy.amount).toBeLessThan(energyBefore + 0.5);
-    expect(after.resources.energy.amount).toBeCloseTo(Math.max(0, energyBefore + 0.5 - 0.9), 1);
+    expect(after.resources.energy.amount).toBeCloseTo(energyBefore + 0.5 - 0.9, 1);
   });
 
   // --- Mechanic upgrade tests ---
@@ -262,13 +264,20 @@ describe('tick', () => {
     }
   });
 
-  it('energy never goes below zero from electronics consumption', () => {
+  it('electronics production throttles when energy is depleted', () => {
     const state = createInitialState();
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 100, rateMult: 1 };
     state.resources.energy = { ...state.resources.energy, unlocked: true, amount: 1 };
-    // Electronics rate = 100/s, energy consumed = 100 * 0.3 = 30/s, but only 1 + 0.5 available
+    // Electronics rate = 100/s, energy cost = 100 * 0.3 = 30/s for dt=1
+    // But only 1 energy available, so scale = 1/30
+    // Throttled electronics production = 100 * (1/30) = 3.33/s
+    // Energy consumed = 100 * (1/30) * 0.3 = 1.0
+    // Energy after = 1 + 0.5 (production) - 1.0 (consumed) = 0.5
     const after = tick(state, 1);
-    expect(after.resources.energy.amount).toBe(0);
+    expect(after.resources.energy.amount).toBeCloseTo(0.5, 1);
+    // Electronics should have produced a throttled amount, not full rate
+    expect(after.resources.electronics.amount).toBeLessThan(100);
+    expect(after.resources.electronics.amount).toBeGreaterThan(0);
   });
 
   it('initial state includes new mini-game fields', () => {

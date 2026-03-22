@@ -44,12 +44,45 @@ export function tick(state, dt) {
     }
   }
 
-  // Food consumption: labor production costs food
+  // Consumption throttling: when the consumed resource runs low,
+  // throttle the consuming resource's production proportionally.
+  // This prevents resources from producing at full rate when their
+  // input resource is depleted (consistent across all 5 chains).
+
+  // Chain 1: food → labor
   const laborRate = rates.labor || 0;
   const foodCost = laborRate * FOOD_PER_LABOR * dt;
   const foodAvailable = state.resources.food?.amount || 0;
   const foodLimited = foodCost > 0 && foodAvailable < foodCost;
   const laborScale = foodLimited ? foodAvailable / foodCost : 1;
+
+  // Chain 2: energy → electronics
+  const electronicsRate = rates.electronics || 0;
+  const energyCostTotal = electronicsRate * ENERGY_PER_ELECTRONICS * dt;
+  const energyAvailable = state.resources.energy?.amount || 0;
+  const energyLimited = energyCostTotal > 0 && energyAvailable < energyCostTotal;
+  const electronicsScale = energyLimited ? energyAvailable / energyCostTotal : 1;
+
+  // Chain 3: rocketFuel → orbitalInfra
+  const orbitalRate = rates.orbitalInfra || 0;
+  const fuelCostTotal = orbitalRate * FUEL_PER_ORBITAL * dt;
+  const fuelAvailable = state.resources.rocketFuel?.amount || 0;
+  const fuelLimited = fuelCostTotal > 0 && fuelAvailable < fuelCostTotal;
+  const orbitalScale = fuelLimited ? fuelAvailable / fuelCostTotal : 1;
+
+  // Chain 4: exoticMaterials → colonies (Era 5+)
+  const colonyProdRate = rates.colonies || 0;
+  const exoticCostTotal = colonyProdRate * 0.2 * dt;
+  const exoticAvailable = state.resources.exoticMaterials?.amount || 0;
+  const exoticLimited = state.era >= 5 && exoticCostTotal > 0 && exoticAvailable < exoticCostTotal;
+  const colonyScale = exoticLimited ? exoticAvailable / exoticCostTotal : 1;
+
+  // Chain 5: stellarForge → megastructures (Era 7+)
+  const megaProdRate = rates.megastructures || 0;
+  const forgeCostTotal = megaProdRate * 0.3 * dt;
+  const forgeAvailable = state.resources.stellarForge?.amount || 0;
+  const forgeLimited = state.era >= 7 && forgeCostTotal > 0 && forgeAvailable < forgeCostTotal;
+  const megaScale = forgeLimited ? forgeAvailable / forgeCostTotal : 1;
 
   // Advance resources (apply timed event multipliers)
   const newResources = { ...state.resources };
@@ -60,6 +93,10 @@ export function tick(state, dt) {
 
     let effectiveRate = rate;
     if (id === 'labor') effectiveRate = rate * laborScale;
+    if (id === 'electronics') effectiveRate = rate * electronicsScale;
+    if (id === 'orbitalInfra') effectiveRate = rate * orbitalScale;
+    if (id === 'colonies') effectiveRate = rate * colonyScale;
+    if (id === 'megastructures') effectiveRate = rate * megaScale;
 
     // Apply timed effect multipliers
     const timedMult = getTimedRateMultiplier(state, id);
@@ -84,9 +121,8 @@ export function tick(state, dt) {
   }
 
   // Deduct energy consumed by electronics production (Era 2+)
-  const electronicsRate = rates.electronics || 0;
   if (electronicsRate > 0 && newResources.energy) {
-    const energyCost = electronicsRate * ENERGY_PER_ELECTRONICS * dt;
+    const energyCost = electronicsRate * electronicsScale * ENERGY_PER_ELECTRONICS * dt;
     newResources.energy = {
       ...newResources.energy,
       amount: Math.max(0, newResources.energy.amount - energyCost),
@@ -94,29 +130,26 @@ export function tick(state, dt) {
   }
 
   // Deduct fuel consumed by orbital infra production (Era 4+)
-  const orbitalRate = rates.orbitalInfra || 0;
   if (orbitalRate > 0 && newResources.rocketFuel) {
-    const fuelCost = orbitalRate * FUEL_PER_ORBITAL * dt;
+    const fuelCost = orbitalRate * orbitalScale * FUEL_PER_ORBITAL * dt;
     newResources.rocketFuel = {
       ...newResources.rocketFuel,
       amount: Math.max(0, newResources.rocketFuel.amount - fuelCost),
     };
   }
 
-  // Era 5+: colonies consume exoticMaterials (building materials for colonies)
+  // Era 5+: colonies consume exoticMaterials
   if (state.era >= 5 && newResources.exoticMaterials?.unlocked && newResources.colonies?.unlocked) {
-    const colonyRate = ((newResources.colonies.baseRate + newResources.colonies.rateAdd) * newResources.colonies.rateMult * state.prestigeMultiplier);
-    if (colonyRate > 0) {
-      const consumed = colonyRate * 0.2 * dt;
+    if (colonyProdRate > 0) {
+      const consumed = colonyProdRate * colonyScale * 0.2 * dt;
       newResources.exoticMaterials = { ...newResources.exoticMaterials, amount: Math.max(0, newResources.exoticMaterials.amount - consumed) };
     }
   }
 
   // Era 7+: megastructures consume stellarForge output
   if (state.era >= 7 && newResources.stellarForge?.unlocked && newResources.megastructures?.unlocked) {
-    const megaRate = ((newResources.megastructures.baseRate + newResources.megastructures.rateAdd) * newResources.megastructures.rateMult * state.prestigeMultiplier);
-    if (megaRate > 0) {
-      const consumed = megaRate * 0.3 * dt;
+    if (megaProdRate > 0) {
+      const consumed = megaProdRate * megaScale * 0.3 * dt;
       newResources.stellarForge = { ...newResources.stellarForge, amount: Math.max(0, newResources.stellarForge.amount - consumed) };
     }
   }
