@@ -1,26 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { tick } from '../engine/tick.js';
-import { createInitialState } from '../engine/state.js';
-
-function migrateState(saved) {
-  const fresh = createInitialState();
-  // Ensure all fields exist by merging with defaults
-  const migrated = { ...fresh, ...saved };
-  // Ensure resources have all required fields
-  for (const [id, freshR] of Object.entries(fresh.resources)) {
-    if (!migrated.resources[id]) {
-      migrated.resources[id] = freshR;
-    } else {
-      migrated.resources[id] = { ...freshR, ...migrated.resources[id] };
-    }
-  }
-  // Ensure new state fields exist
-  if (!migrated.dysonSegments) migrated.dysonSegments = 0;
-  if (!migrated.tuningScore) migrated.tuningScore = 0;
-  if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
-  migrated.saveVersion = fresh.saveVersion;
-  return migrated;
-}
+import { createInitialState, migrateState } from '../engine/state.js';
 
 const SAVE_KEY = 'incremental-game-save';
 const SAVE_INTERVAL = 15000; // 15 seconds — more frequent saves

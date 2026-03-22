@@ -5,9 +5,9 @@
 const FOCUS_TYPES = ['growth', 'science', 'industry'];
 
 const FOCUS_BONUSES = {
-  growth: { food: 5, labor: 1.5 },
-  science: { research: 4, data: 2 },
-  industry: { exoticMaterials: 1, energy: 15 },
+  growth: { food: 10, labor: 3 },
+  science: { research: 8, data: 4 },
+  industry: { exoticMaterials: 2, energy: 25 },
 };
 
 // Get max assignable colonies (based on colonies resource amount)

@@ -21,7 +21,7 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
       setTimeout(() => setLastGain(null), 800);
       return {
         ...s,
-        dysonSegments: (s.dysonSegments || 0) + 1,
+        dysonSegments: Math.min(500, (s.dysonSegments || 0) + 1),
         resources: {
           ...s.resources,
           stellarForge: { ...sf, amount: sf.amount + sfGain },
@@ -45,9 +45,9 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
         <div className="upgrade-progress-fill" style={{ width: `${completion}%`, background: 'linear-gradient(90deg, #d08030, #e8a040)' }} />
       </div>
       <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '4px' }}>
-        Completion: {completion}% | Next milestone: {nextMilestone} segments
+        Completion: {completion}% | {totalSegments >= 500 ? 'MAX SEGMENTS' : `Next milestone: ${nextMilestone} segments`}
       </div>
-      <button className="mine-btn" onClick={handleAssemble} style={{ background: 'linear-gradient(90deg, #3a2a1a, #4a3020)' }}>
+      <button className="mine-btn" onClick={handleAssemble} disabled={totalSegments >= 500} style={{ background: 'linear-gradient(90deg, #3a2a1a, #4a3020)' }}>
         {lastGain ? (
           <span style={{ color: '#e8a040' }}>
             +{formatNumber(lastGain.sf)} forge, +{formatNumber(lastGain.mg)} mega

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
 
@@ -21,7 +21,7 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
     return () => clearInterval(targetTimerRef.current);
   }, []);
 
-  const handleTune = () => {
+  const handleTune = useCallback(() => {
     playClick();
     const diff = Math.abs(frequency - target);
     let quality;
@@ -57,7 +57,18 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
         };
       });
     }
-  };
+  }, [frequency, target, onUpdate]);
+
+  // Keyboard support: arrow keys to adjust, Enter to tune
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); setFrequency(f => Math.max(0, f - 2)); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); setFrequency(f => Math.min(100, f + 2)); }
+      if (e.key === 'Enter') { e.preventDefault(); handleTune(); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleTune]);
 
   const distance = Math.abs(frequency - target);
   const resultColors = { perfect: '#ffdd44', good: '#88dd88', ok: '#aaaaaa', miss: '#ff6666' };
@@ -145,7 +156,7 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
           <>Tune Frequency</>
         )}
       </button>
-      <p className="mining-hint">Adjust the slider to match the yellow target marker | Target changes every 30s | Perfect (dist &le; 2) = 5x reward</p>
+      <p className="mining-hint">Adjust the slider to match the yellow target marker | Target changes every 30s | Perfect (dist &le; 2) = 5x reward | Arrow keys to adjust, Enter to tune</p>
     </div>
   );
 });

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { createInitialState } from '../engine/state.js';
+import { createInitialState, migrateState } from '../engine/state.js';
 import { useGameLoop } from '../hooks/useGameLoop.js';
 import { mine } from '../engine/mining.js';
 import { ResourcePanel } from './ResourcePanel.jsx';
@@ -21,6 +21,7 @@ import { TradingPanel } from './TradingPanel.jsx';
 import { SenatePanel } from './SenatePanel.jsx';
 import { RealityForgePanel } from './RealityForgePanel.jsx';
 import { VictoryScreen } from './VictoryScreen.jsx';
+import { HelpOverlay } from './HelpOverlay.jsx';
 import { setMuted, isMuted } from './AudioManager.js';
 import { StatsPanel } from './StatsPanel.jsx';
 import { PrestigePanel } from './PrestigePanel.jsx';
@@ -59,6 +60,7 @@ export function App() {
   const [hintsDismissed, setHintsDismissed] = useState(false);
   const [audioMuted, setAudioMuted] = useState(() => localStorage.getItem('audioMuted') === 'true');
   const [victoryDismissed, setVictoryDismissed] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const prevEventsRef = useRef(state.eventLog?.length || 0);
   const prevPerfectsRef = useRef(state.dockingPerfects || 0);
 
@@ -127,6 +129,10 @@ export function App() {
       // Don't switch tabs on 0-3 keys during hack challenge
       if (state.hackChallenge && ['0','1','2','3'].includes(e.key)) return;
       setActiveTab(tabByKey.id);
+      return;
+    }
+    if (e.key === '?') {
+      setShowHelp(h => !h);
       return;
     }
     if (e.code === 'Space') {
@@ -239,6 +245,7 @@ export function App() {
               Prestige (x{prestigeBonus.toFixed(1)} bonus)
             </button>
           )}
+          <button className="reset-btn" aria-label="Show help" onClick={() => setShowHelp(h => !h)} title="Help (?)">?</button>
           <button className="reset-btn" aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'} onClick={() => setAudioMuted(m => !m)} title={audioMuted ? 'Sound OFF' : 'Sound ON'}>
             {audioMuted ? 'Sound OFF' : 'Sound ON'}
           </button>
@@ -265,7 +272,8 @@ export function App() {
                 try {
                   const data = JSON.parse(ev.target.result);
                   if (data.era && data.resources) {
-                    localStorage.setItem('incremental-game-save', ev.target.result);
+                    const migrated = migrateState(data);
+                    localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() }));
                     window.location.reload();
                   }
                 } catch { alert('Invalid save file'); }
@@ -356,6 +364,7 @@ export function App() {
           </div>
         </div>
       </div>
+      {showHelp && <HelpOverlay onClose={() => setShowHelp(false)} />}
       {!victoryDismissed && (state.gameComplete || state.trueEnding) && (
         <VictoryScreen state={state} onDismiss={() => setVictoryDismissed(true)} />
       )}

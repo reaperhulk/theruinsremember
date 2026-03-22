@@ -3,9 +3,9 @@ import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
 
 const FACTIONS = [
-  { id: 'merchants', label: 'Merchant Guild', color: '#ddaa44', desc: 'Exotic Matter +0.5/s per influence', resource: 'exoticMatter' },
-  { id: 'scholars', label: 'Scholar Enclave', color: '#88bbee', desc: 'Galactic Influence +0.3/s per influence', resource: 'galacticInfluence' },
-  { id: 'warriors', label: 'Warrior Caste', color: '#ee6644', desc: 'Star Systems +0.2/s per influence', resource: 'starSystems' },
+  { id: 'merchants', label: 'Merchant Guild', color: '#ddaa44', desc: 'Exotic Matter +1.0/s per influence', resource: 'exoticMatter' },
+  { id: 'scholars', label: 'Scholar Enclave', color: '#88bbee', desc: 'Galactic Influence +0.6/s per influence', resource: 'galacticInfluence' },
+  { id: 'warriors', label: 'Warrior Caste', color: '#ee6644', desc: 'Star Systems +0.4/s per influence', resource: 'starSystems' },
 ];
 
 export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
@@ -52,7 +52,7 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
           const isMaj = FACTIONS.filter(ff => (newSenate[ff.id] || 0) === Math.max(newSenate.merchants, newSenate.scholars, newSenate.warriors)).length === 1
             && (newSenate[f.id] || 0) === Math.max(newSenate.merchants, newSenate.scholars, newSenate.warriors);
           const mult = isMaj ? 2 : 1;
-          const gain = count * (f.id === 'merchants' ? 0.5 : f.id === 'scholars' ? 0.3 : 0.2) * mult;
+          const gain = count * (f.id === 'merchants' ? 1.0 : f.id === 'scholars' ? 0.6 : 0.4) * mult;
           resources[f.resource] = { ...r, amount: r.amount + gain };
         }
       }
@@ -81,7 +81,7 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
                 {faction.label}: {count}
               </span>
               <span className="line-bonus" style={{ color: isMaj ? '#ffdd44' : '#888' }}>
-                {faction.desc}{isMaj ? ' (x2!)' : ''} {count > 0 && `[+${formatNumber(count * (faction.id === 'merchants' ? 0.5 : faction.id === 'scholars' ? 0.3 : 0.2) * (isMaj ? 2 : 1))}/s]`}
+                {faction.desc}{isMaj ? ' (x2!)' : ''} {count > 0 && `[+${formatNumber(count * (faction.id === 'merchants' ? 1.0 : faction.id === 'scholars' ? 0.6 : 0.4) * (isMaj ? 2 : 1))}/s]`}
               </span>
               <div className="line-controls">
                 <button

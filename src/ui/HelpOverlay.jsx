@@ -1,0 +1,22 @@
+export function HelpOverlay({ onClose }) {
+  return (
+    <div className="era-transition-overlay" onClick={onClose} style={{ zIndex: 1003 }}>
+      <div className="era-transition-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto', textAlign: 'left', fontSize: '0.85em' }}>
+        <h2 style={{ color: '#c8a040', marginBottom: '12px', textAlign: 'center' }}>How to Play</h2>
+        <div style={{ color: '#bbb', lineHeight: '1.5' }}>
+          <p><strong>Goal:</strong> Advance through 10 eras of civilization, discovering the ruins of those who came before.</p>
+          <p><strong>Resources:</strong> Click +1 buttons or press Space to mine. Buy upgrades to automate production.</p>
+          <p><strong>Upgrades:</strong> Gold-bordered "MECHANIC" upgrades change gameplay. Purple-bordered upgrades reveal story.</p>
+          <p><strong>Caps:</strong> Resources have storage limits. Buy "Cap" upgrades to increase them. "FULL" means production is wasted.</p>
+          <p><strong>Consumption:</strong> Some resources consume others (food to labor, energy to electronics). Watch for "DRAINING".</p>
+          <p><strong>Mini-games:</strong> Each era unlocks a new game. Use the sub-tabs in the Mini-Game panel.</p>
+          <p><strong>Tech Tree:</strong> Research technologies to unlock new eras. Star techs gate era transitions.</p>
+          <p><strong>Prestige:</strong> At Era 7+, reset for a permanent production multiplier. The cycle begins again.</p>
+          <p><strong>Canvas:</strong> Click glowing orbs, ruins, and deposits for bonuses. Buildings appear as you progress.</p>
+          <p><strong>Keyboard:</strong> 1-6: tabs | Space: mine | D: dock | 0-3: hack | Arrows: tune | ?: this help</p>
+        </div>
+        <p style={{ textAlign: 'center', color: '#555', marginTop: '12px', fontSize: '0.8em' }}>Click outside to close</p>
+      </div>
+    </div>
+  );
+}
