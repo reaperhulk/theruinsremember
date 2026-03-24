@@ -286,7 +286,7 @@ export function App() {
                     localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() }));
                     window.location.reload();
                   }
-                } catch { alert('Invalid save file'); }
+                } catch { alert('Invalid save file. Please select a valid .json save.'); }
               };
               reader.readAsText(file);
             };
