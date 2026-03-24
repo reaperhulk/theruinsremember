@@ -81,7 +81,10 @@ export function PrestigePanel({ state, onUpdate }) {
             </div>
             <div className="stat-row">
               <span>Next Prestige:</span>
-              <span>+{summary.points} pts, x{formatNumber(summary.bonus)} → total x{formatNumber(summary.newMultiplier)}{state.era < 10 ? ' (prestige at Era 10)' : ''}</span>
+              <span>+{summary.points} pts, x{formatNumber(summary.bonus)} → total x{formatNumber(summary.newMultiplier)}{summary.newMultiplier > 10 && (() => {
+                const eff = 10 + Math.sqrt(summary.newMultiplier - 10) * 3;
+                return ` (eff: x${formatNumber(eff)})`;
+              })()}{state.era < 10 ? ' (prestige at Era 10)' : ''}</span>
             </div>
           </>
         )}
