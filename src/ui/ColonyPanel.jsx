@@ -18,15 +18,18 @@ export const ColonyPanel = memo(function ColonyPanel({ state, onUpdate }) {
   const bonus = getColonyBonus(state);
   const strategy = getColonyStrategy(state);
 
-  // Quick-assign: evenly split all colonies
+  // Quick-assign: evenly split all colonies (spread remainder across focuses)
   const handleEvenSplit = () => {
     if (maxColonies < 3) return;
     const each = Math.floor(maxColonies / 3);
     const remainder = maxColonies - each * 3;
+    const focuses = ['growth', 'science', 'industry'];
     onUpdate(s => {
-      let st = assignColonies(s, 'growth', each + remainder);
-      st = st ? assignColonies(st, 'science', each) : s;
-      st = st ? assignColonies(st, 'industry', each) : s;
+      let st = s;
+      for (let i = 0; i < focuses.length; i++) {
+        const extra = i < remainder ? 1 : 0;
+        st = assignColonies(st, focuses[i], each + extra) || st;
+      }
       return st;
     });
   };

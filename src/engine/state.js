@@ -65,6 +65,11 @@ export function createInitialState() {
     // Events system (Era 3+)
     activeEffects: [],  // [{ id, endsAt, description }]
     eventLog: [],       // [{ message, time }] — last 10 events
+    // Docking (Era 4+)
+    dockingAttempts: 0,
+    dockingSuccesses: 0,
+    dockingPerfects: 0,
+    dockingCombo: 0,
     // Trading (Era 6+)
     totalTrades: 0,
     // Era time tracking

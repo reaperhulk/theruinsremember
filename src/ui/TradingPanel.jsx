@@ -122,9 +122,9 @@ export function TradingPanel({ state, onUpdate }) {
         </div>
         {ratio && fromId && toId && (
           <div className="trade-preview">
-            Cost: {formatNumber(cost)} {resourceDefs[fromId]?.name} for {amount} {resourceDefs[toId]?.name}
+            You give: {formatNumber(cost)} {resourceDefs[fromId]?.name} → You receive: {amount} {resourceDefs[toId]?.name}
             <span className="trade-ratio">
-              ({ratio.input}:{ratio.output})
+              (rate: {ratio.input}:{ratio.output}{hasTradeRoutes ? ', -33% discount' : ''})
             </span>
           </div>
         )}
