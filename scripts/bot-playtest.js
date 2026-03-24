@@ -7,21 +7,19 @@ import { createInitialState } from '../src/engine/state.js';
 import { tick } from '../src/engine/tick.js';
 import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable } from '../src/engine/upgrades.js';
 import { unlockTech, getAvailableTech } from '../src/engine/tech.js';
-import { canAfford, gather, getEffectiveRate } from '../src/engine/resources.js';
+import { canAfford, gather } from '../src/engine/resources.js';
 import { mine } from '../src/engine/mining.js';
-import { allocateWorker, getWorkerPool, getAllocation, getMaxWorkers } from '../src/engine/factory.js';
+import { allocateWorker, getWorkerPool } from '../src/engine/factory.js';
 import { startHack, submitHack } from '../src/engine/hacking.js';
 import { attemptDock, getTargetZone } from '../src/engine/docking.js';
-import { assignColonies, getAssignableColonies, getColonyAssignments, getTotalColoniesAssigned } from '../src/engine/colonies.js';
+import { assignColonies, getAssignableColonies } from '../src/engine/colonies.js';
 import { createRoute, getUnlockedSystems, routeExists, getRoutes } from '../src/engine/starChart.js';
-import { drawFragment, resolveWeave, getWeavingGrid } from '../src/engine/weaving.js';
+import { drawFragment, resolveWeave } from '../src/engine/weaving.js';
 import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
 import { assembleDysonSegment } from '../src/engine/dyson.js';
 import { applyTuning } from '../src/engine/tuning.js';
-import { allocateSenateInfluence, getMaxSenateInfluence, getSenateAllocateCost } from '../src/engine/senate.js';
+import { allocateSenateInfluence, getMaxSenateInfluence } from '../src/engine/senate.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
-import { resources as resourceDefs } from '../src/data/resources.js';
-import { prestigeUpgrades as prestigeUpgradeDefs } from '../src/data/prestige-upgrades.js';
 import { readFileSync } from 'fs';
 
 // ─── Mulberry32 PRNG ────────────────────────────────────────────────────────
@@ -433,7 +431,7 @@ function botTrade(state, profile, t, rng) {
   if (t % 30 !== 0) return state;
 
   const aggressive = profile.tradeStrategy === 'aggressive';
-  const tradeInterval = aggressive ? 1 : 1; // always trade when triggered
+  // trade always triggered when conditions met // always trade when triggered
 
   // Find bottleneck: unlocked resource with lowest rate needed by next upgrade
   const available = getAvailableUpgrades(state);
@@ -671,7 +669,6 @@ function updateMiniGameStats(prevState, state, collector) {
 
 function detectBottlenecks(state, collector) {
   const available = getAvailableUpgrades(state);
-  const techs = getAvailableTech(state);
 
   for (const u of available) {
     const cost = getUpgradeCost(state, u.id);
@@ -1018,7 +1015,7 @@ function runComparison(currentResults, compareFile) {
   let previousData;
   try {
     previousData = JSON.parse(readFileSync(compareFile, 'utf-8'));
-  } catch (e) {
+  } catch {
     console.error(`  ERROR: Could not load comparison file: ${compareFile}`);
     return;
   }
