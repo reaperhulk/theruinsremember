@@ -25,7 +25,7 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
         The sphere remembers its shape. You just have to remind it.
       </p>
       <div className="upgrade-progress-bar" style={{ margin: '4px 0 8px' }}>
-        <div className="upgrade-progress-fill" style={{ width: `${completion}%`, background: 'linear-gradient(90deg, #d08030, #e8a040)' }} />
+        <div className="upgrade-progress-fill" style={{ width: `${Math.min(100, (totalSegments % 10) * 10)}%`, background: 'linear-gradient(90deg, #d08030, #e8a040)' }} />
       </div>
       <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '4px' }}>
         Next milestone: {nextMilestone} segments | Bonus: x{bonusMult.toFixed(1)} assembly value
