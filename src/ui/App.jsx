@@ -109,7 +109,7 @@ export function App() {
     const msg = [
       '--- The Cycle Ends. The Cycle Begins. ---',
       '',
-      `Multiplier: x${summary.currentMultiplier.toFixed(1)} → x${summary.newMultiplier.toFixed(1)} (x${summary.bonus.toFixed(1)} bonus)`,
+      `Multiplier: x${formatNumber(getEffectivePrestige(summary.currentMultiplier))} → x${formatNumber(getEffectivePrestige(summary.newMultiplier))} (x${summary.bonus.toFixed(1)} bonus)`,
       `Prestige Points: +${summary.points} (total: ${summary.totalPoints})`,
       `Cycle: #${summary.prestigeCount}`,
       '',
