@@ -111,6 +111,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const [showHidden, setShowHidden] = useState(false);
   const [sortBy, setSortBy] = useState('default');
   const [filterType, setFilterType] = useState('all');
+  const [filterResource, setFilterResource] = useState('');
   const [searchText, setSearchText] = useState('');
   const [flashId, setFlashId] = useState(null);
   const [chainFlash, setChainFlash] = useState(false);
@@ -198,14 +199,19 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
     })
   );
 
+  // Apply resource target filter
+  const resourceFiltered = filterResource
+    ? typeFiltered.filter(u => u.effects.some(e => e.target === filterResource))
+    : typeFiltered;
+
   // Apply text search filter
   const searchLower = searchText.toLowerCase().trim();
   const searchFiltered = searchLower
-    ? typeFiltered.filter(u =>
+    ? resourceFiltered.filter(u =>
         u.name.toLowerCase().includes(searchLower) ||
         u.description.toLowerCase().includes(searchLower)
       )
-    : typeFiltered;
+    : resourceFiltered;
 
   // Apply hidden upgrade filter
   const hiddenUpgrades = state.hiddenUpgrades || {};
@@ -333,6 +339,20 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           <button className={filterType === 'mult' ? 'active' : ''} onClick={() => setFilterType('mult')}>xN</button>
           <button className={filterType === 'add' ? 'active' : ''} onClick={() => setFilterType('add')}>+N</button>
           <button className={filterType === 'cap' ? 'active' : ''} onClick={() => setFilterType('cap')}>Cap</button>
+          <span style={{ borderLeft: '1px solid #333', margin: '0 4px' }} />
+          <select
+            value={filterResource}
+            onChange={e => setFilterResource(e.target.value)}
+            style={{ background: '#161820', color: filterResource ? '#aaddff' : '#888', border: '1px solid #2a2418', fontFamily: 'inherit', fontSize: '0.75em', padding: '2px 4px', borderRadius: '3px', maxWidth: '100px' }}
+            aria-label="Filter by target resource"
+          >
+            <option value="">Resource</option>
+            {Object.entries(state.resources)
+              .filter(([, r]) => r.unlocked)
+              .map(([id]) => (
+                <option key={id} value={id}>{resourceDefs[id]?.name || id}</option>
+              ))}
+          </select>
         </div>
       )}
       <div className="upgrade-list">
