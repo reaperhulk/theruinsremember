@@ -3638,6 +3638,8 @@ export function GameCanvas({ state, onUpdate }) {
         onClick={handleCanvasClick}
         onMouseMove={handleMouseMove}
         style={{ cursor: 'pointer' }}
+        role="img"
+        aria-label="Game world visualization — click to interact"
       />
     </div>
   );

@@ -30,7 +30,7 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
       <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '4px' }}>
         Next milestone: {nextMilestone} segments | Bonus: x{bonusMult.toFixed(1)} assembly value
       </div>
-      <button className="mine-btn" onClick={handleAssemble} style={{ background: 'linear-gradient(90deg, #3a2a1a, #4a3020)' }}>
+      <button className="mine-btn" onClick={handleAssemble} style={{ background: 'linear-gradient(90deg, #3a2a1a, #4a3020)' }} aria-label={`Assemble Dyson segment (${totalSegments} segments built)`}>
         {lastGain ? (
           <span style={{ color: '#e8a040' }}>
             +{formatNumber(lastGain.sf)} forge, +{formatNumber(lastGain.mg)} mega

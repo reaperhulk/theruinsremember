@@ -117,26 +117,26 @@ export function useGameLoop(initialState) {
     lastTimeRef.current = performance.now();
     rafRef.current = requestAnimationFrame(gameLoop);
 
-    // Auto-save
-    saveTimerRef.current = setInterval(() => {
-      const toSave = { ...stateRef.current, lastSaved: Date.now() };
-      localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
-    }, SAVE_INTERVAL);
+    // Auto-save with error handling for quota/disabled localStorage
+    const safeSave = () => {
+      try {
+        const toSave = { ...stateRef.current, lastSaved: Date.now() };
+        localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+      } catch {
+        // localStorage may be full or disabled — silently skip
+      }
+    };
+    saveTimerRef.current = setInterval(safeSave, SAVE_INTERVAL);
 
     // Save on tab close / page unload
-    const handleBeforeUnload = () => {
-      const toSave = { ...stateRef.current, lastSaved: Date.now() };
-      localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
-    };
+    const handleBeforeUnload = () => safeSave();
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       clearInterval(saveTimerRef.current);
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      // Save on unmount
-      const toSave = { ...stateRef.current, lastSaved: Date.now() };
-      localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+      safeSave();
     };
   }, [gameLoop]);
 
@@ -148,8 +148,10 @@ export function useGameLoop(initialState) {
         const upgradesBefore = Object.keys(prev.upgrades || {}).length;
         const upgradesAfter = Object.keys(result.upgrades || {}).length;
         if (upgradesAfter > upgradesBefore || result.era !== prev.era) {
-          const toSave = { ...result, lastSaved: Date.now() };
-          localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+          try {
+            const toSave = { ...result, lastSaved: Date.now() };
+            localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+          } catch { /* localStorage may be full */ }
         }
       }
       return result || prev;
