@@ -362,7 +362,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         {filteredAvailable.length === 0 && upcoming.length > 0 && (
           <p className="empty-message">Buy prerequisites to unlock {upcoming.length} upcoming upgrade{upcoming.length > 1 ? 's' : ''}</p>
         )}
-        {(() => { const firstAffordableId = Object.keys(state.upgrades).length === 0 ? filteredAvailable.find(u => canAfford(state, getUpgradeCost(state, u.id)))?.id : null; return filteredAvailable.map(upgrade => {
+        {(() => { const firstAffordableId = Object.keys(state.upgrades).length === 0 ? filteredAvailable.filter(u => !u.repeatable).find(u => canAfford(state, getUpgradeCost(state, u.id)))?.id : null; return filteredAvailable.filter(u => !u.repeatable).map(upgrade => {
           const cost = getUpgradeCost(state, upgrade.id);
           const affordable = canAfford(state, cost);
           const count = typeof state.upgrades[upgrade.id] === 'number' ? state.upgrades[upgrade.id] : 0;
@@ -449,6 +449,53 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
             </div>
           );
         }); })()}
+        {(() => {
+          const repeatables = filteredAvailable.filter(u => u.repeatable);
+          if (repeatables.length === 0) return null;
+          return (
+            <>
+              <div style={{ padding: '4px 8px', fontSize: '0.75em', color: '#998866', borderTop: '1px solid #333', marginTop: '8px', paddingTop: '8px' }}>
+                Repeatable Upgrades ({repeatables.length})
+              </div>
+              {repeatables.map(upgrade => {
+                const cost = getUpgradeCost(state, upgrade.id);
+                const affordable = canAfford(state, cost);
+                const count = typeof state.upgrades[upgrade.id] === 'number' ? state.upgrades[upgrade.id] : 0;
+                return (
+                  <div key={upgrade.id} className="upgrade-row">
+                    <button
+                      className={`upgrade-btn ${affordable ? 'affordable' : 'too-expensive'}`}
+                      disabled={!affordable}
+                      onClick={() => handlePurchase(upgrade.id)}
+                      title={upgrade.description}
+                    >
+                      <div className="upgrade-name">
+                        {upgrade.name} (x{count})
+                        <span className="repeatable-badge">repeatable</span>
+                      </div>
+                      <div className="upgrade-cost"><CostDisplay cost={cost} state={state} /></div>
+                      <div className="upgrade-effects">
+                        {upgrade.effects.map((e, i) => {
+                          let label = '';
+                          if (e.type === 'production_add') label = `+${e.value} ${resourceName(e.target)}/s`;
+                          else if (e.type === 'production_mult') label = `x${e.value} ${resourceName(e.target)}`;
+                          else if (e.type === 'cap_mult') label = `x${e.value} ${resourceName(e.target)} cap`;
+                          return label ? <span key={i} className="effect-tag">{label}</span> : null;
+                        })}
+                      </div>
+                    </button>
+                    {affordable && (
+                      <button className="buy-max-btn" onClick={() => onUpdate(s => buyMaxRepeatable(s, upgrade.id))} title="Buy max">Max</button>
+                    )}
+                    <button className="upgrade-hide-btn" onClick={(e) => { e.stopPropagation(); handleToggleHide(upgrade.id); }}>
+                      {hiddenUpgrades[upgrade.id] ? 'Show' : 'Hide'}
+                    </button>
+                  </div>
+                );
+              })}
+            </>
+          );
+        })()}
       </div>
       {upcoming.length > 0 && (
         <div className="upcoming-section">
