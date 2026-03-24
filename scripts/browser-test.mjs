@@ -1,198 +1,210 @@
 #!/usr/bin/env node
 /**
  * Automated browser playtest using Puppeteer.
- * Runs the game at high speed, monitors progress, takes screenshots,
- * and reports visual/functional issues.
+ * Primary browser testing tool — validates UI rendering, layout,
+ * accessibility, and game flow in a real browser environment.
  *
- * Usage: node scripts/browser-test.mjs [--speed N] [--prestige N]
+ * Usage: node scripts/browser-test.mjs [--prestige N] [--mobile] [--screenshots]
  */
 
 import puppeteer from 'puppeteer';
-import { mkdirSync } from 'fs';
+import { mkdirSync, writeFileSync } from 'fs';
 
-const SPEED = parseInt(process.argv.find((_, i, a) => a[i-1] === '--speed') || '100');
-const PRESTIGE_CYCLES = parseInt(process.argv.find((_, i, a) => a[i-1] === '--prestige') || '1');
+const PRESTIGE_CYCLES = parseInt(process.argv.find((_, i, a) => a[i-1] === '--prestige') || '0');
+const MOBILE = process.argv.includes('--mobile');
+const SCREENSHOTS = process.argv.includes('--screenshots');
 const SCREENSHOT_DIR = '/tmp/game-screenshots';
-mkdirSync(SCREENSHOT_DIR, { recursive: true });
+if (SCREENSHOTS) mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
-async function run() {
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'], protocolTimeout: 60000 });
-  const page = await browser.newPage();
-  await page.setViewport({ width: 1280, height: 900 });
+// ── Helpers ──────────────────────────────────────────────────────────────
 
-  // Navigate and clear save
-  await page.goto('http://localhost:5173', { waitUntil: 'networkidle0' });
-  await page.evaluate(() => { localStorage.clear(); });
-  await page.reload({ waitUntil: 'networkidle0' });
-  // Wait for game to initialize (React mount + game loop start)
-  await page.waitForFunction(() => window.__game && window.__game.getState().totalTime >= 0, { timeout: 10000 });
-  await new Promise(r => setTimeout(r, 1000));
-
-  // In headless mode, rAF doesn't fire. We use a hybrid approach:
-  // 1. fastForward for time advancement (engine-level, no DOM needed)
-  // 2. DOM clicks for purchases (must match real user interaction)
-  // 3. Alternate tabs to trigger purchases across upgrades/tech/prestige
-  await page.evaluate(() => {
-    // Advance game time in chunks, with periodic purchase attempts
-    let purchasePhase = 0;
-    const purchasePhases = ['upgrades', 'tech', 'prestige', 'upgrades', 'tech', 'upgrades'];
-
+function startPump(page) {
+  return page.evaluate(() => {
+    let phase = 0;
+    const phases = ['upgrades', 'tech', 'prestige', 'upgrades', 'tech', 'upgrades'];
     window.__pump = setInterval(() => {
-      // Advance 10 game-seconds per tick (fast but not so fast events get skipped)
       for (let i = 0; i < 5; i++) window.__game.fastForward(10);
-
-      // Switch tab and buy on every pump
-      const phase = purchasePhases[purchasePhase % purchasePhases.length];
-      purchasePhase++;
-      document.querySelector('#tab-' + phase)?.click();
-
-      // Wait a microtask for React to render, then click
+      const p = phases[phase++ % phases.length];
+      document.querySelector('#tab-' + p)?.click();
       setTimeout(() => {
-        if (phase === 'upgrades') {
-          document.querySelectorAll('button').forEach(b => {
-            if (b.textContent.includes('Buy All') && !b.disabled) b.click();
-          });
-        } else if (phase === 'tech') {
-          document.querySelectorAll('button').forEach(b => {
-            if (b.textContent.includes('Research All') && !b.disabled) b.click();
-          });
-          document.querySelectorAll('.tech-btn.affordable').forEach(b => b.click());
-        } else if (phase === 'prestige') {
-          document.querySelectorAll('.upgrade-btn.affordable').forEach(b => {
-            if (!b.disabled) b.click();
-          });
-        }
-        // Always gather
+        if (p === 'upgrades') document.querySelectorAll('button').forEach(b => { if (b.textContent.includes('Buy All') && !b.disabled) b.click(); });
+        else if (p === 'tech') { document.querySelectorAll('button').forEach(b => { if (b.textContent.includes('Research All') && !b.disabled) b.click(); }); document.querySelectorAll('.tech-btn.affordable').forEach(b => b.click()); document.querySelectorAll('.tech-btn.affordable.era-gate-tech').forEach(b => b.click()); }
+        else if (p === 'prestige') document.querySelectorAll('.upgrade-btn.affordable').forEach(b => { if (!b.disabled) b.click(); });
         document.querySelectorAll('.gather-btn').forEach(b => b.click());
       }, 10);
-    }, 100);
+    }, 80);
   });
+}
 
-  // Verify game loop is running
-  await new Promise(r => setTimeout(r, 2000));
-  const initCheck = await page.evaluate(() => {
+function stopPump(page) {
+  return page.evaluate(() => {
+    clearInterval(window.__pump);
+    clearInterval(window.__ac);
+    clearInterval(window.__ps);
+  });
+}
+
+async function screenshot(page, name) {
+  if (!SCREENSHOTS) return;
+  await stopPump(page);
+  await new Promise(r => setTimeout(r, 200));
+  await page.screenshot({ path: `${SCREENSHOT_DIR}/${name}.png` });
+  await startPump(page);
+}
+
+async function getState(page) {
+  return page.evaluate(() => {
     const s = window.__game.getState();
-    return { totalTime: s.totalTime, totalTicks: s.totalTicks, speed: window.__game.getSpeed() };
+    return {
+      era: s.era, totalTime: Math.floor(s.totalTime),
+      upgrades: Object.keys(s.upgrades || {}).length,
+      tech: Object.keys(s.tech || {}).length,
+      achievements: Object.keys(s.achievements || {}).length,
+      prestigeCount: s.prestigeCount || 0,
+      prestigeMultiplier: s.prestigeMultiplier || 1,
+      trueEnding: !!s.trueEnding, gameComplete: !!s.gameComplete,
+      eternalReturn: !!s.prestigeUpgrades?.eternalReturn,
+      prestigeUpgrades: Object.keys(s.prestigeUpgrades || {}).length,
+    };
   });
-  console.log(`Init check: totalTime=${initCheck.totalTime}, ticks=${initCheck.totalTicks}, speed=${initCheck.speed}`);
-  console.log(`Game running at ${SPEED}x speed...`);
+}
 
-  // Monitor and screenshot
-  let lastEra = 1;
-  let cycle = 0;
-  console.log('Era 1 (start)');
+async function checkLayout(page) {
+  return page.evaluate(() => {
+    const issues = [];
+    const ok = [];
 
-  for (let i = 0; i < 300; i++) { // max 5 minutes
-    await new Promise(r => setTimeout(r, 1000));
+    // Header overflow
+    const header = document.querySelector('.game-header');
+    if (header && header.scrollWidth > header.clientWidth + 5)
+      issues.push(`Header overflow: ${header.scrollWidth} > ${header.clientWidth}`);
+    else ok.push('Header fits');
 
-    const state = await page.evaluate(() => {
-      const s = window.__game.getState();
-      return {
-        era: s.era,
-        totalTime: Math.floor(s.totalTime),
-        upgrades: Object.keys(s.upgrades || {}).length,
-        tech: Object.keys(s.tech || {}).length,
-        achievements: Object.keys(s.achievements || {}).length,
-        prestigeCount: s.prestigeCount || 0,
-        prestigeMultiplier: s.prestigeMultiplier || 1,
-        trueEnding: !!s.trueEnding,
-        gameComplete: !!s.gameComplete,
-        eternalReturn: !!s.prestigeUpgrades?.eternalReturn,
-      };
+    // Panel overflow
+    document.querySelectorAll('.panel').forEach(p => {
+      if (p.scrollWidth > p.clientWidth + 20)
+        issues.push(`Panel overflow: ${p.className.split(' ')[1] || 'unknown'}`);
     });
 
-    if (state.era > lastEra) {
-      console.log(`Era ${state.era} reached | ${state.upgrades} upgrades | ${state.tech} tech | game time: ${state.totalTime}s`);
-      lastEra = state.era;
+    // Upgrade card width (should be > 200px, not collapsed)
+    const upgradeBtn = document.querySelector('.upgrade-row .upgrade-btn:first-child');
+    if (upgradeBtn) {
+      const w = upgradeBtn.getBoundingClientRect().width;
+      if (w < 100) issues.push(`Upgrade card collapsed: ${Math.round(w)}px`);
+      else ok.push(`Upgrade cards: ${Math.round(w)}px wide`);
+    }
 
-      // Screenshots disabled in headless mode (CPU-intensive intervals cause CDP timeouts)
+    // Upgrade name visible
+    const nameDiv = document.querySelector('.upgrade-name');
+    if (nameDiv) {
+      const h = nameDiv.getBoundingClientRect().height;
+      if (h < 5) issues.push('Upgrade name invisible');
+      else ok.push(`Upgrade name: ${nameDiv.textContent.substring(0, 25)}`);
+    }
+
+    // Resource rows
+    const rows = document.querySelectorAll('.resource-row');
+    if (rows.length > 0) ok.push(`${rows.length} resource rows`);
+
+    // FULL/SLOW indicators
+    const full = document.querySelectorAll('.text-danger');
+    const slow = document.querySelectorAll('[title*="Production limited"]');
+    const capped = document.querySelectorAll('.resource-capped');
+    if (full.length) ok.push(`${full.length} FULL indicators`);
+    if (slow.length) ok.push(`${slow.length} SLOW indicators`);
+    if (capped.length) ok.push(`${capped.length} capped rows`);
+
+    // Prestige button
+    const prestige = document.querySelector('.prestige-btn');
+    ok.push(`Prestige btn: ${prestige ? 'visible' : 'hidden'}`);
+
+    // Throttle warning
+    const throttle = document.querySelector('[style*="supply chains"]');
+    if (throttle) ok.push('Throttle warning shown');
+
+    // Toast container
+    const toasts = document.querySelectorAll('.toast');
+    if (toasts.length > 3) issues.push(`Toast spam: ${toasts.length} visible`);
+
+    return { issues, ok };
+  });
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────
+
+async function run() {
+  const viewport = MOBILE
+    ? { width: 375, height: 812, isMobile: true, deviceScaleFactor: 2 }
+    : { width: 1280, height: 900 };
+
+  console.log(`Browser test: ${MOBILE ? 'mobile (375x812)' : 'desktop (1280x900)'}, ${PRESTIGE_CYCLES} prestige cycles`);
+
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'], protocolTimeout: 120000 });
+  const page = await browser.newPage();
+  await page.setViewport(viewport);
+
+  // Capture console errors
+  const consoleErrors = [];
+  page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+  page.on('pageerror', err => consoleErrors.push(err.message));
+
+  // Navigate and clear save
+  await page.goto('http://localhost:5173', { waitUntil: 'networkidle0', timeout: 30000 });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: 'networkidle0', timeout: 30000 });
+  await page.waitForFunction(() => window.__game, { timeout: 10000 });
+  await new Promise(r => setTimeout(r, 500));
+
+  // Start auto-player
+  await startPump(page);
+  console.log('Auto-player started');
+
+  let lastEra = 1;
+  let cycle = 0;
+  const eraTimes = {};
+
+  for (let tick = 0; tick < 600; tick++) { // max 10 min real time
+    await new Promise(r => setTimeout(r, 1000));
+    const state = await getState(page);
+
+    if (state.era > lastEra) {
+      eraTimes[state.era] = state.totalTime;
+      console.log(`  Era ${state.era} | ${state.upgrades} upgrades | ${state.tech} tech | ${state.totalTime}s game time`);
+      lastEra = state.era;
+      await screenshot(page, `cycle${cycle}_era${state.era}`);
     }
 
     if (state.era >= 10) {
-      // Pause auto-player for checks
-      await page.evaluate(() => { clearInterval(window.__pump); clearInterval(window.__ac); clearInterval(window.__ps); });
+      // Layout checks at era 10
+      await stopPump(page);
       await new Promise(r => setTimeout(r, 500));
 
-      // Check for visual issues
-      const issues = await page.evaluate(() => {
-        const problems = [];
+      // Check each tab
+      for (const tab of ['upgrades', 'tech', 'prestige', 'stats']) {
+        await page.evaluate(t => document.querySelector('#tab-' + t)?.click(), tab);
+        await new Promise(r => setTimeout(r, 200));
+      }
+      // Back to upgrades for layout check
+      await page.evaluate(() => document.querySelector('#tab-upgrades')?.click());
+      await new Promise(r => setTimeout(r, 300));
 
-        // Check header overflow
-        const header = document.querySelector('.game-header');
-        if (header && header.scrollWidth > header.clientWidth + 5) {
-          problems.push(`Header overflow: scrollW=${header.scrollWidth} > clientW=${header.clientWidth}`);
-        }
+      const layout = await checkLayout(page);
+      console.log('\n=== LAYOUT CHECK (Era 10) ===');
+      layout.ok.forEach(o => console.log('  ✓ ' + o));
+      layout.issues.forEach(i => console.log('  ✗ ' + i));
 
-        // Check for overlapping upgrade buttons
-        const rows = document.querySelectorAll('.upgrade-row');
-        rows.forEach(row => {
-          const btns = row.querySelectorAll('button');
-          if (btns.length > 1) {
-            const first = btns[0].getBoundingClientRect();
-            const second = btns[1].getBoundingClientRect();
-            if (first.right > second.left + 5 && second.width > 0) {
-              problems.push(`Upgrade buttons overlap in row`);
-            }
-          }
-        });
-
-        // Check for console errors (if captured)
-        // Check resource panel overflow
-        const resPanel = document.querySelector('.resource-panel');
-        if (resPanel && resPanel.scrollWidth > resPanel.clientWidth + 5) {
-          problems.push(`Resource panel overflow: scrollW=${resPanel.scrollWidth} > clientW=${resPanel.clientWidth}`);
-        }
-
-        // Check for FULL indicators
-        const fullIndicators = document.querySelectorAll('.text-danger');
-        if (fullIndicators.length > 0) {
-          problems.push(`FULL indicators present: ${fullIndicators.length} (GOOD - working)`);
-        }
-
-        // Check for capped rows
-        const cappedRows = document.querySelectorAll('.resource-capped');
-        if (cappedRows.length > 0) {
-          problems.push(`Capped resource rows: ${cappedRows.length} (GOOD - visual indicator working)`);
-        }
-
-        // Check prestige button visibility
-        const prestigeBtn = document.querySelector('.prestige-btn');
-        problems.push(`Prestige button: ${prestigeBtn ? 'visible' : 'hidden'}`);
-
-        return problems;
-      });
-
-      console.log('\n=== ERA 10 VISUAL CHECK ===');
-      issues.forEach(i => console.log('  ' + i));
+      await screenshot(page, `cycle${cycle}_era10_check`);
 
       if (cycle < PRESTIGE_CYCLES) {
         // Prestige
-        console.log(`\nPrestiging (cycle ${cycle + 1})...`);
-        await page.evaluate(() => {
-          document.querySelector('.prestige-btn')?.click();
-        });
+        await page.evaluate(() => document.querySelector('.prestige-btn')?.click());
         await new Promise(r => setTimeout(r, 500));
-        await page.evaluate(() => {
-          document.querySelector('.confirm-yes')?.click();
-        });
+        await page.evaluate(() => document.querySelector('.confirm-yes')?.click());
         await new Promise(r => setTimeout(r, 1000));
-        // Restart auto-player
-        await page.evaluate(() => {
-          let phase = 0;
-          const phases = ['upgrades', 'upgrades', 'tech', 'mini', 'prestige', 'upgrades', 'tech'];
-          window.__ps = setInterval(() => { phase = (phase + 1) % phases.length; document.querySelector('#tab-' + phases[phase])?.click(); }, 1500);
-          window.__pump = setInterval(() => window.__game.fastForward(30), 50);
-          window.__ac = setInterval(() => {
-            document.querySelectorAll('.gather-btn').forEach(b => b.click());
-            document.querySelectorAll('button').forEach(b => { if (b.textContent.includes('Buy All') && !b.disabled) b.click(); });
-            document.querySelectorAll('.tech-btn.affordable').forEach(b => b.click());
-            document.querySelectorAll('button').forEach(b => { if (b.textContent.includes('Research All') && !b.disabled) b.click(); });
-            document.querySelectorAll('.upgrade-btn.affordable').forEach(b => { if (!b.disabled) b.click(); });
-          }, 100);
-        });
+        await startPump(page);
         lastEra = 0;
         cycle++;
-        console.log(`Prestige complete. Starting cycle ${cycle + 1}...`);
+        console.log(`\nPrestige #${cycle} complete. Starting cycle ${cycle + 1}...`);
       } else {
         break;
       }
@@ -200,33 +212,34 @@ async function run() {
   }
 
   // Final state
-  const finalState = await page.evaluate(() => {
-    const s = window.__game.getState();
-    return {
-      era: s.era,
-      totalTime: Math.floor(s.totalTime),
-      upgrades: Object.keys(s.upgrades || {}).length,
-      tech: Object.keys(s.tech || {}).length,
-      achievements: Object.keys(s.achievements || {}).length,
-      prestigeCount: s.prestigeCount || 0,
-      prestigeMultiplier: s.prestigeMultiplier || 1,
-      trueEnding: !!s.trueEnding,
-      eternalReturn: !!s.prestigeUpgrades?.eternalReturn,
-      prestigeUpgrades: Object.keys(s.prestigeUpgrades || {}).length,
-    };
-  });
-
+  const final = await getState(page);
   console.log('\n=== FINAL STATE ===');
-  console.log(JSON.stringify(finalState, null, 2));
+  console.log(`  Era: ${final.era} | Upgrades: ${final.upgrades} | Tech: ${final.tech}`);
+  console.log(`  Achievements: ${final.achievements} | Prestige: ${final.prestigeCount} (x${final.prestigeMultiplier})`);
+  console.log(`  Prestige upgrades: ${final.prestigeUpgrades}/30`);
+  if (final.trueEnding) console.log('  TRUE ENDING achieved');
 
-  // Check console errors
-  const consoleErrors = [];
-  page.on('console', msg => {
-    if (msg.type() === 'error') consoleErrors.push(msg.text());
-  });
+  // Console errors
+  if (consoleErrors.length > 0) {
+    console.log(`\n=== CONSOLE ERRORS (${consoleErrors.length}) ===`);
+    [...new Set(consoleErrors)].slice(0, 10).forEach(e => console.log('  ' + e.substring(0, 120)));
+  } else {
+    console.log('\n  ✓ No console errors');
+  }
 
-  console.log(`\nScreenshots saved to ${SCREENSHOT_DIR}/`);
+  // Mobile check
+  if (MOBILE) {
+    const mobileLayout = await checkLayout(page);
+    console.log('\n=== MOBILE LAYOUT ===');
+    mobileLayout.ok.forEach(o => console.log('  ✓ ' + o));
+    mobileLayout.issues.forEach(i => console.log('  ✗ ' + i));
+  }
+
+  if (SCREENSHOTS) console.log(`\nScreenshots: ${SCREENSHOT_DIR}/`);
+
+  const exitCode = (await checkLayout(page)).issues.length > 0 ? 1 : 0;
   await browser.close();
+  process.exit(exitCode);
 }
 
 run().catch(e => { console.error(e); process.exit(1); });

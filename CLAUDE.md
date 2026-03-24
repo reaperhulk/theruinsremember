@@ -15,23 +15,26 @@
 ## Architecture
 The engine is **pure and deterministic**: `tick(state, dt, rng)` → new state. All game logic lives in `src/engine/`. The React layer in `src/hooks/useGameLoop.js` drives the loop via `requestAnimationFrame`, throttled to ~10 FPS for state updates.
 
-## Browser Testing with Chrome DevTools MCP
+## Browser Testing with Puppeteer
 
-### Quick Start
+### Automated Browser Test
+```bash
+# Start dev server first: npm run dev
+node scripts/browser-test.mjs                    # Quick layout validation
+node scripts/browser-test.mjs --prestige 2       # Test prestige flow
+node scripts/browser-test.mjs --mobile           # Mobile viewport (375x812)
+node scripts/browser-test.mjs --screenshots      # Save screenshots to /tmp/game-screenshots/
+```
+
+The Puppeteer test drives a real headless Chrome, uses `fastForward()` to pump the engine,
+clicks DOM buttons to buy upgrades/tech, and validates layout at Era 10. Exit code 1 if
+layout issues found.
+
+### Manual Browser Testing (inject harness)
 1. Start the dev server: `npm run dev`
-2. Open the game in Chrome (navigate_page to http://localhost:5173)
-3. Clear any existing save for a fresh start:
-   ```js
-   evaluate_script: localStorage.removeItem('incremental-game-save'); location.reload();
-   ```
-4. Inject the harness:
-   ```js
-   evaluate_script: <contents of scripts/browser-harness.js>
-   ```
-5. Set speed and observe:
-   ```js
-   evaluate_script: __harness.setSpeed(50); JSON.stringify(__harness.snapshot());
-   ```
+2. Open http://localhost:5173 in Chrome
+3. Open DevTools Console and paste contents of `scripts/browser-harness.js`
+4. Use `__harness.setSpeed(50)` and `JSON.stringify(__harness.snapshot())`
 
 ### Speed Control
 `window.__game.setSpeed(n)` scales the dt passed to the engine each frame:
