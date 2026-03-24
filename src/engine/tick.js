@@ -212,18 +212,21 @@ export function tick(state, dt, rng = Math.random) {
   // Auto-purchase earlier era upgrades when in era 3+.
   // Critical for game balance: cross-era costs grow faster than caps,
   // so upgrades MUST be bought while costs are still affordable.
+  // Buys ALL affordable upgrades from prior eras (not just one) to
+  // prevent deep prerequisite chains from stalling progression.
   if (newState.era >= 3 && newState.totalTicks % 30 === 0) {
     const autoPurchaseEra = Math.max(1, newState.era - 1);
-    for (const def of Object.values(upgradeDefs)) {
-      if (def.era > autoPurchaseEra) continue;
-      if (def.repeatable) continue;
-      if (newState.upgrades[def.id]) continue;
-      if (def.prerequisites.some(p => !newState.upgrades[p])) continue;
-      const result = purchaseUpgrade(newState, def.id);
-      if (result) {
-        newState = result;
-        break; // One per tick to avoid lag
+    for (let pass = 0; pass < 5; pass++) { // multiple passes for chains
+      let boughtAny = false;
+      for (const def of Object.values(upgradeDefs)) {
+        if (def.era > autoPurchaseEra) continue;
+        if (def.repeatable) continue;
+        if (newState.upgrades[def.id]) continue;
+        if (def.prerequisites.some(p => !newState.upgrades[p])) continue;
+        const result = purchaseUpgrade(newState, def.id);
+        if (result) { newState = result; boughtAny = true; }
       }
+      if (!boughtAny) break;
     }
   }
 
