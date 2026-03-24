@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { eraNames, ERA_COUNT, getMinUpgradesForEra, countEraUpgrades, checkEraTransition } from '../engine/eras.js';
+import { eraNames, ERA_COUNT, getMinUpgradesForEra, getMinTimeForEra, countEraUpgrades, checkEraTransition } from '../engine/eras.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
 import { calculateProduction } from '../engine/resources.js';
@@ -147,12 +147,20 @@ export function EraProgress({ state }) {
       {!isMaxEra && (() => {
         const nextEra = state.era + 1;
         const gatingTech = Object.values(techTree).find(t => t.grantsEra === nextEra && state.tech[t.id]);
-        const readyToTransition = upgradesMet && gatingTech;
+        const minTime = getMinTimeForEra(state.era, state.prestigeCount || 0);
+        const timeInEra = state.totalTime - (state.eraStartTime || 0);
+        const timeRemaining = Math.max(0, minTime - timeInEra);
+        const readyToTransition = upgradesMet && gatingTech && timeRemaining <= 0;
         if (readyToTransition) {
           return <p className="era-hint" style={{ color: '#88ff88' }}>Era transition imminent...</p>;
         }
         if (!upgradesMet) {
-          return <p className="era-hint">Buy {minUpgrades - eraUpgradeCount} more upgrades, then research ★ tech to advance</p>;
+          return <p className="era-hint">Buy {minUpgrades - eraUpgradeCount} more upgrades, then research ★ tech to advance
+            {timeRemaining > 0 && <span style={{ color: '#888', fontSize: '0.85em' }}> ({Math.ceil(timeRemaining)}s settling time)</span>}
+          </p>;
+        }
+        if (timeRemaining > 0) {
+          return <p className="era-hint" style={{ color: '#ddcc44' }}>Establishing presence... {Math.ceil(timeRemaining)}s remaining</p>;
         }
         return <p className="era-hint" style={{ color: '#88ff88' }}>Research starred (★) technologies to advance to the next era</p>;
       })()}
