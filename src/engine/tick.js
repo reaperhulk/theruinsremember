@@ -385,7 +385,7 @@ export function tick(state, dt, rng = Math.random) {
   // Dyson auto-assembly: every 60 ticks, auto-add segments based on existing count
   // Auto-rate scales with segments (1 per 10 segments, up to 20/tick)
   if (newState.era >= 7 && (newState.dysonSegments || 0) > 0 && newState.totalTicks % 60 === 0) {
-    const autoRate = Math.min(20, Math.floor((newState.dysonSegments || 0) / 10));
+    const autoRate = Math.max(1, Math.min(20, Math.floor((newState.dysonSegments || 0) / 10)));
     if (autoRate > 0) {
       newState = { ...newState, dysonSegments: (newState.dysonSegments || 0) + autoRate };
     }

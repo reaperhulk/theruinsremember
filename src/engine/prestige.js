@@ -36,8 +36,8 @@ export function calculatePrestigePoints(state) {
   let points = 0;
   if (state.era >= 7) points += 5;
   if (state.era >= 8) points += 7;
-  if (state.era >= 9) points += 9;
-  if (state.era >= 10) points += 9;  // 30 total for reaching era 10
+  if (state.era >= 9) points += 8;
+  if (state.era >= 10) points += 10;  // 30 total for reaching era 10
   // Bonus for upgrade completion across all eras (rewards thorough play)
   const totalUpgrades = Object.keys(state.upgrades).length;
   points += Math.floor(totalUpgrades / 20); // 1 point per 20 upgrades

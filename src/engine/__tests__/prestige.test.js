@@ -110,7 +110,7 @@ describe('prestige', () => {
     it('gives graduated points for deep eras', () => {
       const state = createInitialState();
       state.era = 10;
-      // Era 7=5, 8=+7, 9=+9, 10=+9 = 30 (no upgrades, no mini-games)
+      // Era 7=5, 8=+7, 9=+8, 10=+10 = 30 (no upgrades, no mini-games)
       expect(calculatePrestigePoints(state)).toBe(30);
     });
   });

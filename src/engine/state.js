@@ -74,6 +74,8 @@ export function createInitialState() {
     prestigeCount: 0,
     prestigePoints: 0,
     prestigeUpgrades: {},
+    lifetimeHighestEra: 1,
+    lifetimePlayTime: 0,
     achievements: {},
     // Dyson Assembly (Era 7+)
     dysonSegments: 0,

@@ -26,7 +26,7 @@ export function mine(state, roll = Math.random(), { skipCooldown = false } = {})
 
   // First mine is always a big hit (bypass cooldown for the very first mine)
   if ((state.miningStreak || 0) === 0 && (state.totalGems || 0) === 0) {
-    const firstMineAmount = 20; // Big burst to hook the player
+    const firstMineAmount = 20 * getEffectivePrestige(state.prestigeMultiplier || 1); // Big burst, scales with prestige
     return {
       state: {
         ...state,
