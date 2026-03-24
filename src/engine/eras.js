@@ -49,7 +49,7 @@ export function countEraUpgrades(state, era) {
 // Prevents late eras from compressing to nothing when production snowballs.
 // Scales down with prestige: experienced players earn faster transitions.
 const ERA_MIN_TIME = {
-  1: 220, 2: 180, 3: 240, 4: 210, 5: 150, 6: 180, 7: 210, 8: 150, 9: 120, 10: 0,
+  1: 220, 2: 190, 3: 250, 4: 210, 5: 150, 6: 180, 7: 210, 8: 150, 9: 120, 10: 0,
 };
 
 export function getMinTimeForEra(era, prestigeCount = 0) {
