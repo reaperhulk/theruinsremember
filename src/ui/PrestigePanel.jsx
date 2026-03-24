@@ -74,7 +74,10 @@ export function PrestigePanel({ state, onUpdate }) {
             </div>
             <div className="stat-row">
               <span>Current Multiplier:</span>
-              <span>x{formatNumber(state.prestigeMultiplier)}</span>
+              <span>x{formatNumber(state.prestigeMultiplier)}{state.prestigeMultiplier > 10 && (() => {
+                const eff = 10 + Math.sqrt(state.prestigeMultiplier - 10) * 3;
+                return ` (effective: x${formatNumber(eff)})`;
+              })()}</span>
             </div>
             <div className="stat-row">
               <span>Next Prestige:</span>

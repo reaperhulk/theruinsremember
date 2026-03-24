@@ -182,9 +182,11 @@ export function EraProgress({ state }) {
         )}
         <span> | {upgradeCount} upgrades | {techCount} tech</span>
         {(state.totalGems || 0) > 0 && <span> | {state.totalGems} gems</span>}
-        {state.prestigeMultiplier > 1 && (
-          <span> | x{formatNumber(state.prestigeMultiplier)}</span>
-        )}
+        {state.prestigeMultiplier > 1 && (() => {
+          const raw = state.prestigeMultiplier;
+          const effective = raw <= 10 ? raw : 10 + Math.sqrt(raw - 10) * 3;
+          return <span title={`Raw: x${formatNumber(raw)}, Effective: x${formatNumber(effective)} (soft-scaled)`}> | x{formatNumber(effective)}</span>;
+        })()}
         {totalRate > 0 && (
           <span style={rateFlash ? { color: '#88ff88', transition: 'color 0.6s ease' } : { transition: 'color 0.6s ease' }}> | {formatNumber(totalRate)}/s total</span>
         )}

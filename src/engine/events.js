@@ -15,7 +15,7 @@ export function checkForEvent(state, dt, roll = Math.random()) {
   const hasEventMagnet = state.prestigeUpgrades && state.prestigeUpgrades.eventMagnet;
   // Temporal Echo prestige upgrade: scales with prestige count (1.25x per prestige, capped at 3x)
   const hasTemporalEcho = state.prestigeUpgrades && state.prestigeUpgrades.temporalEcho;
-  const echoBonus = hasTemporalEcho ? Math.min(3, 1 + 0.25 * (state.prestigeCount || 1)) : 1;
+  const echoBonus = hasTemporalEcho ? Math.min(2, 1 + 0.15 * (state.prestigeCount || 1)) : 1;
   let eventChance = BASE_EVENT_CHANCE;
   if (hasEventMagnet) eventChance *= 1.5;
   eventChance *= echoBonus;

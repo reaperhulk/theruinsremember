@@ -99,6 +99,8 @@ export function App() {
 
   const handlePrestige = () => {
     if (state.era < ERA_COUNT) return;
+    // Game is truly complete once Eternal Return is purchased — no more cycles
+    if (state.prestigeUpgrades?.eternalReturn) return;
     const summary = getPrestigeSummary(state);
     const milestones = [];
     if (summary.prestigeCount >= 3 && (state.prestigeCount || 0) < 3) milestones.push('NEW: Auto-gather unlocked');
@@ -248,7 +250,7 @@ export function App() {
       <header className="game-header">
         <h1>The Ruins Remember{state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888', marginLeft: '8px' }}>Era {state.era}: {eraNames[state.era]}</span>}</h1>
         <div className="header-controls">
-          {state.era >= ERA_COUNT && (
+          {state.era >= ERA_COUNT && !state.prestigeUpgrades?.eternalReturn && (
             <button className="prestige-btn" onClick={handlePrestige}>
               Prestige (x{prestigeBonus.toFixed(1)} bonus)
             </button>

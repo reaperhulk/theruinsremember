@@ -93,9 +93,42 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
 
   const overclockActive = state.upgrades?.overclockProtocol && ((state.totalTime || 0) % 60) < 10;
 
+  // Detect throttled consumption chains
+  const throttledChains = [];
+  if (state.resources.food?.unlocked && getEffectiveRate(state, 'labor') > 0) {
+    const net = getNetRate(state, 'food');
+    const gross = getEffectiveRate(state, 'food');
+    if (gross > 0 && net / gross < 0.2) throttledChains.push('Food → Labor');
+  }
+  if (state.resources.energy?.unlocked && getEffectiveRate(state, 'electronics') > 0) {
+    const net = getNetRate(state, 'energy');
+    const gross = getEffectiveRate(state, 'energy');
+    if (gross > 0 && net / gross < 0.2) throttledChains.push('Energy → Electronics');
+  }
+  if (state.era >= 4 && state.resources.rocketFuel?.unlocked && getEffectiveRate(state, 'orbitalInfra') > 0) {
+    const net = getNetRate(state, 'rocketFuel');
+    const gross = getEffectiveRate(state, 'rocketFuel');
+    if (gross > 0 && net / gross < 0.2) throttledChains.push('Fuel → Orbital');
+  }
+  if (state.era >= 5 && state.resources.exoticMaterials?.unlocked && getEffectiveRate(state, 'colonies') > 0) {
+    const net = getNetRate(state, 'exoticMaterials');
+    const gross = getEffectiveRate(state, 'exoticMaterials');
+    if (gross > 0 && net / gross < 0.2) throttledChains.push('Exotic → Colonies');
+  }
+  if (state.era >= 7 && state.resources.stellarForge?.unlocked && getEffectiveRate(state, 'megastructures') > 0) {
+    const net = getNetRate(state, 'stellarForge');
+    const gross = getEffectiveRate(state, 'stellarForge');
+    if (gross > 0 && net / gross < 0.2) throttledChains.push('Forge → Mega');
+  }
+
   return (
     <div className="panel resource-panel" style={overclockActive ? { borderColor: '#cc9933', boxShadow: '0 0 8px rgba(204, 153, 51, 0.3)' } : undefined}>
       <h2>Resources ({unlockedResources.length} unlocked)</h2>
+      {throttledChains.length >= 2 && (
+        <div style={{ fontSize: '0.75em', color: '#ff8844', padding: '2px 8px', marginBottom: '4px', background: 'rgba(255,100,50,0.1)', borderRadius: '3px' }}>
+          ⚠ Multiple supply chains strained: {throttledChains.join(', ')} — production severely reduced
+        </div>
+      )}
       {eras.map(era => {
         const isOld = era < state.era;
         const isCollapsed = collapsed[era] !== undefined ? collapsed[era] : (autoCollapse && isOld && eras.length > 2);
@@ -147,7 +180,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                   const tooltip = tooltipParts.join('\n');
                   return (
                     <div key={r.id} className={`resource-row-wrapper`}>
-                    <div className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${boostedResources.has(r.id) ? 'rate-boosted' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0) || (r.id === 'exoticMaterials' && state.era >= 5 && getEffectiveRate(state, 'colonies') > 0) || (r.id === 'stellarForge' && state.era >= 7 && getEffectiveRate(state, 'megastructures') > 0)) ? 'consuming' : ''}`} title={tooltip}>
+                    <div className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${boostedResources.has(r.id) ? 'rate-boosted' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0) || (r.id === 'exoticMaterials' && state.era >= 5 && getEffectiveRate(state, 'colonies') > 0) || (r.id === 'stellarForge' && state.era >= 7 && getEffectiveRate(state, 'megastructures') > 0)) ? 'consuming' : ''} ${r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0 ? 'resource-capped' : ''}`} title={tooltip}>
                       <span className="resource-name" style={{ cursor: 'pointer', textDecoration: expandedResource === r.id ? 'underline' : 'none', borderBottom: expandedResource === r.id ? 'none' : '1px dotted #556' }} onClick={() => setExpandedResource(expandedResource === r.id ? null : r.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedResource(expandedResource === r.id ? null : r.id); }}} tabIndex={0} role="button" aria-expanded={expandedResource === r.id}>
                         {r.def?.name || r.id}
                       </span>

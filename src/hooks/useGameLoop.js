@@ -73,6 +73,8 @@ export function useGameLoop(initialState) {
       getState: () => stateRef.current,
       setState: (fn) => setState(prev => fn(prev) || prev),
       fastForward: (seconds) => setState(prev => tick(prev, seconds)),
+      setSpeed: (mult) => { speedRef.current = Math.max(0, mult); },
+      getSpeed: () => speedRef.current,
       giveAll: (amount = 1000) => setState(prev => {
         const res = { ...prev.resources };
         for (const [id, r] of Object.entries(res)) {
@@ -89,13 +91,14 @@ export function useGameLoop(initialState) {
   const accumulatedDtRef = useRef(0);
   const rafRef = useRef(null);
   const saveTimerRef = useRef(null);
+  const speedRef = useRef(1);
 
   const gameLoop = useCallback((now) => {
     const dt = (now - lastTimeRef.current) / 1000;
     lastTimeRef.current = now;
 
     // Cap dt to avoid spiral of death (e.g., tab was hidden)
-    const cappedDt = Math.max(0, Math.min(dt, 1));
+    const cappedDt = Math.max(0, Math.min(dt, 1)) * speedRef.current;
     accumulatedDtRef.current += cappedDt;
 
     // Throttle React state updates to ~10fps (100ms) while canvas animates at 60fps

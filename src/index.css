@@ -1972,6 +1972,12 @@ canvas:hover {
   100% { background: transparent; box-shadow: none; }
 }
 
+/* Resource capped — visual indicator when production is wasted */
+.resource-row.resource-capped {
+  border-left: 2px solid #cc6633;
+  background: rgba(204, 100, 50, 0.06);
+}
+
 /* Mechanic upgrade styling */
 .upgrade-btn.mechanic-upgrade {
   border-left: 3px solid #d4a840;

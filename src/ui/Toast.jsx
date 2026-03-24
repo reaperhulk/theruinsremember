@@ -52,18 +52,17 @@ export function Toast({ state }) {
       }
     }
 
-    // Resource cap warnings (once per resource)
+    // Resource cap warnings (once per resource per cap level)
     for (const [id, r] of Object.entries(state.resources)) {
       if (!r.unlocked) continue;
       const cap = getEffectiveCap(state, id);
-      if (cap > 0 && r.amount >= cap * 0.99 && !capWarningsRef.current[id]) {
-        capWarningsRef.current[id] = true;
-        const name = resourceDefs[id]?.name || id;
-        newToasts.push({ id: ++idRef.current, text: `${name} storage is full! Buy cap upgrades.`, type: 'milestone' });
-      }
-      // Reset warning if below 80% so it can trigger again after player upgrades cap
-      if (cap > 0 && r.amount < cap * 0.8) {
-        capWarningsRef.current[id] = false;
+      if (cap > 0 && r.amount >= cap * 0.99) {
+        // Only warn once per cap value — resets when player upgrades the cap
+        if (capWarningsRef.current[id] !== cap) {
+          capWarningsRef.current[id] = cap;
+          const name = resourceDefs[id]?.name || id;
+          newToasts.push({ id: ++idRef.current, text: `${name} storage is full! Buy cap upgrades.`, type: 'milestone' });
+        }
       }
     }
 

@@ -1,14 +1,23 @@
 import { resources as resourceDefs } from '../data/resources.js';
 import { ERA_COST_MULTIPLIERS } from './upgrades.js';
 
-// Calculate effective production rate for a single resource
+// Calculate effective production rate for a single resource.
+// The prestige multiplier uses soft-scaling: sqrt growth beyond 10x so early
+// prestiges feel meaningful but don't trivialize the game. Only the final
+// prestiges (with huge multipliers) dramatically accelerate progression.
 export function getEffectiveRate(state, resourceId) {
   const r = state.resources[resourceId];
   if (!r || !r.unlocked) return 0;
   const def = resourceDefs[resourceId];
   if (!def) return 0;
   const realityKeyBonus = 1 + (Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0) * 0.01);
-  const prestigeMult = state.prestigeMultiplier || 1;
+  const rawPrestige = state.prestigeMultiplier || 1;
+  // Soft-scale: first 10x is linear, beyond that grows as sqrt
+  // e.g. 100x raw → 10 + sqrt(100-10)*3 ≈ 38x effective
+  // e.g. 1000x raw → 10 + sqrt(1000-10)*3 ≈ 104x effective
+  const prestigeMult = rawPrestige <= 10
+    ? rawPrestige
+    : 10 + Math.sqrt(rawPrestige - 10) * 3;
   return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * realityKeyBonus;
 }
 
@@ -75,7 +84,9 @@ export function gather(state, resourceId, amount = 1) {
   const r = state.resources[resourceId];
   if (!r || !r.unlocked) return state;
   const eraScale = 1 + (state.era - 1) * 1.0;
-  const gathered = amount * r.rateMult * state.prestigeMultiplier * eraScale;
+  const rawPrestige = state.prestigeMultiplier || 1;
+  const prestigeMult = rawPrestige <= 10 ? rawPrestige : 10 + Math.sqrt(rawPrestige - 10) * 3;
+  const gathered = amount * r.rateMult * prestigeMult * eraScale;
   const cap = getEffectiveCap(state, resourceId);
   let newAmount = r.amount + gathered;
   // Enforce cap on gathering (clicking)
