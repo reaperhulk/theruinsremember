@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global process */
 // Bot Playtest CLI — configurable game balance testing tool.
 // Usage: node scripts/bot-playtest.js [options]
 // Zero external dependencies. Run --help for full usage.
@@ -258,7 +259,7 @@ function botGather(state, profile, t, _rng) {
   return state;
 }
 
-function botBuyUpgrades(state, profile, t, _rng) {
+function botBuyUpgrades(state, profile, _t, _rng) {
   if (!profile.buyUpgrades) return state;
   const available = getAvailableUpgrades(state);
   // Non-repeatable first
@@ -279,7 +280,7 @@ function botBuyUpgrades(state, profile, t, _rng) {
   return state;
 }
 
-function botBuyTech(state, profile, t, _rng) {
+function botBuyTech(state, profile, _t, _rng) {
   if (!profile.buyTech) return state;
   const techs = getAvailableTech(state);
   for (const tech of techs) {
@@ -930,7 +931,7 @@ function printHumanReport(scenarioName, opts, collector) {
   if (hasAnyMini) {
     console.log('\n── Mini-Game Stats ──');
     if (mg.mining.gems > 0) console.log(`  Mining: ${mg.mining.gems} gems found`);
-    if (mg.factory.allocations > 0 || true) console.log(`  Factory: active`);
+    if (mg.factory.allocations >= 0) console.log(`  Factory: active`);
     if (mg.hacking.successes > 0) console.log(`  Hacking: ${mg.hacking.successes} successes`);
     if (mg.docking.attempts > 0) console.log(`  Docking: ${mg.docking.successes}/${mg.docking.attempts} hits (${mg.docking.perfects} perfect)`);
     if (mg.starChart.routes > 0) console.log(`  Star Chart: ${mg.starChart.routes} routes`);

@@ -1,6 +1,5 @@
 import { useState, memo } from 'react';
 import { eraNames, countEraUpgrades } from '../engine/eras.js';
-import { getPrestigeSummary } from '../engine/prestige.js';
 import { getAchievementList } from '../engine/achievements.js';
 import { getEffectiveRate, getEffectivePrestige } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -13,7 +12,6 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
   const [showEarned, setShowEarned] = useState(true);
   const achievementList = getAchievementList(state);
   const earnedCount = achievementList.filter(a => a.earned).length;
-  const summary = getPrestigeSummary(state);
 
   // Lore codex — discovered lore upgrades
   const discoveredLore = LORE_UPGRADE_IDS

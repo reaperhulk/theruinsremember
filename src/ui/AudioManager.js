@@ -24,7 +24,7 @@ export function playClick() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
     osc.start();
     osc.stop(ctx.currentTime + 0.1);
-  } catch {}
+  } catch { /* audio may be unavailable */ }
 }
 
 export function playUpgrade() {
@@ -42,7 +42,7 @@ export function playUpgrade() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
     osc.start();
     osc.stop(ctx.currentTime + 0.2);
-  } catch {}
+  } catch { /* audio may be unavailable */ }
 }
 
 export function playEraTransition() {
@@ -61,5 +61,5 @@ export function playEraTransition() {
       osc.start(ctx.currentTime + i * 0.15);
       osc.stop(ctx.currentTime + i * 0.15 + 0.3);
     });
-  } catch {}
+  } catch { /* audio may be unavailable */ }
 }

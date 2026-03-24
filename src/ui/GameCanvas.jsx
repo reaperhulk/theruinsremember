@@ -2541,7 +2541,6 @@ function drawDysonEra(ctx, w, h, t, state) {
   }
 
   // Orbiting megastructures — habitats, factories, research stations
-  const megaRng = seededRandom(8888);
   const megaTypes = [
     { label: 'habitat', color: [100, 220, 150] },
     { label: 'factory', color: [220, 180, 80] },
