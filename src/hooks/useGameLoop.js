@@ -48,11 +48,12 @@ export function useGameLoop(initialState) {
           }
           // Store offline report (will be shown by UI)
           // For large offline periods, show processing indicator briefly
+          const eraChanged = after.era > before.era;
           if (chunks > 100) {
-            setOfflineReport({ elapsed: offlineDt, processing: true, gains: {}, era: after.era });
-            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era }), 300);
+            setOfflineReport({ elapsed: offlineDt, processing: true, gains: {}, era: after.era, prevEra: before.era, eraChanged });
+            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged }), 300);
           } else {
-            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era }), 100);
+            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged }), 100);
           }
           return after;
         }
