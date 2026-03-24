@@ -103,16 +103,6 @@ export function attemptDock(state, position) {
       : (state.dockingPerfects || 0),
   };
 
-  // Launch window: perfect docks add a 5% production boost for 30 seconds
-  if (result === 'perfect' && state.upgrades?.launchWindow) {
-    newState.activeEffects = [...(newState.activeEffects || []), {
-      id: `dockingBoost_${newState.totalTime}`,
-      description: 'Docking Precision: +5% all production',
-      endsAt: (newState.totalTime || 0) + 30,
-      startedAt: newState.totalTime || 0,
-      effect: { resourceId: 'all', rateMultBonus: 1.05 },
-    }];
-  }
 
   return {
     state: newState,

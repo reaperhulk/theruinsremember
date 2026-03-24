@@ -1,6 +1,6 @@
 import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
-import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
+// Events system removed — was causing random resource surges that disrupted pacing
 import { getFactoryBonus } from './factory.js';
 import { getColonyBonus } from './colonies.js';
 import { getRouteBonus } from './starChart.js';
@@ -101,10 +101,6 @@ export function tick(state, dt, rng = Math.random) {
     if (id === 'colonies') effectiveRate = rate * colonyScale;
     if (id === 'megastructures') effectiveRate = rate * megaScale;
 
-    // Apply timed effect multipliers
-    const timedMult = getTimedRateMultiplier(state, id);
-    effectiveRate *= timedMult;
-
     const cap = getEffectiveCap(state, id);
     let newAmount = r.amount + effectiveRate * dt;
     // Enforce resource cap: production cannot push above cap
@@ -164,35 +160,10 @@ export function tick(state, dt, rng = Math.random) {
     totalTime: state.totalTime + dt,
   };
 
-  // Expire timed effects
-  newState = expireEffects(newState);
+  // Events system removed
 
   // Check weave combo reset (120s inactivity)
   newState = checkComboReset(newState);
-
-  // Random events (Era 3+)
-  const { state: afterEvent, event } = checkForEvent(newState, dt, rng());
-  if (event) {
-    // Skip lore events already seen this run
-    if (event.isLore && afterEvent.seenLoreEvents?.[event.id]) {
-      newState = afterEvent;
-    } else {
-      newState = {
-        ...afterEvent,
-        eventLog: [...(afterEvent.eventLog || []), {
-          message: `${event.name}: ${event.description}`,
-          time: afterEvent.totalTime,
-          ...(event.isLore ? { isLore: true } : {}),
-        }].slice(-20),
-      };
-      // Track lore events so they only fire once per run
-      if (event.isLore) {
-        newState.seenLoreEvents = { ...(newState.seenLoreEvents || {}), [event.id]: true };
-      }
-    }
-  } else {
-    newState = afterEvent;
-  }
 
   // Auto-mine (prestige upgrade)
   if (newState.prestigeUpgrades && newState.prestigeUpgrades.autoClicker) {

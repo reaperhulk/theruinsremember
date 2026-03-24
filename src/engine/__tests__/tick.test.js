@@ -82,17 +82,7 @@ describe('tick', () => {
     expect(bonusTick.resources.food.amount).toBeGreaterThan(baseTick.resources.food.amount);
   });
 
-  it('entropySiphon (crisisInversion) inverts negative timed effects', () => {
-    const state = createInitialState();
-    state.upgrades = { entropySiphon: true };
-    state.activeEffects = [
-      { id: 'crisis', endsAt: 999, effect: { resourceId: 'food', rateMultBonus: 0.5 } },
-    ];
-    const after = tick(state, 1);
-    // With crisisInversion, the 0.5x should be inverted to 2x
-    // Food: 1.5 * 2 = 3.0/s, so amount should be > base 1.5
-    expect(after.resources.food.amount).toBeGreaterThan(state.resources.food.amount + 2.5);
-  });
+  // entropySiphon test removed — events system removed
 
   it('echoMultiplier (diversityBonus) scales with unlocked resource count', () => {
     const state = createInitialState();

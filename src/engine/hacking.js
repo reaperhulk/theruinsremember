@@ -46,29 +46,30 @@ export function submitHack(state, playerSequence) {
 
   if (success) {
     const hasHackMaster = state.prestigeUpgrades && state.prestigeUpgrades.hackMaster;
-    const duration = hasHackMaster ? BONUS_DURATION * 2 : BONUS_DURATION;
+    const burstSeconds = hasHackMaster ? BONUS_DURATION * 2 : BONUS_DURATION;
     // Era scaling: hacks give bigger bonuses in later eras
     const eraScale = 1 + (state.era - 3) * 0.3;
     const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
     const savantMult = hasSavant ? 1.5 : 1;
     const scaledMult = challenge.multiplier * Math.max(1, eraScale) * savantMult;
-    const effect = {
-      id: `hack_${state.totalTime}`,
-      startedAt: state.totalTime,
-      endsAt: state.totalTime + duration,
-      description: `Hack Success: x${scaledMult.toFixed(1)} data & software`,
-      effects: [
-        { resourceId: 'data', rateMultBonus: scaledMult },
-        { resourceId: 'software', rateMultBonus: scaledMult },
-      ],
-    };
+
+    // Give instant burst of data + software (equivalent to burstSeconds of boosted production)
+    const newResources = { ...state.resources };
+    for (const resId of ['data', 'software']) {
+      const r = newResources[resId];
+      if (r && r.unlocked) {
+        const rate = (r.baseRate + r.rateAdd) * r.rateMult * (state.prestigeMultiplier || 1);
+        const burst = rate * scaledMult * burstSeconds;
+        newResources[resId] = { ...r, amount: r.amount + burst };
+      }
+    }
 
     const newState = {
       ...state,
+      resources: newResources,
       hackChallenge: null,
       hackDifficulty: Math.min(10, (state.hackDifficulty || 0) + 1),
       hackSuccesses: (state.hackSuccesses || 0) + 1,
-      activeEffects: [...(state.activeEffects || []), effect],
     };
 
     // Forge Memory: successful hacks permanently increase a random resource's multiplier by 1%
@@ -114,18 +115,3 @@ export function submitHack(state, playerSequence) {
   };
 }
 
-// Get current hack bonus multiplier (from active effects)
-export function getHackBonus(state) {
-  if (!state.activeEffects) return 1;
-  let mult = 1;
-  for (const effect of state.activeEffects) {
-    if (effect.id && effect.id.startsWith('hack_') && effect.effects) {
-      for (const e of effect.effects) {
-        if (e.resourceId === 'data') {
-          mult *= e.rateMultBonus;
-        }
-      }
-    }
-  }
-  return mult;
-}

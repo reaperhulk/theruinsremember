@@ -7,7 +7,6 @@ import { UpgradePanel } from './UpgradePanel.jsx';
 import { TechTree } from './TechTree.jsx';
 import { EraProgress } from './EraProgress.jsx';
 import { GameCanvas } from './GameCanvas.jsx';
-import { EventLog } from './EventLog.jsx';
 import { MiningPanel } from './MiningPanel.jsx';
 import { FactoryPanel } from './FactoryPanel.jsx';
 import { HackingPanel } from './HackingPanel.jsx';
@@ -16,7 +15,6 @@ import { ColonyPanel } from './ColonyPanel.jsx';
 import { StarChartPanel } from './StarChartPanel.jsx';
 import { WeavingPanel } from './WeavingPanel.jsx';
 import { DysonPanel } from './DysonPanel.jsx';
-import { TuningPanel } from './TuningPanel.jsx';
 import { TradingPanel } from './TradingPanel.jsx';
 import { SenatePanel } from './SenatePanel.jsx';
 import { RealityForgePanel } from './RealityForgePanel.jsx';
@@ -62,7 +60,6 @@ export function App() {
   const [victoryDismissed, setVictoryDismissed] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(null);
-  const prevEventsRef = useRef(state.eventLog?.length || 0);
   const prevPerfectsRef = useRef(state.dockingPerfects || 0);
 
   // Sync audio muted state
@@ -83,19 +80,6 @@ export function App() {
     prevPerfectsRef.current = perfects;
   }, [state.dockingPerfects]);
 
-  // Event flash on new events (red for crisis, blue for normal)
-  useEffect(() => {
-    const events = state.eventLog?.length || 0;
-    if (events > prevEventsRef.current) {
-      const latestMsg = state.eventLog?.[state.eventLog.length - 1]?.message || '';
-      const isCrisis = /^Blight|strikes|surge|rupture|corrupted/i.test(latestMsg);
-      setFlashClass(isCrisis ? 'crisis-flash' : 'event-flash');
-      const t = setTimeout(() => setFlashClass(''), isCrisis ? 800 : 500);
-      prevEventsRef.current = events;
-      return () => clearTimeout(t);
-    }
-    prevEventsRef.current = events;
-  }, [state.eventLog?.length]);
 
   const handlePrestige = () => {
     if (state.era < ERA_COUNT) return;
@@ -173,7 +157,7 @@ export function App() {
   // Badge counts for tabs
   const affordableUpgrades = getAvailableUpgrades(state).filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
   const affordableTech = getAvailableTech(state).filter(t => canAfford(state, t.cost)).length;
-  const activeEffectCount = (state.activeEffects || []).length;
+  const activeEffectCount = 0; // Events removed
 
   // Mini-game definitions with era requirements
   const miniGameDefs = [
@@ -186,7 +170,6 @@ export function App() {
     { id: 'dyson', label: 'Dyson', era: 7, desc: 'Build sphere segments for forge output' },
     { id: 'senate', label: 'Senate', era: 8, desc: 'Allocate influence to factions' },
     { id: 'weaving', label: 'Weaving', era: 8, desc: 'Match reality fragments for boosts' },
-    { id: 'tuning', label: 'Tuning', era: 9, desc: 'Match cosmic frequencies for power' },
     { id: 'realityForge', label: 'Forge', era: 10, desc: 'Craft keys for permanent bonuses' },
   ];
 
@@ -216,7 +199,6 @@ export function App() {
       dyson: <DysonPanel key="dyson" state={state} onUpdate={updateState} />,
       senate: <SenatePanel key="senate" state={state} onUpdate={updateState} />,
       weaving: <WeavingPanel key="weaving" state={state} onUpdate={updateState} />,
-      tuning: <TuningPanel key="tuning" state={state} onUpdate={updateState} />,
       realityForge: <RealityForgePanel key="realityForge" state={state} onUpdate={updateState} />,
     };
 
@@ -327,7 +309,6 @@ export function App() {
         <div className="left-column">
           <GameCanvas state={state} onUpdate={updateState} />
           <ResourcePanel state={state} onUpdate={updateState} />
-          <EventLog state={state} />
         </div>
         <div className="right-column">
           <div className="tab-bar" role="tablist" aria-label="Game tabs">

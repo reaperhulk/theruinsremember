@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateChallenge, startHack, submitHack, getHackBonus } from '../hacking.js';
+import { generateChallenge, startHack, submitHack } from '../hacking.js';
 import { createInitialState } from '../state.js';
 
 describe('hacking', () => {
@@ -41,8 +41,10 @@ describe('hacking', () => {
     expect(after.hackChallenge).toBeUndefined();
   });
 
-  it('successful hack adds timed effect and increments difficulty', () => {
+  it('successful hack gives instant burst and increments difficulty', () => {
     const state = makeEra3State();
+    state.resources.data = { ...state.resources.data, unlocked: true, amount: 0, baseRate: 1, rateAdd: 0, rateMult: 1 };
+    state.resources.software = { ...state.resources.software, unlocked: true, amount: 0, baseRate: 1, rateAdd: 0, rateMult: 1 };
     const withChallenge = startHack(state, [0.1, 0.3, 0.5, 0.7]);
     const sequence = withChallenge.hackChallenge.sequence;
     const { state: after, success } = submitHack(withChallenge, sequence);
@@ -50,7 +52,8 @@ describe('hacking', () => {
     expect(after.hackDifficulty).toBe(1);
     expect(after.hackSuccesses).toBe(1);
     expect(after.hackChallenge).toBeNull();
-    expect(after.activeEffects.length).toBe(1);
+    expect(after.resources.data.amount).toBeGreaterThan(0);
+    expect(after.resources.software.amount).toBeGreaterThan(0);
   });
 
   it('failed hack decreases difficulty', () => {
@@ -62,16 +65,4 @@ describe('hacking', () => {
     expect(after.hackDifficulty).toBe(2);
   });
 
-  it('getHackBonus returns multiplier from active hack effects', () => {
-    const state = makeEra3State();
-    state.activeEffects = [{
-      id: 'hack_100',
-      endsAt: 130,
-      effects: [
-        { resourceId: 'data', rateMultBonus: 2 },
-        { resourceId: 'software', rateMultBonus: 2 },
-      ],
-    }];
-    expect(getHackBonus(state)).toBe(2);
-  });
 });
