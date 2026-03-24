@@ -2,15 +2,20 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { spend } from './resources.js';
 
-// Era-based cost multiplier to keep pace with exponential production growth
+// Era-based cost multiplier to keep pace with exponential production growth.
+// Smooth exponential curve: each era ~15-30x more expensive than previous.
+// Also scales resource caps so earlier resources can store enough.
 export const ERA_COST_MULTIPLIERS = {
-  1: 1, 2: 70, 3: 150, 4: 500, 5: 2000, 6: 10000, 7: 4000000, 8: 60000000, 9: 40000000, 10: 1000000000000,
+  1: 1, 2: 70, 3: 200, 4: 1500, 5: 15000, 6: 200000, 7: 5000000, 8: 100000000, 9: 3000000000, 10: 1000000000000,
 };
 
 // Same-era cost exponent per era. Early eras use gentler scaling (sqrt-like),
 // later eras use steeper scaling to prevent instant transitions.
+// Same-era exponent: controls how much same-era resources cost for same-era
+// upgrades. Higher = more expensive = longer eras. Late eras use steeper
+// exponents so they don't compress to nothing.
 const SAME_ERA_EXPONENT = {
-  1: 0.5, 2: 0.5, 3: 0.5, 4: 0.5, 5: 0.55, 6: 0.6, 7: 0.6, 8: 0.65, 9: 0.65, 10: 0.65,
+  1: 0.5, 2: 0.5, 3: 0.5, 4: 0.55, 5: 0.6, 6: 0.7, 7: 0.75, 8: 0.8, 9: 0.85, 10: 0.85,
 };
 
 // Apply era-based cost scaling per resource:

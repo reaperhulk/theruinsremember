@@ -103,14 +103,14 @@ describe('prestige', () => {
     it('calculates points based on era reached', () => {
       const state = createInitialState();
       state.era = 7;
-      // Era 7 = 3 points (no upgrades, no mini-games)
-      expect(calculatePrestigePoints(state)).toBe(3);
+      // Era 7 = 5 points (no upgrades, no mini-games)
+      expect(calculatePrestigePoints(state)).toBe(5);
     });
 
-    it('gives escalating points for deep eras', () => {
+    it('gives graduated points for deep eras', () => {
       const state = createInitialState();
       state.era = 10;
-      // Era 7=3, 8=+5, 9=+8, 10=+14 = 30 (no upgrades, no mini-games)
+      // Era 7=5, 8=+7, 9=+9, 10=+9 = 30 (no upgrades, no mini-games)
       expect(calculatePrestigePoints(state)).toBe(30);
     });
   });

@@ -32,12 +32,12 @@ export function calculatePrestigeBonus(state) {
 export function calculatePrestigePoints(state) {
   // No points until era 7 — prestige is a late-game mechanic
   if (state.era < 7) return 0;
-  // Base: escalating points for deep eras
+  // Base: graduated points for deep eras (rewards steady progression)
   let points = 0;
-  if (state.era >= 7) points += 3;
-  if (state.era >= 8) points += 5;
-  if (state.era >= 9) points += 8;
-  if (state.era >= 10) points += 14;  // 30 total for reaching era 10
+  if (state.era >= 7) points += 5;
+  if (state.era >= 8) points += 7;
+  if (state.era >= 9) points += 9;
+  if (state.era >= 10) points += 9;  // 30 total for reaching era 10
   // Bonus for upgrade completion across all eras (rewards thorough play)
   const totalUpgrades = Object.keys(state.upgrades).length;
   points += Math.floor(totalUpgrades / 20); // 1 point per 20 upgrades
