@@ -93,8 +93,17 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
         </div>
         <div className="stat-row">
           <span>Production Mult</span>
-          <span>x{formatNumber(state.prestigeMultiplier || 1)}</span>
+          <span>x{formatNumber(state.prestigeMultiplier || 1)}{state.prestigeMultiplier > 10 && (() => {
+            const eff = 10 + Math.sqrt(state.prestigeMultiplier - 10) * 3;
+            return ` (eff: x${formatNumber(eff)})`;
+          })()}</span>
         </div>
+        {(state.lifetimePlayTime || 0) > 0 && (
+          <div className="stat-row">
+            <span>Lifetime Play</span>
+            <span>{formatTime((state.lifetimePlayTime || 0) + (state.totalTime || 0))}</span>
+          </div>
+        )}
         {state.lastUpgradeTime > 0 && (
           <div className="stat-row">
             <span>Since Last Upgrade</span>
