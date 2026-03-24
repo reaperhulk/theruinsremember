@@ -583,7 +583,3 @@ export const techTree = {
   dysonTheory: { id: 'dysonTheory', name: 'Dyson Theory', era: 5, cost: { research: 4800, exoticMaterials: 160, energy: 28000 }, prerequisites: ['advancedPropulsion'], grantsEra: null, description: 'The framework was not theoretical — the math describes structures already built around dead stars, waiting to be studied and replicated', effects: [{ type: 'production_add', target: 'energy', value: 20.0 }, { type: 'production_add', target: 'colonies', value: 10.0 }] },
   temporalShielding: { id: 'temporalShielding', name: 'Temporal Shielding', era: 7, cost: { stellarForge: 28, megastructures: 12, research: 420000 }, prerequisites: ['galacticAscendancy'], grantsEra: null, description: 'The shields deflect time itself — temporal armor forged from moments that have already passed, hardened by the weight of cycles they have survived', effects: [{ type: 'production_add', target: 'stellarForge', value: 100.0 }, { type: 'production_add', target: 'darkEnergy', value: 50.0 }] },
 };
-
-export function getTechForEra(era) {
-  return Object.values(techTree).filter(t => t.era <= era);
-}

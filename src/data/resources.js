@@ -45,7 +45,3 @@ export const resources = {
   realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 10, baseCap: 10000, baseRate: 0.1, description: 'Shards of alternate realities' },
   quantumEchoes: { id: 'quantumEchoes', name: 'Quantum Echoes', era: 10, baseCap: 20000, baseRate: 0.08, description: 'Resonances from parallel universes' },
 };
-
-export function getResourcesForEra(era) {
-  return Object.values(resources).filter(r => r.era <= era);
-}
