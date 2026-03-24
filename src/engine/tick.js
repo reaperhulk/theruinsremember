@@ -408,10 +408,12 @@ export function tick(state, dt, rng = Math.random) {
     }
   }
 
-  // Check game completion
+  // Check game completion — must match achievement condition in achievements.js
   if (!newState.gameComplete && newState.era >= 10 &&
       newState.upgrades?.recursionScar && newState.upgrades?.finalIteration &&
-      Object.keys(newState.prestigeUpgrades || {}).length >= 25) {
+      newState.upgrades?.multiverseCapstone &&
+      Object.keys(newState.prestigeUpgrades || {}).length >= 25 &&
+      (newState.prestigeCount || 0) >= 1) {
     newState = {
       ...newState,
       gameComplete: true,
