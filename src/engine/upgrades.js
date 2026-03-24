@@ -6,7 +6,7 @@ import { spend } from './resources.js';
 // Smooth exponential curve: each era ~15-30x more expensive than previous.
 // Also scales resource caps so earlier resources can store enough.
 export const ERA_COST_MULTIPLIERS = {
-  1: 1, 2: 70, 3: 200, 4: 1500, 5: 15000, 6: 200000, 7: 5000000, 8: 100000000, 9: 3000000000, 10: 1000000000000,
+  1: 1, 2: 70, 3: 150, 4: 800, 5: 5000, 6: 20000, 7: 5000000, 8: 100000000, 9: 3000000000, 10: 1000000000000,
 };
 
 // Same-era cost exponent per era. Early eras use gentler scaling (sqrt-like),
