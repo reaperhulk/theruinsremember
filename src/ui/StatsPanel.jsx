@@ -124,10 +124,6 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
         {state.prestigeCount > 0 && (
           <>
             <div className="stat-row">
-              <span>Lifetime Play</span>
-              <span>{formatTime((state.lifetimePlayTime || 0) + state.totalTime)}</span>
-            </div>
-            <div className="stat-row">
               <span>Best Era</span>
               <span>{eraNames[state.lifetimeHighestEra] || 'N/A'}</span>
             </div>
@@ -260,7 +256,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
             </div>
           )}
           <div className="achievement-list">
-            {achievementList.filter(a => a.earned).map(a => (
+            {achievementList.filter(a => a.earned).reverse().map(a => (
               <div key={a.id} className="achievement earned">
                 <span className="achievement-name">{a.name}</span>
                 <span className="achievement-desc">{a.description}</span>
