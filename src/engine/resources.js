@@ -43,7 +43,7 @@ export function getNetRate(state, resourceId) {
   }
   if (resourceId === 'rocketFuel' && state.era >= 4) {
     const orbRate = getEffectiveRate(state, 'orbitalInfra');
-    return grossRate - orbRate * 0.7;
+    return grossRate - orbRate * 0.5;
   }
   if (resourceId === 'exoticMaterials' && state.era >= 5) {
     const colonyRate = getEffectiveRate(state, 'colonies');

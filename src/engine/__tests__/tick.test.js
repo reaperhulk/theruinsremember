@@ -236,10 +236,10 @@ describe('tick', () => {
     state.era = 4;
     state.resources.orbitalInfra = { ...state.resources.orbitalInfra, unlocked: true, rateAdd: 2, rateMult: 1 };
     state.resources.rocketFuel = { ...state.resources.rocketFuel, unlocked: true, amount: 100, rateAdd: 0, rateMult: 1, capMult: 1 };
-    // Orbital rate = (0.15 + 2) * 1 = 2.15/s, fuel consumed = 2.15 * 0.7 = 1.505/s
-    // Fuel production = (0.3 + 0) * 1 = 0.3/s, net = 0.3 - 1.505 = -1.205/s
+    // Orbital rate = (0.4 + 2) * 1 = 2.4/s, fuel consumed = 2.4 * 0.5 = 1.2/s
+    // Fuel production = (0.3 + 0) * 1 = 0.3/s, net = 0.3 - 1.2 = -0.9/s
     const after = tick(state, 1);
-    expect(after.resources.rocketFuel.amount).toBeCloseTo(100 + 0.3 - 2.15 * 0.7, 1);
+    expect(after.resources.rocketFuel.amount).toBeCloseTo(100 + 0.3 - 2.4 * 0.5, 1);
   });
 
   it('auto-purchase only buys non-repeatable upgrades from earlier eras', () => {

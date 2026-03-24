@@ -17,9 +17,9 @@ export const resources = {
   software: { id: 'software', name: 'Software', era: 3, baseCap: 1500, baseRate: 0.2, description: 'Digital programs and algorithms' },
   data: { id: 'data', name: 'Data', era: 3, baseCap: 1000, baseRate: 0.25, description: 'Collected and processed information' },
 
-  // Era 4: Space Age — moderate base rate to help bootstrapping
+  // Era 4: Space Age — orbital infra needs enough base rate to bootstrap
   rocketFuel: { id: 'rocketFuel', name: 'Rocket Fuel', era: 4, baseCap: 5000, baseRate: 0.3, description: 'Propellant for rockets' },
-  orbitalInfra: { id: 'orbitalInfra', name: 'Orbital Infrastructure', era: 4, baseCap: 1000, baseRate: 0.15, description: 'Structures in orbit' },
+  orbitalInfra: { id: 'orbitalInfra', name: 'Orbital Infrastructure', era: 4, baseCap: 1000, baseRate: 0.4, description: 'Structures in orbit' },
 
   // Era 5: Solar System
   colonies: { id: 'colonies', name: 'Colonies', era: 5, baseCap: 2000, baseRate: 0.1, description: 'Off-world settlements' },
