@@ -279,26 +279,47 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         </div>
       )}
       {(() => {
-        const affordableNonRepeatable = filteredAvailable.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
-        // Capture current filter state for the onClick handler
+        // Simulate the actual buy sequence to get accurate count
         const currentFilterType = filterType;
+        const hidden = state.hiddenUpgrades || {};
+        let simState = state;
+        let simBought = 0;
+        let simEffects = 0;
+        for (let pass = 0; pass < 10; pass++) {
+          const avail = getAvailableUpgrades(simState);
+          let boughtThisPass = 0;
+          for (const u of avail) {
+            if (u.repeatable) continue;
+            if (hidden[u.id]) continue;
+            if (currentFilterType !== 'all' && !u.effects.some(e => {
+              if (currentFilterType === 'mult') return e.type === 'production_mult' || e.type === 'production_mult_all';
+              if (currentFilterType === 'add') return e.type === 'production_add';
+              if (currentFilterType === 'cap') return e.type === 'cap_mult';
+              if (currentFilterType === 'unlock') return e.type === 'unlock_resource';
+              return true;
+            })) continue;
+            if (filterResource && !u.effects.some(e => e.target === filterResource)) continue;
+            if (!canAfford(simState, getUpgradeCost(simState, u.id))) continue;
+            const next = purchaseUpgrade(simState, u.id);
+            if (next) { simState = next; simBought++; simEffects += u.effects.length; boughtThisPass++; }
+          }
+          if (boughtThisPass === 0) break;
+        }
         return available.length > 0 && (
           <button
             className="gather-btn"
             style={{ width: '100%', marginBottom: '4px', padding: '4px', fontSize: '0.8em' }}
-            disabled={affordableNonRepeatable.length === 0}
+            disabled={simBought === 0}
             onClick={() => onUpdate(s => {
-              // Recompute from live state, respecting current filter + hidden
               let current = s;
               let bought = 0;
-              const hidden = current.hiddenUpgrades || {};
+              const hid = current.hiddenUpgrades || {};
               for (let pass = 0; pass < 10; pass++) {
                 const avail = getAvailableUpgrades(current);
                 let boughtThisPass = 0;
                 for (const u of avail) {
                   if (u.repeatable) continue;
-                  if (hidden[u.id]) continue;
-                  // Respect the active effect-type filter
+                  if (hid[u.id]) continue;
                   if (currentFilterType !== 'all' && !u.effects.some(e => {
                     if (currentFilterType === 'mult') return e.type === 'production_mult' || e.type === 'production_mult_all';
                     if (currentFilterType === 'add') return e.type === 'production_add';
@@ -306,6 +327,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                     if (currentFilterType === 'unlock') return e.type === 'unlock_resource';
                     return true;
                   })) continue;
+                  if (filterResource && !u.effects.some(e => e.target === filterResource)) continue;
                   if (!canAfford(current, getUpgradeCost(current, u.id))) continue;
                   const next = purchaseUpgrade(current, u.id);
                   if (next) { current = next; bought++; boughtThisPass++; }
@@ -315,7 +337,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
               return bought > 0 ? current : null;
             })}
           >
-            {affordableNonRepeatable.length > 0 ? `Buy All Affordable (${affordableNonRepeatable.length} upgrades, ${countEffects(affordableNonRepeatable)} effects)` : 'No affordable upgrades'}
+            {simBought > 0 ? `Buy All Affordable (${simBought} upgrades, ${simEffects} effects)` : 'No affordable upgrades'}
           </button>
         );
       })()}
