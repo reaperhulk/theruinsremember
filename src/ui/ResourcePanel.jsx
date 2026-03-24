@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
-import { getEffectiveRate, getEffectiveCap, getNetRate, gather } from '../engine/resources.js';
+import { getEffectiveRate, getEffectiveCap, getEffectivePrestige, getNetRate, gather } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
 import { getFactoryBonus } from '../engine/factory.js';
 import { getColonyBonus } from '../engine/colonies.js';
@@ -168,7 +168,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                   if (cb[r.id]) tooltipParts.push(`Colonies: +${cb[r.id].toFixed(1)}/s`);
                   const rb = getRouteBonus(state);
                   if (rb[r.id]) tooltipParts.push(`Star routes: +${rb[r.id].toFixed(1)}/s`);
-                  if (state.prestigeMultiplier > 1) tooltipParts.push(`Prestige: x${formatNumber(state.prestigeMultiplier)}`);
+                  if (state.prestigeMultiplier > 1) tooltipParts.push(`Prestige: x${formatNumber(getEffectivePrestige(state.prestigeMultiplier))}`);
                   // Consumption info
                   if (r.id === 'food' && r.rate > 0) tooltipParts.push(`Consumed by: labor (1.0/labor/s)`);
                   if (r.id === 'energy') tooltipParts.push(`Consumed by: electronics (0.4/elec/s)`);
@@ -246,7 +246,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                       const fb = getFactoryBonus(state);
                       const cb = getColonyBonus(state);
                       const rb = getRouteBonus(state);
-                      const prestigeMult = state.prestigeMultiplier || 1;
+                      const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
                       const net = getNetRate(state, r.id);
                       const cap = r.cap;
                       const pctFull = cap > 0 ? Math.floor(r.amount / cap * 100) : 0;
