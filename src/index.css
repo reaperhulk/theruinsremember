@@ -1661,13 +1661,6 @@ canvas:hover {
   background: linear-gradient(90deg, rgba(187, 136, 255, 0.08), transparent);
 }
 
-.resource-amount.increasing {
-  color: #88ff88;
-}
-
-.resource-amount.decreasing {
-  color: #ff8888;
-}
 
 /* Near-cap warning pulse */
 .resource-amount.near-cap {
