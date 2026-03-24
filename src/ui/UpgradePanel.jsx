@@ -412,10 +412,9 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
             )}
             {upgrade.repeatable && (
               <button
-                className="upgrade-btn"
+                className="upgrade-hide-btn"
                 onClick={(e) => { e.stopPropagation(); handleToggleHide(upgrade.id); }}
                 title={hiddenUpgrades[upgrade.id] ? 'Show this upgrade' : 'Hide this upgrade'}
-                style={{ fontSize: '0.7em', padding: '2px 6px', opacity: 0.6, minWidth: 'auto' }}
               >
                 {hiddenUpgrades[upgrade.id] ? 'Show' : 'Hide'}
               </button>

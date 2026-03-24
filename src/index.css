@@ -1708,21 +1708,42 @@ canvas:hover {
   100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
 }
 
-/* Upgrade row hover lift */
+/* Upgrade row: main button full width, Max/Hide overlay top-right */
 .upgrade-row {
   animation: upgrade-appear 0.2s ease-out;
-  display: flex;
-  gap: 4px;
-  align-items: stretch;
+  position: relative;
 }
-.upgrade-row > .upgrade-btn:first-child {
-  flex: 1;
-  min-width: 0;
+.upgrade-row > .buy-max-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 2;
+  font-size: 0.75em !important;
+  padding: 2px 8px !important;
+  min-width: auto !important;
 }
-.upgrade-row > .buy-max-btn,
-.upgrade-row > .upgrade-btn:not(:first-child) {
-  flex-shrink: 0;
-  align-self: center;
+.upgrade-row > .upgrade-hide-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 2;
+  font-size: 0.6em;
+  padding: 1px 5px;
+  opacity: 0.4;
+  cursor: pointer;
+  color: #888;
+  background: rgba(20, 20, 30, 0.8);
+  border: 1px solid #444;
+  border-radius: 3px;
+  font-family: inherit;
+}
+.upgrade-row > .upgrade-hide-btn:hover {
+  opacity: 1;
+  border-color: #888;
+}
+/* When Max is also present, shift Hide button left */
+.upgrade-row > .buy-max-btn + .upgrade-hide-btn {
+  right: 46px;
 }
 
 @keyframes upgrade-appear {
