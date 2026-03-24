@@ -93,32 +93,24 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
 
   const overclockActive = state.upgrades?.overclockProtocol && ((state.totalTime || 0) % 60) < 10;
 
-  // Detect throttled consumption chains
+  // Detect critically throttled consumption chains — only warn when resource
+  // is actually draining (net negative), not just heavily consumed
   const throttledChains = [];
-  if (state.resources.food?.unlocked && getEffectiveRate(state, 'labor') > 0) {
-    const net = getNetRate(state, 'food');
-    const gross = getEffectiveRate(state, 'food');
-    if (gross > 0 && net / gross < 0.2) throttledChains.push('Food → Labor');
-  }
-  if (state.resources.energy?.unlocked && getEffectiveRate(state, 'electronics') > 0) {
-    const net = getNetRate(state, 'energy');
-    const gross = getEffectiveRate(state, 'energy');
-    if (gross > 0 && net / gross < 0.2) throttledChains.push('Energy → Electronics');
-  }
-  if (state.era >= 4 && state.resources.rocketFuel?.unlocked && getEffectiveRate(state, 'orbitalInfra') > 0) {
-    const net = getNetRate(state, 'rocketFuel');
-    const gross = getEffectiveRate(state, 'rocketFuel');
-    if (gross > 0 && net / gross < 0.2) throttledChains.push('Fuel → Orbital');
-  }
-  if (state.era >= 5 && state.resources.exoticMaterials?.unlocked && getEffectiveRate(state, 'colonies') > 0) {
-    const net = getNetRate(state, 'exoticMaterials');
-    const gross = getEffectiveRate(state, 'exoticMaterials');
-    if (gross > 0 && net / gross < 0.2) throttledChains.push('Exotic → Colonies');
-  }
-  if (state.era >= 7 && state.resources.stellarForge?.unlocked && getEffectiveRate(state, 'megastructures') > 0) {
-    const net = getNetRate(state, 'stellarForge');
-    const gross = getEffectiveRate(state, 'stellarForge');
-    if (gross > 0 && net / gross < 0.2) throttledChains.push('Forge → Mega');
+  const consumedResources = [
+    { id: 'food', consumer: 'labor', era: 1 },
+    { id: 'energy', consumer: 'electronics', era: 1 },
+    { id: 'rocketFuel', consumer: 'orbitalInfra', era: 4 },
+    { id: 'exoticMaterials', consumer: 'colonies', era: 5 },
+    { id: 'stellarForge', consumer: 'megastructures', era: 7 },
+  ];
+  for (const { id, consumer, era } of consumedResources) {
+    if (state.era < era || !state.resources[id]?.unlocked) continue;
+    if (getEffectiveRate(state, consumer) <= 0) continue;
+    const net = getNetRate(state, id);
+    if (net < 0) {
+      const name = { food: 'Food', energy: 'Energy', rocketFuel: 'Fuel', exoticMaterials: 'Exotic', stellarForge: 'Forge' }[id];
+      throttledChains.push(name + ' draining');
+    }
   }
 
   return (
