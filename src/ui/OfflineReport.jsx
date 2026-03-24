@@ -1,5 +1,6 @@
 import { formatNumber, formatTime } from './format.js';
 import { resources as resourceDefs } from '../data/resources.js';
+import { eraNames } from '../engine/eras.js';
 
 function resourceName(id) {
   return resourceDefs[id]?.name || id;
@@ -45,7 +46,7 @@ export function OfflineReport({ report, onDismiss }) {
         <p className="offline-time">You were away for {formatTime(report.elapsed)}</p>
         {report.eraChanged && (
           <p style={{ color: '#88ff88', fontWeight: 'bold', textAlign: 'center', margin: '4px 0' }}>
-            Era advanced: {report.prevEra} → {report.era}!
+            Era advanced: {eraNames[report.prevEra] || report.prevEra} → {eraNames[report.era] || report.era}!
           </p>
         )}
         {gains.length > 0 && (
