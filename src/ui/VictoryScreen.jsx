@@ -23,9 +23,10 @@ export function VictoryScreen({ state, onDismiss }) {
         </p>
         <div style={{ fontSize: '0.85em', color: '#888', marginBottom: '16px' }}>
           <div>Prestige cycles: {state.prestigeCount || 0}</div>
+          <div>Prestige upgrades: {Object.keys(state.prestigeUpgrades || {}).length}/30</div>
           <div>Total play time: {formatTime((state.lifetimePlayTime || 0) + (state.totalTime || 0))}</div>
           <div>Upgrades purchased: {Object.keys(state.upgrades || {}).length}</div>
-          <div>Achievements: {Object.keys(state.achievements || {}).length}</div>
+          <div>Achievements: {Object.keys(state.achievements || {}).length}/289</div>
           {state.totalGems > 0 && <div>Gems found: {state.totalGems}</div>}
           {state.dysonSegments > 0 && <div>Dyson segments: {state.dysonSegments}</div>}
         </div>
