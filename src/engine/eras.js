@@ -21,14 +21,14 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 const ERA_MIN_UPGRADES = {
   1: 30,   // ~55% of ~55
   2: 35,   // ~63% of ~56
-  3: 25,   // ~47% of ~53 — bootstrapping delay
-  4: 35,   // ~60% of ~58 — rocketFuel bootstrapping gate
-  5: 42,   // ~72% of ~58
-  6: 40,   // ~69% of ~58
-  7: 40,   // ~66% of ~61
-  8: 38,   // ~63% of ~60
-  9: 38,   // ~62% of ~61
-  10: 35,  // ~59% of ~59
+  3: 20,   // ~38% of ~53 — reduced for faster flow
+  4: 30,   // ~52% of ~58
+  5: 30,   // ~52% of ~58 — reduced from 42 to avoid stalls
+  6: 30,   // ~52% of ~58
+  7: 30,   // ~49% of ~61
+  8: 30,   // ~50% of ~60
+  9: 30,   // ~49% of ~61
+  10: 30,  // ~51% of ~59
 };
 
 // Minimum upgrades gate: requires purchasing enough era-specific upgrades before

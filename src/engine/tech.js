@@ -56,8 +56,10 @@ export function unlockTech(state, techId) {
 }
 
 // Get the scaled cost for a tech node (with era multiplier applied)
+// Tech costs are defined as final values — no era scaling applied
+// (unlike upgrades which have base costs that get scaled by era multiplier)
 export function getTechCost(def) {
-  return applyEraCostScaling(def.cost, def.era);
+  return { ...def.cost };
 }
 
 // Get available tech nodes

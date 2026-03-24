@@ -14,8 +14,8 @@ export const resources = {
   research: { id: 'research', name: 'Research', era: 2, baseCap: 10000, baseRate: 0.2, description: 'Scientific knowledge' },
 
   // Era 3: Digital Age — base rate balances bootstrapping vs meaningful duration
-  software: { id: 'software', name: 'Software', era: 3, baseCap: 1500, baseRate: 0.2, description: 'Digital programs and algorithms' },
-  data: { id: 'data', name: 'Data', era: 3, baseCap: 1000, baseRate: 0.25, description: 'Collected and processed information' },
+  software: { id: 'software', name: 'Software', era: 3, baseCap: 1500, baseRate: 0.5, description: 'Digital programs and algorithms' },
+  data: { id: 'data', name: 'Data', era: 3, baseCap: 1000, baseRate: 0.5, description: 'Collected and processed information' },
 
   // Era 4: Space Age — orbital infra needs enough base rate to bootstrap
   rocketFuel: { id: 'rocketFuel', name: 'Rocket Fuel', era: 4, baseCap: 5000, baseRate: 0.3, description: 'Propellant for rockets' },
