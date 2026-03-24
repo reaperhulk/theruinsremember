@@ -1711,9 +1711,17 @@ canvas:hover {
   top: 4px;
   right: 4px;
   z-index: 2;
-  font-size: 0.75em !important;
-  padding: 2px 8px !important;
-  min-width: auto !important;
+  font-size: 0.7em;
+  padding: 2px 8px;
+  cursor: pointer;
+  color: #ddd;
+  background: rgba(100, 140, 60, 0.3);
+  border: 1px solid #6a9a44;
+  border-radius: 3px;
+  font-family: inherit;
+}
+.upgrade-row > .buy-max-btn:hover {
+  background: rgba(100, 140, 60, 0.5);
 }
 .upgrade-row > .upgrade-hide-btn {
   position: absolute;

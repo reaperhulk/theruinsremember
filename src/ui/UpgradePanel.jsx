@@ -402,10 +402,9 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
             </button>
             {upgrade.repeatable && affordable && (
               <button
-                className="upgrade-btn buy-max-btn affordable"
+                className="buy-max-btn"
                 onClick={() => onUpdate(s => buyMaxRepeatable(s, upgrade.id))}
                 title="Buy as many as you can afford"
-                style={{ fontSize: '0.8em', padding: '4px 8px' }}
               >
                 Max
               </button>
