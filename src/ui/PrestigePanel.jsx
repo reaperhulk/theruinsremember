@@ -168,7 +168,7 @@ export function PrestigePanel({ state, onUpdate }) {
         </div>
         <div className="stat-row">
           <span>Upgrades Owned:</span>
-          <span>{Object.keys(state.upgrades || {}).length} / {Object.keys(state.prestigeUpgrades || {}).length} prestige</span>
+          <span>{Object.keys(state.upgrades || {}).length} regular, {Object.keys(state.prestigeUpgrades || {}).length}/30 prestige</span>
         </div>
       </div>
       {Object.keys(bestTimes).length > 0 && (
