@@ -298,7 +298,8 @@ export function tick(state, dt, rng = Math.random) {
   // Mechanic: upgradeCountBonus — +1% production per upgrade owned
   if (newState.upgrades?.communalEffort) {
     const upgradeCount = Object.keys(newState.upgrades).length;
-    const bonusFraction = Math.min(0.5, upgradeCount * 0.005);
+    const maxBonus = 0.5 + (newState.prestigeCount || 0) * 0.05; // scales with prestige
+    const bonusFraction = Math.min(maxBonus, upgradeCount * 0.005);
     newState = applyProductionBonus(newState, bonusFraction, dt);
   }
 
