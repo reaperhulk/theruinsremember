@@ -380,12 +380,12 @@ export function tick(state, dt, rng = Math.random) {
     newState = applyProductionBonus(newState, 0.001, dt);
   }
 
-  // Dyson auto-assembly: every 60 ticks (~1 min at 1 tick/s), auto-add segments based on existing count
-  // Cap total segments at 500 to prevent indefinite compounding
-  if (newState.era >= 7 && (newState.dysonSegments || 0) > 0 && (newState.dysonSegments || 0) < 500 && newState.totalTicks % 60 === 0) {
-    const autoRate = Math.min(10, Math.floor((newState.dysonSegments || 0) / 10));
+  // Dyson auto-assembly: every 60 ticks, auto-add segments based on existing count
+  // Auto-rate scales with segments (1 per 10 segments, up to 20/tick)
+  if (newState.era >= 7 && (newState.dysonSegments || 0) > 0 && newState.totalTicks % 60 === 0) {
+    const autoRate = Math.min(20, Math.floor((newState.dysonSegments || 0) / 10));
     if (autoRate > 0) {
-      newState = { ...newState, dysonSegments: Math.min(500, (newState.dysonSegments || 0) + autoRate) };
+      newState = { ...newState, dysonSegments: (newState.dysonSegments || 0) + autoRate };
     }
   }
 

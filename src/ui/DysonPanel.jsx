@@ -5,7 +5,7 @@ import { assembleDysonSegment, getDysonStats } from '../engine/dyson.js';
 
 export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
   const [lastGain, setLastGain] = useState(null);
-  const { segments: totalSegments, completion, milestone, nextMilestone, autoRate } = getDysonStats(state);
+  const { segments: totalSegments, completion, milestone, nextMilestone, autoRate, bonusMult } = getDysonStats(state);
 
   const handleAssemble = () => {
     playClick();
@@ -28,9 +28,9 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
         <div className="upgrade-progress-fill" style={{ width: `${completion}%`, background: 'linear-gradient(90deg, #d08030, #e8a040)' }} />
       </div>
       <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '4px' }}>
-        Completion: {completion}% | {totalSegments >= 500 ? 'MAX SEGMENTS' : `Next milestone: ${nextMilestone} segments`}
+        Next milestone: {nextMilestone} segments | Bonus: x{bonusMult.toFixed(1)} assembly value
       </div>
-      <button className="mine-btn" onClick={handleAssemble} disabled={totalSegments >= 500} style={{ background: 'linear-gradient(90deg, #3a2a1a, #4a3020)' }}>
+      <button className="mine-btn" onClick={handleAssemble} style={{ background: 'linear-gradient(90deg, #3a2a1a, #4a3020)' }}>
         {lastGain ? (
           <span style={{ color: '#e8a040' }}>
             +{formatNumber(lastGain.sf)} forge, +{formatNumber(lastGain.mg)} mega
@@ -42,12 +42,12 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
       <p className="mining-hint">Click to assemble | Rewards scale with production rate | Every 10 segments = milestone</p>
       {milestone > 0 && (
         <div style={{ fontSize: '0.75em', color: '#d08030', marginTop: '4px' }}>
-          Milestones reached: {milestone} | Bonus: +{Math.min(50, milestone * 10)}% assembly value (max 50%)
+          Milestones reached: {milestone} | Assembly bonus: x{bonusMult.toFixed(1)}
         </div>
       )}
       {totalSegments > 0 && (
         <div style={{ fontSize: '0.75em', color: '#888', marginTop: '4px' }}>
-          Auto-assembly: {autoRate} segments/min (max 10/min)
+          Auto-assembly: {autoRate} segments/min{autoRate >= 20 ? ' (max)' : ''}
         </div>
       )}
     </div>

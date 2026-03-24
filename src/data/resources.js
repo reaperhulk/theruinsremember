@@ -22,7 +22,7 @@ export const resources = {
   orbitalInfra: { id: 'orbitalInfra', name: 'Orbital Infrastructure', era: 4, baseCap: 1000, baseRate: 0.15, description: 'Structures in orbit' },
 
   // Era 5: Solar System
-  colonies: { id: 'colonies', name: 'Colonies', era: 5, baseCap: 2000, baseRate: 0.05, description: 'Off-world settlements' },
+  colonies: { id: 'colonies', name: 'Colonies', era: 5, baseCap: 2000, baseRate: 0.1, description: 'Off-world settlements' },
   exoticMaterials: { id: 'exoticMaterials', name: 'Exotic Materials', era: 5, baseCap: 3000, baseRate: 0.08, description: 'Rare space resources' },
 
   // Era 6: Interstellar — higher base rates for passive/noMinigames bootstrapping

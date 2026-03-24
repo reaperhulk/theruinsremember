@@ -45,10 +45,19 @@ export function countEraUpgrades(state, era) {
   ).length;
 }
 
-// Get minimum time required in an era before transition.
-// Returns 0 — pacing is handled by upgrade/tech costs, not artificial time gates.
+// Minimum time in era before transition allowed (seconds).
+// Prevents late eras from compressing to nothing when production snowballs.
+// Scales down with prestige: experienced players earn faster transitions.
+const ERA_MIN_TIME = {
+  1: 0, 2: 0, 3: 0, 4: 0, 5: 30, 6: 45, 7: 60, 8: 45, 9: 30, 10: 0,
+};
+
 export function getMinTimeForEra(era, prestigeCount = 0) {
-  return 0;
+  const base = ERA_MIN_TIME[era] || 0;
+  if (base === 0) return 0;
+  // Each prestige reduces minimum time by 15%, down to 10% of base
+  const reduction = Math.pow(0.85, prestigeCount);
+  return Math.max(base * 0.1, base * reduction);
 }
 
 // Check if state qualifies for an era transition. Returns next era number or null.
