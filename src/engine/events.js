@@ -163,6 +163,8 @@ export function getTimedRateMultiplier(state, resourceId) {
       }
     }
   }
+  // Cap stacked multiplier to prevent runaway surges from multiple events
+  mult = Math.min(mult, 20);
   mult = Math.max(0.25, mult);
 
   // Mechanic: crisisInversion — if owned and mult < 1, invert it (capped at 4x)
