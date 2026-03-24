@@ -55,6 +55,7 @@ describe('eras', () => {
       const state = createInitialState();
       state.tech.industrialRevolution = true;
       state.totalGems = 1; // mini-game engagement required
+      state.totalTime = 600; // enough time to pass min era time gate
       // Purchase 30 era 1 upgrades to meet the minimum
       const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
       for (let i = 0; i < 30 && i < era1Upgrades.length; i++) {

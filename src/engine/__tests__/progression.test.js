@@ -46,8 +46,8 @@ describe('progression integration', () => {
     // Buy industrial revolution to transition
     state = giveAndBuy(state, 'tech', 'industrialRevolution');
 
-    // Tick to trigger era transition
-    state = tick(state, 0.1);
+    // Tick enough time to pass era min time gate, then trigger transition
+    state = tick(state, 300);
     expect(state.era).toBe(2);
   });
 
