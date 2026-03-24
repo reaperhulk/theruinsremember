@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { eraNames } from '../engine/eras.js';
-import { resources as resourceDefs } from '../data/resources.js';
 import { playEraTransition } from './AudioManager.js';
 
 const eraLore = {

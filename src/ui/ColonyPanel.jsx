@@ -1,6 +1,5 @@
 import { memo } from 'react';
 import { getAssignableColonies, getColonyAssignments, getTotalColoniesAssigned, assignColonies, getColonyBonus, getColonyStrategy } from '../engine/colonies.js';
-import { formatNumber } from './format.js';
 import { resources as resourceDefs } from '../data/resources.js';
 
 function resourceName(id) { return resourceDefs[id]?.name || id; }

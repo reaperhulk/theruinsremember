@@ -7,7 +7,7 @@ import { getRouteBonus } from './starChart.js';
 import { mine } from './mining.js';
 import { checkAchievements } from './achievements.js';
 import { checkComboReset } from './weaving.js';
-import { purchaseUpgrade, getUpgradeCost } from './upgrades.js';
+import { purchaseUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 // Resource consumption rates — moderate tension without breaking non-minigame paths

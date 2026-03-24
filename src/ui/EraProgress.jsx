@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { eraNames, ERA_COUNT, getMinUpgradesForEra, getMinTimeForEra, countEraUpgrades, checkEraTransition } from '../engine/eras.js';
+import { eraNames, ERA_COUNT, getMinUpgradesForEra, getMinTimeForEra, countEraUpgrades } from '../engine/eras.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
 import { calculateProduction } from '../engine/resources.js';

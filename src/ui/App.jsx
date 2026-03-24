@@ -28,7 +28,7 @@ import { PrestigePanel } from './PrestigePanel.jsx';
 import { EraTransition } from './EraTransition.jsx';
 import { Toast } from './Toast.jsx';
 import { OfflineReport } from './OfflineReport.jsx';
-import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, getPrestigeSummary } from '../engine/prestige.js';
+import { performPrestige, calculatePrestigeBonus, getPrestigeSummary } from '../engine/prestige.js';
 import { ERA_COUNT, eraNames } from '../engine/eras.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
