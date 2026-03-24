@@ -1,4 +1,5 @@
 import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary } from '../engine/prestige.js';
+import { getEffectivePrestige } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
 import { formatNumber } from './format.js';
 
@@ -74,17 +75,15 @@ export function PrestigePanel({ state, onUpdate }) {
             </div>
             <div className="stat-row">
               <span>Current Multiplier:</span>
-              <span>x{formatNumber(state.prestigeMultiplier)}{state.prestigeMultiplier > 10 && (() => {
-                const eff = 10 + Math.sqrt(state.prestigeMultiplier - 10) * 3;
-                return ` (effective: x${formatNumber(eff)})`;
-              })()}</span>
+              <span>x{formatNumber(state.prestigeMultiplier)}{state.prestigeMultiplier > 10 &&
+                ` (effective: x${formatNumber(getEffectivePrestige(state.prestigeMultiplier))})`
+              }</span>
             </div>
             <div className="stat-row">
               <span>Next Prestige:</span>
-              <span>+{summary.points} pts, x{formatNumber(summary.bonus)} → total x{formatNumber(summary.newMultiplier)}{summary.newMultiplier > 10 && (() => {
-                const eff = 10 + Math.sqrt(summary.newMultiplier - 10) * 3;
-                return ` (eff: x${formatNumber(eff)})`;
-              })()}{state.era < 10 ? ' (prestige at Era 10)' : ''}</span>
+              <span>+{summary.points} pts, x{formatNumber(summary.bonus)} → total x{formatNumber(summary.newMultiplier)}{summary.newMultiplier > 10 &&
+                ` (eff: x${formatNumber(getEffectivePrestige(summary.newMultiplier))})`
+              }{state.era < 10 ? ' (prestige at Era 10)' : ''}</span>
             </div>
           </>
         )}

@@ -2,7 +2,7 @@ import { useState, memo } from 'react';
 import { eraNames, countEraUpgrades } from '../engine/eras.js';
 import { getPrestigeSummary } from '../engine/prestige.js';
 import { getAchievementList } from '../engine/achievements.js';
-import { getEffectiveRate } from '../engine/resources.js';
+import { getEffectiveRate, getEffectivePrestige } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { formatTime, formatNumber } from './format.js';
@@ -93,10 +93,9 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
         </div>
         <div className="stat-row">
           <span>Production Mult</span>
-          <span>x{formatNumber(state.prestigeMultiplier || 1)}{state.prestigeMultiplier > 10 && (() => {
-            const eff = 10 + Math.sqrt(state.prestigeMultiplier - 10) * 3;
-            return ` (eff: x${formatNumber(eff)})`;
-          })()}</span>
+          <span>x{formatNumber(state.prestigeMultiplier || 1)}{state.prestigeMultiplier > 10 &&
+            ` (eff: x${formatNumber(getEffectivePrestige(state.prestigeMultiplier))})`
+          }</span>
         </div>
         {(state.lifetimePlayTime || 0) > 0 && (
           <div className="stat-row">

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { eraNames, ERA_COUNT, getMinUpgradesForEra, getMinTimeForEra, countEraUpgrades } from '../engine/eras.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
-import { calculateProduction } from '../engine/resources.js';
+import { calculateProduction, getEffectivePrestige } from '../engine/resources.js';
 import { formatNumber, formatTime } from './format.js';
 
 function pickHint(options, era, totalTime) {
@@ -196,7 +196,7 @@ export function EraProgress({ state }) {
         {(state.totalGems || 0) > 0 && <span> | {state.totalGems} gems</span>}
         {state.prestigeMultiplier > 1 && (() => {
           const raw = state.prestigeMultiplier;
-          const effective = raw <= 10 ? raw : 10 + Math.sqrt(raw - 10) * 3;
+          const effective = getEffectivePrestige(raw);
           return <span title={`Raw: x${formatNumber(raw)}, Effective: x${formatNumber(effective)} (soft-scaled)`}> | x{formatNumber(effective)}</span>;
         })()}
         {totalRate > 0 && (
