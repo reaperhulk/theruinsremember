@@ -89,7 +89,7 @@ export function TradingPanel({ state, onUpdate }) {
       <div className="trade-controls">
         <div className="trade-row">
           <label>Give:</label>
-          <select value={fromId} onChange={e => setFromId(e.target.value)}>
+          <select value={fromId} onChange={e => setFromId(e.target.value)} aria-label="Resource to give">
             <option value="">Select...</option>
             {unlocked.map(r => (
               <option key={r.id} value={r.id}>
@@ -106,8 +106,9 @@ export function TradingPanel({ state, onUpdate }) {
             value={amount}
             onChange={e => setAmount(Math.max(1, parseInt(e.target.value) || 1))}
             style={{ width: '60px' }}
+            aria-label="Amount to receive"
           />
-          <select value={toId} onChange={e => setToId(e.target.value)}>
+          <select value={toId} onChange={e => setToId(e.target.value)} aria-label="Resource to receive">
             <option value="">Select...</option>
             {unlocked.filter(r => r.id !== fromId).map(r => (
               <option key={r.id} value={r.id}>
