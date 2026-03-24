@@ -202,6 +202,11 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                         {r.rate > 0 ? (() => {
                           const net = getNetRate(state, r.id);
                           const isConsumed = ['food','energy','rocketFuel','exoticMaterials','stellarForge'].includes(r.id) && net < r.rate;
+                          // Check if this resource is throttled by its supply chain
+                          const supplyChain = { labor: 'food', electronics: 'energy', orbitalInfra: 'rocketFuel', colonies: 'exoticMaterials', megastructures: 'stellarForge' };
+                          const supplier = supplyChain[r.id];
+                          const isThrottled = supplier && state.resources[supplier]?.unlocked &&
+                            getNetRate(state, supplier) < 0;
                           if (isConsumed) {
                             return <>
                               {net > 0 && <span className="rate-active" />}
@@ -209,6 +214,13 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                                 {net >= 0 ? '+' : ''}{formatNumber(net)}/s
                                 {net < 0 && <span className="rate-warning" title="Consumption exceeds production!"> DRAINING</span>}
                               </span>
+                            </>;
+                          }
+                          if (isThrottled) {
+                            return <>
+                              <span className="rate-active" />
+                              <span style={{ color: '#ddaa44' }}>+{formatNumber(r.rate)}/s</span>
+                              <span style={{ fontSize: '0.6em', color: '#ddaa44', marginLeft: '3px' }} title={`Production limited — ${resourceDefs[supplier]?.name || supplier} supply is low`}>SLOW</span>
                             </>;
                           }
                           return <><span className="rate-active" />+{formatNumber(r.rate)}/s</>;
