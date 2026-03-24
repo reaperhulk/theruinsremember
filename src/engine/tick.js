@@ -33,6 +33,7 @@ function applyProductionBonus(state, fraction, dt) {
 // Core game loop: advance state by dt seconds.
 // Optional rng parameter for deterministic bot/testing runs.
 export function tick(state, dt, rng = Math.random) {
+  if (dt <= 0) return state; // Guard against negative or zero dt
   const rates = calculateProduction(state);
 
   // Add mini-game bonuses to production rates
