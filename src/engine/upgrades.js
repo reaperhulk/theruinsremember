@@ -1,6 +1,6 @@
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { resources as resourceDefs } from '../data/resources.js';
-import { spend } from './resources.js';
+import { spend, getEffectivePrestige } from './resources.js';
 
 // Era-based cost multiplier to keep pace with exponential production growth.
 // Smooth exponential curve: each era ~15-30x more expensive than previous.
@@ -168,7 +168,7 @@ export function purchaseUpgrade(state, upgradeId) {
     const burstResources = { ...finalState.resources };
     for (const [id, r] of Object.entries(burstResources)) {
       if (!r.unlocked) continue;
-      const rate = (r.baseRate + r.rateAdd) * r.rateMult * (finalState.prestigeMultiplier || 1);
+      const rate = (r.baseRate + r.rateAdd) * r.rateMult * getEffectivePrestige(finalState.prestigeMultiplier || 1);
       if (rate > 0) {
         const burst = rate * 5; // 5 seconds worth of production
         const cap = r.baseCap > 0 ? r.baseCap * r.capMult : Infinity;

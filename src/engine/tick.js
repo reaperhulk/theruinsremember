@@ -1,4 +1,4 @@
-import { calculateProduction, getEffectiveCap, gather } from './resources.js';
+import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
 import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
 import { getFactoryBonus } from './factory.js';
@@ -18,9 +18,10 @@ const FUEL_PER_ORBITAL = 0.7;     // Fuel consumed per orbitalInfra/s
 // Apply a fractional production bonus to all producing resources, respecting caps
 function applyProductionBonus(state, fraction, dt) {
   let updated = state;
+  const prestigeMult = getEffectivePrestige(updated.prestigeMultiplier || 1);
   for (const [id, r] of Object.entries(updated.resources)) {
     if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
-      const rate = (r.baseRate + r.rateAdd) * r.rateMult * (updated.prestigeMultiplier || 1);
+      const rate = (r.baseRate + r.rateAdd) * r.rateMult * prestigeMult;
       const bonus = rate * fraction * dt;
       const cap = getEffectiveCap(updated, id);
       const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
@@ -316,7 +317,7 @@ export function tick(state, dt, rng = Math.random) {
       if (id === 'research' || !r.unlocked) continue;
       const cap = getEffectiveCap(newState, id);
       if (cap > 0 && r.amount >= cap) {
-        const rate = (r.baseRate + r.rateAdd) * r.rateMult * (newState.prestigeMultiplier || 1);
+        const rate = (r.baseRate + r.rateAdd) * r.rateMult * getEffectivePrestige(newState.prestigeMultiplier || 1);
         totalOverflow += rate * dt * 0.1;
       }
     }
