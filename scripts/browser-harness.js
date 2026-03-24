@@ -77,15 +77,11 @@
     location.reload();
   };
 
-  /** Reset save without reload — returns to initial state */
+  /** Reset save without reload — clicks the Reset button in the UI */
   H.softReset = () => {
-    localStorage.removeItem('incremental-game-save');
-    // Trigger the reset button's logic via the React state
-    window.__game.setState(() => {
-      // Import creates circular dep, so we reconstruct minimal initial state
-      // Better to click the reset button via DOM
-      return null; // no-op, use hardReset instead
-    });
+    const resetBtn = document.querySelector('.reset-btn[aria-label*="Hard reset"]');
+    if (resetBtn) resetBtn.click();
+    else H.hardReset();
   };
 
   // ── Waiting / polling ──────────────────────────────────────────────────

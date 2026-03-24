@@ -31,8 +31,8 @@ const ERA_MIN_UPGRADES = {
   10: 35,  // ~59% of ~59
 };
 
-// Time gates removed — era pacing is now fully organic via upgrade/tech costs.
-// Kept the function signature for backward compatibility but always returns 0.
+// Minimum upgrades gate: requires purchasing enough era-specific upgrades before
+// transitioning. This ensures players engage with each era's content.
 
 export function getMinUpgradesForEra(era) {
   return ERA_MIN_UPGRADES[era] || 10;
