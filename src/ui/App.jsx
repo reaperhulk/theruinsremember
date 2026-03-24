@@ -32,7 +32,7 @@ import { performPrestige, calculatePrestigeBonus, getPrestigeSummary } from '../
 import { ERA_COUNT, eraNames } from '../engine/eras.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
-import { canAfford } from '../engine/resources.js';
+import { canAfford, getEffectivePrestige } from '../engine/resources.js';
 import { formatNumber } from './format.js';
 
 const initialState = createInitialState();
@@ -402,7 +402,7 @@ export function App() {
       <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#444', padding: '8px 0 4px' }}>
         v1.0 — Era {state.era} | {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.achievements || {}).length} achievements
         {(state.prestigeCount || 0) > 0 && ` | Cycle ${state.prestigeCount}`}
-        {state.prestigeMultiplier > 1 && ` (x${formatNumber(state.prestigeMultiplier)})`}
+        {state.prestigeMultiplier > 1 && ` (x${formatNumber(getEffectivePrestige(state.prestigeMultiplier))})`}
       </footer>
     </div>
   );
