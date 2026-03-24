@@ -71,6 +71,13 @@ g[role="button"]:focus-visible {
   padding: 8px 0;
   border-bottom: 1px solid #3a3020;
   margin-bottom: 12px;
+  overflow: hidden;
+}
+.game-header h1 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* game-header h1 styled below with gradient */
@@ -152,11 +159,12 @@ g[role="button"]:focus-visible {
 
 .resource-row {
   display: grid;
-  grid-template-columns: 1fr auto auto auto;
+  grid-template-columns: minmax(60px, 1fr) minmax(0, auto) minmax(0, auto) auto;
   gap: 8px;
   align-items: center;
   font-size: 0.85em;
   padding: 2px 4px;
+  overflow: hidden;
 }
 
 .resource-row:hover {
@@ -165,6 +173,9 @@ g[role="button"]:focus-visible {
 
 .resource-name {
   color: #aaccee;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .resource-amount {
@@ -172,6 +183,9 @@ g[role="button"]:focus-visible {
   text-align: right;
   font-variant-numeric: tabular-nums;
   transition: color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .resource-rate {
@@ -1697,6 +1711,18 @@ canvas:hover {
 /* Upgrade row hover lift */
 .upgrade-row {
   animation: upgrade-appear 0.2s ease-out;
+  display: flex;
+  gap: 4px;
+  align-items: stretch;
+}
+.upgrade-row > .upgrade-btn:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.upgrade-row > .buy-max-btn,
+.upgrade-row > .upgrade-btn:not(:first-child) {
+  flex-shrink: 0;
+  align-self: center;
 }
 
 @keyframes upgrade-appear {

@@ -131,16 +131,16 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const handlePurchase = useCallback((upgradeId) => {
     playUpgrade();
     setFlashId(upgradeId);
-    onUpdate(s => {
-      const result = purchaseUpgrade(s, upgradeId);
-      // Chain Reaction flash when purchaseBurst fires
-      if (result && result.upgrades?.chainReaction) {
+    onUpdate(s => purchaseUpgrade(s, upgradeId));
+    // Chain Reaction flash — check after state update settles
+    setTimeout(() => {
+      const s = window.__game?.getState?.();
+      if (s?.upgrades?.chainReaction) {
         setChainFlash(true);
         clearTimeout(chainTimerRef.current);
         chainTimerRef.current = setTimeout(() => setChainFlash(false), 600);
       }
-      return result;
-    });
+    }, 0);
     clearTimeout(flashTimerRef.current);
     flashTimerRef.current = setTimeout(() => setFlashId(null), 400);
   }, [onUpdate]);
