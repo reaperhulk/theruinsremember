@@ -28,7 +28,7 @@ export function EventLog({ state }) {
   if (log.length === 0 && activeEffects.length === 0) return null;
 
   return (
-    <div className="panel event-panel">
+    <div className="panel event-panel" role="log" aria-label="Game events">
       <h2>Events{activeEffects.length > 0 ? ` (${activeEffects.length} active)` : log.length > 0 ? ` (${log.length} recent)` : ''}</h2>
       {activeEffects.length > 0 && (
         <div className="active-effects">

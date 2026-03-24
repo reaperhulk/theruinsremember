@@ -36,7 +36,7 @@ export function OfflineReport({ report, onDismiss }) {
   const gains = Object.entries(report.gains).filter(([, v]) => v > 0.1);
 
   return (
-    <div className="offline-overlay" onClick={onDismiss}>
+    <div className="offline-overlay" onClick={onDismiss} role="dialog" aria-modal="true" aria-label="Offline progress report">
       <div className="offline-report" onClick={e => e.stopPropagation()}>
         <h2>Welcome Back!</h2>
         <p className="text-lore" style={{ fontSize: '0.8em', margin: '0 0 6px', textAlign: 'center' }}>
