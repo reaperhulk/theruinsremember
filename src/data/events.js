@@ -56,7 +56,7 @@ export const events = {
     id: 'asteroidDiscovery',
     name: 'Asteroid Discovery',
     description: 'The asteroid has been hollowed out and refilled with sorted minerals — a cache left by hands that knew exactly what you would need.',
-    minEra: 4,
+    minEra: 5,
     type: 'instant',
     effect: { resourceId: 'exoticMaterials', amount: 50 },
   },
@@ -1062,7 +1062,7 @@ export const events = {
 
   // Era 6
   stellarNova: { id: 'stellarNova', name: 'Stellar Nova', description: 'The nova detonates on schedule — the precursor timing logs predicted it to the hour. Dark energy washes over your collectors like a gift.', minEra: 6, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 60 } },
-  firstContactProtocol: { id: 'firstContactProtocol', name: 'First Contact Protocol', description: 'The aliens already know your name. Their contact protocols reference your species by a designation older than either civilization.', minEra: 6, type: 'timed', duration: 45, effect: { resourceId: 'galacticInfluence', rateMultBonus: 4 } },
+  firstContactProtocol: { id: 'firstContactProtocol', name: 'First Contact Protocol', description: 'The aliens already know your name. Their contact protocols reference your species by a designation older than either civilization.', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'galacticInfluence', rateMultBonus: 4 } },
 
   // Era 7
   stellarQuake: { id: 'stellarQuake', name: 'Stellar Quake', description: 'The quake follows fault lines mapped in precursor geology — it shakes free construction materials cached in the star\'s mantle eons ago.', minEra: 7, type: 'instant', effect: { resourceId: 'megastructures', amount: 10 } },
@@ -1096,7 +1096,7 @@ export const events = {
   kuiperBeltStrike: { id: 'kuiperBeltStrike', name: 'Kuiper Belt Strike', description: 'The Kuiper belt object splits open on approach, revealing pre-constructed colony modules sealed in ice — waiting to thaw, waiting to be inhabited again.', minEra: 5, type: 'timed', duration: 35, effect: { resourceId: 'colonies', rateMultBonus: 6 } },
 
   // Era 6
-  warpFieldHarvest: { id: 'warpFieldHarvest', name: 'Warp Field Harvest', description: 'The collapsing warp field deposits your diplomatic credentials across a dozen systems simultaneously — your reputation precedes you, written in the fabric of space.', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'galacticInfluence', rateMultBonus: 5 } },
+  warpFieldHarvest: { id: 'warpFieldHarvest', name: 'Warp Field Harvest', description: 'The collapsing warp field deposits your diplomatic credentials across a dozen systems simultaneously — your reputation precedes you, written in the fabric of space.', minEra: 8, type: 'timed', duration: 40, effect: { resourceId: 'galacticInfluence', rateMultBonus: 5 } },
   nebularCondensation: { id: 'nebularCondensation', name: 'Nebular Condensation', description: 'The nebula condenses along structural lines left by a previous stellar engineering project — stars forming in a grid, each with habitable worlds already positioned.', minEra: 6, type: 'instant', effect: { resourceId: 'starSystems', amount: 15 } },
 
   // Era 7
@@ -1124,7 +1124,7 @@ export const events = {
   cyberHeist: { id: 'cyberHeist', name: 'Cyber Heist', description: 'Hackers break into precursor servers and find code already waiting — functions addressed to their specific usernames.', minEra: 3, type: 'timed', duration: 30, effect: { resourceId: 'software', rateMultBonus: 5 } },
 
   // Era 4
-  asteroidRedirect: { id: 'asteroidRedirect', name: 'Asteroid Redirect', description: 'The asteroid was already on a rendezvous trajectory — its orbit adjusted millennia ago to arrive at this exact window.', minEra: 4, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 30 } },
+  asteroidRedirect: { id: 'asteroidRedirect', name: 'Asteroid Redirect', description: 'The asteroid was already on a rendezvous trajectory — its orbit adjusted millennia ago to arrive at this exact window.', minEra: 5, type: 'instant', effect: { resourceId: 'exoticMaterials', amount: 30 } },
   solarSailBoost: { id: 'solarSailBoost', name: 'Solar Sail Boost', description: 'The solar wind gusts along channels shaped by ancient magnetic arrays — a breeze manufactured for sails that had not yet been unfurled.', minEra: 4, type: 'timed', duration: 35, effect: { resourceId: 'energy', rateMultBonus: 5 } },
 
   // Era 5
@@ -1204,7 +1204,7 @@ export const events = {
   antimatterCache: { id: 'antimatterCache', name: 'Antimatter Cache', description: 'The antimatter was suspended in a magnetic bottle buried in the asteroid belt — a fuel reserve cached by engineers who knew you would need it at exactly this point.', minEra: 5, type: 'timed', duration: 40, effect: { resourceId: 'rocketFuel', rateMultBonus: 6 } },
 
   // Era 6
-  firstContact: { id: 'firstContact', name: 'First Contact', description: 'The aliens greet you by name. Their oldest records describe your arrival with the certainty of prophecy — because it has happened before.', minEra: 6, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 80 } },
+  firstContact: { id: 'firstContact', name: 'First Contact', description: 'The aliens greet you by name. Their oldest records describe your arrival with the certainty of prophecy — because it has happened before.', minEra: 8, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 80 } },
   hyperlaneDiscovery: { id: 'hyperlaneDiscovery', name: 'Hyperlane Discovery', description: 'The hyperlane was mapped in dead star charts — a highway decommissioned when the last travelers completed their journey.', minEra: 6, type: 'timed', duration: 40, effect: { resourceId: 'starSystems', rateMultBonus: 6 } },
 
   // Era 7
@@ -1331,7 +1331,7 @@ export const events = {
   stellarForgeChain: { id: 'stellarForgeChain', name: 'Stellar Forge Chain Reaction', description: 'The chain reaction follows a cascade path encoded in the forge\'s control rods — a sequence from the previous cycle.', minEra: 7, type: 'instant', effect: { resourceId: 'stellarForge', amount: 35 } },
 
   // Era 8
-  cosmicPowerSurge: { id: 'cosmicPowerSurge', name: 'Cosmic Power Surge', description: 'The surge follows conduits built by the previous galactic civilization — power lines spanning the galaxy\'s spiral arms.', minEra: 8, type: 'timed', duration: 45, effect: { resourceId: 'cosmicPower', rateMultBonus: 5 } },
+  cosmicPowerSurge: { id: 'cosmicPowerSurge', name: 'Cosmic Power Surge', description: 'The surge follows conduits built by the previous galactic civilization — power lines spanning the galaxy\'s spiral arms.', minEra: 9, type: 'timed', duration: 45, effect: { resourceId: 'cosmicPower', rateMultBonus: 5 } },
 
   // Era 9
   universalResonance: { id: 'universalResonance', name: 'Universal Resonance', description: 'Every constant aligns to values that favor your exact technology — the universe is not random, it is rehearsed.', minEra: 9, type: 'timed', duration: 50, effect: { resourceId: 'universalConstants', rateMultBonus: 10 } },
@@ -1492,7 +1492,7 @@ export const events = {
   // Era 6: Interstellar — Ancient beacons, dead civilizations, familiar coordinates
   storyEchoingBeacon: { id: 'storyEchoingBeacon', isLore: true, name: 'Echoing Beacon', description: 'An ancient FTL beacon activates as you approach. Its signal predates your arrival by millennia — but it\'s broadcasting your ship\'s transponder code.', minEra: 6, chance: 0.006, type: 'instant', effect: { resourceId: 'starSystems', amount: 50 } },
   storyStarGraveyard: { id: 'storyStarGraveyard', isLore: true, name: 'Star Graveyard', description: 'A cluster of dead stars, each surrounded by debris that was once a civilization. Every one reached exactly this stage of development.', minEra: 6, chance: 0.006, type: 'instant', effect: { resourceId: 'darkEnergy', amount: 200 } },
-  storyFamiliarCoordinates: { id: 'storyFamiliarCoordinates', isLore: true, name: 'Familiar Coordinates', description: 'The navigation computer flags an anomaly — the ancient star maps don\'t just show where civilizations were. They show where you\'re going next.', minEra: 6, chance: 0.006, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 80 } },
+  storyFamiliarCoordinates: { id: 'storyFamiliarCoordinates', isLore: true, name: 'Familiar Coordinates', description: 'The navigation computer flags an anomaly — the ancient star maps don\'t just show where civilizations were. They show where you\'re going next.', minEra: 8, chance: 0.006, type: 'instant', effect: { resourceId: 'galacticInfluence', amount: 80 } },
 
   // Era 7: Dyson Era — Mirror sphere, stellar archive, resonance cascade
   storyMirrorSphere: { id: 'storyMirrorSphere', isLore: true, name: 'Mirror Sphere', description: 'The abandoned Dyson sphere\'s control interface accepts your authentication codes. It was built by hands with the same fingerprints as yours.', minEra: 7, chance: 0.006, type: 'instant', effect: { resourceId: 'megastructures', amount: 15 } },
@@ -1577,7 +1577,7 @@ export const events = {
     id: 'realityTear',
     name: 'Reality Tear',
     description: 'A brief tear in spacetime deposits fragments of another reality.',
-    minEra: 8,
+    minEra: 10,
     chance: 0.008,
     type: 'instant',
     effect: { resourceId: 'realityFragments', amount: 25 },
