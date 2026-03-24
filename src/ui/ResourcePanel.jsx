@@ -221,10 +221,20 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                       <span className="resource-gather" style={{ position: 'relative', opacity: r.rate > 0 ? 0.3 : 1 }}>
                         <button
                           className="gather-btn"
-                          onClick={() => handleGather(r.id, r.rateMult > 1 ? r.rateMult : 1)}
-                          aria-label={`Gather ${r.def?.name || r.id}. +${r.rateMult > 1 ? formatNumber(r.rateMult) : '1'}`}
+                          onClick={() => {
+                            const eraScale = 1 + (state.era - 1);
+                            const pm = getEffectivePrestige(state.prestigeMultiplier || 1);
+                            const base = r.rateMult > 1 ? r.rateMult : 1;
+                            handleGather(r.id, base * pm * eraScale);
+                          }}
+                          aria-label={`Gather ${r.def?.name || r.id}`}
                         >
-                          +{r.rateMult > 1 ? formatNumber(r.rateMult) : '1'}
+                          {(() => {
+                            const eraScale = 1 + (state.era - 1);
+                            const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
+                            const base = r.rateMult > 1 ? r.rateMult : 1;
+                            return '+' + formatNumber(base * prestigeMult * eraScale);
+                          })()}
                         </button>
                         {floats.filter(f => f.resourceId === r.id).map(f => (
                           <span key={f.id} className="gather-float">{f.text}</span>
