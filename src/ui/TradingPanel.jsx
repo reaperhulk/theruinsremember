@@ -14,7 +14,9 @@ export function TradingPanel({ state, onUpdate }) {
     .filter(r => r.def);
 
   const ratio = fromId && toId && fromId !== toId ? getTradeRatio(fromId, toId) : null;
-  const cost = ratio ? amount * (ratio.input / ratio.output) : 0;
+  const hasTradeRoutes = state.prestigeUpgrades?.tradeRoutes;
+  const tradeDiscount = hasTradeRoutes ? 0.67 : 1;
+  const cost = ratio ? Math.ceil(amount * (ratio.input / ratio.output) * tradeDiscount) : 0;
   const canTrade = ratio && state.resources[fromId]?.amount >= cost && amount > 0;
 
   const handleTrade = () => {
@@ -132,7 +134,7 @@ export function TradingPanel({ state, onUpdate }) {
           <button className="gather-btn" onClick={() => setAmount(1000)} style={{ flex: 1 }}>1K</button>
           {ratio && fromId && (
             <button className="gather-btn" onClick={() => {
-              const maxAmount = Math.floor(state.resources[fromId]?.amount * (ratio.output / ratio.input));
+              const maxAmount = Math.floor(state.resources[fromId]?.amount / (ratio.input / ratio.output * tradeDiscount));
               if (maxAmount > 0) setAmount(maxAmount);
             }} style={{ flex: 1, color: '#ffdd44' }}>Max</button>
           )}

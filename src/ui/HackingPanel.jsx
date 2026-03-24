@@ -137,7 +137,11 @@ export const HackingPanel = memo(function HackingPanel({ state, onUpdate }) {
             ))}
           </div>
           <div className="hack-reward">
-            x{challenge.multiplier.toFixed(1)} Data & Software for {state.prestigeUpgrades?.hackMaster ? 60 : 30}s
+            {(() => {
+              const eraScale = 1 + (state.era - 3) * 0.3;
+              const savantMult = state.prestigeUpgrades?.miniGameSavant ? 1.5 : 1;
+              return `x${(challenge.multiplier * Math.max(1, eraScale) * savantMult).toFixed(1)}`;
+            })()} Data & Software for {state.prestigeUpgrades?.hackMaster ? 60 : 30}s
             {difficulty > 0 && <span style={{ color: '#888' }}> (difficulty {difficulty})</span>}
           </div>
         </div>
