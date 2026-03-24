@@ -247,7 +247,7 @@ function botMine(state, profile, t, rng) {
   return afterMine;
 }
 
-function botGather(state, profile, t, rng) {
+function botGather(state, profile, t, _rng) {
   if (!profile.gather || !profile.gatherInterval) return state;
   if (t % profile.gatherInterval !== 0) return state;
   for (const [id, r] of Object.entries(state.resources)) {
@@ -258,7 +258,7 @@ function botGather(state, profile, t, rng) {
   return state;
 }
 
-function botBuyUpgrades(state, profile, t, rng) {
+function botBuyUpgrades(state, profile, t, _rng) {
   if (!profile.buyUpgrades) return state;
   const available = getAvailableUpgrades(state);
   // Non-repeatable first
@@ -279,7 +279,7 @@ function botBuyUpgrades(state, profile, t, rng) {
   return state;
 }
 
-function botBuyTech(state, profile, t, rng) {
+function botBuyTech(state, profile, t, _rng) {
   if (!profile.buyTech) return state;
   const techs = getAvailableTech(state);
   for (const tech of techs) {
@@ -291,7 +291,7 @@ function botBuyTech(state, profile, t, rng) {
   return state;
 }
 
-function botFactory(state, profile, t, rng) {
+function botFactory(state, profile, t, _rng) {
   if (!profile.factory || state.era < 2) return state;
   // Re-allocate every 30s to adjust for changing worker pool
   if (t % 30 !== 0) return state;
@@ -357,7 +357,7 @@ function botDock(state, profile, t, rng) {
   return state;
 }
 
-function botColonies(state, profile, t, rng) {
+function botColonies(state, profile, t, _rng) {
   if (!profile.colonies || state.era < 5) return state;
   // Re-assign every 30s
   if (t % 30 !== 0) return state;
@@ -386,7 +386,7 @@ function botColonies(state, profile, t, rng) {
   return state;
 }
 
-function botStarChart(state, profile, t, rng) {
+function botStarChart(state, profile, t, _rng) {
   if (!profile.starChart || state.era < 6) return state;
   // Try to create routes every 60s
   if (t % 60 !== 0) return state;
@@ -425,7 +425,7 @@ function botWeave(state, profile, t, rng) {
   return state;
 }
 
-function botTrade(state, profile, t, rng) {
+function botTrade(state, profile, t, _rng) {
   if (!profile.trading || state.era < 4) return state;
   // Trade every 30s
   if (t % 30 !== 0) return state;
@@ -493,7 +493,7 @@ function botTrade(state, profile, t, rng) {
   return state;
 }
 
-function botDyson(state, profile, t, rng) {
+function botDyson(state, profile, t, _rng) {
   if (!profile.dysonAssembly || state.era < 7) return state;
   // Assemble every 5s (clicking manually)
   if (t % 5 !== 0) return state;
@@ -502,7 +502,7 @@ function botDyson(state, profile, t, rng) {
   return result ? result.state : state;
 }
 
-function botCosmicTuning(state, profile, t, rng) {
+function botCosmicTuning(state, profile, t, _rng) {
   if (!profile.cosmicTuning || state.era < 9) return state;
   // Tune every 10s with perfect accuracy
   if (t % 10 !== 0) return state;
@@ -511,7 +511,7 @@ function botCosmicTuning(state, profile, t, rng) {
   return result ? result.state : state;
 }
 
-function botSenate(state, profile, t, rng) {
+function botSenate(state, profile, t, _rng) {
   if (!profile.senateFocus || state.era < 8) return state;
   // Allocate every 10s — senate slots open as GI accumulates
   if (t % 10 !== 0) return state;
@@ -538,7 +538,7 @@ function botSenate(state, profile, t, rng) {
   return result || state;
 }
 
-function botRealityForge(state, profile, t, rng) {
+function botRealityForge(state, profile, t, _rng) {
   if (!profile.realityForge || state.era < 10) return state;
   // Forge every 30s
   if (t % 30 !== 0) return state;
@@ -573,7 +573,7 @@ function botRealityForge(state, profile, t, rng) {
   return state;
 }
 
-function botPrestigeUpgrades(state, profile, t, rng) {
+function botPrestigeUpgrades(state, profile, t, _rng) {
   if (!profile.buyPrestigeUpgrades) return state;
   if ((state.prestigePoints || 0) < 2) return state;
   // Only check every 60s
