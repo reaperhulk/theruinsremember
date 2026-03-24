@@ -385,7 +385,7 @@ export function App() {
         <VictoryScreen state={state} onDismiss={() => setVictoryDismissed(true)} />
       )}
       {confirmDialog && (
-        <div className="confirm-overlay" onClick={confirmDialog.onCancel}>
+        <div className="confirm-overlay" onClick={confirmDialog.onCancel} onKeyDown={e => { if (e.key === 'Escape') confirmDialog.onCancel(); }}>
           <div className="confirm-dialog" onClick={e => e.stopPropagation()} role="alertdialog" aria-modal="true" aria-label="Confirmation">
             <div className="confirm-body">
               {confirmDialog.lines.map((line, i) => (
