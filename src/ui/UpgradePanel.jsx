@@ -392,7 +392,15 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                   switch (e.type) {
                     case 'production_mult': label = `x${e.value} ${resourceName(e.target)}`; cls += ' effect-mult'; break;
                     case 'production_mult_all': label = `x${e.value} ALL production`; cls += ' effect-mult'; break;
-                    case 'production_add': label = `+${e.value} ${resourceName(e.target)}/s`; cls += ' effect-add'; break;
+                    case 'production_add': {
+                      const r = state.resources[e.target];
+                      const mult = r ? r.rateMult : 1;
+                      const effective = e.value * mult;
+                      label = effective > e.value * 1.5
+                        ? `+${e.value} ${resourceName(e.target)}/s (eff: +${formatNumber(effective)}/s)`
+                        : `+${e.value} ${resourceName(e.target)}/s`;
+                      cls += ' effect-add'; break;
+                    }
                     case 'cap_mult': label = `x${e.value} ${resourceName(e.target)} cap`; cls += ' effect-cap'; break;
                     case 'unlock_resource': label = `Unlock ${resourceName(e.target)}`; cls += ' effect-unlock'; break;
                   }
