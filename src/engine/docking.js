@@ -21,7 +21,7 @@ export function getIndicatorPosition(time, era = 4) {
 
 // Get the target zone center (0-1). Changes each attempt.
 export function getTargetZone(state) {
-  const seed = state.dockingAttempts || 0;
+  const seed = (state.dockingAttempts || 0) + (state.era || 1) * 17;
   // Deterministic pseudo-random zone position between 0.2 and 0.8
   return 0.2 + ((seed * 7 + 3) % 10) / 10 * 0.6;
 }
@@ -106,7 +106,7 @@ export function attemptDock(state, position) {
   // Launch window: perfect docks add a 5% production boost for 30 seconds
   if (result === 'perfect' && state.upgrades?.launchWindow) {
     newState.activeEffects = [...(newState.activeEffects || []), {
-      id: 'dockingBoost',
+      id: `dockingBoost_${newState.totalTime}`,
       description: 'Docking Precision: +5% all production',
       endsAt: (newState.totalTime || 0) + 30,
       startedAt: newState.totalTime || 0,
