@@ -163,7 +163,7 @@ async function run() {
   let cycle = 0;
   const eraTimes = {};
 
-  for (let tick = 0; tick < 600; tick++) { // max 10 min real time
+  for (let tick = 0; tick < 120; tick++) { // max 2 min real time
     await new Promise(r => setTimeout(r, 1000));
     const state = await getState(page);
 
@@ -210,6 +210,16 @@ async function run() {
       }
     }
   }
+
+  // Always run layout check at current state
+  await stopPump(page);
+  await new Promise(r => setTimeout(r, 300));
+  await page.evaluate(() => document.querySelector('#tab-upgrades')?.click());
+  await new Promise(r => setTimeout(r, 200));
+  const layout = await checkLayout(page);
+  console.log('\n=== LAYOUT CHECK ===');
+  layout.ok.forEach(o => console.log('  ✓ ' + o));
+  layout.issues.forEach(i => console.log('  ✗ ' + i));
 
   // Final state
   const final = await getState(page);
