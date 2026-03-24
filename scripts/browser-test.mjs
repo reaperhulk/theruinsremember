@@ -28,38 +28,43 @@ async function run() {
   await page.waitForFunction(() => window.__game && window.__game.getState().totalTime >= 0, { timeout: 10000 });
   await new Promise(r => setTimeout(r, 1000));
 
-  // In headless mode, rAF doesn't fire, so we drive the game loop manually
-  // using fastForward + DOM clicks for purchases
+  // In headless mode, rAF doesn't fire. We use a hybrid approach:
+  // 1. fastForward for time advancement (engine-level, no DOM needed)
+  // 2. DOM clicks for purchases (must match real user interaction)
+  // 3. Alternate tabs to trigger purchases across upgrades/tech/prestige
   await page.evaluate(() => {
-    // Pump the game engine every 100ms real-time, advancing by 10 game-seconds each pump
+    // Advance game time in chunks, with periodic purchase attempts
+    let purchasePhase = 0;
+    const purchasePhases = ['upgrades', 'tech', 'prestige', 'upgrades', 'tech', 'upgrades'];
+
     window.__pump = setInterval(() => {
-      window.__game.fastForward(10);
-    }, 100);
+      // Advance 10 game-seconds per tick (fast but not so fast events get skipped)
+      for (let i = 0; i < 5; i++) window.__game.fastForward(10);
 
-    let phase = 0;
-    const phases = ['upgrades', 'upgrades', 'tech', 'mini', 'prestige', 'upgrades', 'tech'];
-    window.__ps = setInterval(() => {
-      phase = (phase + 1) % phases.length;
-      document.querySelector('#tab-' + phases[phase])?.click();
-    }, 1500);
+      // Switch tab and buy on every pump
+      const phase = purchasePhases[purchasePhase % purchasePhases.length];
+      purchasePhase++;
+      document.querySelector('#tab-' + phase)?.click();
 
-    window.__ac = setInterval(() => {
-      document.querySelectorAll('.gather-btn').forEach(b => b.click());
-      const p = phases[phase];
-      if (p === 'upgrades') {
-        document.querySelectorAll('button').forEach(b => {
-          if (b.textContent.includes('Buy All') && !b.disabled) b.click();
-        });
-      } else if (p === 'tech') {
-        document.querySelectorAll('button').forEach(b => {
-          if (b.textContent.includes('Research All') && !b.disabled) b.click();
-        });
-        document.querySelectorAll('.tech-btn.affordable').forEach(b => b.click());
-      } else if (p === 'prestige') {
-        document.querySelectorAll('.upgrade-btn.affordable').forEach(b => {
-          if (!b.disabled) b.click();
-        });
-      }
+      // Wait a microtask for React to render, then click
+      setTimeout(() => {
+        if (phase === 'upgrades') {
+          document.querySelectorAll('button').forEach(b => {
+            if (b.textContent.includes('Buy All') && !b.disabled) b.click();
+          });
+        } else if (phase === 'tech') {
+          document.querySelectorAll('button').forEach(b => {
+            if (b.textContent.includes('Research All') && !b.disabled) b.click();
+          });
+          document.querySelectorAll('.tech-btn.affordable').forEach(b => b.click());
+        } else if (phase === 'prestige') {
+          document.querySelectorAll('.upgrade-btn.affordable').forEach(b => {
+            if (!b.disabled) b.click();
+          });
+        }
+        // Always gather
+        document.querySelectorAll('.gather-btn').forEach(b => b.click());
+      }, 10);
     }, 100);
   });
 
@@ -176,7 +181,7 @@ async function run() {
           let phase = 0;
           const phases = ['upgrades', 'upgrades', 'tech', 'mini', 'prestige', 'upgrades', 'tech'];
           window.__ps = setInterval(() => { phase = (phase + 1) % phases.length; document.querySelector('#tab-' + phases[phase])?.click(); }, 1500);
-          window.__pump = setInterval(() => window.__game.fastForward(10), 100);
+          window.__pump = setInterval(() => window.__game.fastForward(30), 50);
           window.__ac = setInterval(() => {
             document.querySelectorAll('.gather-btn').forEach(b => b.click());
             document.querySelectorAll('button').forEach(b => { if (b.textContent.includes('Buy All') && !b.disabled) b.click(); });
