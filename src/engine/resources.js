@@ -5,6 +5,7 @@ import { ERA_COST_MULTIPLIERS } from './upgrades.js';
 // Prevents early prestiges from trivializing the game while still rewarding
 // deep prestige investment. Used everywhere prestige mult affects gameplay.
 export function getEffectivePrestige(rawMultiplier) {
+  if (!rawMultiplier || rawMultiplier <= 1) return 1;
   if (rawMultiplier <= 10) return rawMultiplier;
   return 10 + Math.sqrt(rawMultiplier - 10) * 3;
 }
