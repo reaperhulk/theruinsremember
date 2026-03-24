@@ -17,8 +17,8 @@ export function unlockTech(state, techId) {
   // Check mutual exclusion
   if (def.excludes && state.tech[def.excludes]) return null;
 
-  // Apply era-based cost multiplier (only for earlier-era resources)
-  const cost = applyEraCostScaling(def.cost, def.era);
+  // Tech costs are final values — no era scaling
+  const cost = { ...def.cost };
 
   const afterSpend = spend(state, cost);
   if (!afterSpend) return null;
