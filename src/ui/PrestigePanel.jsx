@@ -1,7 +1,7 @@
 import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary } from '../engine/prestige.js';
 import { getEffectivePrestige } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
-import { formatNumber } from './format.js';
+import { formatNumber, formatTime } from './format.js';
 
 function getPrestigeInsight(state) {
   const owned = state.prestigeUpgrades || {};
@@ -164,7 +164,7 @@ export function PrestigePanel({ state, onUpdate }) {
         </div>
         <div className="stat-row">
           <span>Lifetime Play:</span>
-          <span>{Math.floor(((state.lifetimePlayTime || 0) + state.totalTime) / 60)}m</span>
+          <span>{formatTime((state.lifetimePlayTime || 0) + state.totalTime)}</span>
         </div>
         <div className="stat-row">
           <span>Upgrades Owned:</span>
