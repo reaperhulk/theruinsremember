@@ -2,6 +2,7 @@
 // Random events that fire during tick and grant instant or timed bonuses.
 
 import { getEligibleEvents } from '../data/events.js';
+import { getEffectivePrestige } from './resources.js';
 
 const BASE_EVENT_CHANCE = 0.02; // 2% per second of gameplay
 
@@ -74,7 +75,7 @@ function applyInstantEvent(state, event) {
         };
       } else {
         const eraScale = 1 + (s.era - 1) * 0.5;
-        const scaledAmount = fx.value * eraScale * s.prestigeMultiplier;
+        const scaledAmount = fx.value * eraScale * getEffectivePrestige(s.prestigeMultiplier || 1);
         s = {
           ...s,
           resources: {
@@ -94,9 +95,9 @@ function applyInstantEvent(state, event) {
   const r = state.resources[resourceId];
   if (!r) return state;
 
-  // Scale instant rewards by era and prestige so events stay relevant
+  // Scale instant rewards by era and effective prestige so events stay relevant
   const eraScale = 1 + (state.era - 1) * 0.5;
-  const scaledAmount = amount * eraScale * state.prestigeMultiplier;
+  const scaledAmount = amount * eraScale * getEffectivePrestige(state.prestigeMultiplier || 1);
 
   return {
     ...state,
