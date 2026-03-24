@@ -43,7 +43,7 @@ export const FactoryPanel = memo(function FactoryPanel({ state, onUpdate }) {
               <span className="line-label" style={{ color: line.color }}>
                 {line.label}: {count}
               </span>
-              <span className="line-bonus">+{(count * 0.3 * effMult).toFixed(1)}/s</span>
+              <span className="line-bonus" title="Base bonus (before era/prestige scaling)">+{(count * 0.3 * effMult).toFixed(1)}/s</span>
               <div className="line-controls">
                 <button
                   disabled={count <= 0}

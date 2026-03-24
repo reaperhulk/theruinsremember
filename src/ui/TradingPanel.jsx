@@ -105,8 +105,9 @@ export function TradingPanel({ state, onUpdate }) {
           <input
             type="number"
             min="1"
+            step="1"
             value={amount}
-            onChange={e => setAmount(Math.max(1, parseInt(e.target.value) || 1))}
+            onChange={e => setAmount(Math.max(1, Math.floor(parseFloat(e.target.value)) || 1))}
             style={{ width: '60px' }}
             aria-label="Amount to receive"
           />
