@@ -1,6 +1,8 @@
 // Dyson Sphere Assembly — Era 7 mini-game
 // Click to assemble segments; rewards scale with stellarForge & megastructures production.
 
+import { getEffectivePrestige } from './resources.js';
+
 // Assemble one Dyson segment. Returns { state, sfGain, mgGain } or null if unavailable.
 // No hard cap — segments continue to provide scaling bonuses.
 export function assembleDysonSegment(state) {
@@ -10,8 +12,9 @@ export function assembleDysonSegment(state) {
   const mg = state.resources.megastructures;
   if (!sf?.unlocked || !mg?.unlocked) return null;
 
-  const sfRate = (sf.baseRate + sf.rateAdd) * sf.rateMult * (state.prestigeMultiplier || 1);
-  const mgRate = (mg.baseRate + mg.rateAdd) * mg.rateMult * (state.prestigeMultiplier || 1);
+  const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
+  const sfRate = (sf.baseRate + sf.rateAdd) * sf.rateMult * prestigeMult;
+  const mgRate = (mg.baseRate + mg.rateAdd) * mg.rateMult * prestigeMult;
   const segments = state.dysonSegments || 0;
   // Milestone bonus: scales continuously with segments
   const milestoneBonus = 1 + segments / 100;

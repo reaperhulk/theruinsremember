@@ -101,7 +101,7 @@ export function gather(state, resourceId, amount = 1) {
   if (state.upgrades?.dataMining && newResources.data?.unlocked) {
     if (Math.random() < 0.2) {
       const dataR = newResources.data;
-      const dataRate = (dataR.baseRate + dataR.rateAdd) * dataR.rateMult * (state.prestigeMultiplier || 1);
+      const dataRate = (dataR.baseRate + dataR.rateAdd) * dataR.rateMult * getEffectivePrestige(state.prestigeMultiplier || 1);
       if (dataRate > 0) {
         const dataCap = getEffectiveCap({ ...state, resources: newResources }, 'data');
         const burst = dataRate * 30;
@@ -120,7 +120,7 @@ export function gather(state, resourceId, amount = 1) {
     for (const [otherId, otherR] of Object.entries(state.resources)) {
       if (otherId !== resourceId && otherR.unlocked) {
         const otherCap = getEffectiveCap({ ...state, resources: newResources }, otherId);
-        const bonus = 1 * (otherR.rateMult || 1) * (state.prestigeMultiplier || 1);
+        const bonus = 1 * (otherR.rateMult || 1) * getEffectivePrestige(state.prestigeMultiplier || 1);
         const cur = newResources[otherId] || otherR;
         let otherAmount = cur.amount + bonus;
         if (otherCap > 0 && otherAmount > otherCap) {

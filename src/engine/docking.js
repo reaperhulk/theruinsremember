@@ -2,6 +2,8 @@
 // Timing-based click game: hit the target zone for bonus resources.
 // The docking indicator moves back and forth; click when it's in the zone.
 
+import { getEffectivePrestige } from './resources.js';
+
 const ZONE_SIZE = 0.30;      // 30% of the bar is the target zone
 const PERFECT_ZONE = 0.10;   // 10% center for perfect dock
 const BASE_SPEED = 0.6;      // cycles per second at era 4 (~1.7s full sweep)
@@ -82,7 +84,7 @@ export function attemptDock(state, position) {
   for (const [resourceId, amount] of Object.entries(rewards)) {
     const r = newResources[resourceId];
     if (r && r.unlocked) {
-      const scaled = amount * state.prestigeMultiplier * comboMult * dockPrestigeMult * eraScale * savantMult;
+      const scaled = amount * getEffectivePrestige(state.prestigeMultiplier || 1) * comboMult * dockPrestigeMult * eraScale * savantMult;
       newResources[resourceId] = { ...r, amount: r.amount + scaled };
     }
   }

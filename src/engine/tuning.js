@@ -1,6 +1,8 @@
 // Cosmic Tuning — Era 9 mini-game
 // Match a frequency slider to a target for cosmicPower & universalConstants rewards.
 
+import { getEffectivePrestige } from './resources.js';
+
 // Determine quality from the distance between player frequency and target.
 export function getTuningQuality(distance) {
   if (distance <= 2) return 'perfect';
@@ -28,8 +30,9 @@ export function applyTuning(state, quality) {
   const uc = state.resources.universalConstants;
   if (!cp?.unlocked || !uc?.unlocked) return null;
 
-  const cpRate = (cp.baseRate + cp.rateAdd) * cp.rateMult * (state.prestigeMultiplier || 1);
-  const ucRate = (uc.baseRate + uc.rateAdd) * uc.rateMult * (state.prestigeMultiplier || 1);
+  const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
+  const cpRate = (cp.baseRate + cp.rateAdd) * cp.rateMult * prestigeMult;
+  const ucRate = (uc.baseRate + uc.rateAdd) * uc.rateMult * prestigeMult;
   const cpGain = Math.max(1, cpRate * multiplier);
   const ucGain = Math.max(0.5, ucRate * multiplier * 0.5);
 

@@ -2,7 +2,7 @@
 // Clicking to mine has a chance to find a gem (5x materials).
 // Consecutive clicks without a gem increase the chance (pity mechanic).
 
-import { getEffectiveCap } from './resources.js';
+import { getEffectiveCap, getEffectivePrestige } from './resources.js';
 
 const BASE_GEM_CHANCE = 0.1;       // 10% base
 const STREAK_BONUS = 0.02;         // +2% per consecutive miss
@@ -55,7 +55,7 @@ export function mine(state, roll = Math.random(), { skipCooldown = false } = {})
   const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
   const savantMult = hasSavant ? 1.5 : 1;
   // Scale with the resource's full production rate so mining stays relevant
-  const fullRate = ((r.baseRate || 0) + (r.rateAdd || 0)) * (r.rateMult || 1) * (state.prestigeMultiplier || 1);
+  const fullRate = ((r.baseRate || 0) + (r.rateAdd || 0)) * (r.rateMult || 1) * getEffectivePrestige(state.prestigeMultiplier || 1);
   const rateScale = Math.max(1, fullRate); // minimum 1 so early mining still works
   const baseGather = rateScale * eraScale * savantMult;
   const gathered = foundGem ? baseGather * GEM_MULTIPLIER * gemQuality : baseGather;
