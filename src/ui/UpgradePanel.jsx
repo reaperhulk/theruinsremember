@@ -274,9 +274,8 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
       )}
       {(() => {
         const affordableNonRepeatable = filteredAvailable.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
-        // Capture current filter/hidden state for the onClick handler
+        // Capture current filter state for the onClick handler
         const currentFilterType = filterType;
-        const currentHidden = state.hiddenUpgrades || {};
         return available.length > 0 && (
           <button
             className="gather-btn"
@@ -343,14 +342,13 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         {filteredAvailable.length === 0 && upcoming.length > 0 && (
           <p className="empty-message">Buy prerequisites to unlock {upcoming.length} upcoming upgrade{upcoming.length > 1 ? 's' : ''}</p>
         )}
-        {(() => { let firstAffordableFound = false; return filteredAvailable.map(upgrade => {
+        {(() => { const firstAffordableId = Object.keys(state.upgrades).length === 0 ? filteredAvailable.find(u => canAfford(state, getUpgradeCost(state, u.id)))?.id : null; return filteredAvailable.map(upgrade => {
           const cost = getUpgradeCost(state, upgrade.id);
           const affordable = canAfford(state, cost);
           const count = typeof state.upgrades[upgrade.id] === 'number' ? state.upgrades[upgrade.id] : 0;
           const progress = affordable ? 1 : getAffordProgress(state, cost);
           const isMechanic = !!upgrade.mechanic;
-          const isFirstHighlight = affordable && !firstAffordableFound && Object.keys(state.upgrades).length === 0;
-          if (affordable && !firstAffordableFound) firstAffordableFound = true;
+          const isFirstHighlight = upgrade.id === firstAffordableId;
           return (
             <div key={upgrade.id} className="upgrade-row">
             <button

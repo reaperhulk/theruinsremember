@@ -1,4 +1,4 @@
-import { formatNumber, formatTime } from './format.js';
+import { formatTime } from './format.js';
 
 export function VictoryScreen({ state, onDismiss }) {
   if (!state.gameComplete && !state.trueEnding) return null;
