@@ -123,13 +123,14 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
         value={frequency}
         onChange={e => setFrequency(Number(e.target.value))}
         style={{ width: '100%', marginBottom: '6px' }}
+        aria-label={`Frequency tuner — current: ${frequency}, target: ${target}`}
       />
       {result && (
         <div style={{ textAlign: 'center', fontSize: '0.9em', color: resultColors[result], marginBottom: '4px', fontWeight: result === 'perfect' ? 'bold' : 'normal' }}>
           {resultTexts[result]}
         </div>
       )}
-      <button className="mine-btn" onClick={handleTune} style={{ background: 'linear-gradient(90deg, #1a2a2a, #203030)' }}>
+      <button className="mine-btn" onClick={handleTune} style={{ background: 'linear-gradient(90deg, #1a2a2a, #203030)' }} aria-label="Tune frequency">
         {lastTune ? (
           <span style={{ color: '#50b098' }}>
             +{formatNumber(lastTune.cp)} power, +{formatNumber(lastTune.uc)} constants
