@@ -170,8 +170,12 @@ export function EraProgress({ state }) {
         </>
       )}
       {isMaxEra && (
-        <p className="era-hint" style={{ color: '#bb88ff' }}>
-          You have reached the Multiverse — Prestige available for permanent bonuses!
+        <p className="era-hint" style={{ color: state.trueEnding ? '#e8c040' : '#bb88ff' }}>
+          {state.trueEnding
+            ? 'The cycle is complete. The cycle begins again. The eternal return.'
+            : state.prestigeUpgrades?.eternalReturn
+            ? 'The Eternal Return is yours. There is nothing more.'
+            : 'You have reached the Multiverse — Prestige available for permanent bonuses!'}
         </p>
       )}
       <div className="era-stats">

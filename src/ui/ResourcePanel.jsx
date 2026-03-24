@@ -170,9 +170,9 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                   if (rb[r.id]) tooltipParts.push(`Star routes: +${rb[r.id].toFixed(1)}/s`);
                   if (state.prestigeMultiplier > 1) tooltipParts.push(`Prestige: x${formatNumber(state.prestigeMultiplier)}`);
                   // Consumption info
-                  if (r.id === 'food' && r.rate > 0) tooltipParts.push(`Consumed by: labor (0.8/labor/s)`);
-                  if (r.id === 'energy') tooltipParts.push(`Consumed by: electronics (0.3/elec/s)`);
-                  if (r.id === 'rocketFuel' && state.era >= 4) tooltipParts.push(`Consumed by: orbital infra (0.6/orbital/s)`);
+                  if (r.id === 'food' && r.rate > 0) tooltipParts.push(`Consumed by: labor (1.0/labor/s)`);
+                  if (r.id === 'energy') tooltipParts.push(`Consumed by: electronics (0.4/elec/s)`);
+                  if (r.id === 'rocketFuel' && state.era >= 4) tooltipParts.push(`Consumed by: orbital infra (0.7/orbital/s)`);
                   if (r.id === 'exoticMaterials' && state.era >= 5) tooltipParts.push(`Consumed by: colonies (0.2/colony/s)`);
                   if (r.id === 'stellarForge' && state.era >= 7) tooltipParts.push(`Consumed by: megastructures (0.3/mega/s)`);
                   tooltipParts.push(`Effective: ${formatNumber(r.rate)}/s`);
@@ -260,13 +260,13 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                           {rb[r.id] > 0 && <div>Star routes: +{rb[r.id].toFixed(1)}/s</div>}
                           {prestigeMult > 1 && <div>Prestige: x{formatNumber(prestigeMult)}</div>}
                           {r.id === 'food' && getEffectiveRate(state, 'labor') > 0 && (
-                            <div style={{ color: '#ff9966' }}>Consumed by: labor (0.8/labor/s)</div>
+                            <div style={{ color: '#ff9966' }}>Consumed by: labor (1.0/labor/s)</div>
                           )}
                           {r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0 && (
-                            <div style={{ color: '#ff9966' }}>Consumed by: electronics (0.3/elec/s)</div>
+                            <div style={{ color: '#ff9966' }}>Consumed by: electronics (0.4/elec/s)</div>
                           )}
                           {r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0 && (
-                            <div style={{ color: '#ff9966' }}>Consumed by: orbital infra (0.6/orbital/s)</div>
+                            <div style={{ color: '#ff9966' }}>Consumed by: orbital infra (0.7/orbital/s)</div>
                           )}
                           {r.id === 'exoticMaterials' && state.era >= 5 && state.resources.colonies?.unlocked && (
                             <div style={{ color: '#ff9966' }}>Consumed by: colonies (0.2/colony/s)</div>
