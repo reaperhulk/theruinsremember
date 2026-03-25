@@ -243,15 +243,14 @@ describe('tick', () => {
     // Pre-own some era 1 upgrades so chain works
     state.upgrades = { tools: true, irrigation: true, basicPower: true };
     const after = tick(state, 0.1);
-    // Should have auto-purchased one non-repeatable upgrade from era <= 2
+    // Should have auto-purchased non-repeatable upgrades from era <= 4 (era-1)
     const newUpgrades = Object.keys(after.upgrades).filter(id => !state.upgrades[id]);
-    if (newUpgrades.length > 0) {
-      for (const id of newUpgrades) {
-        const def = allUpgradeDefs[id];
-        if (def) {
-          expect(def.era).toBeLessThanOrEqual(2); // era 5 - 3 = era 2 max
-          expect(def.repeatable).toBeFalsy();
-        }
+    expect(newUpgrades.length).toBeGreaterThan(0);
+    for (const id of newUpgrades) {
+      const def = allUpgradeDefs[id];
+      if (def) {
+        expect(def.era).toBeLessThanOrEqual(4); // era 5 - 1 = era 4 max
+        expect(def.repeatable).toBeFalsy();
       }
     }
   });
