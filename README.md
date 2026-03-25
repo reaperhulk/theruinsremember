@@ -23,10 +23,9 @@ Prestige isn't just a mechanic. It's the cycle itself.
 - **10 Eras** spanning primitive survival to multiverse exploration
 - **579 upgrades** forming deep prerequisite chains with meaningful branching choices
 - **109 tech nodes** including mutually exclusive paths that shape each run differently
-- **12 mini-games** (mining, factory management, hacking, orbital docking, colony management, star charting, trading, Dyson assembly, reality weaving, galactic senate, cosmic tuning, reality forge)
+- **11 mini-games** (mining, factory management, hacking, orbital docking, colony management, star charting, trading, Dyson assembly, reality weaving, galactic senate, reality forge)
 - **30 prestige upgrades** including 5 "Ascension" tier endgame upgrades
 - **289 achievements** tracking everything from speed milestones to narrative discovery
-- **374 random events** with lore discoveries threaded throughout
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players
 - **Resource caps that matter** — storage is a real constraint requiring strategic cap upgrades
 - **Consumption chains** — food feeds labor, energy powers electronics, fuel maintains orbital infrastructure, exotic materials sustain colonies
@@ -43,7 +42,7 @@ This game was built entirely by an AI agent ([Claude Code](https://docs.anthropi
 - Requesting iterations ("do it again", "200 more iterations")
 - Naming the game
 
-Everything else — architecture, engine design, data balancing, CSS, canvas rendering, story writing, bug fixing, performance optimization, accessibility — was designed and implemented by the agent across 230+ commits and hundreds of iterative improvement cycles.
+Everything else — architecture, engine design, data balancing, CSS, canvas rendering, story writing, bug fixing, performance optimization, accessibility — was designed and implemented by the agent across 300+ commits and hundreds of iterative improvement cycles.
 
 The agent researched incremental game design best practices (drawing from Cookie Clicker, Antimatter Dimensions, A Dark Room, Trimps, Synergism, and others), audited its own work repeatedly, simulated playthroughs to find dead spots, and fixed its own bugs.
 
@@ -60,9 +59,11 @@ npm run dev
 
 - React + Vite
 - Pure engine functions (no side effects, deterministic)
-- Vitest for testing (241 tests)
+- Vitest for testing (243 tests)
+- Puppeteer for automated browser testing
+- Bot playtest system with 6 player profiles for balance verification
 - HTML5 Canvas for animated scene
-- No external dependencies beyond React and Vite
+- No external runtime dependencies beyond React and Vite
 
 ## License
 
