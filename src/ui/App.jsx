@@ -235,6 +235,11 @@ export function App() {
             ))}
           </div>
         )}
+        {availableMiniGames.find(g => g.id === activeMiniGame) && (
+          <div className="mini-game-caption">
+            {availableMiniGames.find(g => g.id === activeMiniGame)?.desc}
+          </div>
+        )}
         {miniGameComponents[activeMiniGame] || miniGameComponents.mining}
       </>
     );
