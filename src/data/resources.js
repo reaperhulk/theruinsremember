@@ -34,13 +34,13 @@ export const resources = {
   stellarForge: { id: 'stellarForge', name: 'Stellar Forge Output', era: 7, baseCap: 2000, baseRate: 0.35, description: 'Output from star-powered forges' },
 
   // Era 8: Galactic — higher base rates for passive/noMinigames bootstrapping
-  galacticInfluence: { id: 'galacticInfluence', name: 'Galactic Influence', era: 8, baseCap: 100000, baseRate: 0.7, description: 'Political power across the galaxy' },
-  exoticMatter: { id: 'exoticMatter', name: 'Exotic Matter', era: 8, baseCap: 10000, baseRate: 0.55, description: 'Matter with unusual properties' },
+  galacticInfluence: { id: 'galacticInfluence', name: 'Galactic Influence', era: 8, baseCap: 100000, baseRate: 0.9, description: 'Political power across the galaxy' },
+  exoticMatter: { id: 'exoticMatter', name: 'Exotic Matter', era: 8, baseCap: 10000, baseRate: 0.75, description: 'Matter with unusual properties' },
 
   // Era 9: Intergalactic — stronger passive rates so late runs bend instead of stall
-  cosmicPower: { id: 'cosmicPower', name: 'Cosmic Power', era: 9, baseCap: 20000, baseRate: 0.3, description: 'Energy from the cosmos itself' },
-  universalConstants: { id: 'universalConstants', name: 'Universal Constants', era: 9, baseCap: 5000, baseRate: 0.2, description: 'Manipulable laws of physics' },
-  realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 9, baseCap: 15000, baseRate: 0.4, description: 'Shards of adjacent realities bleeding into yours' },
+  cosmicPower: { id: 'cosmicPower', name: 'Cosmic Power', era: 9, baseCap: 20000, baseRate: 0.4, description: 'Energy from the cosmos itself' },
+  universalConstants: { id: 'universalConstants', name: 'Universal Constants', era: 9, baseCap: 5000, baseRate: 0.28, description: 'Manipulable laws of physics' },
+  realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 9, baseCap: 15000, baseRate: 0.55, description: 'Shards of adjacent realities bleeding into yours' },
 
   // Era 10: Multiverse — moderate base rates for bootstrapping
   quantumEchoes: { id: 'quantumEchoes', name: 'Quantum Echoes', era: 10, baseCap: 20000, baseRate: 0.08, description: 'Resonances from parallel universes' },
