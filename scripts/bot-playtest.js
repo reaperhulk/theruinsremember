@@ -47,6 +47,7 @@ function parseArgs(argv) {
     verbose: false,
     quiet: false,
     compare: null,
+    assertBalance: false,
     seed: null,
     snapshotInterval: 300,
     listScenarios: false,
@@ -68,6 +69,7 @@ function parseArgs(argv) {
       case '--verbose': args.verbose = true; break;
       case '--quiet': args.quiet = true; break;
       case '--compare': args.compare = next; i++; break;
+      case '--assert-balance': args.assertBalance = true; break;
       case '--seed': args.seed = Number(next); i++; break;
       case '--snapshot-interval': args.snapshotInterval = Number(next); i++; break;
       case '--list-scenarios': args.listScenarios = true; break;
@@ -235,6 +237,13 @@ const SCENARIOS = {
   earlyGame:    { profile: 'optimal',      prestige: 0,  targetEra: 3,  maxTime: 900,   purpose: 'Era 1-3 pacing detail' },
   lateGame:     { profile: 'optimal',      prestige: 2,  targetEra: 10, maxTime: 14400, prestigeAtEra: 7, purpose: 'Late-game with prestige' },
   casual:       { profile: 'casual',       prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Standard casual player experience' },
+};
+
+const BALANCE_TARGETS = {
+  full: { minTime: 600, maxTime: 900, requiredEra: 10 },
+  casual: { maxTime: 14400, requiredEra: 10 },
+  noMinigames: { maxTime: 25200, requiredEra: 10 },
+  passive: { maxTime: 25200, requiredEra: 10 },
 };
 
 // ─── Bot Action Functions ───────────────────────────────────────────────────
@@ -1072,6 +1081,38 @@ function runComparison(currentResults, compareFile) {
   console.log();
 }
 
+function assertBalanceTargets(allResults) {
+  let failures = 0;
+  console.log(`\n${'═'.repeat(60)}`);
+  console.log('  BALANCE ASSERTIONS');
+  console.log(`${'═'.repeat(60)}`);
+
+  for (const { scenarioName, collector } of allResults) {
+    const target = BALANCE_TARGETS[scenarioName];
+    if (!target) continue;
+
+    const status = collector.completionStatus;
+    const issues = [];
+    if (status.finalEra < target.requiredEra) issues.push(`final era ${status.finalEra} < ${target.requiredEra}`);
+    if (target.minTime != null && status.totalTime < target.minTime) issues.push(`too fast (${fmtTime(status.totalTime)} < ${fmtTime(target.minTime)})`);
+    if (target.maxTime != null && status.totalTime > target.maxTime) issues.push(`too slow (${fmtTime(status.totalTime)} > ${fmtTime(target.maxTime)})`);
+
+    if (issues.length > 0) {
+      failures++;
+      console.log(`  ✗ ${scenarioName}: ${issues.join(', ')}`);
+    } else {
+      console.log(`  ✓ ${scenarioName}: ${fmtTime(status.totalTime)}`);
+    }
+  }
+
+  if (failures > 0) {
+    console.log(`\n  ${failures} balance assertion${failures === 1 ? '' : 's'} failed.`);
+  } else {
+    console.log('\n  All balance assertions passed.');
+  }
+  return failures === 0;
+}
+
 // ─── Resource Snapshot (for stuck detection) ────────────────────────────────
 
 function printResourceSnapshot(state) {
@@ -1120,6 +1161,7 @@ Options:
   --verbose                 Per-tick detail every 60s
   --quiet                   Only final report
   --compare <file>          Compare against previous JSON run
+  --assert-balance          Enforce built-in pacing targets for key scenarios
   --seed <N>                Fixed RNG seed for deterministic runs
   --snapshot-interval <N>   Seconds between snapshots (default: 300)
   --list-scenarios          Print built-in scenarios and exit
@@ -1132,6 +1174,7 @@ Examples:
   node scripts/bot-playtest.js --scenario full,noMinigames,passive --quiet
   node scripts/bot-playtest.js --scenario prestige3 --verbose
   node scripts/bot-playtest.js --seed 42 --verbose
+  node scripts/bot-playtest.js --scenario full,casual,noMinigames,passive --seed 424242 --quiet --assert-balance
 `);
 }
 
@@ -1241,4 +1284,9 @@ if (args.json) {
 // Comparison
 if (args.compare) {
   runComparison(allResults, args.compare);
+}
+
+if (args.assertBalance) {
+  const passed = assertBalanceTargets(allResults);
+  if (!passed) process.exit(1);
 }

@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:balance": "node scripts/bot-playtest.js --scenario full,casual,noMinigames,passive --seed 424242 --quiet --assert-balance"
   },
   "dependencies": {
     "react": "^19.2.4",

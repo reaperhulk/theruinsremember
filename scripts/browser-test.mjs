@@ -106,6 +106,14 @@ async function checkLayout(page) {
     const rows = document.querySelectorAll('.resource-row');
     if (rows.length > 0) ok.push(`${rows.length} resource rows`);
 
+    // Era panel guidance
+    const eraPanel = document.querySelector('.era-panel');
+    const eraHint = eraPanel?.querySelector('.era-hint');
+    if (!eraPanel) issues.push('Era panel missing');
+    else ok.push('Era panel visible');
+    if (!eraHint || !eraHint.textContent.trim()) issues.push('Era guidance missing');
+    else ok.push('Era guidance visible');
+
     // FULL/SLOW indicators
     const full = document.querySelectorAll('.text-danger');
     const slow = document.querySelectorAll('[title*="Production limited"]');
@@ -117,6 +125,18 @@ async function checkLayout(page) {
     // Prestige button
     const prestige = document.querySelector('.prestige-btn');
     ok.push(`Prestige btn: ${prestige ? 'visible' : 'hidden'}`);
+
+    // Actionability
+    const actionable = [...document.querySelectorAll('button')]
+      .filter(btn => !btn.disabled && btn.offsetParent !== null);
+    const primaryActionable = actionable.filter(btn =>
+      btn.classList.contains('upgrade-btn') ||
+      btn.classList.contains('tech-btn') ||
+      btn.classList.contains('gather-btn') ||
+      btn.classList.contains('prestige-btn')
+    );
+    if (primaryActionable.length === 0) issues.push('No actionable economy controls visible');
+    else ok.push(`${primaryActionable.length} actionable controls`);
 
     // Throttle warning
     const throttle = document.querySelector('[style*="supply chains"]');
