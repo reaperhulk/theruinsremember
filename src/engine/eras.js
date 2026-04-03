@@ -31,11 +31,27 @@ const ERA_MIN_UPGRADES = {
   10: 30,  // ~51% of ~59
 };
 
-// Minimum upgrades gate: requires purchasing enough era-specific upgrades before
-// transitioning. This ensures players engage with each era's content.
-
 export function getMinUpgradesForEra(era) {
   return ERA_MIN_UPGRADES[era] || 10;
+}
+
+// Minimum tech depth in the current era before transition is allowed.
+// This replaces fixed dwell timers with build-out/readiness checks.
+const ERA_MIN_TECHS = {
+  1: 2,    // path tech + era gate
+  2: 4,    // path techs + multiple era commitments
+  3: 4,
+  4: 4,
+  5: 4,
+  6: 3,
+  7: 3,
+  8: 3,
+  9: 3,
+  10: 0,
+};
+
+export function getMinTechsForEra(era) {
+  return ERA_MIN_TECHS[era] ?? 1;
 }
 
 // Count how many upgrades the player has purchased that belong to the given era.
@@ -45,19 +61,26 @@ export function countEraUpgrades(state, era) {
   ).length;
 }
 
-// Minimum time in era before transition allowed (seconds).
-// Prevents late eras from compressing to nothing when production snowballs.
-// Scales down with prestige: experienced players earn faster transitions.
-const ERA_MIN_TIME = {
-  1: 220, 2: 190, 3: 250, 4: 210, 5: 150, 6: 180, 7: 210, 8: 150, 9: 120, 10: 0,
-};
+export function countEraTechs(state, era) {
+  return Object.keys(state.tech || {}).filter(
+    id => techTree[id] && techTree[id].era === era
+  ).length;
+}
 
-export function getMinTimeForEra(era, prestigeCount = 0) {
-  const base = ERA_MIN_TIME[era] || 0;
-  if (base === 0) return 0;
-  // Each prestige reduces minimum time by 15%, down to 10% of base
-  const reduction = Math.pow(0.85, prestigeCount);
-  return Math.max(base * 0.1, base * reduction);
+export function getEraReadiness(state, era = state.era) {
+  const minUpgrades = getMinUpgradesForEra(era);
+  const currentUpgrades = countEraUpgrades(state, era);
+  const minTechs = getMinTechsForEra(era);
+  const currentTechs = countEraTechs(state, era);
+
+  return {
+    minUpgrades,
+    currentUpgrades,
+    upgradesMet: currentUpgrades >= minUpgrades,
+    minTechs,
+    currentTechs,
+    techsMet: currentTechs >= minTechs,
+  };
 }
 
 // Check if state qualifies for an era transition. Returns next era number or null.
@@ -72,16 +95,8 @@ export function checkEraTransition(state) {
 
   if (!gatingTech) return null;
 
-  // Require a minimum number of upgrades purchased in the current era
-  const minUpgrades = getMinUpgradesForEra(state.era);
-  const currentUpgrades = countEraUpgrades(state, state.era);
-  if (currentUpgrades < minUpgrades) return null;
-
-  // Require minimum time spent in the current era
-  const eraStartTime = state.eraStartTime || 0;
-  const timeInEra = state.totalTime - eraStartTime;
-  const minTime = getMinTimeForEra(state.era, state.prestigeCount || 0);
-  if (timeInEra < minTime) return null;
+  const readiness = getEraReadiness(state, state.era);
+  if (!readiness.upgradesMet || !readiness.techsMet) return null;
 
   return nextEra;
 }

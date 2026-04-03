@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkEraTransition, transitionEra, getMinUpgradesForEra, countEraUpgrades } from '../eras.js';
+import { checkEraTransition, transitionEra, getMinUpgradesForEra, getMinTechsForEra, countEraUpgrades, countEraTechs } from '../eras.js';
 import { createInitialState } from '../state.js';
 import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 
@@ -9,6 +9,14 @@ describe('eras', () => {
       expect(getMinUpgradesForEra(1)).toBe(30);
       expect(getMinUpgradesForEra(5)).toBe(30);
       expect(getMinUpgradesForEra(10)).toBe(30);
+    });
+  });
+
+  describe('getMinTechsForEra', () => {
+    it('returns configured research depth per era', () => {
+      expect(getMinTechsForEra(1)).toBe(2);
+      expect(getMinTechsForEra(5)).toBe(4);
+      expect(getMinTechsForEra(10)).toBe(0);
     });
   });
 
@@ -38,6 +46,18 @@ describe('eras', () => {
     });
   });
 
+  describe('countEraTechs', () => {
+    it('counts only tech from the specified era', () => {
+      const state = createInitialState();
+      state.tech.metallurgy = true;
+      state.tech.industrialRevolution = true;
+      state.tech.advancedComputing = true;
+
+      expect(countEraTechs(state, 1)).toBe(2);
+      expect(countEraTechs(state, 2)).toBe(1);
+    });
+  });
+
   describe('checkEraTransition', () => {
     it('returns null when no era-granting tech is unlocked', () => {
       const state = createInitialState();
@@ -51,17 +71,26 @@ describe('eras', () => {
       expect(checkEraTransition(state)).toBeNull();
     });
 
-    it('returns next era when gating tech is unlocked and enough upgrades purchased', () => {
+    it('returns next era when gating tech is unlocked and enough upgrades and era research are purchased', () => {
       const state = createInitialState();
+      state.tech.metallurgy = true;
       state.tech.industrialRevolution = true;
-      state.totalGems = 1; // mini-game engagement required
-      state.totalTime = 600; // enough time to pass min era time gate
       // Purchase 30 era 1 upgrades to meet the minimum
       const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
       for (let i = 0; i < 30 && i < era1Upgrades.length; i++) {
         state.upgrades[era1Upgrades[i].id] = true;
       }
       expect(checkEraTransition(state)).toBe(2);
+    });
+
+    it('returns null when gating tech is unlocked but era research depth is too low', () => {
+      const state = createInitialState();
+      state.tech.industrialRevolution = true;
+      const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
+      for (let i = 0; i < 30 && i < era1Upgrades.length; i++) {
+        state.upgrades[era1Upgrades[i].id] = true;
+      }
+      expect(checkEraTransition(state)).toBeNull();
     });
 
     it('returns null when upgrades are from wrong era', () => {

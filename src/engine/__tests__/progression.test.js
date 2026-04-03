@@ -32,7 +32,6 @@ function giveAndBuy(state, type, id) {
 describe('progression integration', () => {
   it('can progress from Era 1 to Era 2 via upgrades and tech', () => {
     let state = createInitialState();
-    state.totalGems = 1; // mini-game engagement
 
     // Buy enough era 1 upgrades to meet the minimum (30)
     const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
@@ -46,17 +45,15 @@ describe('progression integration', () => {
     // Buy industrial revolution to transition
     state = giveAndBuy(state, 'tech', 'industrialRevolution');
 
-    // Tick enough time to pass era min time gate, then trigger transition
-    state = tick(state, 300);
+    // Tick once to trigger the progression-based transition check
+    state = tick(state, 0.1);
     expect(state.era).toBe(2);
   });
 
   it('can progress from Era 2 to Era 3 (Digital Age)', () => {
     let state = createInitialState();
     state.era = 2;
-    state.totalTime = 600; // ensure min time-in-era is met
     state.eraStartTime = 0;
-    state.totalGems = 1; // mini-game engagement
     // Mark era 1 upgrades as done
     state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true };
     state.tech = { metallurgy: true, industrialRevolution: true };
@@ -74,6 +71,8 @@ describe('progression integration', () => {
 
     // Buy tech to transition
     state = giveAndBuy(state, 'tech', 'advancedComputing');
+    state = giveAndBuy(state, 'tech', 'heavyIndustry');
+    state = giveAndBuy(state, 'tech', 'massProduction');
     state = giveAndBuy(state, 'tech', 'digitalRevolution');
 
     state = tick(state, 0.1);
@@ -87,9 +86,7 @@ describe('progression integration', () => {
   it('can progress from Era 3 (Digital Age) to Era 4 (Space Age)', () => {
     let state = createInitialState();
     state.era = 3;
-    state.totalTime = 600; // ensure min time-in-era is met
     state.eraStartTime = 0;
-    state.totalGems = 1; // mini-game engagement
     state.upgrades = { tools: true, irrigation: true, basicPower: true, housing: true, foundry: true, assemblyLines: true, powerGrid: true, computingLab: true };
     state.tech = { metallurgy: true, industrialRevolution: true, advancedComputing: true, digitalRevolution: true };
     state.resources.software = { amount: 0, unlocked: true, rateAdd: 0, rateMult: 1, capMult: 1 };
@@ -106,6 +103,8 @@ describe('progression integration', () => {
 
     // Buy tech to transition
     state = giveAndBuy(state, 'tech', 'globalNetwork');
+    state = giveAndBuy(state, 'tech', 'openSourceMovement');
+    state = giveAndBuy(state, 'tech', 'neuralInterfaces');
     state = giveAndBuy(state, 'tech', 'spaceProgram');
 
     state = tick(state, 0.1);

@@ -26,21 +26,21 @@ export const resources = {
   exoticMaterials: { id: 'exoticMaterials', name: 'Exotic Materials', era: 5, baseCap: 3000, baseRate: 0.08, description: 'Rare space resources' },
 
   // Era 6: Interstellar — higher base rates for passive/noMinigames bootstrapping
-  starSystems: { id: 'starSystems', name: 'Star Systems', era: 6, baseCap: 5000, baseRate: 0.2, description: 'Colonized star systems' },
-  darkEnergy: { id: 'darkEnergy', name: 'Dark Energy', era: 6, baseCap: 5000, baseRate: 0.3, description: 'Mysterious cosmic force' },
+  starSystems: { id: 'starSystems', name: 'Star Systems', era: 6, baseCap: 5000, baseRate: 0.7, description: 'Colonized star systems' },
+  darkEnergy: { id: 'darkEnergy', name: 'Dark Energy', era: 6, baseCap: 5000, baseRate: 0.9, description: 'Mysterious cosmic force' },
 
-  // Era 7: Dyson Era — moderate base rates to avoid bootstrapping crisis
-  megastructures: { id: 'megastructures', name: 'Megastructures', era: 7, baseCap: 2000, baseRate: 0.1, description: 'Massive stellar-scale constructions' },
-  stellarForge: { id: 'stellarForge', name: 'Stellar Forge Output', era: 7, baseCap: 2000, baseRate: 0.15, description: 'Output from star-powered forges' },
+  // Era 7: Dyson Era — stronger base rates so Dyson play accelerates instead of gating
+  megastructures: { id: 'megastructures', name: 'Megastructures', era: 7, baseCap: 2000, baseRate: 0.25, description: 'Massive stellar-scale constructions' },
+  stellarForge: { id: 'stellarForge', name: 'Stellar Forge Output', era: 7, baseCap: 2000, baseRate: 0.35, description: 'Output from star-powered forges' },
 
   // Era 8: Galactic — higher base rates for passive/noMinigames bootstrapping
-  galacticInfluence: { id: 'galacticInfluence', name: 'Galactic Influence', era: 8, baseCap: 100000, baseRate: 0.3, description: 'Political power across the galaxy' },
-  exoticMatter: { id: 'exoticMatter', name: 'Exotic Matter', era: 8, baseCap: 10000, baseRate: 0.2, description: 'Matter with unusual properties' },
+  galacticInfluence: { id: 'galacticInfluence', name: 'Galactic Influence', era: 8, baseCap: 100000, baseRate: 0.7, description: 'Political power across the galaxy' },
+  exoticMatter: { id: 'exoticMatter', name: 'Exotic Matter', era: 8, baseCap: 10000, baseRate: 0.55, description: 'Matter with unusual properties' },
 
-  // Era 9: Intergalactic — moderate base rates for bootstrapping
-  cosmicPower: { id: 'cosmicPower', name: 'Cosmic Power', era: 9, baseCap: 20000, baseRate: 0.15, description: 'Energy from the cosmos itself' },
-  universalConstants: { id: 'universalConstants', name: 'Universal Constants', era: 9, baseCap: 5000, baseRate: 0.12, description: 'Manipulable laws of physics' },
-  realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 9, baseCap: 15000, baseRate: 0.25, description: 'Shards of adjacent realities bleeding into yours' },
+  // Era 9: Intergalactic — stronger passive rates so late runs bend instead of stall
+  cosmicPower: { id: 'cosmicPower', name: 'Cosmic Power', era: 9, baseCap: 20000, baseRate: 0.3, description: 'Energy from the cosmos itself' },
+  universalConstants: { id: 'universalConstants', name: 'Universal Constants', era: 9, baseCap: 5000, baseRate: 0.2, description: 'Manipulable laws of physics' },
+  realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 9, baseCap: 15000, baseRate: 0.4, description: 'Shards of adjacent realities bleeding into yours' },
 
   // Era 10: Multiverse — moderate base rates for bootstrapping
   quantumEchoes: { id: 'quantumEchoes', name: 'Quantum Echoes', era: 10, baseCap: 20000, baseRate: 0.08, description: 'Resonances from parallel universes' },

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { eraNames, ERA_COUNT, getMinUpgradesForEra, getMinTimeForEra, countEraUpgrades } from '../engine/eras.js';
+import { eraNames, ERA_COUNT, getEraReadiness } from '../engine/eras.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
 import { calculateProduction, getEffectivePrestige } from '../engine/resources.js';
@@ -94,9 +94,10 @@ export function EraProgress({ state }) {
   const isMaxEra = state.era >= ERA_COUNT;
   const upgradeCount = Object.keys(state.upgrades || {}).length;
   const techCount = Object.keys(state.tech || {}).length;
-  const eraUpgradeCount = countEraUpgrades(state, state.era);
-  const minUpgrades = getMinUpgradesForEra(state.era);
-  const upgradesMet = eraUpgradeCount >= minUpgrades;
+  const readiness = getEraReadiness(state, state.era);
+  const eraUpgradeCount = readiness.currentUpgrades;
+  const minUpgrades = readiness.minUpgrades;
+  const upgradesMet = readiness.upgradesMet;
   const totalEraUpgrades = Object.values(upgradeDefs).filter(u => u.era === state.era).length;
   const eraCompletion = totalEraUpgrades > 0 ? Math.floor(eraUpgradeCount / totalEraUpgrades * 100) : 0;
   const loreHint = getLoreHint(eraCompletion, isMaxEra, state.era, state.totalTime || 0);
@@ -147,20 +148,15 @@ export function EraProgress({ state }) {
       {!isMaxEra && (() => {
         const nextEra = state.era + 1;
         const gatingTech = Object.values(techTree).find(t => t.grantsEra === nextEra && state.tech[t.id]);
-        const minTime = getMinTimeForEra(state.era, state.prestigeCount || 0);
-        const timeInEra = state.totalTime - (state.eraStartTime || 0);
-        const timeRemaining = Math.max(0, minTime - timeInEra);
-        const readyToTransition = upgradesMet && gatingTech && timeRemaining <= 0;
+        const readyToTransition = readiness.upgradesMet && readiness.techsMet && gatingTech;
         if (readyToTransition) {
           return <p className="era-hint" style={{ color: '#88ff88' }}>Era transition imminent...</p>;
         }
         if (!upgradesMet) {
-          return <p className="era-hint">Buy {minUpgrades - eraUpgradeCount} more upgrades, then research ★ tech to advance
-            {timeRemaining > 0 && <span style={{ color: '#888', fontSize: '0.85em' }}> ({Math.ceil(timeRemaining)}s settling time)</span>}
-          </p>;
+          return <p className="era-hint">Buy {minUpgrades - eraUpgradeCount} more upgrades to stabilize this era, then finish the breakthrough research.</p>;
         }
-        if (timeRemaining > 0) {
-          return <p className="era-hint" style={{ color: '#ddcc44' }}>Establishing presence... {Math.ceil(timeRemaining)}s remaining</p>;
+        if (!readiness.techsMet) {
+          return <p className="era-hint" style={{ color: '#ddcc44' }}>Research {readiness.minTechs - readiness.currentTechs} more era tech{readiness.minTechs - readiness.currentTechs === 1 ? '' : 's'} to prove the economy is ready.</p>;
         }
         return <p className="era-hint" style={{ color: '#88ff88' }}>Research starred (★) technologies to advance to the next era</p>;
       })()}
@@ -169,6 +165,10 @@ export function EraProgress({ state }) {
           <p className="era-hint" style={{ color: upgradesMet ? '#88ff88' : '#ffcc44' }}>
             Era upgrades: {eraUpgradeCount}/{minUpgrades} needed | Total: {upgradeCount} ({eraCompletion}% of era)
             {upgradesMet ? ' ✓' : ''}
+          </p>
+          <p className="era-hint" style={{ color: readiness.techsMet ? '#88ff88' : '#ffcc44' }}>
+            Era research: {readiness.currentTechs}/{readiness.minTechs} breakthrough steps
+            {readiness.techsMet ? ' ✓' : ''}
           </p>
           {!upgradesMet && (
             <div className="upgrade-progress-bar" role="progressbar" aria-valuenow={eraUpgradeCount} aria-valuemin={0} aria-valuemax={minUpgrades} aria-label="Era upgrade progress" style={{ margin: '2px 0 4px' }}>
