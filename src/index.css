@@ -234,6 +234,29 @@ g[role="button"]:focus-visible {
   margin-bottom: 8px;
 }
 
+.help-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.help-card {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(214, 176, 101, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.help-card strong {
+  display: block;
+  color: #e4c684;
+  margin-bottom: 4px;
+}
+
+.help-card-wide {
+  grid-column: 1 / -1;
+}
+
 /* Resources */
 .resource-era-group {
   margin-bottom: 4px;

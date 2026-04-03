@@ -24,18 +24,36 @@ export function HelpOverlay({ onClose }) {
   return (
     <div className="era-transition-overlay" onClick={onClose} style={{ zIndex: 1003 }} role="dialog" aria-modal="true" aria-label="How to Play">
       <div className="era-transition-content" ref={contentRef} tabIndex={-1} onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', maxHeight: '80vh', overflowY: 'auto', textAlign: 'left', fontSize: '0.85em', outline: 'none' }}>
-        <h2 style={{ color: '#c8a040', marginBottom: '12px', textAlign: 'center' }}>How to Play</h2>
-        <div style={{ color: '#bbb', lineHeight: '1.5' }}>
-          <p><strong>Goal:</strong> Advance through 10 eras of civilization, discovering the ruins of those who came before.</p>
-          <p><strong>Resources:</strong> Click +1 buttons or press Space to mine. Buy upgrades to automate production.</p>
-          <p><strong>Upgrades:</strong> Gold-bordered "MECHANIC" upgrades change gameplay. Purple-bordered upgrades reveal story.</p>
-          <p><strong>Caps:</strong> Resources have storage limits. Buy "Cap" upgrades to increase them. "FULL" means production is wasted.</p>
-          <p><strong>Consumption:</strong> Some resources consume others (food feeds labor, energy powers electronics, fuel maintains orbits, exotic materials sustain colonies, forge feeds megastructures). Watch for "DRAINING".</p>
-          <p><strong>Mini-games:</strong> Mining (era 1), Factory (2), Hacking (3), Docking (4), Trading (4), Colony (5), Star Chart (6), Dyson Assembly (7), Weaving (8), Galactic Senate (8), Cosmic Tuning (9), Reality Forge (10).</p>
-          <p><strong>Tech Tree:</strong> Research technologies to unlock new eras. Star techs gate era transitions.</p>
-          <p><strong>Prestige:</strong> At Era 10, reset for a permanent production multiplier. Earn prestige points from Era 7+. The cycle begins again.</p>
-          <p><strong>Canvas:</strong> Click glowing orbs, ruins, and deposits for bonuses. Buildings appear as you progress.</p>
-          <p><strong>Keyboard:</strong> 1-6: tabs | Space: mine | D: dock | 0-3: hack | Arrows: tune | ?: this help</p>
+        <h2 style={{ color: '#c8a040', marginBottom: '12px', textAlign: 'center' }}>Field Guide</h2>
+        <div className="help-grid" style={{ color: '#bbb', lineHeight: '1.5' }}>
+          <div className="help-card">
+            <strong>Objective</strong>
+            <p>Advance through 10 eras, rebuild civilization, and piece together the evidence that your people have done this before.</p>
+          </div>
+          <div className="help-card">
+            <strong>Early Survival</strong>
+            <p>Press Space or use + buttons to gather resources. Buy upgrades fast so manual collection becomes a backup, not the plan.</p>
+          </div>
+          <div className="help-card">
+            <strong>Read The Warnings</strong>
+            <p><strong>FULL</strong> means storage is wasting production. <strong>DRAINING</strong> means one supply chain is starving another.</p>
+          </div>
+          <div className="help-card">
+            <strong>Era Progression</strong>
+            <p>Era advances require enough upgrades, enough era research, and the starred breakthrough tech. The Run Director tells you what is missing.</p>
+          </div>
+          <div className="help-card">
+            <strong>Mini-Games</strong>
+            <p>Each era adds a specialized system. They should accelerate a run, not be the only thing keeping it alive.</p>
+          </div>
+          <div className="help-card">
+            <strong>Prestige</strong>
+            <p>At Era 10 you can reset for permanent multipliers and upgrades. The cycle is part of progression, not just a post-game screen.</p>
+          </div>
+          <div className="help-card help-card-wide">
+            <strong>Controls</strong>
+            <p>Tabs: 1-6 | Mine: Space | Dock: D | Hack: 0-3 | Tune: Arrows | Help: ?</p>
+          </div>
         </div>
         <p style={{ textAlign: 'center', color: '#555', marginTop: '12px', fontSize: '0.8em' }}>Click outside or press Escape to close</p>
       </div>
