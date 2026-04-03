@@ -21,7 +21,26 @@ export function VictoryScreen({ state, onDismiss }) {
           will find what you leave behind, and they will build again, and they will remember again,
           and the cycle will continue, as it always has, as it always will.
         </p>
-        <div style={{ fontSize: '0.85em', color: '#888', marginBottom: '16px' }}>
+        <div className="victory-grid" style={{ fontSize: '0.85em', color: '#888', marginBottom: '16px' }}>
+          <div className="victory-card">
+            <strong>Cycle Record</strong>
+            <div>Prestige cycles: {state.prestigeCount || 0}</div>
+            <div>Prestige upgrades: {Object.keys(state.prestigeUpgrades || {}).length}/30</div>
+            <div>Total play time: {formatTime((state.lifetimePlayTime || 0) + (state.totalTime || 0))}</div>
+          </div>
+          <div className="victory-card">
+            <strong>World Left Behind</strong>
+            <div>Upgrades purchased: {Object.keys(state.upgrades || {}).length}</div>
+            <div>Achievements: {Object.keys(state.achievements || {}).length}/289</div>
+            {state.totalGems > 0 && <div>Gems found: {state.totalGems}</div>}
+            {state.dysonSegments > 0 && <div>Dyson segments: {state.dysonSegments}</div>}
+          </div>
+          <div className="victory-card victory-card-wide">
+            <strong>Final Signal</strong>
+            <div>{isTrueEnding ? 'You broke the loop by understanding it completely.' : 'You reached the edge, but the loop still wants another civilization.'}</div>
+          </div>
+        </div>
+        <div style={{ display: 'none' }}>
           <div>Prestige cycles: {state.prestigeCount || 0}</div>
           <div>Prestige upgrades: {Object.keys(state.prestigeUpgrades || {}).length}/30</div>
           <div>Total play time: {formatTime((state.lifetimePlayTime || 0) + (state.totalTime || 0))}</div>
