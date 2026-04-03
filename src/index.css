@@ -313,6 +313,39 @@ g[role="button"]:focus-visible {
   letter-spacing: 0.08em;
 }
 
+.readiness-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.readiness-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(214, 176, 101, 0.18);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.readiness-card.ready {
+  border-color: rgba(110, 181, 176, 0.32);
+  background: linear-gradient(180deg, rgba(110, 181, 176, 0.12), rgba(255, 255, 255, 0.03));
+}
+
+.readiness-card strong {
+  color: #e6d9b6;
+}
+
+.readiness-label {
+  font-size: 0.7em;
+  color: #88b9c9;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .toast {
   backdrop-filter: blur(8px);
   border: 1px solid rgba(214, 176, 101, 0.18);

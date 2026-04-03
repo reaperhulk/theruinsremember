@@ -249,14 +249,18 @@ export function EraProgress({ state }) {
       })()}
       {!isMaxEra && (
         <>
-          <p className="era-hint" style={{ color: upgradesMet ? '#88ff88' : '#ffcc44' }}>
-            Era upgrades: {eraUpgradeCount}/{minUpgrades} needed | Total: {upgradeCount} ({eraCompletion}% of era)
-            {upgradesMet ? ' ✓' : ''}
-          </p>
-          <p className="era-hint" style={{ color: readiness.techsMet ? '#88ff88' : '#ffcc44' }}>
-            Era research: {readiness.currentTechs}/{readiness.minTechs} breakthrough steps
-            {readiness.techsMet ? ' ✓' : ''}
-          </p>
+          <div className="readiness-grid">
+            <div className={`readiness-card${upgradesMet ? ' ready' : ''}`}>
+              <span className="readiness-label">Era Upgrades</span>
+              <strong>{eraUpgradeCount}/{minUpgrades}</strong>
+              <span>{eraCompletion}% of this era's catalog</span>
+            </div>
+            <div className={`readiness-card${readiness.techsMet ? ' ready' : ''}`}>
+              <span className="readiness-label">Era Research</span>
+              <strong>{readiness.currentTechs}/{readiness.minTechs}</strong>
+              <span>breakthrough steps completed</span>
+            </div>
+          </div>
           {!upgradesMet && (
             <div className="upgrade-progress-bar" role="progressbar" aria-valuenow={eraUpgradeCount} aria-valuemin={0} aria-valuemax={minUpgrades} aria-label="Era upgrade progress" style={{ margin: '2px 0 4px' }}>
               <div className={`upgrade-progress-fill ${eraUpgradeCount / minUpgrades > 0.8 ? 'almost' : ''}`} style={{ width: `${Math.floor(eraUpgradeCount / minUpgrades * 100)}%` }} />
