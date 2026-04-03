@@ -178,7 +178,11 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                   const tooltip = tooltipParts.join('\n');
                   return (
                     <div key={r.id} className={`resource-row-wrapper`}>
-                    <div className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${boostedResources.has(r.id) ? 'rate-boosted' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0) || (r.id === 'exoticMaterials' && state.era >= 5 && getEffectiveRate(state, 'colonies') > 0) || (r.id === 'stellarForge' && state.era >= 7 && getEffectiveRate(state, 'megastructures') > 0)) ? 'consuming' : ''} ${r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0 ? 'resource-capped' : ''}`} title={tooltip}>
+                    <div
+                      className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${boostedResources.has(r.id) ? 'rate-boosted' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0) || (r.id === 'exoticMaterials' && state.era >= 5 && getEffectiveRate(state, 'colonies') > 0) || (r.id === 'stellarForge' && state.era >= 7 && getEffectiveRate(state, 'megastructures') > 0)) ? 'consuming' : ''} ${r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0 ? 'resource-capped' : ''}`}
+                      title={tooltip}
+                      style={r.cap > 0 ? { '--resource-fill': `${Math.min(100, Math.max(0, (r.amount / r.cap) * 100))}%` } : undefined}
+                    >
                       <span className="resource-name" style={{ cursor: 'pointer', textDecoration: expandedResource === r.id ? 'underline' : 'none', borderBottom: expandedResource === r.id ? 'none' : '1px dotted #556' }} onClick={() => setExpandedResource(expandedResource === r.id ? null : r.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedResource(expandedResource === r.id ? null : r.id); }}} tabIndex={0} role="button" aria-expanded={expandedResource === r.id}>
                         {r.def?.name || r.id}
                       </span>

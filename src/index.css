@@ -330,6 +330,22 @@ g[role="button"]:focus-visible {
   font-size: 0.85em;
   padding: 2px 4px;
   overflow: hidden;
+  position: relative;
+}
+
+.resource-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: var(--resource-fill, 0%);
+  background: linear-gradient(90deg, rgba(110, 181, 176, 0.16), rgba(214, 176, 101, 0.08));
+  pointer-events: none;
+  z-index: 0;
+}
+
+.resource-row > * {
+  position: relative;
+  z-index: 1;
 }
 
 .resource-row:hover {
