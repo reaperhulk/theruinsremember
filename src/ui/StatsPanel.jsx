@@ -20,6 +20,17 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
     .filter(Boolean);
   // Lore events from event log
   const loreEvents = (state.eventLog || []).filter(e => e.isLore);
+  const chronicle = [...discoveredLore.map(u => ({
+    type: 'upgrade',
+    era: u.era,
+    title: u.name,
+    body: u.description,
+  })), ...loreEvents.map(e => ({
+    type: 'echo',
+    era: state.era,
+    title: 'Recovered Echo',
+    body: e.message,
+  }))].slice(-8).reverse();
 
   return (
     <div className="panel stats-panel">
@@ -156,10 +167,20 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
         return (
         <>
           <h3 onClick={() => setShowCodexOverride(showCodex ? false : true)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowCodexOverride(showCodex ? false : true); }}} tabIndex={0} role="button" aria-expanded={showCodex} style={{ cursor: 'pointer' }}>
-            Codex ({discoveredLore.length}/{totalLore} discovered) {showCodex ? '(hide)' : '(show)'}
+            Chronicle ({discoveredLore.length}/{totalLore} artifacts) {showCodex ? '(hide)' : '(show)'}
           </h3>
           {showCodex && (
-            <div className="achievement-list" style={{ marginBottom: '8px' }}>
+            <div style={{ marginBottom: '8px' }}>
+              <div className="chronicle-list">
+                {chronicle.map((entry, i) => (
+                  <div key={`${entry.title}-${i}`} className={`chronicle-entry chronicle-${entry.type}`}>
+                    <span className="chronicle-era">Era {entry.era}</span>
+                    <strong>{entry.title}</strong>
+                    <span>{entry.body}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="achievement-list" style={{ marginBottom: '8px', marginTop: '8px' }}>
               {(() => {
                 // Group discovered lore by era
                 const byEra = {};
@@ -207,6 +228,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
                   Purchase lore upgrades to uncover the full story...
                 </div>
               )}
+              </div>
             </div>
           )}
         </>

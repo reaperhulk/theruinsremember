@@ -280,6 +280,39 @@ g[role="button"]:focus-visible {
   grid-column: 1 / -1;
 }
 
+.chronicle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chronicle-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(214, 176, 101, 0.16);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.chronicle-entry strong {
+  color: #e4c684;
+}
+
+.chronicle-entry span:last-child {
+  color: #c7cfda;
+  font-size: 0.9em;
+  line-height: 1.45;
+}
+
+.chronicle-era {
+  color: #88b9c9;
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .toast {
   backdrop-filter: blur(8px);
   border: 1px solid rgba(214, 176, 101, 0.18);
