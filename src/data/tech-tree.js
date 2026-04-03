@@ -217,7 +217,7 @@ export const techTree = {
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
-    cost: { universalConstants: 600, cosmicPower: 400000, realityFragments: 300 },
+    cost: { universalConstants: 600, cosmicPower: 400000, realityFragments: 150 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
     description: 'The signatures are identical to ours — every universe, the same collapse, the same rebirth',

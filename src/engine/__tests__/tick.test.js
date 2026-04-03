@@ -255,6 +255,18 @@ describe('tick', () => {
     }
   });
 
+  it('reality fragments produce immediately once era 9 unlocks them', () => {
+    const state = createInitialState();
+    state.era = 9;
+    state.resources.realityFragments = {
+      ...state.resources.realityFragments,
+      unlocked: true,
+      amount: 0,
+    };
+    const after = tick(state, 10);
+    expect(after.resources.realityFragments.amount).toBeGreaterThan(0);
+  });
+
   it('electronics production throttles when energy is depleted', () => {
     const state = createInitialState();
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 100, rateMult: 1 };

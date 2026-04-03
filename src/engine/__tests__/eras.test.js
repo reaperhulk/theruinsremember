@@ -92,6 +92,14 @@ describe('eras', () => {
       expect(after.resources.research.unlocked).toBe(true);
     });
 
+    it('unlocks reality fragments on entering era 9', () => {
+      const state = createInitialState();
+      state.era = 8;
+      const after = transitionEra(state, 9);
+      expect(after.era).toBe(9);
+      expect(after.resources.realityFragments.unlocked).toBe(true);
+    });
+
     it('does not downgrade era', () => {
       const state = createInitialState();
       state.era = 3;

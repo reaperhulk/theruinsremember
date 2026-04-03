@@ -40,8 +40,8 @@ export const resources = {
   // Era 9: Intergalactic — moderate base rates for bootstrapping
   cosmicPower: { id: 'cosmicPower', name: 'Cosmic Power', era: 9, baseCap: 20000, baseRate: 0.15, description: 'Energy from the cosmos itself' },
   universalConstants: { id: 'universalConstants', name: 'Universal Constants', era: 9, baseCap: 5000, baseRate: 0.12, description: 'Manipulable laws of physics' },
+  realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 9, baseCap: 15000, baseRate: 0.25, description: 'Shards of adjacent realities bleeding into yours' },
 
   // Era 10: Multiverse — moderate base rates for bootstrapping
-  realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 10, baseCap: 10000, baseRate: 0.1, description: 'Shards of alternate realities' },
   quantumEchoes: { id: 'quantumEchoes', name: 'Quantum Echoes', era: 10, baseCap: 20000, baseRate: 0.08, description: 'Resonances from parallel universes' },
 };
