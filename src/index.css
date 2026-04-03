@@ -280,6 +280,12 @@ g[role="button"]:focus-visible {
   grid-column: 1 / -1;
 }
 
+.toast {
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(214, 176, 101, 0.18);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
 /* Resources */
 .resource-era-group {
   margin-bottom: 4px;

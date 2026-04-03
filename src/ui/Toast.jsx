@@ -5,6 +5,17 @@ import { formatNumber } from './format.js';
 
 const MILESTONES = [100, 1000, 10000, 100000, 1000000, 10000000, 100000000];
 
+function formatToastText(text, type) {
+  if (type === 'era' && text.startsWith('New Era:')) {
+    return `Threshold crossed. ${text.replace('New Era: ', 'Era ')}`;
+  }
+  if (type === 'gem') return 'Precursor gem recovered.';
+  if (type === 'milestone' && text.includes('storage is full')) {
+    return text.replace('storage is full! Buy cap upgrades.', 'stores saturated. Expand capacity.');
+  }
+  return text;
+}
+
 export function Toast({ state }) {
   const [toasts, setToasts] = useState([]);
   const toastTimerRef = useRef(null);
@@ -99,8 +110,9 @@ export function Toast({ state }) {
     prevEventsRef.current = currentEvents;
 
     if (newToasts.length > 0) {
-      setToasts(prev => [...prev, ...newToasts].slice(-3));
-      const ids = newToasts.map(t => t.id);
+      const normalized = newToasts.map(t => ({ ...t, text: formatToastText(t.text, t.type) }));
+      setToasts(prev => [...prev, ...normalized].slice(-3));
+      const ids = normalized.map(t => t.id);
       clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => {
         setToasts(prev => prev.filter(t => !ids.includes(t.id)));
