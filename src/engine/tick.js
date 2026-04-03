@@ -202,7 +202,7 @@ export function tick(state, dt, rng = Math.random) {
     newState = {
       ...newState,
       eventLog: [...(newState.eventLog || []), {
-        message: `ERA ${nextEra}: ${eraLabels[nextEra] || 'Unknown'} — New resources and upgrades unlocked!`,
+        message: `ERA ${nextEra}: ${eraLabels[nextEra] || 'Unknown'} — Threshold crossed. The ruins answer with new tools, new theories, and older warnings.`,
         time: newState.totalTime,
       }].slice(-20),
     };
