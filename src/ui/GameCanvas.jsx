@@ -62,6 +62,19 @@ const ruinLore = [
   'A countdown timer, still running. It started before your species existed.',
 ];
 
+const eraWhispers = {
+  1: 'The ground remembers the landing before yours.',
+  2: 'Smoke rises from factories buried beneath your factories.',
+  3: 'Signals arrive from a network older than your first machine.',
+  4: 'Orbit is cluttered with proof that this ascent already happened.',
+  5: 'Every colony marker feels less planted than rediscovered.',
+  6: 'The beacon light is steady. The warning is not.',
+  7: 'The sphere waits like a cathedral with the lights still on.',
+  8: 'Every archive agrees: expansion always ends in silence.',
+  9: 'Reality flexes where too many civilizations pushed at once.',
+  10: 'The multiverse does not greet you. It recognizes you.',
+};
+
 const resourceColorMap = {
   materials: 'rgba(180,140,100,1)', food: 'rgba(100,200,100,1)',
   energy: 'rgba(255,220,50,1)', steel: 'rgba(150,170,190,1)',
@@ -3241,6 +3254,17 @@ export function GameCanvas({ state, onUpdate }) {
       const eraLabels = ['', 'Planetfall', 'Industrial', 'Digital', 'Space', 'Solar', 'Interstellar', 'Dyson', 'Galactic', 'Intergalactic', 'Multiverse'];
       ctx.fillText(eraLabels[era] || '', 4, 12);
       ctx.restore();
+
+      // Whisper line — small atmospheric text so the canvas carries story, not just scenery
+      const whisper = eraWhispers[era];
+      if (whisper) {
+        ctx.save();
+        ctx.font = '8px serif';
+        ctx.fillStyle = 'rgba(255, 240, 210, 0.28)';
+        ctx.textAlign = 'right';
+        ctx.fillText(whisper, w - 6, h - 8);
+        ctx.restore();
+      }
 
       // Prosperity glow — subtle light at top-right based on total upgrades
       if (upgradeCount > 0) {
