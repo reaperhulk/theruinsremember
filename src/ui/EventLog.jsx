@@ -24,12 +24,17 @@ function getEventStyle(entry) {
 export function EventLog({ state }) {
   const log = state.eventLog || [];
   const activeEffects = state.activeEffects || [];
+  const loreCount = log.filter(entry => entry?.isLore).length;
 
   if (log.length === 0 && activeEffects.length === 0) return null;
 
   return (
     <div className="panel event-panel" role="log" aria-label="Game events">
       <h2>Events{activeEffects.length > 0 ? ` (${activeEffects.length} active)` : log.length > 0 ? ` (${log.length} recent)` : ''}</h2>
+      <div className="event-status-strip">
+        <span className="event-status-pill">{loreCount} recovered signals</span>
+        <span className="event-status-pill">{log.length - loreCount} operational notices</span>
+      </div>
       {activeEffects.length > 0 && (
         <div className="active-effects">
           {activeEffects.map((effect, i) => {
@@ -53,7 +58,7 @@ export function EventLog({ state }) {
         {log.slice(-8).reverse().map((entry, i) => {
           const style = getEventStyle(entry);
           return (
-            <div key={i} className="event-entry" style={{ opacity: 1 - i * 0.1 }}>
+            <div key={i} className={`event-entry${entry?.isLore ? ' lore-entry' : ''}`} style={{ opacity: 1 - i * 0.1 }}>
               <span style={{ color: style.color, marginRight: '4px', fontSize: '0.9em' }}>{style.icon}</span>
               <span className="event-time">{formatTimeAgo(entry.time, state.totalTime)}</span>
               <span className="event-message" style={{ color: style.color !== '#888' ? style.color : undefined }}>{entry.message}</span>

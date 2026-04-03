@@ -149,7 +149,8 @@ g[role="button"]:focus-visible {
 }
 
 .resource-status-strip,
-.director-chip-row {
+.director-chip-row,
+.event-status-strip {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
@@ -159,8 +160,13 @@ g[role="button"]:focus-visible {
   margin-bottom: 8px;
 }
 
+.event-status-strip {
+  margin-bottom: 10px;
+}
+
 .resource-status-pill,
-.director-chip {
+.director-chip,
+.event-status-pill {
   display: inline-flex;
   align-items: center;
   padding: 4px 9px;
@@ -171,6 +177,13 @@ g[role="button"]:focus-visible {
   font-size: 0.72em;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.event-entry.lore-entry {
+  border-left: 2px solid rgba(187, 136, 255, 0.5);
+  padding-left: 8px;
+  background: linear-gradient(90deg, rgba(120, 72, 170, 0.16), rgba(255, 255, 255, 0.02));
+  border-radius: 6px;
 }
 
 .resource-alert {
