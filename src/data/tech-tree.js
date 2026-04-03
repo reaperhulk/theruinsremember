@@ -253,7 +253,7 @@ export const techTree = {
   },
   intergalacticBeacon: {
     id: 'intergalacticBeacon', name: 'Intergalactic Beacon', era: 8,
-    cost: { exoticMatter: 6000, galacticInfluence: 90000, cosmicPower: 600 },
+    cost: { exoticMatter: 4500, galacticInfluence: 70000, cosmicPower: 450 },
     prerequisites: ['cosmicEngineering'],
     grantsEra: 9,
     description: 'The signal format was familiar — it matched the distress call that brought us here',
@@ -262,7 +262,7 @@ export const techTree = {
   // Era 9 → 10 (Intergalactic → Multiverse)
   realityScience: {
     id: 'realityScience', name: 'Reality Science', era: 9,
-    cost: { universalConstants: 40, cosmicPower: 15000, research: 4000000 },
+    cost: { universalConstants: 30, cosmicPower: 12000, research: 3200000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Reality has seams. The prior civilization found them. So have we',
@@ -295,7 +295,7 @@ export const techTree = {
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
-    cost: { universalConstants: 220, cosmicPower: 90000, realityFragments: 120 },
+    cost: { universalConstants: 180, cosmicPower: 70000, realityFragments: 100 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
     description: 'The signatures are identical to ours — every universe, the same collapse, the same rebirth',
