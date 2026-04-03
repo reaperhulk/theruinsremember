@@ -97,6 +97,19 @@ g[role="button"]:focus-visible {
   white-space: nowrap;
 }
 
+.title-block {
+  min-width: 0;
+}
+
+.header-omen {
+  margin-top: 6px;
+  max-width: 44rem;
+  color: #aeb8c4;
+  font-size: 0.8em;
+  line-height: 1.4;
+  font-style: italic;
+}
+
 /* game-header h1 styled below with gradient */
 
 .header-controls {

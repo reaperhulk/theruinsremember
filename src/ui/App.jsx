@@ -35,6 +35,19 @@ import { formatNumber } from './format.js';
 
 const initialState = createInitialState();
 
+const ERA_OMENS = {
+  1: 'The wreck still smolders. The stones nearby were cut long before the crash.',
+  2: 'Each furnace you raise sits neatly atop a buried one.',
+  3: 'The old network hums with messages written for minds like yours.',
+  4: 'Orbit is crowded with wreckage from voyages you have not taken yet.',
+  5: 'Every colony site carries evidence that someone already failed there.',
+  6: 'The beacons are not welcoming you. They are warning whoever comes next.',
+  7: 'The unfinished sphere behaves like a machine paused mid-breath.',
+  8: 'Across the galaxy, every archive tells the same rise and the same silence.',
+  9: 'The laws of reality bend like material under remembered strain.',
+  10: 'Every universe you touch feels less discovered than revisited.',
+};
+
 // Tab definitions — which tabs are available at which era
 function getAvailableTabs(era) {
   const tabs = [
@@ -230,7 +243,10 @@ export function App() {
   return (
     <div className={`game-container era-${state.era} ${shakeClass} ${flashClass}`}>
       <header className="game-header">
-        <h1>The Ruins Remember{state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888', marginLeft: '8px' }}>Era {state.era}: {eraNames[state.era]}</span>}</h1>
+        <div className="title-block">
+          <h1>The Ruins Remember{state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888', marginLeft: '8px' }}>Era {state.era}: {eraNames[state.era]}</span>}</h1>
+          <p className="header-omen">{ERA_OMENS[state.era]}</p>
+        </div>
         <div className="header-controls">
           {state.era >= ERA_COUNT && !state.prestigeUpgrades?.eternalReturn && (
             <button className="prestige-btn" onClick={handlePrestige}>
