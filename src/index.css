@@ -346,6 +346,37 @@ g[role="button"]:focus-visible {
   letter-spacing: 0.08em;
 }
 
+@media (max-width: 720px) {
+  .game-container {
+    padding: 12px 10px 20px;
+  }
+
+  .game-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .header-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .help-grid,
+  .victory-grid,
+  .readiness-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-sublabel {
+    display: none;
+  }
+
+  .tab-btn {
+    padding: 8px 6px;
+  }
+}
+
 .toast {
   backdrop-filter: blur(8px);
   border: 1px solid rgba(214, 176, 101, 0.18);
