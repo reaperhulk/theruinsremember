@@ -2,7 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { eraNames, ERA_COUNT, getEraReadiness } from '../engine/eras.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
-import { calculateProduction, getEffectivePrestige } from '../engine/resources.js';
+import { calculateProduction, canAfford, getEffectivePrestige, getEffectiveRate } from '../engine/resources.js';
+import { getAvailableTech } from '../engine/tech.js';
+import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
+import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber, formatTime } from './format.js';
 
 function pickHint(options, era, totalTime) {
@@ -89,6 +92,89 @@ function getLoreHint(eraCompletion, isMaxEra, era, totalTime) {
   return pickHint(final, era, totalTime) || 'The horizon shifts. A new age dawns.';
 }
 
+function summarizeCostPressure(state, cost) {
+  return Object.entries(cost)
+    .map(([resourceId, amount]) => {
+      const have = state.resources[resourceId]?.amount || 0;
+      const missing = Math.max(0, amount - have);
+      const rate = getEffectiveRate(state, resourceId);
+      const eta = missing <= 0 ? 0 : (rate > 0 ? missing / rate : Infinity);
+      return { resourceId, missing, eta };
+    })
+    .filter(entry => entry.missing > 0)
+    .sort((a, b) => a.eta - b.eta)
+    .slice(0, 3);
+}
+
+function buildDirector(state, readiness) {
+  const availableTech = getAvailableTech(state);
+  const affordableTech = availableTech.filter(tech => canAfford(state, tech.cost));
+  const gateTech = availableTech.find(tech => tech.grantsEra === state.era + 1);
+  const availableUpgrades = getAvailableUpgrades(state);
+  const affordableUpgrades = availableUpgrades.filter(upgrade => canAfford(state, getUpgradeCost(state, upgrade.id)));
+
+  if (!readiness.upgradesMet) {
+    return {
+      title: 'Build Out The Era',
+      detail: `${readiness.minUpgrades - readiness.currentUpgrades} more upgrades needed before the next breakthrough counts.`,
+      chips: [
+        `${affordableUpgrades.length} upgrades affordable now`,
+        `${readiness.currentUpgrades}/${readiness.minUpgrades} era upgrades`,
+      ],
+      tone: 'warning',
+    };
+  }
+
+  if (!readiness.techsMet) {
+    const eraTechs = affordableTech.filter(tech => tech.era === state.era);
+    return {
+      title: 'Deepen The Research',
+      detail: `${readiness.minTechs - readiness.currentTechs} more era tech${readiness.minTechs - readiness.currentTechs === 1 ? '' : 's'} needed to prove this age is stable.`,
+      chips: [
+        `${eraTechs.length} era techs affordable`,
+        `${readiness.currentTechs}/${readiness.minTechs} era techs`,
+      ],
+      tone: 'warning',
+    };
+  }
+
+  if (!gateTech) {
+    return {
+      title: 'Find The Breakthrough',
+      detail: 'The starred era-advance tech is still locked. Clear its prerequisites first.',
+      chips: [
+        `${affordableTech.length} techs affordable now`,
+        'follow prerequisite chain',
+      ],
+      tone: 'neutral',
+    };
+  }
+
+  if (canAfford(state, gateTech.cost)) {
+    return {
+      title: 'Advance Now',
+      detail: `${gateTech.name} is affordable. Research it to enter Era ${state.era + 1}.`,
+      chips: ['gate tech ready', `Era ${state.era + 1}: ${eraNames[state.era + 1]}`],
+      tone: 'ready',
+    };
+  }
+
+  const blockers = summarizeCostPressure(state, gateTech.cost).map(entry => {
+    const label = resourceDefs[entry.resourceId]?.name || entry.resourceId;
+    if (!Number.isFinite(entry.eta)) return `${label} stalled`;
+    if (entry.eta < 60) return `${label} ~${Math.ceil(entry.eta)}s`;
+    if (entry.eta < 3600) return `${label} ~${Math.ceil(entry.eta / 60)}m`;
+    return `${label} ~${Math.ceil(entry.eta / 3600)}h`;
+  });
+
+  return {
+    title: 'Prepare The Breakthrough',
+    detail: `${gateTech.name} is the next gate. The slowest resources below are what actually matters now.`,
+    chips: blockers,
+    tone: 'neutral',
+  };
+}
+
 export function EraProgress({ state }) {
   const currentEra = eraNames[state.era] || `Era ${state.era}`;
   const isMaxEra = state.era >= ERA_COUNT;
@@ -101,6 +187,7 @@ export function EraProgress({ state }) {
   const totalEraUpgrades = Object.values(upgradeDefs).filter(u => u.era === state.era).length;
   const eraCompletion = totalEraUpgrades > 0 ? Math.floor(eraUpgradeCount / totalEraUpgrades * 100) : 0;
   const loreHint = getLoreHint(eraCompletion, isMaxEra, state.era, state.totalTime || 0);
+  const director = buildDirector(state, readiness);
 
   // Calculate total production rate across all unlocked resources
   const rates = calculateProduction(state);
@@ -177,6 +264,18 @@ export function EraProgress({ state }) {
           )}
         </>
       )}
+      <div className={`era-director era-director-${director.tone}`}>
+        <div className="director-heading">
+          <span className="director-label">Run Director</span>
+          <strong>{director.title}</strong>
+        </div>
+        <p className="director-detail">{director.detail}</p>
+        <div className="director-chip-row">
+          {director.chips.map(chip => (
+            <span key={chip} className="director-chip">{chip}</span>
+          ))}
+        </div>
+      </div>
       {isMaxEra && (
         <p className="era-hint" style={{ color: state.trueEnding ? '#e8c040' : '#bb88ff' }}>
           {state.trueEnding

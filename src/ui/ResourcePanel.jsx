@@ -112,12 +112,18 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
       throttledChains.push(name + ' draining');
     }
   }
+  const cappedResources = unlockedResources.filter(r => r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0);
 
   return (
     <div className="panel resource-panel" style={overclockActive ? { borderColor: '#cc9933', boxShadow: '0 0 8px rgba(204, 153, 51, 0.3)' } : undefined}>
       <h2>Resources ({unlockedResources.length} unlocked)</h2>
+      <div className="resource-status-strip">
+        <span className="resource-status-pill">{unlockedResources.filter(r => r.rate > 0).length} producing</span>
+        <span className="resource-status-pill">{cappedResources.length} capped</span>
+        <span className="resource-status-pill">{throttledChains.length} strained chains</span>
+      </div>
       {throttledChains.length >= 2 && (
-        <div style={{ fontSize: '0.75em', color: '#ff8844', padding: '2px 8px', marginBottom: '4px', background: 'rgba(255,100,50,0.1)', borderRadius: '3px' }}>
+        <div className="resource-alert">
           ⚠ Multiple supply chains strained: {throttledChains.join(', ')} — production severely reduced
         </div>
       )}
