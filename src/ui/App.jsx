@@ -51,13 +51,13 @@ const ERA_OMENS = {
 // Tab definitions — which tabs are available at which era
 function getAvailableTabs(era) {
   const tabs = [
-    { id: 'upgrades', label: 'Upgrades', key: '1' },
-    { id: 'tech', label: 'Tech', key: '2' },
-    { id: 'mini', label: 'Mini-Game', key: '3' },
+    { id: 'upgrades', label: 'Upgrades', sublabel: 'shape the economy', key: '1' },
+    { id: 'tech', label: 'Tech', sublabel: 'unlock the next age', key: '2' },
+    { id: 'mini', label: 'Mini-Game', sublabel: 'active accelerators', key: '3' },
   ];
-  if (era >= 4) tabs.push({ id: 'trading', label: 'Trading', key: '4' });
-  tabs.push({ id: 'prestige', label: 'Prestige', key: '5' });
-  tabs.push({ id: 'stats', label: 'Stats', key: '6' });
+  if (era >= 4) tabs.push({ id: 'trading', label: 'Trading', sublabel: 'reroute surplus', key: '4' });
+  tabs.push({ id: 'prestige', label: 'Prestige', sublabel: 'bank the cycle', key: '5' });
+  tabs.push({ id: 'stats', label: 'Stats', sublabel: 'codex and run data', key: '6' });
   return tabs;
 }
 
@@ -351,7 +351,8 @@ export function App() {
                   aria-controls={`tabpanel-${tab.id}`}
                   id={`tab-${tab.id}`}
                 >
-                  {tab.label}
+                  <span className="tab-label">{tab.label}</span>
+                  <span className="tab-sublabel">{tab.sublabel}</span>
                   {(badge > 0 || badge === '!') && <span className="tab-badge" aria-label={`${badge} available`}>{badge}</span>}
                 </button>
               );

@@ -1464,6 +1464,10 @@ canvas:hover {
 
 .tab-btn {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   padding: 6px 4px;
   background: transparent;
   color: #888;
@@ -1474,6 +1478,17 @@ canvas:hover {
   font-size: 0.8em;
   font-weight: bold;
   transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.tab-label {
+  font-weight: 700;
+}
+
+.tab-sublabel {
+  font-size: 0.68em;
+  color: #8793a5;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .tab-btn:hover {
