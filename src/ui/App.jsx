@@ -308,6 +308,12 @@ export function App() {
           </button>
         </div>
       </header>
+      <div className="control-ribbon">
+        <span className="control-chip">Era {state.era}: {eraNames[state.era]}</span>
+        <span className="control-chip">{affordableUpgrades} upgrades ready</span>
+        <span className="control-chip">{affordableTech} tech options</span>
+        {state.era >= ERA_COUNT && <span className="control-chip">Prestige available</span>}
+      </div>
 
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
       {!hintsDismissed && state.totalTime < 60 && Object.keys(state.upgrades).length === 0 && (

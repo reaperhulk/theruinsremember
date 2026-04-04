@@ -117,6 +117,26 @@ g[role="button"]:focus-visible {
   gap: 8px;
 }
 
+.control-ribbon {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+
+.control-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 176, 101, 0.18);
+  background: rgba(255,255,255,0.04);
+  color: #c4ced9;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* reset-btn and prestige-btn: primary definitions below */
 
 .game-layout {
