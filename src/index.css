@@ -164,6 +164,29 @@ g[role="button"]:focus-visible {
   margin-bottom: 10px;
 }
 
+.event-lead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(214, 176, 101, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.event-lead.lore {
+  border-color: rgba(187, 136, 255, 0.3);
+  background: linear-gradient(180deg, rgba(120, 72, 170, 0.18), rgba(255,255,255,0.03));
+}
+
+.event-lead-label {
+  color: #88b9c9;
+  font-size: 0.68em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .resource-status-pill,
 .director-chip,
 .event-status-pill {

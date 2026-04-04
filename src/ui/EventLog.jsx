@@ -25,12 +25,19 @@ export function EventLog({ state }) {
   const log = state.eventLog || [];
   const activeEffects = state.activeEffects || [];
   const loreCount = log.filter(entry => entry?.isLore).length;
+  const latestEntry = log[log.length - 1];
 
   if (log.length === 0 && activeEffects.length === 0) return null;
 
   return (
     <div className="panel event-panel" role="log" aria-label="Game events">
       <h2>Events{activeEffects.length > 0 ? ` (${activeEffects.length} active)` : log.length > 0 ? ` (${log.length} recent)` : ''}</h2>
+      {latestEntry && (
+        <div className={`event-lead${latestEntry.isLore ? ' lore' : ''}`}>
+          <span className="event-lead-label">{latestEntry.isLore ? 'Latest signal' : 'Latest notice'}</span>
+          <strong>{latestEntry.message}</strong>
+        </div>
+      )}
       <div className="event-status-strip">
         <span className="event-status-pill">{loreCount} recovered signals</span>
         <span className="event-status-pill">{log.length - loreCount} operational notices</span>
