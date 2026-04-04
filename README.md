@@ -27,14 +27,16 @@ Prestige isn't just a mechanic. It's the cycle itself.
 - **30 prestige upgrades** including 5 "Ascension" tier endgame upgrades
 - **289 achievements** tracking everything from speed milestones to narrative discovery
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players
+- **Progression-gated era advancement** — new eras require sufficient upgrade depth, era-local research depth, and the starred breakthrough technology instead of passive waiting
 - **Resource caps that matter** — storage is a real constraint requiring strategic cap upgrades
 - **Consumption chains** — food feeds labor, energy powers electronics, fuel maintains orbital infrastructure, exotic materials sustain colonies
 - **Automation cascades** — earlier eras auto-manage as you progress, shifting your focus to new challenges
-- **A narrative Codex** collecting lore fragments that piece together the story of the cycle
+- **A narrative Chronicle** collecting lore fragments, recovered signals, and codex discoveries that piece together the story of the cycle
+- **A run-director UI layer** that explains what is blocking the next breakthrough instead of leaving progression hidden in raw numbers
 
 ## The Experiment
 
-This game was built entirely by an AI agent ([Claude Code](https://docs.anthropic.com/en/docs/claude-code)). No human wrote any of the code. The human's role was limited to:
+This game was built entirely through AI coding agents, primarily [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and Codex. No human wrote any of the code directly. The human's role was limited to:
 
 - Describing the initial concept and iteration plan
 - Playtesting and providing feedback ("the end of era 4 takes too long", "upgrades feel pointless", "the canvas should be more relevant")
@@ -55,13 +57,51 @@ npm install
 npm run dev
 ```
 
+## Testing And Playtesting
+
+Pure logic:
+
+```bash
+npm test -- --run
+```
+
+Balance regression harness:
+
+```bash
+npm run test:balance
+```
+
+Browser smoke tests:
+
+```bash
+npm run dev
+node scripts/browser-test.mjs
+node scripts/browser-test.mjs --mobile
+```
+
+The balance harness currently validates four seeded scenarios:
+
+- `full` for optimal completion pacing
+- `casual` for a normal active run
+- `noMinigames` for low-interaction viability
+- `passive` for mostly idle viability
+
+## Recent Direction
+
+Recent iteration work focused on:
+
+- Removing fixed era timers in favor of progression-based readiness checks
+- Adding stronger late-run doctrine branches to differentiate builds
+- Improving the shell UI with better run guidance, stronger lore surfacing, and clearer resource pressure indicators
+- Expanding regression coverage so pacing drift and browser-level usability regressions are caught automatically
+
 ## Tech Stack
 
 - React + Vite
 - Pure engine functions (no side effects, deterministic)
-- Vitest for testing (243 tests)
+- Vitest for testing
 - Puppeteer for automated browser testing
-- Bot playtest system with 6 player profiles for balance verification
+- Bot playtest system with seeded scenario assertions for balance verification
 - HTML5 Canvas for animated scene
 - No external runtime dependencies beyond React and Vite
 
