@@ -224,6 +224,8 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
     filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length,
     [filteredAvailable, state.resources]
   );
+  const mechanicCount = useMemo(() => filteredAvailable.filter(u => u.mechanic).length, [filteredAvailable]);
+  const loreCount = useMemo(() => filteredAvailable.filter(u => LORE_UPGRADE_ID_SET.has(u.id)).length, [filteredAvailable]);
 
   // Pre-compute enables counts for all upgrades (avoids O(N*M) per render)
   const enablesCountMap = useMemo(() => {
@@ -260,6 +262,11 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           </span>
         )}
       </h2>
+      <div className="upgrade-summary-strip">
+        <span className="upgrade-summary-pill">{affordableCount} affordable now</span>
+        <span className="upgrade-summary-pill">{mechanicCount} mechanic shifts</span>
+        <span className="upgrade-summary-pill">{loreCount} lore fragments</span>
+      </div>
       {filteredAvailable.some(u => LORE_UPGRADE_ID_SET.has(u.id)) && (
         <div className="text-hint" style={{ color: '#bb88ff', marginBottom: '4px' }}>
           Purple border = story upgrades — collected in Stats → Codex
