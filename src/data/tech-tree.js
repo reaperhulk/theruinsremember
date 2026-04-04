@@ -195,7 +195,7 @@ export const techTree = {
   },
   megaEngineering: {
     id: 'megaEngineering', name: 'Mega Engineering', era: 6,
-    cost: { starSystems: 120, darkEnergy: 1500, research: 180000 },
+    cost: { starSystems: 100, darkEnergy: 1200, research: 150000 },
     prerequisites: ['galacticCartography'],
     grantsEra: 7,
     description: 'Half-built Dyson scaffolding orbits every dead star you visit — someone was building this before',
@@ -204,7 +204,7 @@ export const techTree = {
   // Era 7 → 8 (Dyson Era → Galactic)
   galacticAscendancy: {
     id: 'galacticAscendancy', name: 'Galactic Ascendancy', era: 7,
-    cost: { megastructures: 40, stellarForge: 100, research: 220000 },
+    cost: { megastructures: 36, stellarForge: 90, research: 180000 },
     prerequisites: [],
     grantsEra: null,
     description: 'The Dyson sphere\'s control throne fits a human body perfectly. Coincidence fades',
