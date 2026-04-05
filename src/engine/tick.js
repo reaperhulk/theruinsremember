@@ -121,6 +121,14 @@ export function tick(state, dt, rng = Math.random) {
       effectiveRate *= getTuningProductionBonus(state.tuningScore);
     }
 
+    // Apply reality forge key bonuses to quantumEchoes (era 10+)
+    // Temporal, Spatial, Causal keys each give +25% quantumEchoes production (max +75%)
+    if (id === 'quantumEchoes' && state.era >= 10) {
+      const rk = state.realityKeys || {};
+      const slotBonus = ((rk.temporal || 0) > 0 ? 1 : 0) + ((rk.spatial || 0) > 0 ? 1 : 0) + ((rk.causal || 0) > 0 ? 1 : 0);
+      if (slotBonus > 0) effectiveRate *= (1 + slotBonus * 0.25);
+    }
+
     const cap = getEffectiveCap(state, id);
     let newAmount = r.amount + effectiveRate * dt;
     // Enforce resource cap: production cannot push above cap

@@ -3,10 +3,21 @@ import { formatNumber } from './format.js';
 import { playClick, playUpgrade } from './AudioManager.js';
 
 const RECIPES = [
-  { id: 'temporal', label: 'Temporal Key', fragments: 50, echoes: 20, color: '#ff8866', desc: '+1% all production' },
-  { id: 'spatial', label: 'Spatial Key', fragments: 30, echoes: 40, color: '#66aaff', desc: '+1% all production' },
-  { id: 'causal', label: 'Causal Key', fragments: 40, echoes: 30, color: '#88dd88', desc: '+1% all production' },
-  { id: 'quantum', label: 'Quantum Key', fragments: 20, echoes: 50, color: '#dd88ff', desc: '+1% all production' },
+  { id: 'temporal', label: 'Temporal Key', fragments: 50, echoes: 20, color: '#ff8866',
+    desc: '+1% all production, +25% Quantum Echoes',
+    lore: 'Frozen moments compressed into a key. Time bends around whoever holds it.',
+    milestone: 'Earn by reaching Cosmic Tuning score 50' },
+  { id: 'spatial', label: 'Spatial Key', fragments: 30, echoes: 40, color: '#66aaff',
+    desc: '+1% all production, +25% Quantum Echoes',
+    lore: 'Space itself yields a path. The forge routes echoes through folded geometry.',
+    milestone: 'Earn by landing 50 perfect docks' },
+  { id: 'causal', label: 'Causal Key', fragments: 40, echoes: 30, color: '#88dd88',
+    desc: '+1% all production, +25% Quantum Echoes',
+    lore: 'Effect becomes cause. The causal loop feeds more echoes into the present.',
+    milestone: 'Earn by completing 50 weaves' },
+  { id: 'quantum', label: 'Quantum Key', fragments: 20, echoes: 50, color: '#dd88ff',
+    desc: '+1% all production',
+    lore: 'Superposition of states collapsed into permanence. The forge approves.' },
 ];
 
 export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpdate }) {
@@ -14,6 +25,7 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
   const keys = state.realityKeys || {};
   const totalKeys = Object.values(keys).reduce((s, v) => s + v, 0);
   const bonus = totalKeys * 1;
+  const echoesSlots = ((keys.temporal || 0) > 0 ? 1 : 0) + ((keys.spatial || 0) > 0 ? 1 : 0) + ((keys.causal || 0) > 0 ? 1 : 0);
 
   const handleForge = (recipe) => {
     playClick();
@@ -50,39 +62,55 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
 
   return (
     <div className="panel reality-forge-panel">
-      <h2>Reality Forge ({totalKeys} keys, +{bonus}% all)</h2>
-      <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#dd88ff', margin: '0 0 6px' }}>
+      <h2>Reality Forge ({totalKeys} keys, +{bonus}% all{echoesSlots > 0 ? `, +${echoesSlots * 25}% echoes` : ''})</h2>
+      <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#dd88ff', margin: '0 0 4px' }}>
         The forge was here before you arrived. It remembers every key ever made — including the ones you are about to make.
       </p>
+      {echoesSlots > 0 && (
+        <div style={{ fontSize: '0.75em', color: '#88ddcc', marginBottom: '4px' }}>
+          Key slots active: {echoesSlots}/3 — Quantum Echoes +{echoesSlots * 25}% production
+        </div>
+      )}
       {lastForged && (
         <div className="hack-result success" style={{ marginBottom: '4px' }}>
-          Forged {lastForged}! +1% all production permanently!
+          Forged {lastForged}!
         </div>
       )}
       <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '6px' }}>
-        Each key grants a permanent +1% to all production. Keys persist through prestige.
+        Each key grants +1% all production. Temporal/Spatial/Causal keys also unlock +25% Quantum Echoes each.
       </div>
       <div className="factory-lines">
         {RECIPES.map(recipe => {
           const count = keys[recipe.id] || 0;
           const affordable = canAffordRecipe(recipe);
+          const hasKey = count > 0;
           return (
-            <div key={recipe.id} className="factory-line" style={{ alignItems: 'center' }}>
-              <span className="line-label" style={{ color: recipe.color }}>
-                {recipe.label}: {count}
-              </span>
-              <span className="line-bonus" style={{ fontSize: '0.75em' }}>
-                {formatNumber(recipe.fragments)} fragments + {formatNumber(recipe.echoes)} echoes
-              </span>
-              <button
-                className={`mine-btn ${affordable ? '' : 'too-expensive'}`}
-                disabled={!affordable}
-                onClick={() => handleForge(recipe)}
-                style={{ fontSize: '0.75em', padding: '3px 8px', marginLeft: '4px' }}
-                aria-label={`Forge ${recipe.label} for ${recipe.fragments} fragments and ${recipe.echoes} echoes`}
-              >
-                Forge
-              </button>
+            <div key={recipe.id} className="factory-line" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '2px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span className="line-label" style={{ color: recipe.color, flex: 1 }}>
+                  {recipe.label}: {count} {hasKey && recipe.lore && recipe.id !== 'quantum' && <span style={{ color: '#88ddcc', fontSize: '0.85em' }}>✓</span>}
+                </span>
+                <span className="line-bonus" style={{ fontSize: '0.7em', color: '#888' }}>
+                  {formatNumber(recipe.fragments)} frags + {formatNumber(recipe.echoes)} echoes
+                </span>
+                <button
+                  className={`mine-btn ${affordable ? '' : 'too-expensive'}`}
+                  disabled={!affordable}
+                  onClick={() => handleForge(recipe)}
+                  style={{ fontSize: '0.75em', padding: '3px 8px' }}
+                  aria-label={`Forge ${recipe.label}`}
+                >
+                  Forge
+                </button>
+              </div>
+              <div style={{ fontSize: '0.68em', color: '#776688', fontStyle: 'italic', paddingLeft: '2px' }}>
+                {recipe.lore}
+              </div>
+              {recipe.milestone && !hasKey && (
+                <div style={{ fontSize: '0.68em', color: '#556677', paddingLeft: '2px' }}>
+                  💡 {recipe.milestone}
+                </div>
+              )}
             </div>
           );
         })}
