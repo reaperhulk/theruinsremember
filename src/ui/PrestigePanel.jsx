@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary } from '../engine/prestige.js';
-import { getEffectivePrestige } from '../engine/resources.js';
+import { getEffectivePrestige, PRESTIGE_HARD_CAP } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
+import { events as eventDefs } from '../data/events.js';
 import { formatNumber, formatTime } from './format.js';
 
 function getPrestigeInsight(state) {
@@ -76,7 +78,7 @@ export function PrestigePanel({ state, onUpdate }) {
             <div className="stat-row">
               <span>Current Multiplier:</span>
               <span>x{formatNumber(state.prestigeMultiplier)}{state.prestigeMultiplier > 10 &&
-                ` (effective: x${formatNumber(getEffectivePrestige(state.prestigeMultiplier))})`
+                ` (effective: x${formatNumber(getEffectivePrestige(state.prestigeMultiplier))}${getEffectivePrestige(state.prestigeMultiplier) >= PRESTIGE_HARD_CAP ? ' MAX' : ''})`
               }</span>
             </div>
             <div className="stat-row">
@@ -185,6 +187,45 @@ export function PrestigePanel({ state, onUpdate }) {
               ))}
           </div>
         </>
+      )}
+
+      {state.trueEnding && <CycleCodex state={state} />}
+    </div>
+  );
+}
+
+function CycleCodex({ state }) {
+  const [expanded, setExpanded] = useState(false);
+  const totalLoreEvents = Object.values(eventDefs).filter(e => e.isLore).length + 3; // +3 milestone lore
+  const seenLore = (state.eventLog || []).filter(e => e.isLore);
+  const pct = Math.min(100, Math.round((seenLore.length / totalLoreEvents) * 100));
+
+  return (
+    <div style={{ marginTop: '12px', borderTop: '1px solid #446', paddingTop: '10px' }}>
+      <h3 style={{ color: '#cc88ff' }}>Cycle Codex</h3>
+      <p style={{ fontSize: '0.8em', color: '#7799aa', fontStyle: 'italic', margin: '0 0 8px' }}>
+        "Every ruin is a library. You have read {seenLore.length} of its pages."
+      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+        <div style={{ flex: 1, height: '6px', background: '#223', borderRadius: '3px' }}>
+          <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, #8844cc, #cc44aa)', borderRadius: '3px' }} />
+        </div>
+        <span style={{ fontSize: '0.8em', color: '#cc88ff' }}>{pct}% recovered</span>
+      </div>
+      <button
+        style={{ fontSize: '0.8em', color: '#aaa', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+        onClick={() => setExpanded(e => !e)}
+      >
+        {expanded ? 'hide echoes' : `show ${seenLore.length} recovered echo${seenLore.length !== 1 ? 'es' : ''}`}
+      </button>
+      {expanded && (
+        <div style={{ maxHeight: '200px', overflowY: 'auto', marginTop: '6px' }}>
+          {seenLore.map((e, i) => (
+            <p key={i} style={{ fontSize: '0.75em', color: '#99aacc', margin: '4px 0', fontStyle: 'italic', borderLeft: '2px solid #446', paddingLeft: '6px' }}>
+              {e.message.replace(/^Event: [^—]+— /, '')}
+            </p>
+          ))}
+        </div>
       )}
     </div>
   );

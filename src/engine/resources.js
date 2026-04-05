@@ -4,10 +4,13 @@ import { ERA_COST_MULTIPLIERS } from './upgrades.js';
 // Soft-scale prestige multiplier: first 10x is linear, beyond that sqrt.
 // Prevents early prestiges from trivializing the game while still rewarding
 // deep prestige investment. Used everywhere prestige mult affects gameplay.
+// Hard cap: effective prestige multiplier never exceeds 50x.
+export const PRESTIGE_HARD_CAP = 50;
+
 export function getEffectivePrestige(rawMultiplier) {
   if (!rawMultiplier || rawMultiplier <= 1) return 1;
   if (rawMultiplier <= 10) return rawMultiplier;
-  return 10 + Math.sqrt(rawMultiplier - 10) * 3;
+  return Math.min(PRESTIGE_HARD_CAP, 10 + Math.sqrt(rawMultiplier - 10) * 3);
 }
 
 // Calculate effective production rate for a single resource.
