@@ -345,19 +345,23 @@ export function tick(state, dt, rng = Math.random) {
     }
   }
 
+  // Complexity tax (eras 7+): stacked mechanic bonuses are dampened slightly to prevent runaway
+  // Divisor = 1 + 0.05*(era-7): 1.0 at era 7, 1.05 at era 8, 1.1 at era 9, 1.15 at era 10
+  const complexityTaxFactor = 1 / (1 + 0.05 * Math.max(0, (newState.era || 1) - 7));
+
   // Mechanic: upgradeCountBonus — +1% production per upgrade owned
   if (newState.upgrades?.communalEffort) {
     const upgradeCount = Object.keys(newState.upgrades).length;
     const maxBonus = 0.5 + (newState.prestigeCount || 0) * 0.05; // scales with prestige
     const bonusFraction = Math.min(maxBonus, upgradeCount * 0.005);
-    newState = applyProductionBonus(newState, bonusFraction, dt);
+    newState = applyProductionBonus(newState, bonusFraction * complexityTaxFactor, dt);
   }
 
   // Mechanic: productionPulse — double production for 10s every 60s
   if (newState.upgrades?.overclockProtocol) {
     const cyclePos = (newState.totalTime || 0) % 60;
     if (cyclePos < 10) {
-      newState = applyProductionBonus(newState, 1, dt);
+      newState = applyProductionBonus(newState, 1 * complexityTaxFactor, dt);
     }
   }
 
@@ -383,7 +387,7 @@ export function tick(state, dt, rng = Math.random) {
   if (newState.upgrades?.recursiveOptimizer) {
     const eraBonus = Math.pow(1.1, (newState.era || 1) - 1);
     if (eraBonus > 1) {
-      newState = applyProductionBonus(newState, eraBonus - 1, dt);
+      newState = applyProductionBonus(newState, (eraBonus - 1) * complexityTaxFactor, dt);
     }
   }
 
@@ -399,7 +403,7 @@ export function tick(state, dt, rng = Math.random) {
     if ((newState.totalWeaves || 0) > 0) miniCount++;
 
     if (miniCount > 0) {
-      newState = applyProductionBonus(newState, miniCount * 0.10, dt);
+      newState = applyProductionBonus(newState, miniCount * 0.10 * complexityTaxFactor, dt);
     }
   }
 
@@ -407,7 +411,7 @@ export function tick(state, dt, rng = Math.random) {
   if (newState.upgrades?.warpEcho) {
     const routes = newState.starRoutes?.length || 0;
     if (routes > 0) {
-      newState = applyProductionBonus(newState, routes * 0.03, dt);
+      newState = applyProductionBonus(newState, routes * 0.03 * complexityTaxFactor, dt);
     }
   }
 
@@ -415,7 +419,7 @@ export function tick(state, dt, rng = Math.random) {
   if (newState.upgrades?.galacticMemory) {
     const prestigeBonus = (newState.prestigeCount || 0) * 0.05;
     if (prestigeBonus > 0) {
-      newState = applyProductionBonus(newState, prestigeBonus, dt);
+      newState = applyProductionBonus(newState, prestigeBonus * complexityTaxFactor, dt);
     }
   }
 
@@ -424,13 +428,13 @@ export function tick(state, dt, rng = Math.random) {
     const unlockedCount = Object.values(newState.resources).filter(r => r.unlocked).length;
     const diversityMult = Math.pow(1.05, unlockedCount) - 1;
     if (diversityMult > 0) {
-      newState = applyProductionBonus(newState, diversityMult, dt);
+      newState = applyProductionBonus(newState, diversityMult * complexityTaxFactor, dt);
     }
   }
 
   // Mechanic: compoundingTick — production compounds slightly each tick
   if (newState.upgrades?.infiniteLoop) {
-    newState = applyProductionBonus(newState, 0.001, dt);
+    newState = applyProductionBonus(newState, 0.001 * complexityTaxFactor, dt);
   }
 
   // Dyson auto-assembly: every 60 ticks, auto-add segments based on existing count
