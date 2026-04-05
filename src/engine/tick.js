@@ -1,6 +1,6 @@
 import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
-// Events system removed — was causing random resource surges that disrupted pacing
+import { events as eventDefs } from '../data/events.js';
 import { getFactoryBonus } from './factory.js';
 import { getColonyBonus } from './colonies.js';
 import { getRouteBonus } from './starChart.js';
@@ -101,6 +101,13 @@ export function tick(state, dt, rng = Math.random) {
     if (id === 'colonies') effectiveRate = rate * colonyScale;
     if (id === 'megastructures') effectiveRate = rate * megaScale;
 
+    // Apply timed event bonuses (relative: +50% per matching active event)
+    const activeEvents = state.activeEvents || [];
+    const eventBonus = activeEvents
+      .filter(e => e.endTime > state.totalTime && (e.target === id || e.target === null))
+      .reduce((sum, e) => sum + e.multBonus, 0);
+    if (eventBonus > 0) effectiveRate *= (1 + eventBonus);
+
     const cap = getEffectiveCap(state, id);
     let newAmount = r.amount + effectiveRate * dt;
     // Enforce resource cap: production cannot push above cap
@@ -160,7 +167,50 @@ export function tick(state, dt, rng = Math.random) {
     totalTime: state.totalTime + dt,
   };
 
-  // Events system removed
+  // Events system: fire one event per interval, using relative bonuses to avoid pacing disruption
+  {
+    const eventInterval = state.era <= 3 ? 180 : state.era <= 6 ? 120 : 90;
+    const timeSinceEvent = newState.totalTime - (state.lastEventTime || 0);
+    const activeEvents = (state.activeEvents || []).filter(e => e.endTime > newState.totalTime);
+
+    if (timeSinceEvent >= eventInterval) {
+      const eligible = Object.values(eventDefs).filter(e => e.minEra <= state.era);
+      if (eligible.length > 0) {
+        const ev = eligible[Math.floor(rng() * eligible.length)];
+        let newActiveEvents = activeEvents;
+
+        if (ev.type === 'timed') {
+          // Timed: +50% production for 30s on the targeted resource (relative, not absolute)
+          const target = ev.effect?.resourceId || null;
+          newActiveEvents = [...activeEvents, { id: ev.id, target, multBonus: 0.5, endTime: newState.totalTime + 30 }];
+        } else {
+          // Instant: grant 60 seconds of current production for targeted resource(s)
+          const grantResources = { ...newState.resources };
+          const targets = ev.effects
+            ? ev.effects.filter(e => e.type === 'resource').map(e => ({ resourceId: e.target }))
+            : ev.effect ? [ev.effect] : [];
+          for (const t of targets) {
+            const r = grantResources[t.resourceId];
+            if (!r || !r.unlocked) continue;
+            const rate = rates[t.resourceId] || 0;
+            const grant = rate > 0 ? rate * 60 : (t.amount || 0);
+            const cap = getEffectiveCap(newState, t.resourceId);
+            grantResources[t.resourceId] = { ...r, amount: cap > 0 ? Math.min(r.amount + grant, cap) : r.amount + grant };
+          }
+          newState = { ...newState, resources: grantResources };
+        }
+
+        newState = {
+          ...newState,
+          lastEventTime: newState.totalTime,
+          activeEvents: newActiveEvents,
+          eventLog: [...(newState.eventLog || []), { message: `Event: ${ev.name} — ${ev.description}`, time: newState.totalTime }].slice(-20),
+        };
+      }
+    } else {
+      newState = { ...newState, activeEvents };
+    }
+  }
 
   // Check weave combo reset (120s inactivity)
   newState = checkComboReset(newState);
