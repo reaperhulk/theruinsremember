@@ -3,6 +3,7 @@ import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary } from '..
 import { getEffectivePrestige, PRESTIGE_HARD_CAP } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
 import { events as eventDefs } from '../data/events.js';
+import { detectArchetype, ARCHETYPE_LABELS } from '../engine/advisor.js';
 import { formatNumber, formatTime } from './format.js';
 
 function getPrestigeInsight(state) {
@@ -23,6 +24,7 @@ function getPrestigeInsight(state) {
 }
 
 export function PrestigePanel({ state, onUpdate }) {
+  const [showPreview, setShowPreview] = useState(false);
   const shop = getPrestigeShop(state);
   const summary = getPrestigeSummary(state);
   const points = state.prestigePoints || 0;
@@ -90,6 +92,53 @@ export function PrestigePanel({ state, onUpdate }) {
           </>
         )}
       </div>
+
+      {state.era >= 7 && !state.prestigeUpgrades?.eternalReturn && (
+        <div style={{ marginBottom: '8px' }}>
+          <button
+            style={{ fontSize: '0.8em', padding: '4px 10px', background: '#1a1a2e', border: '1px solid #446', color: '#aaccff', cursor: 'pointer', fontFamily: 'inherit', borderRadius: '3px' }}
+            onClick={() => setShowPreview(v => !v)}
+          >
+            {showPreview ? 'Hide Preview' : 'Preview Prestige'}
+          </button>
+          {showPreview && (() => {
+            const archetype = detectArchetype(state);
+            const archLabel = ARCHETYPE_LABELS[archetype];
+            const firstUpgrades = shop.filter(u => !u.owned && !u.locked).slice(0, 3);
+            const PRESTIGE_LORE = [
+              'The cycle remembers you. Something is different this time — quieter, more certain.',
+              'You have walked this road before. The ruins bow slightly as you pass.',
+              'Every ending is a library. You carry what matters into the next beginning.',
+            ];
+            const loreFlav = PRESTIGE_LORE[(state.prestigeCount || 0) % PRESTIGE_LORE.length];
+            return (
+              <div style={{ marginTop: '8px', padding: '10px', background: '#0e0e1a', border: '1px solid #336', borderRadius: '4px', fontSize: '0.85em' }}>
+                <p style={{ fontStyle: 'italic', color: '#7799bb', margin: '0 0 8px' }}>{loreFlav}</p>
+                <div style={{ display: 'grid', gap: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#888' }}>Points earned:</span>
+                    <span style={{ color: '#aaddff' }}>+{summary.points} pts (total: {summary.totalPoints})</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#888' }}>Multiplier:</span>
+                    <span style={{ color: '#aaddff' }}>x{formatNumber(state.prestigeMultiplier)} → x{formatNumber(summary.newMultiplier)} (eff: x{formatNumber(getEffectivePrestige(summary.newMultiplier))})</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#888' }}>Build style:</span>
+                    <span style={{ color: archLabel.color }}>{archLabel.name} — {archLabel.desc}</span>
+                  </div>
+                  {firstUpgrades.length > 0 && (
+                    <div>
+                      <span style={{ color: '#888' }}>Suggested first buys: </span>
+                      <span style={{ color: '#ccaa66' }}>{firstUpgrades.map(u => u.name).join(', ')}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
 
       {state.era < 7 && (state.prestigeCount || 0) === 0 && (
         <div style={{ padding: '12px', color: '#888', textAlign: 'center' }}>
