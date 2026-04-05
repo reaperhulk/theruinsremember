@@ -111,6 +111,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const [showHidden, setShowHidden] = useState(false);
   const [sortBy, setSortBy] = useState('default');
   const [filterType, setFilterType] = useState('all');
+  const [filterEra, setFilterEra] = useState(null);
   const [filterResource, setFilterResource] = useState('');
   const [searchText, setSearchText] = useState('');
   const [flashId, setFlashId] = useState(null);
@@ -199,10 +200,13 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
     })
   );
 
+  // Apply era filter
+  const eraFiltered = filterEra !== null ? typeFiltered.filter(u => u.era === filterEra) : typeFiltered;
+
   // Apply resource target filter
   const resourceFiltered = filterResource
-    ? typeFiltered.filter(u => u.effects.some(e => e.target === filterResource))
-    : typeFiltered;
+    ? eraFiltered.filter(u => u.effects.some(e => e.target === filterResource))
+    : eraFiltered;
 
   // Apply text search filter
   const searchLower = searchText.toLowerCase().trim();
@@ -368,6 +372,16 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           <button className={filterType === 'mult' ? 'active' : ''} onClick={() => setFilterType('mult')}>xN</button>
           <button className={filterType === 'add' ? 'active' : ''} onClick={() => setFilterType('add')}>+N</button>
           <button className={filterType === 'cap' ? 'active' : ''} onClick={() => setFilterType('cap')}>Cap</button>
+          <span style={{ borderLeft: '1px solid #333', margin: '0 4px' }} />
+          <button className={filterEra === null ? 'active' : ''} onClick={() => setFilterEra(null)} title="All eras">All Eras</button>
+          {Array.from({ length: state.era }, (_, i) => i + 1).map(era => {
+            const count = sortedAvailable.filter(u => u.era === era).length;
+            return count > 0 ? (
+              <button key={era} className={filterEra === era ? 'active' : ''} onClick={() => setFilterEra(filterEra === era ? null : era)} title={`Era ${era} only`}>
+                E{era}<span style={{ fontSize: '0.8em', marginLeft: '2px', opacity: 0.7 }}>{count}</span>
+              </button>
+            ) : null;
+          })}
           <span style={{ borderLeft: '1px solid #333', margin: '0 4px' }} />
           <select
             value={filterResource}
