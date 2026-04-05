@@ -27,7 +27,7 @@ const ERA_MIN_UPGRADES = {
   6: 30,   // ~52% of ~58
   7: 30,   // ~49% of ~61
   8: 30,   // ~50% of ~60
-  9: 5,    // Era 10 gate is already tech-heavy; requiring 30 late upgrades stalls casual runs
+  9: 5,    // 5 CP-only entry upgrades form a viable path; later upgrades need mini-game resources
   10: 30,  // ~51% of ~59
 };
 

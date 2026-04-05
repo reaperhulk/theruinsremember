@@ -262,7 +262,7 @@ export const techTree = {
   // Era 9 → 10 (Intergalactic → Multiverse)
   realityScience: {
     id: 'realityScience', name: 'Reality Science', era: 9,
-    cost: { universalConstants: 30, cosmicPower: 12000, research: 3200000 },
+    cost: { universalConstants: 30, cosmicPower: 1500, research: 3200000 },
     prerequisites: [],
     grantsEra: null,
     description: 'Reality has seams. The prior civilization found them. So have we',
@@ -295,7 +295,7 @@ export const techTree = {
   },
   multiverseDetection: {
     id: 'multiverseDetection', name: 'Multiverse Detection', era: 9,
-    cost: { universalConstants: 180, cosmicPower: 70000, realityFragments: 100 },
+    cost: { universalConstants: 180, cosmicPower: 10000, realityFragments: 100 },
     prerequisites: ['realityScience'],
     grantsEra: 10,
     description: 'The signatures are identical to ours — every universe, the same collapse, the same rebirth',

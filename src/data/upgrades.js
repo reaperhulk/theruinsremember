@@ -763,14 +763,14 @@ export const upgrades = {
   // Era 9: Intergalactic
   galaxySeeding: {
     id: 'galaxySeeding', name: 'Galaxy Seeding', era: 9,
-    cost: { cosmicPower: 300, exoticMatter: 250, galacticInfluence: 600, steel: 5000 },
+    cost: { cosmicPower: 250 },
     effects: [{ type: 'production_mult', target: 'cosmicPower', value: 5 }],
     description: 'Every galaxy holds fossils of civilizations already there. You are not the seed — you are the soil',
     prerequisites: ['matterReplicators', 'galacticAcademy'],
   },
   cosmicInfrastructure: {
     id: 'cosmicInfrastructure', name: 'Cosmic Infrastructure', era: 9,
-    cost: { cosmicPower: 80, megastructures: 20, exoticMatter: 50 },
+    cost: { cosmicPower: 80 },
     effects: [
       { type: 'production_add', target: 'cosmicPower', value: 12 },
       { type: 'production_add', target: 'exoticMatter', value: 2 },
@@ -2418,8 +2418,8 @@ export const upgrades = {
   exoticMatterForge: { id: 'exoticMatterForge', name: 'Exotic Matter Forge', era: 8, cost: { exoticMatter: 50, darkEnergy: 100, galacticInfluence: 80 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 8 }, { type: 'cap_mult', target: 'exoticMatter', value: 5 }], description: 'Forge exotic matter at scale — x3 output and x5 capacity', prerequisites: ['voidCondenser', 'quantumAnvil'] },
 
   // Era 9 — BALANCE FIX: add 2 upgrades with matterReplicators prereq for parallel entry
-  cosmicExpansion: { id: 'cosmicExpansion', name: 'Cosmic Expansion', era: 9, cost: { cosmicPower: 200, exoticMatter: 150, darkEnergy: 200 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 12 }, { type: 'production_add', target: 'cosmicPower', value: 2 }], description: 'Expand your cosmic domain — +12 exotic matter/s and +2 cosmic power/s', prerequisites: ['matterReplicators'] },
-  voidWeaver: { id: 'voidWeaver', name: 'Void Weaver', era: 9, cost: { cosmicPower: 250, darkEnergy: 180, galacticInfluence: 300 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 24 }, { type: 'production_add', target: 'universalConstants', value: 0.08 }], description: 'Weave the void itself — +24 dark energy/s and +0.08 universal constants/s', prerequisites: ['matterReplicators'] },
+  cosmicExpansion: { id: 'cosmicExpansion', name: 'Cosmic Expansion', era: 9, cost: { cosmicPower: 200 }, effects: [{ type: 'production_add', target: 'exoticMatter', value: 12 }, { type: 'production_add', target: 'cosmicPower', value: 2 }], description: 'Expand your cosmic domain — +12 exotic matter/s and +2 cosmic power/s', prerequisites: ['matterReplicators'] },
+  voidWeaver: { id: 'voidWeaver', name: 'Void Weaver', era: 9, cost: { cosmicPower: 250 }, effects: [{ type: 'production_add', target: 'darkEnergy', value: 24 }, { type: 'production_add', target: 'universalConstants', value: 0.08 }], description: 'Weave the void itself — +24 dark energy/s and +0.08 universal constants/s', prerequisites: ['matterReplicators'] },
   cosmicSentinel: { id: 'cosmicSentinel', name: 'Cosmic Sentinel', era: 9, cost: { cosmicPower: 150, universalConstants: 10, megastructures: 18 }, effects: [{ type: 'production_add', target: 'megastructures', value: 24 }, { type: 'production_add', target: 'cosmicPower', value: 6 }], description: 'Sentinels guard and amplify cosmic infrastructure', prerequisites: ['cosmicFortress'] },
 
   // Era 10 — BALANCE FIX: add 2 upgrades with entropyReversal prereq for parallel entry
@@ -2462,7 +2462,7 @@ export const upgrades = {
   voidShipyard: { id: 'voidShipyard', name: 'Void Shipyard', era: 8, cost: { megastructures: 20, exoticMatter: 70, galacticInfluence: 180 }, effects: [{ type: 'production_add', target: 'megastructures', value: 8 }, { type: 'production_add', target: 'exoticMatter', value: 0.5 }], description: 'Build ships in the void between galaxies — +8 megastructures/s and +0.5 exotic matter/s', prerequisites: ['matterCondenser'] },
 
   // Era 9
-  cosmicResonator: { id: 'cosmicResonator', name: 'Cosmic Resonator', era: 9, cost: { cosmicPower: 180, universalConstants: 12, darkEnergy: 200 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 12 }, { type: 'production_add', target: 'universalConstants', value: 0.1 }], description: 'Resonate with cosmic frequencies for amplified power', prerequisites: ['cosmicExpansion'] },
+  cosmicResonator: { id: 'cosmicResonator', name: 'Cosmic Resonator', era: 9, cost: { cosmicPower: 180 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 12 }, { type: 'production_add', target: 'universalConstants', value: 0.1 }], description: 'Resonate with cosmic frequencies for amplified power', prerequisites: ['cosmicExpansion'] },
   constantForge: { id: 'constantForge', name: 'Constant Forge', era: 9, cost: { universalConstants: 14, cosmicPower: 200, exoticMatter: 120 }, effects: [{ type: 'production_add', target: 'universalConstants', value: 12 }, { type: 'cap_mult', target: 'universalConstants', value: 3 }], description: 'Forge universal constants from pure cosmic power', prerequisites: ['dimensionalAnchor'] },
   entropicDynamo: { id: 'entropicDynamo', name: 'Entropic Dynamo', era: 9, cost: { cosmicPower: 220, realityFragments: 15, megastructures: 25 }, effects: [{ type: 'production_add', target: 'cosmicPower', value: 6 }, { type: 'production_add', target: 'exoticMatter', value: 12 }], description: 'Harness entropy itself as a dynamo power source', prerequisites: ['entropyEngine'] },
 

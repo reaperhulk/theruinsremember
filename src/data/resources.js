@@ -38,7 +38,7 @@ export const resources = {
   exoticMatter: { id: 'exoticMatter', name: 'Exotic Matter', era: 8, baseCap: 10000, baseRate: 0.75, description: 'Matter with unusual properties' },
 
   // Era 9: Intergalactic — stronger passive rates so late runs bend instead of stall
-  cosmicPower: { id: 'cosmicPower', name: 'Cosmic Power', era: 9, baseCap: 20000, baseRate: 0.4, description: 'Energy from the cosmos itself' },
+  cosmicPower: { id: 'cosmicPower', name: 'Cosmic Power', era: 9, baseCap: 20000, baseRate: 10.0, description: 'Energy from the cosmos itself' },
   universalConstants: { id: 'universalConstants', name: 'Universal Constants', era: 9, baseCap: 5000, baseRate: 0.28, description: 'Manipulable laws of physics' },
   realityFragments: { id: 'realityFragments', name: 'Reality Fragments', era: 9, baseCap: 15000, baseRate: 0.55, description: 'Shards of adjacent realities bleeding into yours' },
 

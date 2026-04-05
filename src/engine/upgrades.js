@@ -15,7 +15,7 @@ export const ERA_COST_MULTIPLIERS = {
 // upgrades. Higher = more expensive = longer eras. Late eras use steeper
 // exponents so they don't compress to nothing.
 const SAME_ERA_EXPONENT = {
-  1: 0.5, 2: 0.5, 3: 0.5, 4: 0.55, 5: 0.6, 6: 0.7, 7: 0.75, 8: 0.8, 9: 0.85, 10: 0.85,
+  1: 0.5, 2: 0.5, 3: 0.5, 4: 0.55, 5: 0.6, 6: 0.7, 7: 0.75, 8: 0.8, 9: 0.20, 10: 0.85,
 };
 
 // Apply era-based cost scaling per resource:
