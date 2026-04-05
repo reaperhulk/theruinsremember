@@ -7,6 +7,38 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { formatTime, formatNumber } from './format.js';
 import { LORE_UPGRADE_IDS } from '../data/lore.js';
 
+function AchievementWithProgress({ a }) {
+  const [hovered, setHovered] = useState(false);
+  const pct = a.progress ? Math.min(100, Math.floor((a.progress.current / a.progress.target) * 100)) : 0;
+  const near = a.progress && pct >= 90;
+  return (
+    <div
+      className="achievement locked"
+      style={{ opacity: 0.7, position: 'relative' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <span className="achievement-name" style={near ? { color: '#ffcc66' } : undefined}>
+        {near ? '★ ' : '? '}{a.name}
+      </span>
+      <span className="achievement-desc">{a.description}</span>
+      {a.progress && (
+        <div className="upgrade-progress-bar" style={{ marginTop: '3px' }}>
+          <div
+            className={`upgrade-progress-fill${pct >= 90 ? ' almost' : ''}`}
+            style={{ width: `${pct}%` }}
+          />
+          {hovered && (
+            <span style={{ position: 'absolute', right: '4px', top: '0', fontSize: '0.7em', color: '#aaa', lineHeight: '8px' }}>
+              {formatNumber(a.progress.current)} / {formatNumber(a.progress.target)}
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export const StatsPanel = memo(function StatsPanel({ state }) {
   const [showCodexOverride, setShowCodexOverride] = useState(null);
   const [showEarned, setShowEarned] = useState(true);
@@ -256,10 +288,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
               {totalLocked > 15 ? `Showing 15 of ${totalLocked} locked (easiest first)` : `Locked (${totalLocked} remaining)`}:
             </div>
             {lockedAchievements.map(a => (
-              <div key={a.id} className="achievement locked" style={{ opacity: 0.7 }}>
-                <span className="achievement-name">? {a.name}</span>
-                <span className="achievement-desc">{a.description}</span>
-              </div>
+              <AchievementWithProgress key={a.id} a={a} />
             ))}
           </div>
         );
@@ -270,10 +299,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
             <div className="achievement-list" style={{ marginBottom: '6px' }}>
               <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '2px' }}>Next up:</div>
               {achievementList.filter(a => !a.earned).slice(0, 3).map(a => (
-                <div key={a.id} className="achievement locked" style={{ opacity: 0.7 }}>
-                  <span className="achievement-name">? {a.name}</span>
-                  <span className="achievement-desc">{a.description}</span>
-                </div>
+                <AchievementWithProgress key={a.id} a={a} />
               ))}
             </div>
           )}

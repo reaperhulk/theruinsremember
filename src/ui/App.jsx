@@ -31,6 +31,7 @@ import { ERA_COUNT, eraNames } from '../engine/eras.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
 import { canAfford, getEffectivePrestige } from '../engine/resources.js';
+import { getAchievementsNearComplete } from '../engine/achievements.js';
 import { formatNumber } from './format.js';
 
 const initialState = createInitialState();
@@ -366,7 +367,7 @@ export function App() {
                 if (state.era >= ERA_COUNT && badge === 0) badge = '!';
               }
               if (tab.id === 'trading') badge = 0; // no badge — total trades not actionable
-              if (tab.id === 'stats') badge = unseenLoreCount;
+              if (tab.id === 'stats') badge = unseenLoreCount + getAchievementsNearComplete(state);
               return (
                 <button
                   key={tab.id}
