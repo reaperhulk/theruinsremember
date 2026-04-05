@@ -106,12 +106,41 @@ function summarizeCostPressure(state, cost) {
     .slice(0, 3);
 }
 
+// Supply chains: [consumer, producer, consumption_ratio_label, fix_upgrade_id]
+const SUPPLY_CHAINS = [
+  { consumer: 'labor', producer: 'food', ratio: 1.0, label: 'food → labor', fix: 'farmingEfficiency' },
+  { consumer: 'electronics', producer: 'energy', ratio: 0.4, label: 'energy → electronics', fix: 'solarPanels' },
+  { consumer: 'orbitalInfra', producer: 'rocketFuel', ratio: 0.5, label: 'fuel → orbital', fix: 'fuelRefinery' },
+  { consumer: 'colonies', producer: 'exoticMaterials', ratio: 0.2, label: 'exoticMaterials → colonies', fix: 'exoticHarvester' },
+  { consumer: 'megastructures', producer: 'stellarForge', ratio: 0.3, label: 'stellarForge → megastructures', fix: 'stellarCore' },
+];
+
+function getSupplyChainAlert(state) {
+  const rates = calculateProduction(state);
+  const alerts = [];
+  for (const chain of SUPPLY_CHAINS) {
+    const consumerRate = Math.max(0, rates[chain.consumer] || 0);
+    const producerRate = Math.max(0, rates[chain.producer] || 0);
+    if (!state.resources[chain.consumer]?.unlocked || !state.resources[chain.producer]?.unlocked) continue;
+    if (consumerRate <= 0) continue;
+    const consumptionRate = consumerRate * chain.ratio;
+    if (consumptionRate > producerRate * 1.1) {
+      const deficit = consumptionRate - producerRate;
+      const ratio = producerRate > 0 ? consumptionRate / producerRate : Infinity;
+      alerts.push({ label: chain.label, deficit: deficit.toFixed(2), ratio: ratio.toFixed(1), fix: chain.fix });
+    }
+  }
+  return alerts;
+}
+
 function buildDirector(state, readiness) {
   const availableTech = getAvailableTech(state);
   const affordableTech = availableTech.filter(tech => canAfford(state, tech.cost));
   const gateTech = availableTech.find(tech => tech.grantsEra === state.era + 1);
   const availableUpgrades = getAvailableUpgrades(state);
   const affordableUpgrades = availableUpgrades.filter(upgrade => canAfford(state, getUpgradeCost(state, upgrade.id)));
+
+  const supplyAlerts = getSupplyChainAlert(state);
 
   if (!readiness.upgradesMet) {
     return {
@@ -122,6 +151,7 @@ function buildDirector(state, readiness) {
         `${readiness.currentUpgrades}/${readiness.minUpgrades} era upgrades`,
       ],
       tone: 'warning',
+      supplyAlerts,
     };
   }
 
@@ -172,6 +202,7 @@ function buildDirector(state, readiness) {
     detail: `${gateTech.name} is the next gate. The slowest resources below are what actually matters now.`,
     chips: blockers,
     tone: 'neutral',
+    supplyAlerts,
   };
 }
 
@@ -274,6 +305,20 @@ export function EraProgress({ state }) {
           <strong>{director.title}</strong>
         </div>
         <p className="director-detail">{director.detail}</p>
+        {director.supplyAlerts?.length > 0 && (
+          <div style={{ marginTop: '4px', padding: '4px 6px', background: 'rgba(255,80,40,0.08)', borderLeft: '2px solid #ff5028', fontSize: '0.78em' }}>
+            {director.supplyAlerts.map(alert => (
+              <div key={alert.label} style={{ marginBottom: '2px' }}>
+                <span style={{ color: '#ff8866' }}>⚠ {alert.label}</span>
+                {' — consuming '}
+                <span style={{ color: '#ffaa66' }}>{alert.ratio}×</span>
+                {' faster than production (deficit: '}
+                <span style={{ color: '#ffaa66' }}>{alert.deficit}/s</span>
+                {')'}
+              </div>
+            ))}
+          </div>
+        )}
         <div className="director-chip-row">
           {director.chips.map(chip => (
             <span key={chip} className="director-chip">{chip}</span>
