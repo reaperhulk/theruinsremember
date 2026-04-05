@@ -330,6 +330,35 @@ export function App() {
         <span className="control-chip">{affordableUpgrades} upgrades ready</span>
         <span className="control-chip">{affordableTech} tech options</span>
         {state.era >= ERA_COUNT && <span className="control-chip">Prestige available</span>}
+        {availableMiniGames.length > 1 && (
+          <span className="mini-status-dots" aria-label="Mini-game activity">
+            {availableMiniGames.map(g => {
+              const active = (
+                (g.id === 'mining' && (state.totalGems || 0) > 0) ||
+                (g.id === 'factory' && ((state.factoryAllocation?.steel || 0) > 0 || (state.factoryAllocation?.electronics || 0) > 0)) ||
+                (g.id === 'hacking' && (state.hackSuccesses || 0) > 0) ||
+                (g.id === 'docking' && (state.dockingAttempts || 0) > 0) ||
+                (g.id === 'colony' && Object.values(state.colonyAssignments || {}).some(v => v > 0)) ||
+                (g.id === 'starChart' && (state.starRoutes?.length || 0) > 0) ||
+                (g.id === 'dyson' && (state.dysonSegments || 0) > 0) ||
+                (g.id === 'senate' && Object.values(state.senate || {}).some(v => v > 0)) ||
+                (g.id === 'weaving' && (state.totalWeaves || 0) > 0) ||
+                (g.id === 'realityForge' && Object.values(state.realityKeys || {}).some(v => v > 0))
+              );
+              return (
+                <button
+                  key={g.id}
+                  className={`mini-dot ${active ? 'active' : 'inactive'} ${activeMiniGame === g.id && activeTab === 'mini' ? 'current' : ''}`}
+                  title={`${g.label}: ${active ? 'active' : 'inactive'}`}
+                  onClick={() => { setActiveTab('mini'); setActiveMiniGame(g.id); }}
+                  aria-label={`${g.label} mini-game (${active ? 'active' : 'inactive'})`}
+                >
+                  {g.label[0]}
+                </button>
+              );
+            })}
+          </span>
+        )}
       </div>
 
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />

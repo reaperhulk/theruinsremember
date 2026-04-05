@@ -137,6 +137,51 @@ g[role="button"]:focus-visible {
   letter-spacing: 0.05em;
 }
 
+.mini-status-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 176, 101, 0.18);
+  background: rgba(255,255,255,0.04);
+}
+
+.mini-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  font-size: 0.55em;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.mini-dot.active {
+  background: #2d6a2d;
+  color: #88ee88;
+  box-shadow: 0 0 4px rgba(100,200,100,0.4);
+}
+
+.mini-dot.inactive {
+  background: #333;
+  color: #555;
+}
+
+.mini-dot.current {
+  outline: 1px solid #88aa88;
+  outline-offset: 1px;
+}
+
+.mini-dot:hover {
+  opacity: 0.85;
+}
+
 .upgrade-summary-strip {
   display: flex;
   gap: 8px;
