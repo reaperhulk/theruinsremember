@@ -5,6 +5,7 @@ import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber } from './format.js';
 import { playUpgrade } from './AudioManager.js';
+import { detectArchetype, getArchetypeSuggestions, ARCHETYPE_LABELS } from '../engine/advisor.js';
 
 function resourceName(id) {
   return resourceDefs[id]?.name || id;
@@ -100,6 +101,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
   const [flashId, setFlashId] = useState(null);
   const [showUnlocked, setShowUnlocked] = useState(false);
   const [hoveredTechId, setHoveredTechId] = useState(null);
+  const [showAdvisor, setShowAdvisor] = useState(false);
   const flashTimerRef = useRef(null);
   const available = getAvailableTech(state);
   const unlocked = Object.keys(state.tech || {});
@@ -168,6 +170,42 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
           })}
         </div>
       )}
+      {state.era >= 2 && (() => {
+        const currentArch = detectArchetype(state);
+        const suggestions = getArchetypeSuggestions(state);
+        const archLabel = ARCHETYPE_LABELS[currentArch];
+        return (
+          <div style={{ marginBottom: '6px', border: '1px solid #2a2a3a', borderRadius: '4px', overflow: 'hidden' }}>
+            <button
+              style={{ width: '100%', padding: '4px 8px', background: '#1a1a2e', border: 'none', color: '#aaa', fontFamily: 'inherit', fontSize: '0.8em', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', textAlign: 'left' }}
+              onClick={() => setShowAdvisor(v => !v)}
+            >
+              <span>Run Advisor — <span style={{ color: archLabel.color }}>{archLabel.name}</span> build</span>
+              <span style={{ fontSize: '0.85em', color: '#666' }}>{showAdvisor ? '▲ hide' : '▼ show'}</span>
+            </button>
+            {showAdvisor && (
+              <div style={{ padding: '6px 8px', background: '#111118', fontSize: '0.8em' }}>
+                <p style={{ margin: '0 0 4px', color: '#888', fontSize: '0.9em' }}>
+                  Current: <span style={{ color: archLabel.color, fontWeight: 'bold' }}>{archLabel.name}</span> — {archLabel.desc}
+                </p>
+                {Object.entries(suggestions).map(([arch, techs]) => {
+                  const label = ARCHETYPE_LABELS[arch];
+                  return (
+                    <div key={arch} style={{ marginBottom: '4px' }}>
+                      <span style={{ color: label.color, fontWeight: 'bold' }}>{label.name}: </span>
+                      {techs.length > 0
+                        ? techs.map(t => t.name).join(' → ')
+                        : <span style={{ color: '#555', fontStyle: 'italic' }}>no specific suggestions</span>
+                      }
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       {affordableTechs.length >= 2 && (
         <button
           className={`upgrade-sort-btn`}
