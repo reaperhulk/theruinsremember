@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import { mine } from '../engine/mining.js';
 import { gather, getEffectiveCap, getEffectiveRate } from '../engine/resources.js';
 import { countEraUpgrades, getMinUpgradesForEra } from '../engine/eras.js';
@@ -2960,6 +2960,8 @@ export function GameCanvas({ state, onUpdate }) {
   const hackFlashRef = useRef(0); // timestamp of last hack flash
   const dockFlashRef = useRef(0); // timestamp of last dock flash
   const mouseRef = useRef({ x: 0, y: 0 }); // for parallax
+  const buildingHitZonesRef = useRef([]); // [{x, y, w, h, label}] in canvas coords
+  const [canvasTooltip, setCanvasTooltip] = useState(null); // {x, y, text} in CSS px
   const ruinsRef = useRef([]); // Array of { x, y, era, discovered, spawnTime }
   const lastRuinsCheckRef = useRef(0);
   const nextRuinDelayRef = useRef(45 + Math.random() * 75); // 45-120s
@@ -3642,6 +3644,14 @@ export function GameCanvas({ state, onUpdate }) {
     return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
+  // Approximate building hit zones for era 1 (canvas is 280x180)
+  const ERA1_BUILDINGS = [
+    { x: 37, y: 103, w: 22, h: 32, label: 'Shelter — first structure raised from wreckage materials' },
+    { x: 87, y: 105, w: 18, h: 24, label: 'Workshop — unlocked by early industrial upgrades' },
+    { x: 197, y: 99, w: 24, h: 34, label: 'Foundry — built by manufacturing technology' },
+    { x: 237, y: 109, w: 16, h: 22, label: 'Storage — expanded by capacity upgrades' },
+  ];
+
   const handleMouseMove = useCallback((e) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -3650,20 +3660,61 @@ export function GameCanvas({ state, onUpdate }) {
       x: (e.clientX - rect.left) / rect.width - 0.5,
       y: (e.clientY - rect.top) / rect.height - 0.5,
     };
+
+    // Hit-test era 1 buildings for tooltip
+    const era = eraRef.current;
+    if (era === 1) {
+      const cx = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const cy = (e.clientY - rect.top) * (canvas.height / rect.height);
+      const upgradeTotal = Object.keys(stateRef.current?.upgrades || {}).length;
+      const visibleCount = Math.min(Math.floor(upgradeTotal / 3), 4);
+      let hit = null;
+      for (let i = 0; i < visibleCount; i++) {
+        const b = ERA1_BUILDINGS[i];
+        if (cx >= b.x && cx <= b.x + b.w && cy >= b.y && cy <= b.y + b.h) {
+          hit = { x: e.clientX - rect.left, y: e.clientY - rect.top - 28, text: b.label };
+          break;
+        }
+      }
+      setCanvasTooltip(hit);
+    } else {
+      setCanvasTooltip(null);
+    }
   }, []);
 
   return (
-    <div className="panel canvas-panel">
+    <div className="panel canvas-panel" style={{ position: 'relative' }}>
       <canvas
         ref={canvasRef}
         width={280}
         height={180}
         onClick={handleCanvasClick}
         onMouseMove={handleMouseMove}
+        onMouseLeave={() => setCanvasTooltip(null)}
         style={{ cursor: 'pointer' }}
         role="img"
         aria-label="Game world visualization — click to interact"
       />
+      {canvasTooltip && (
+        <div style={{
+          position: 'absolute',
+          left: `${canvasTooltip.x}px`,
+          top: `${canvasTooltip.y}px`,
+          background: 'rgba(10,10,20,0.92)',
+          border: '1px solid #446',
+          color: '#ccddee',
+          fontSize: '0.7em',
+          padding: '3px 7px',
+          borderRadius: '3px',
+          pointerEvents: 'none',
+          maxWidth: '160px',
+          whiteSpace: 'normal',
+          transform: 'translateX(-50%)',
+          zIndex: 10,
+        }}>
+          {canvasTooltip.text}
+        </div>
+      )}
     </div>
   );
 }
