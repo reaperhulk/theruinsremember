@@ -118,6 +118,15 @@ export function getUpgradeCost(state, upgradeId) {
   // Apply era-based cost multiplier (only for earlier-era resources)
   baseCost = applyEraCostScaling(baseCost, def.era);
 
+  // Echo Mode (NG+): all upgrade costs are 2x
+  if (state.echoMode) {
+    const doubled = {};
+    for (const [resource, amount] of Object.entries(baseCost)) {
+      doubled[resource] = amount * 2;
+    }
+    baseCost = doubled;
+  }
+
   if (!def.repeatable) return baseCost;
   const count = typeof state.upgrades[upgradeId] === 'number' ? state.upgrades[upgradeId] : 0;
   // Universal Optimizer prestige upgrade: reduce cost scaling by 20%

@@ -1,6 +1,46 @@
 // Prestige shop upgrades — purchased with prestige points
 // These persist across prestige resets
 
+// Echo upgrades — purchased with echo resource in NG+ Echoed mode
+// These persist across all prestiges and echo resets
+export const echoUpgrades = {
+  echoEraSkip: {
+    id: 'echoEraSkip',
+    name: 'Era Skip',
+    cost: 500,
+    description: 'Each prestige, start at Era 3 instead of Era 1. The first two eras are already memory.',
+    effect: 'echo_era_skip',
+  },
+  echoResonanceLock: {
+    id: 'echoResonanceLock',
+    name: 'Resonance Lock',
+    cost: 800,
+    description: 'Factory allocation bonuses persist through prestige. The machines remember your configuration.',
+    effect: 'echo_resonance_lock',
+  },
+  echoMultiplier: {
+    id: 'echoMultiplier',
+    name: 'Echo Amplifier',
+    cost: 300,
+    description: 'Echo resource accumulates 2x faster. The signal strengthens across iterations.',
+    effect: 'echo_multiplier',
+  },
+  echoTemporalAnchor: {
+    id: 'echoTemporalAnchor',
+    name: 'Temporal Anchor',
+    cost: 1200,
+    description: 'After prestige, the first 10 upgrades you purchase cost 50% less. Echoes of past investments.',
+    effect: 'echo_temporal_anchor',
+  },
+  echoVoidResonance: {
+    id: 'echoVoidResonance',
+    name: 'Void Resonance',
+    cost: 2000,
+    description: 'Your prestige multiplier starts at 1.5x its value at the end of the previous run.',
+    effect: 'echo_void_resonance',
+  },
+};
+
 export const prestigeUpgrades = {
   fastStart: {
     id: 'fastStart',

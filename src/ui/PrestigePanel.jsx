@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary } from '../engine/prestige.js';
+import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary, toggleEchoMode, purchaseEchoUpgrade, getEchoShop } from '../engine/prestige.js';
 import { getEffectivePrestige, PRESTIGE_HARD_CAP } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
 import { events as eventDefs } from '../data/events.js';
@@ -239,6 +239,70 @@ export function PrestigePanel({ state, onUpdate }) {
       )}
 
       {state.trueEnding && <CycleCodex state={state} />}
+      {state.trueEnding && <EchoModePanel state={state} onUpdate={onUpdate} />}
+    </div>
+  );
+}
+
+function EchoModePanel({ state, onUpdate }) {
+  const echoShop = getEchoShop(state);
+  const echo = Math.floor(state.echoResource || 0);
+  const owned = state.echoUpgrades || {};
+  const ownedCount = Object.keys(owned).length;
+  return (
+    <div style={{ marginTop: '12px', borderTop: '1px solid #664466', paddingTop: '10px' }}>
+      <h3 style={{ color: '#dd88ff', margin: '0 0 4px' }}>NG+ Echoed Mode</h3>
+      <p style={{ fontSize: '0.75em', color: '#776688', fontStyle: 'italic', margin: '0 0 6px' }}>
+        The ruins echo with the weight of every cycle. Enable to double all upgrade costs — but earn Echo to fund exclusive upgrades.
+      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+        <button
+          style={{
+            padding: '4px 12px',
+            background: state.echoMode ? '#440044' : '#1a1a2e',
+            border: `1px solid ${state.echoMode ? '#dd88ff' : '#446'}`,
+            color: state.echoMode ? '#dd88ff' : '#888',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            fontSize: '0.8em',
+            borderRadius: '3px',
+          }}
+          onClick={() => onUpdate(s => toggleEchoMode(s))}
+        >
+          {state.echoMode ? 'Echoed Mode: ON' : 'Echoed Mode: OFF'}
+        </button>
+        <span style={{ fontSize: '0.8em', color: '#cc88ff' }}>
+          Echo: {echo} {state.echoMode && `(+${Math.max(1, Math.floor(state.prestigeMultiplier || 1))}/s)`}
+        </span>
+      </div>
+      {state.echoMode && (
+        <>
+          <div style={{ fontSize: '0.7em', color: '#aa6688', marginBottom: '6px' }}>
+            ⚠ All upgrade costs ×2 while Echo Mode is active
+          </div>
+          <h4 style={{ margin: '0 0 4px', fontSize: '0.85em', color: '#bb88cc' }}>Echo Shop ({ownedCount}/{echoShop.length})</h4>
+          <div className="prestige-shop">
+            {echoShop.map(u => (
+              <button
+                key={u.id}
+                className={`upgrade-btn ${u.owned ? 'purchased' : u.affordable ? 'affordable' : 'too-expensive'}`}
+                disabled={u.owned || !u.affordable}
+                onClick={() => onUpdate(s => purchaseEchoUpgrade(s, u.id))}
+                style={!u.owned && !u.affordable ? { opacity: 0.65 } : {}}
+              >
+                <div className="upgrade-name">{u.name}{u.owned && ' [OWNED]'}</div>
+                <div className="upgrade-cost">{u.cost} Echo</div>
+                <div className="upgrade-desc">{u.description}</div>
+                {!u.owned && !u.affordable && (
+                  <div className="upgrade-progress-bar">
+                    <div className="upgrade-progress-fill" style={{ width: `${Math.min(100, Math.floor((echo / u.cost) * 100))}%` }} />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

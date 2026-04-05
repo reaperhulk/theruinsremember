@@ -1,9 +1,40 @@
 import { createInitialState } from './state.js';
-import { prestigeUpgrades } from '../data/prestige-upgrades.js';
+import { prestigeUpgrades, echoUpgrades } from '../data/prestige-upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { LORE_UPGRADE_IDS } from '../data/lore.js';
+
+// Toggle Echo Mode on/off (only available after True Ending)
+export function toggleEchoMode(state) {
+  if (!state.trueEnding) return state;
+  return { ...state, echoMode: !state.echoMode };
+}
+
+// Purchase an echo upgrade
+export function purchaseEchoUpgrade(state, upgradeId) {
+  if (!state.trueEnding || !state.echoMode) return state;
+  const def = echoUpgrades[upgradeId];
+  if (!def) return state;
+  if (state.echoUpgrades?.[upgradeId]) return state; // already owned
+  if ((state.echoResource || 0) < def.cost) return state;
+  return {
+    ...state,
+    echoResource: (state.echoResource || 0) - def.cost,
+    echoUpgrades: { ...(state.echoUpgrades || {}), [upgradeId]: true },
+  };
+}
+
+// Get the echo shop display list
+export function getEchoShop(state) {
+  const owned = state.echoUpgrades || {};
+  const echo = state.echoResource || 0;
+  return Object.values(echoUpgrades).map(u => ({
+    ...u,
+    owned: !!owned[u.id],
+    affordable: echo >= u.cost,
+  }));
+}
 
 // Calculate prestige multiplier based on current progress.
 // This is an ADDITIVE bonus to the cumulative multiplier, not multiplicative.
@@ -215,9 +246,12 @@ export function performPrestige(state) {
     }
   }
 
-  // Persist achievements, reality keys, and completion flags across prestige
+  // Persist achievements, reality keys, echo state, and completion flags across prestige
   newState.achievements = state.achievements || {};
   newState.realityKeys = state.realityKeys || {};
+  newState.echoMode = state.echoMode || false;
+  newState.echoResource = state.echoResource || 0;
+  newState.echoUpgrades = state.echoUpgrades || {};
   if (state.gameComplete) newState.gameComplete = true;
   if (state.trueEnding) newState.trueEnding = true;
 
@@ -393,6 +427,30 @@ export function performPrestige(state) {
           }
         }
       }
+    }
+  }
+
+  // Echo Mode upgrades applied after prestige
+  const echoOwned = state.echoUpgrades || {};
+  if (echoOwned.echoEraSkip && newState.era < 3) {
+    // Era Skip: advance to era 3 (requires era transition logic to be done first)
+    newState.era = 3;
+    // Unlock era 2 and 3 resources
+    for (const [id, r] of Object.entries(newState.resources)) {
+      const def = resourceDefs[id];
+      if (def && (def.era === 2 || def.era === 3)) {
+        newState.resources[id] = { ...r, unlocked: true };
+      }
+    }
+  }
+  if (echoOwned.echoResonanceLock) {
+    newState.factoryAllocation = state.factoryAllocation || {};
+  }
+  if (echoOwned.echoVoidResonance) {
+    // Start with 1.5x the previous run's prestige multiplier as a floor
+    const prevMult = state.prestigeMultiplier || 1;
+    if (newState.prestigeMultiplier < prevMult * 1.5) {
+      newState.prestigeMultiplier = prevMult * 1.5;
     }
   }
 

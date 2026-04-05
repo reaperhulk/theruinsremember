@@ -92,6 +92,10 @@ export function createInitialState() {
     senatePct: { merchants: 34, scholars: 33, warriors: 33 },
     // Reality Forge (Era 10+)
     realityKeys: {},
+    // NG+ Echoed Mode (unlocked after True Ending)
+    echoMode: false,
+    echoResource: 0,
+    echoUpgrades: {},
     // Hacking mastery (one-time max difficulty reward, resets on prestige)
     hackMastery: false,
     // Lore event deduplication

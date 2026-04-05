@@ -502,6 +502,13 @@ export function tick(state, dt, rng = Math.random) {
     };
   }
 
+  // Echo Mode accumulation (NG+): echo resource fills at rate = prestige multiplier/s
+  if (newState.trueEnding && newState.echoMode) {
+    const echoRate = Math.max(1, Math.floor(newState.prestigeMultiplier || 1));
+    const echoMult = newState.echoUpgrades?.echoMultiplier ? 2 : 1;
+    newState = { ...newState, echoResource: (newState.echoResource || 0) + echoRate * echoMult * dt };
+  }
+
   // True Ending: purchasing eternalReturn marks the definitive completion
   if (!newState.trueEnding && newState.prestigeUpgrades?.eternalReturn) {
     newState = {
