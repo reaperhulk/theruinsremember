@@ -39,6 +39,7 @@ const ACHIEVEMENT_PROGRESS = {
   dysonBuilder100: s => ({ current: s.dysonSegments || 0, target: 100 }),
   cosmicTuner5:    s => ({ current: s.tuningScore || 0, target: 5 }),
   cosmicTuner25:   s => ({ current: s.tuningScore || 0, target: 25 }),
+  cosmicTuner100:  s => ({ current: s.tuningScore || 0, target: 100 }),
   dockCombo5:      s => ({ current: s.dockingCombo || 0, target: 5 }),
   weaveCombo3:     s => ({ current: s.weaveCombo || 0, target: 3 }),
   techMaster:      s => ({ current: Object.keys(s.tech || {}).length, target: 15 }),

@@ -56,6 +56,7 @@ export const achievements = [
   // Cosmic Tuning achievements
   { id: 'cosmicTuner5', name: 'Frequency Finder', description: 'Score 5 perfect tunes', check: s => (s.tuningScore || 0) >= 5, reward: 3 },
   { id: 'cosmicTuner25', name: 'Harmonic Master', description: 'Score 25 perfect tunes', check: s => (s.tuningScore || 0) >= 25, reward: 10 },
+  { id: 'cosmicTuner100', name: 'Universal Resonance', description: 'Score 100 perfect tunes — Tier IV reached', check: s => (s.tuningScore || 0) >= 100, reward: 20 },
 
   // Senate achievements
   { id: 'senator10', name: 'Junior Senator', description: 'Make 10 senate allocations', check: s => { const a = s.senate || {}; return (a.merchants || 0) + (a.scholars || 0) + (a.warriors || 0) >= 10; }, reward: 3 },

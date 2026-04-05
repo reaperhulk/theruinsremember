@@ -19,6 +19,29 @@ export function getTuningMultiplier(quality) {
   return 0;
 }
 
+// Reward tiers: { threshold, bonus (multiplier on cosmicPower production), label }
+export const TUNING_TIERS = [
+  { threshold: 100, bonus: 1.50, label: 'Tier IV: +50% Cosmic Power' },
+  { threshold:  50, bonus: 1.20, label: 'Tier III: +20% Cosmic Power' },
+  { threshold:  25, bonus: 1.10, label: 'Tier II: +10% Cosmic Power' },
+  { threshold:  10, bonus: 1.05, label: 'Tier I: +5% Cosmic Power' },
+];
+
+// Get the current production bonus for cosmicPower based on tuning score.
+export function getTuningProductionBonus(tuningScore) {
+  const score = tuningScore || 0;
+  for (const tier of TUNING_TIERS) {
+    if (score >= tier.threshold) return tier.bonus;
+  }
+  return 1;
+}
+
+// Get the next tier not yet reached.
+export function getNextTuningTier(tuningScore) {
+  const score = tuningScore || 0;
+  return [...TUNING_TIERS].reverse().find(t => t.threshold > score) || null;
+}
+
 // Apply a tuning action. Returns { state, cpGain, ucGain } or null if miss/unavailable.
 export function applyTuning(state, quality) {
   if (state.era < 9) return null;

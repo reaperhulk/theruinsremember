@@ -10,6 +10,7 @@ import { checkComboReset } from './weaving.js';
 import { purchaseUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { getSenatePctBonuses } from './senate.js';
+import { getTuningProductionBonus } from './tuning.js';
 
 // Resource consumption rates — moderate tension without breaking non-minigame paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
@@ -113,6 +114,11 @@ export function tick(state, dt, rng = Math.random) {
     if (state.era >= 8) {
       const senateBonuses = getSenatePctBonuses(state);
       if (senateBonuses[id] && senateBonuses[id] > 1) effectiveRate *= senateBonuses[id];
+    }
+
+    // Apply cosmic tuning production bonus to cosmicPower (era 9+)
+    if (id === 'cosmicPower' && state.era >= 9) {
+      effectiveRate *= getTuningProductionBonus(state.tuningScore);
     }
 
     const cap = getEffectiveCap(state, id);

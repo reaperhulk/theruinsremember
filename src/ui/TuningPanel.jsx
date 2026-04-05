@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
-import { getTuningQuality, applyTuning } from '../engine/tuning.js';
+import { getTuningQuality, applyTuning, TUNING_TIERS, getTuningProductionBonus, getNextTuningTier } from '../engine/tuning.js';
 
 export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
   const [frequency, setFrequency] = useState(50);
@@ -10,6 +10,8 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
   const [lastTune, setLastTune] = useState(null);
   const targetTimerRef = useRef(null);
   const tuningScore = state.tuningScore || 0;
+  const tuningBonus = getTuningProductionBonus(tuningScore);
+  const nextTier = getNextTuningTier(tuningScore);
 
   // Change target every 30 seconds
   useEffect(() => {
@@ -59,9 +61,39 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
   return (
     <div className="panel tuning-panel">
       <h2>Cosmic Tuning ({tuningScore} score)</h2>
-      <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#50b098', margin: '0 0 6px' }}>
+      <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#50b098', margin: '0 0 4px' }}>
         The universe hums at a frequency only the patient can hear.
       </p>
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '6px' }}>
+        {TUNING_TIERS.slice().reverse().map(tier => {
+          const reached = tuningScore >= tier.threshold;
+          return (
+            <span
+              key={tier.threshold}
+              style={{
+                fontSize: '0.7em',
+                padding: '2px 6px',
+                borderRadius: '3px',
+                background: reached ? 'rgba(80,176,152,0.2)' : '#1a1a2a',
+                border: `1px solid ${reached ? '#50b098' : '#333'}`,
+                color: reached ? '#88ddcc' : '#555',
+              }}
+            >
+              {tier.threshold} — {((tier.bonus - 1) * 100).toFixed(0)}%{reached ? ' ✓' : ''}
+            </span>
+          );
+        })}
+      </div>
+      {tuningBonus > 1 && (
+        <div style={{ fontSize: '0.8em', color: '#50b098', marginBottom: '4px' }}>
+          Current bonus: <strong>+{((tuningBonus - 1) * 100).toFixed(0)}% Cosmic Power</strong>
+        </div>
+      )}
+      {nextTier && (
+        <div style={{ fontSize: '0.75em', color: '#778899', marginBottom: '6px' }}>
+          Next: {nextTier.label} at score {nextTier.threshold} ({nextTier.threshold - tuningScore} more)
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8em', marginBottom: '6px' }}>
         <span>Your frequency: <strong style={{ color: '#aaddff' }}>{frequency}</strong></span>
         <span style={{ color: distance <= 2 ? '#ffdd44' : distance <= 8 ? '#88dd88' : distance <= 20 ? '#aaaaaa' : '#ff6666' }}>
