@@ -404,6 +404,9 @@ export function App() {
               <StatsPanel state={state} />
             )}
           </div>
+          <div className="shortcut-legend" aria-hidden="true">
+            [1–6] tabs &nbsp;·&nbsp; [Space] mine &nbsp;·&nbsp; [D] dock &nbsp;·&nbsp; [?] help
+          </div>
         </div>
       </main>
       {showHelp && <HelpOverlay onClose={() => setShowHelp(false)} />}

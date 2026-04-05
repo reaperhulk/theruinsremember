@@ -1646,6 +1646,20 @@ canvas:hover {
 }
 
 /* Tabs */
+.shortcut-legend {
+  text-align: center;
+  font-size: 0.65em;
+  color: #444;
+  padding: 4px 0 2px;
+  border-top: 1px solid #222;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+@media (max-width: 600px) {
+  .shortcut-legend { display: none; }
+}
+
 .tab-bar {
   display: flex;
   gap: 2px;
