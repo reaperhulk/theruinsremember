@@ -62,6 +62,40 @@ export function allocateSenateInfluence(state, factionId, delta) {
   return { ...state, senate: newSenate, resources };
 }
 
+// Set senate directive percentages — adjusting one slider rebalances others proportionally.
+// factionId: which faction to set; pct: new percentage 0-100
+export function setSenateDirective(state, factionId, pct) {
+  if (state.era < 8) return state;
+  const clampedPct = Math.max(0, Math.min(100, Math.round(pct)));
+  const others = ['merchants', 'scholars', 'warriors'].filter(f => f !== factionId);
+  const remaining = 100 - clampedPct;
+  const current = state.senatePct || { merchants: 34, scholars: 33, warriors: 33 };
+  const otherTotal = others.reduce((sum, f) => sum + (current[f] || 0), 0);
+  let newPct = { ...current, [factionId]: clampedPct };
+  if (otherTotal === 0) {
+    const half = Math.floor(remaining / 2);
+    newPct[others[0]] = half;
+    newPct[others[1]] = remaining - half;
+  } else {
+    const scale = remaining / otherTotal;
+    const a = Math.round((current[others[0]] || 0) * scale);
+    newPct[others[0]] = a;
+    newPct[others[1]] = remaining - a;
+  }
+  return { ...state, senatePct: newPct };
+}
+
+// Get senate directive production multipliers from slider percentages.
+// Returns { galacticInfluence: mult, exoticMatter: mult, stellarForge: mult }
+export function getSenatePctBonuses(state) {
+  const pct = state.senatePct || { merchants: 34, scholars: 33, warriors: 33 };
+  return {
+    galacticInfluence: 1 + (pct.merchants || 0) * 0.001,   // up to +10%
+    exoticMatter:      1 + (pct.scholars || 0) * 0.001,    // up to +10%
+    stellarForge:      1 + (pct.warriors || 0) * 0.001,    // up to +10%
+  };
+}
+
 // Get senate display info.
 export function getSenateInfo(state) {
   const senate = state.senate || { merchants: 0, scholars: 0, warriors: 0 };

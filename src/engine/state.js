@@ -88,6 +88,8 @@ export function createInitialState() {
     tuningScore: 0,
     // Galactic Senate (Era 8+)
     senate: { merchants: 0, scholars: 0, warriors: 0 },
+    // Senate directive sliders — percentage focus per faction (sum = 100)
+    senatePct: { merchants: 34, scholars: 33, warriors: 33 },
     // Reality Forge (Era 10+)
     realityKeys: {},
     // Hacking mastery (one-time max difficulty reward, resets on prestige)

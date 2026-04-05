@@ -1,10 +1,11 @@
 import { memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
-import { allocateSenateInfluence, getSenateInfo } from '../engine/senate.js';
+import { allocateSenateInfluence, getSenateInfo, setSenateDirective } from '../engine/senate.js';
 
 export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
   const { senate, totalInfluence, maxInfluence, available, allocateCost, majorityFaction, factions } = getSenateInfo(state);
+  const senatePct = state.senatePct || { merchants: 34, scholars: 33, warriors: 33 };
 
   const FACTION_UI = {
     merchants: { label: 'Merchant Guild', color: '#ddaa44', desc: 'Exotic Matter +1.0/s per influence' },
@@ -65,6 +66,36 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
       <p className="mining-hint">
         Allocate influence to factions (cost scales with total) | Majority faction gets x2 | Max slots scale with GI
       </p>
+
+      <div style={{ marginTop: '10px', borderTop: '1px solid #334', paddingTop: '8px' }}>
+        <h3 style={{ margin: '0 0 4px', fontSize: '0.9em', color: '#aa88cc' }}>Senate Directive</h3>
+        <p style={{ fontSize: '0.7em', color: '#666', margin: '0 0 6px' }}>
+          Ongoing production focus — sliders sum to 100%
+        </p>
+        {[
+          { id: 'merchants', label: 'Merchants', desc: '+GI production', color: '#ddaa44' },
+          { id: 'scholars', label: 'Scholars', desc: '+Exotic Matter', color: '#88bbee' },
+          { id: 'warriors', label: 'Warriors', desc: '+Stellar Forge', color: '#ee6644' },
+        ].map(({ id, label, desc, color }) => (
+          <div key={id} style={{ marginBottom: '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8em', marginBottom: '2px' }}>
+              <span style={{ color }}>{label}: {senatePct[id]}%</span>
+              <span style={{ color: '#777' }}>{desc} +{(senatePct[id] * 0.1).toFixed(1)}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={senatePct[id]}
+              onChange={e => {
+                playClick();
+                onUpdate(s => setSenateDirective(s, id, parseInt(e.target.value)));
+              }}
+              style={{ width: '100%', accentColor: color, cursor: 'pointer' }}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 });

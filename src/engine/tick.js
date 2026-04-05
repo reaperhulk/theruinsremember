@@ -9,6 +9,7 @@ import { checkAchievements } from './achievements.js';
 import { checkComboReset } from './weaving.js';
 import { purchaseUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
+import { getSenatePctBonuses } from './senate.js';
 
 // Resource consumption rates — moderate tension without breaking non-minigame paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
@@ -107,6 +108,12 @@ export function tick(state, dt, rng = Math.random) {
       .filter(e => e.endTime > state.totalTime && (e.target === id || e.target === null))
       .reduce((sum, e) => sum + e.multBonus, 0);
     if (eventBonus > 0) effectiveRate *= (1 + eventBonus);
+
+    // Apply senate directive production bonuses (era 8+)
+    if (state.era >= 8) {
+      const senateBonuses = getSenatePctBonuses(state);
+      if (senateBonuses[id] && senateBonuses[id] > 1) effectiveRate *= senateBonuses[id];
+    }
 
     const cap = getEffectiveCap(state, id);
     let newAmount = r.amount + effectiveRate * dt;
