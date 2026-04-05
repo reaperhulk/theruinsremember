@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
 import { getEffectiveCap } from '../engine/resources.js';
 import { formatNumber } from './format.js';
+import { playGemFound, playAchievement, playCapWarning } from './AudioManager.js';
 
 const MILESTONES = [100, 1000, 10000, 100000, 1000000, 10000000, 100000000];
 
@@ -47,6 +48,7 @@ export function Toast({ state }) {
     const currentGems = state.totalGems || 0;
     if (currentGems > prevGemsRef.current) {
       newToasts.push({ id: ++idRef.current, text: 'Gem found!', type: 'gem' });
+      playGemFound();
     }
     prevGemsRef.current = currentGems;
 
@@ -73,6 +75,7 @@ export function Toast({ state }) {
           capWarningsRef.current[id] = cap;
           const name = resourceDefs[id]?.name || id;
           newToasts.push({ id: ++idRef.current, text: `${name} storage is full! Buy cap upgrades.`, type: 'milestone' });
+          playCapWarning();
         }
       }
     }
@@ -92,10 +95,12 @@ export function Toast({ state }) {
           text: `${achievements.length} achievements earned!`,
           type: 'achievement',
         });
+        playAchievement();
       } else {
         for (const a of achievements) {
           newToasts.push({ id: ++idRef.current, text: a.message, type: 'achievement' });
         }
+        if (achievements.length > 0) playAchievement();
       }
 
       for (const e of nonAchievements) {

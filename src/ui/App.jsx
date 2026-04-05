@@ -20,7 +20,7 @@ import { SenatePanel } from './SenatePanel.jsx';
 import { RealityForgePanel } from './RealityForgePanel.jsx';
 import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
-import { setMuted } from './AudioManager.js';
+import { setMuted, playPrestige } from './AudioManager.js';
 import { StatsPanel } from './StatsPanel.jsx';
 import { PrestigePanel } from './PrestigePanel.jsx';
 import { EraTransition } from './EraTransition.jsx';
@@ -135,7 +135,7 @@ export function App() {
     ].filter(Boolean).join('\n');
     setConfirmDialog({
       lines: msg.split('\n'),
-      onConfirm: () => { updateState(s => performPrestige(s)); setConfirmDialog(null); },
+      onConfirm: () => { updateState(s => performPrestige(s)); playPrestige(); setConfirmDialog(null); },
       onCancel: () => setConfirmDialog(null),
     });
   };
