@@ -61,9 +61,45 @@ function getAffordProgress(state, cost) {
   return totalNeeded > 0 ? totalHave / totalNeeded : 0;
 }
 
+// Build full prerequisite chain (recursively, not yet unlocked)
+function getPrereqChain(techId, unlockedSet, visited = new Set()) {
+  if (visited.has(techId)) return [];
+  visited.add(techId);
+  const tech = techTree[techId];
+  if (!tech) return [];
+  const chain = [];
+  for (const prereq of (tech.prerequisites || [])) {
+    if (!unlockedSet.has(prereq)) {
+      chain.push(...getPrereqChain(prereq, unlockedSet, visited));
+      if (!chain.includes(prereq)) chain.push(prereq);
+    }
+  }
+  return chain;
+}
+
+// BFS forward to find steps to nearest era-breakthrough tech
+function stepsToBreakthrough(startId, unlockedSet) {
+  const queue = [[startId, 0]];
+  const visited = new Set([startId]);
+  while (queue.length > 0) {
+    const [id, depth] = queue.shift();
+    const tech = techTree[id];
+    if (!tech) continue;
+    if (tech.grantsEra && id !== startId) return depth;
+    for (const t of Object.values(techTree)) {
+      if (!visited.has(t.id) && t.prerequisites.includes(id)) {
+        visited.add(t.id);
+        queue.push([t.id, depth + 1]);
+      }
+    }
+  }
+  return null;
+}
+
 export const TechTree = memo(function TechTree({ state, onUpdate }) {
   const [flashId, setFlashId] = useState(null);
   const [showUnlocked, setShowUnlocked] = useState(false);
+  const [hoveredTechId, setHoveredTechId] = useState(null);
   const flashTimerRef = useRef(null);
   const available = getAvailableTech(state);
   const unlocked = Object.keys(state.tech || {});
@@ -81,6 +117,10 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
   const unlockedCount = unlocked.length;
 
   const affordableTechs = available.filter(t => canAfford(state, t.cost) && !t.excludes && !t.grantsEra);
+
+  const unlockedSet = new Set(Object.keys(state.tech || {}));
+  const hoveredPrereqChain = hoveredTechId ? new Set(getPrereqChain(hoveredTechId, unlockedSet)) : new Set();
+  const hoveredSteps = hoveredTechId ? stepsToBreakthrough(hoveredTechId, unlockedSet) : null;
 
   if (available.length === 0) {
     return (
@@ -163,11 +203,22 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
               className={`tech-btn ${affordable ? 'affordable' : 'too-expensive'} ${flashId === tech.id ? (tech.grantsEra ? 'breakthrough-flash' : 'purchase-flash') : ''} ${tech.grantsEra ? 'era-gate-tech' : ''}`}
               disabled={!affordable}
               onClick={() => handleUnlock(tech.id)}
+              onMouseEnter={() => setHoveredTechId(tech.id)}
+              onMouseLeave={() => setHoveredTechId(null)}
               title={tech.description}
+              style={hoveredPrereqChain.has(tech.id) ? { outline: '2px solid #cc9900', outlineOffset: '-2px' } : undefined}
             >
               <div className="tech-name">
                 {tech.name}
                 {tech.grantsEra && <span className="era-gate"> ★ Era {tech.grantsEra}</span>}
+                {hoveredTechId === tech.id && hoveredSteps !== null && (
+                  <span style={{ fontSize: '0.75em', color: '#cc9900', marginLeft: '6px' }}>
+                    {hoveredSteps === 0 ? '→ Era gate' : `→ breakthrough in ${hoveredSteps} step${hoveredSteps !== 1 ? 's' : ''}`}
+                  </span>
+                )}
+                {hoveredPrereqChain.has(tech.id) && (
+                  <span style={{ fontSize: '0.7em', color: '#cc9900', marginLeft: '4px' }}>← required</span>
+                )}
               </div>
               <div className="tech-cost"><CostDisplay cost={tech.cost} state={state} /></div>
               {!affordable && (() => {
