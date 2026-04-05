@@ -204,11 +204,37 @@ export function tick(state, dt, rng = Math.random) {
           ...newState,
           lastEventTime: newState.totalTime,
           activeEvents: newActiveEvents,
-          eventLog: [...(newState.eventLog || []), { message: `Event: ${ev.name} — ${ev.description}`, time: newState.totalTime }].slice(-20),
+          eventLog: [...(newState.eventLog || []), { message: `Event: ${ev.name} — ${ev.description}`, time: newState.totalTime, isLore: !!ev.isLore }].slice(-20),
         };
       }
     } else {
       newState = { ...newState, activeEvents };
+    }
+  }
+
+  // Milestone lore events — fire once at narrative turning points
+  {
+    const fired = state.firedMilestoneLore || {};
+    const newFired = { ...fired };
+    const loreEntries = [];
+    if (!fired.era3 && state.era >= 3) {
+      newFired.era3 = true;
+      loreEntries.push({ message: 'A data core surfaces from the ruins — still powered after eons. The file structure is hauntingly familiar. Someone built this for you to find.', time: newState.totalTime, isLore: true });
+    }
+    if (!fired.prestige1 && (state.prestigeCount || 0) >= 1) {
+      newFired.prestige1 = true;
+      loreEntries.push({ message: 'The cycle turns. You remember now — not what was lost, but what was always here, waiting. The ruins recognize the pattern.', time: newState.totalTime, isLore: true });
+    }
+    if (!fired.gems1000 && (state.totalGems || 0) >= 1000) {
+      newFired.gems1000 = true;
+      loreEntries.push({ message: 'One thousand gems recovered from the ruins. Each one a memory compressed to crystal — the weight of a civilization stored in your hands.', time: newState.totalTime, isLore: true });
+    }
+    if (loreEntries.length > 0) {
+      newState = {
+        ...newState,
+        firedMilestoneLore: newFired,
+        eventLog: [...(newState.eventLog || []), ...loreEntries].slice(-20),
+      };
     }
   }
 

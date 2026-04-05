@@ -68,6 +68,8 @@ export function App() {
   const prevEraRef = useRef(state.era);
   const [shakeClass, setShakeClass] = useState('');
   const [flashClass, setFlashClass] = useState('');
+  const prevLoreCountRef = useRef((state.eventLog || []).filter(e => e.isLore).length);
+  const [unseenLoreCount, setUnseenLoreCount] = useState(0);
   const [hintsDismissed, setHintsDismissed] = useState(false);
   const [audioMuted, setAudioMuted] = useState(() => localStorage.getItem('audioMuted') === 'true');
   const [victoryDismissed, setVictoryDismissed] = useState(false);
@@ -80,6 +82,20 @@ export function App() {
     setMuted(audioMuted);
     localStorage.setItem('audioMuted', audioMuted);
   }, [audioMuted]);
+
+  // Badge the Stats tab when new lore entries arrive
+  const currentLoreCount = (state.eventLog || []).filter(e => e.isLore).length;
+  useEffect(() => {
+    if (currentLoreCount > prevLoreCountRef.current) {
+      setUnseenLoreCount(n => n + (currentLoreCount - prevLoreCountRef.current));
+    }
+    prevLoreCountRef.current = currentLoreCount;
+  }, [currentLoreCount]);
+
+  const handleStatsTabClick = () => {
+    setActiveTab('stats');
+    setUnseenLoreCount(0);
+  };
 
   // Screen shake on perfect dock
   useEffect(() => {
@@ -350,12 +366,12 @@ export function App() {
                 if (state.era >= ERA_COUNT && badge === 0) badge = '!';
               }
               if (tab.id === 'trading') badge = 0; // no badge — total trades not actionable
-              if (tab.id === 'stats') badge = 0; // no badge — achievement count not actionable
+              if (tab.id === 'stats') badge = unseenLoreCount;
               return (
                 <button
                   key={tab.id}
                   className={`tab-btn ${activeTab === tab.id ? 'active' : ''} ${tab.id === 'mini' && state.totalGems === 0 && state.era >= 1 && (state.totalTime || 0) < 120 ? 'mini-game-pulse' : ''}`}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => tab.id === 'stats' ? handleStatsTabClick() : setActiveTab(tab.id)}
                   title={`Press ${tab.key}`}
                   role="tab"
                   aria-selected={activeTab === tab.id}
