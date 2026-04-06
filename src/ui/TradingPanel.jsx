@@ -148,6 +148,20 @@ export function TradingPanel({ state, onUpdate }) {
           Trade ({state.totalTrades || 0} completed)
         </button>
       </div>
+      {(() => {
+        const tradeLog = (state.eventLog || []).filter(e => e.message.startsWith('Traded') || e.message.startsWith('Quick traded'));
+        if (tradeLog.length === 0) return null;
+        return (
+          <div style={{ marginTop: '8px', borderTop: '1px solid #333', paddingTop: '6px' }}>
+            <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '2px' }}>Recent trades:</div>
+            {tradeLog.slice(-5).reverse().map((t, i) => (
+              <div key={i} style={{ fontSize: '0.7em', color: '#777', padding: '1px 0' }}>
+                {t.message}
+              </div>
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 }
