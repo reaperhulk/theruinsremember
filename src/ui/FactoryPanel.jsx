@@ -60,6 +60,25 @@ export const FactoryPanel = memo(function FactoryPanel({ state, onUpdate }) {
           );
         })}
       </div>
+      {pool >= 3 && available > 0 && (
+        <button
+          className="mine-btn"
+          style={{ fontSize: '0.8em', marginTop: '4px' }}
+          onClick={() => {
+            const each = Math.floor(pool / 3);
+            const rem = pool - each * 3;
+            onUpdate(s => {
+              let st = s;
+              st = allocateWorker(st, 'steel', each + (rem > 0 ? 1 : 0));
+              st = allocateWorker(st, 'electronics', each + (rem > 1 ? 1 : 0));
+              st = allocateWorker(st, 'research', each);
+              return st;
+            });
+          }}
+        >
+          Balance All ({pool} workers)
+        </button>
+      )}
       <p className="mining-hint">
         {!efficient ? 'Assign at least 1 worker to each line for +50% efficiency bonus' : ''}
         {efficient && !fullCapacity ? `Assign all ${available} remaining worker${available !== 1 ? 's' : ''} for x2 full capacity bonus` : ''}
