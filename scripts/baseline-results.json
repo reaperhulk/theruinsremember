@@ -1,47 +1,46 @@
 {
   "timestamp": "2026-04-05",
-  "description": "Regression baseline after 20-iteration improvement plan",
+  "description": "Regression baseline after iterations 30-49 (second improvement plan)",
   "profiles": {
     "optimal": {
       "finalEra": 10,
       "completed": true,
-      "timeMinutes": 9.88,
+      "timeMinutes": 10.95,
       "upgradeCount": 579,
       "techCount": 101,
       "prestiges": 0,
-      "gems": 95,
-      "tuningScore": 65,
+      "gems": 129,
+      "tuningScore": 60,
       "senateInfluence": 14,
       "realityKeys": 4
     },
     "casual": {
       "finalEra": 10,
       "completed": true,
-      "timeMinutes": 34.23,
+      "timeMinutes": 37.48,
       "upgradeCount": 520,
       "techCount": 101,
       "prestiges": 0,
       "gems": 340,
-      "tuningScore": 65,
-      "senateInfluence": 72,
+      "tuningScore": 60,
+      "senateInfluence": 70,
       "realityKeys": 4
     },
     "noMinigames": {
       "finalEra": 10,
       "completed": true,
-      "timeMinutes": 125.73,
+      "timeMinutes": 126.02,
       "upgradeCount": 466,
       "techCount": 101,
       "prestiges": 0,
-      "gems": 1308
+      "gems": 1263
     }
   },
   "notes": [
-    "Optimal completes ~10 minutes of simulated time — pre-existing baseline (< 30 min real-time)",
-    "Casual profile meets the >=30 minute first-run requirement at 34m",
-    "noMinigames now completes era 10 — was stuck in era 9 before era 9 pacing fixes",
-    "Senate directive sliders now affect tick.js production",
-    "Cosmic Tuning reward tiers apply to cosmicPower production",
-    "Reality Forge Temporal/Spatial/Causal keys give +25% quantumEchoes bonus"
+    "Optimal: 10m57s (stable vs previous 9m53s — marginal drift from new features)",
+    "Casual: 37m29s — meets >=30 minute first-run requirement",
+    "noMinigames: 2h06m — stable completion of era 10",
+    "All 248 tests pass, clean production build (901KB JS, 37KB CSS)",
+    "New features: bulk purchase, era splits, resource forecast, mobile swipe, event log, auto-connect, clipboard save, factory balance, etc."
   ]
 }
