@@ -86,6 +86,11 @@ export const HackingPanel = memo(function HackingPanel({ state, onUpdate }) {
       <div className="hack-info">
         <span>Hacks: {successes}</span>
         <span>Difficulty: {difficulty}</span>
+        {successes > 0 && (
+          <span style={{ color: '#88cc88' }}>
+            Rate: {Math.round((successes / Math.max(1, successes + (state.hackFailures || 0))) * 100)}%
+          </span>
+        )}
       </div>
       <div style={{ height: '6px', background: '#222', borderRadius: '3px', margin: '4px 0' }} title={`Difficulty ${difficulty}/10 — longer sequences, less time to memorize`}>
         <div style={{
