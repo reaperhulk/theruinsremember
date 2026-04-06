@@ -50,9 +50,17 @@ export function HelpOverlay({ onClose }) {
             <strong>Prestige</strong>
             <p>At Era 10 you can reset for permanent multipliers and upgrades. The cycle is part of progression, not just a post-game screen.</p>
           </div>
+          <div className="help-card">
+            <strong>Supply Chains</strong>
+            <p>Food feeds Labor, Energy feeds Electronics, Fuel feeds Orbital, Exotic feeds Colonies, Forge feeds Megastructures. If supply runs out, downstream production throttles.</p>
+          </div>
+          <div className="help-card">
+            <strong>Trading</strong>
+            <p>Unlocks at Era 4. Convert surplus resources into ones you need. Quick trades auto-suggest the best exchanges.</p>
+          </div>
           <div className="help-card help-card-wide">
             <strong>Controls</strong>
-            <p>Tabs: 1-6 | Mine: Space | Dock: D | Hack: 0-3 | Tune: Arrows | Help: ?</p>
+            <p>Tabs: 1-6 | Mine: Space | Dock: D | Hack: 0-3 | Tune: Arrows/Enter | Weave: D/W/C | Help: ?</p>
           </div>
         </div>
         <p style={{ textAlign: 'center', color: '#555', marginTop: '12px', fontSize: '0.8em' }}>Click outside or press Escape to close</p>
