@@ -39,9 +39,22 @@ function AchievementWithProgress({ a }) {
   );
 }
 
+const ACHIEVEMENT_CATEGORIES = [
+  { key: 'all', label: 'All' },
+  { key: 'mining', label: 'Mining' },
+  { key: 'eras', label: 'Eras' },
+  { key: 'upgrades', label: 'Upgrades' },
+  { key: 'trading', label: 'Trading' },
+  { key: 'minigames', label: 'Mini-Games' },
+  { key: 'prestige', label: 'Prestige' },
+  { key: 'collection', label: 'Collection' },
+  { key: 'milestones', label: 'Milestones' },
+];
+
 export const StatsPanel = memo(function StatsPanel({ state }) {
   const [showCodexOverride, setShowCodexOverride] = useState(null);
   const [showEarned, setShowEarned] = useState(true);
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const achievementList = getAchievementList(state);
   const earnedCount = achievementList.filter(a => a.earned).length;
 

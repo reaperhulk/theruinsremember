@@ -1,5 +1,5 @@
 import { drawFragment, resolveWeave, clearGrid, getWeavingStats } from '../engine/weaving.js';
-import { useState, useRef, memo } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 
 const TYPE_COLORS = {
   temporal: '#ff8866',
@@ -16,14 +16,14 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
   const stats = getWeavingStats(state);
   const grid = stats.grid;
 
-  const handleDraw = () => {
+  const handleDraw = useCallback(() => {
     onUpdate(s => {
       const { state: newState } = drawFragment(s);
       return newState;
     });
-  };
+  }, [onUpdate]);
 
-  const handleWeave = () => {
+  const handleWeave = useCallback(() => {
     onUpdate(s => {
       const { state: newState, matched, matchType } = resolveWeave(s);
       setLastMatch(matched ? matchType : null);
@@ -34,12 +34,23 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
       }
       return newState;
     });
-  };
+  }, [onUpdate]);
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setLastMatch(null);
     onUpdate(s => clearGrid(s));
-  };
+  }, [onUpdate]);
+
+  // Keyboard shortcuts: D = draw, W = weave, C = clear
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'd' || e.key === 'D') { e.preventDefault(); handleDraw(); }
+      if ((e.key === 'w' || e.key === 'W') && hasMatch) { e.preventDefault(); handleWeave(); }
+      if ((e.key === 'c' || e.key === 'C') && grid.length > 0) { e.preventDefault(); handleClear(); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleDraw, handleWeave, handleClear, hasMatch, grid.length]);
 
   // Count fragments by type
   const counts = {};
@@ -110,6 +121,7 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
       <p className="mining-hint">
         TMP=Temporal SPC=Spatial CSL=Causal QNT=Quantum ***=Chaos(wild)
         <br />3 of a kind to weave | Chaos counts as any type | Combos boost rewards | Grid clears after 120s
+        <br />Keys: [D] draw | [W] weave | [C] clear
       </p>
     </div>
   );
