@@ -234,12 +234,16 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   // Pre-compute enables counts for all upgrades (avoids O(N*M) per render)
   const enablesCountMap = useMemo(() => {
     const map = {};
+    const namesMap = {};
     for (const u of Object.values(upgradeDefs)) {
       if (state.upgrades[u.id]) continue;
       for (const prereq of u.prerequisites) {
         map[prereq] = (map[prereq] || 0) + 1;
+        if (!namesMap[prereq]) namesMap[prereq] = [];
+        if (namesMap[prereq].length < 5) namesMap[prereq].push(u.name);
       }
     }
+    map._names = namesMap;
     return map;
   }, [state.upgrades]);
 
@@ -471,7 +475,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 {isMechanic && <span className="effect-tag effect-mechanic" title={mechanicDescriptions[upgrade.mechanic] || 'Special mechanic'}>MECHANIC</span>}
               </div>
               {enablesCountMap[upgrade.id] > 0 && (
-                <div className="text-hint" style={{ color: enablesCountMap[upgrade.id] >= 5 ? '#ddaa44' : enablesCountMap[upgrade.id] >= 3 ? '#88ccaa' : '#777' }}>Enables {enablesCountMap[upgrade.id]} upgrade{enablesCountMap[upgrade.id] > 1 ? 's' : ''}</div>
+                <div className="text-hint" style={{ color: enablesCountMap[upgrade.id] >= 5 ? '#ddaa44' : enablesCountMap[upgrade.id] >= 3 ? '#88ccaa' : '#777' }} title={enablesCountMap._names[upgrade.id]?.join(', ') || ''}>Enables {enablesCountMap[upgrade.id]} upgrade{enablesCountMap[upgrade.id] > 1 ? 's' : ''}: {(enablesCountMap._names[upgrade.id] || []).slice(0, 3).join(', ')}{enablesCountMap[upgrade.id] > 3 ? '...' : ''}</div>
               )}
               {!affordable && (() => {
                 const eta = getTimeToAfford(state, cost);
