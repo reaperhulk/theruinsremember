@@ -119,8 +119,9 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
       <h2>Resources ({unlockedResources.length} unlocked)</h2>
       <div className="resource-status-strip">
         <span className="resource-status-pill">{unlockedResources.filter(r => r.rate > 0).length} producing</span>
+        <span className="resource-status-pill" style={{ color: '#88dd88' }}>+{formatNumber(unlockedResources.reduce((s, r) => s + Math.max(0, r.rate), 0))}/s total</span>
         <span className="resource-status-pill">{cappedResources.length} capped</span>
-        <span className="resource-status-pill">{throttledChains.length} strained chains</span>
+        {throttledChains.length > 0 && <span className="resource-status-pill">{throttledChains.length} strained</span>}
       </div>
       {throttledChains.length >= 2 && (
         <div className="resource-alert">
