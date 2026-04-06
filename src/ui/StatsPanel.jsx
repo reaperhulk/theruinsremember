@@ -292,9 +292,27 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
       <div className="achievement-progress-bar">
         <div className="achievement-progress-fill" style={{ width: `${Math.floor(earnedCount / achievementList.length * 100)}%` }} />
       </div>
+      <div className="filter-chips" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
+        {ACHIEVEMENT_CATEGORIES.map(cat => {
+          const count = cat.key === 'all'
+            ? achievementList.length
+            : achievementList.filter(a => a.category === cat.key).length;
+          return (
+            <button
+              key={cat.key}
+              className={categoryFilter === cat.key ? 'active' : ''}
+              onClick={() => setCategoryFilter(cat.key)}
+              style={{ fontSize: '0.7em', padding: '1px 6px', cursor: 'pointer', background: categoryFilter === cat.key ? '#2a2418' : '#222', border: `1px solid ${categoryFilter === cat.key ? '#886622' : '#444'}`, color: categoryFilter === cat.key ? '#ddbb66' : '#aaa', borderRadius: '3px', fontFamily: 'inherit' }}
+            >
+              {cat.label}<span style={{ fontSize: '0.8em', marginLeft: '2px', opacity: 0.7 }}>{count}</span>
+            </button>
+          );
+        })}
+      </div>
       {!showEarned && (() => {
-        const lockedAchievements = achievementList.filter(a => !a.earned).sort((a, b) => (a.reward || 0) - (b.reward || 0)).slice(0, 15);
-        const totalLocked = achievementList.length - earnedCount;
+        const filtered = categoryFilter === 'all' ? achievementList : achievementList.filter(a => a.category === categoryFilter);
+        const lockedAchievements = filtered.filter(a => !a.earned).sort((a, b) => (a.reward || 0) - (b.reward || 0)).slice(0, 15);
+        const totalLocked = filtered.filter(a => !a.earned).length;
         return (
           <div className="achievement-list" style={{ marginBottom: '6px' }}>
             <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '2px' }}>
@@ -306,32 +324,37 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
           </div>
         );
       })()}
-      {showEarned && (
+      {showEarned && (() => {
+        const filtered = categoryFilter === 'all' ? achievementList : achievementList.filter(a => a.category === categoryFilter);
+        const filteredLocked = filtered.filter(a => !a.earned);
+        const filteredEarned = filtered.filter(a => a.earned);
+        return (
         <>
-          {achievementList.filter(a => !a.earned).length > 0 && achievementList.filter(a => !a.earned).length <= 20 && (
+          {filteredLocked.length > 0 && filteredLocked.length <= 20 && (
             <div className="achievement-list" style={{ marginBottom: '6px' }}>
               <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '2px' }}>Next up:</div>
-              {achievementList.filter(a => !a.earned).slice(0, 3).map(a => (
+              {filteredLocked.slice(0, 3).map(a => (
                 <AchievementWithProgress key={a.id} a={a} />
               ))}
             </div>
           )}
           <div className="achievement-list">
-            {achievementList.filter(a => a.earned).reverse().map(a => (
+            {filteredEarned.reverse().map(a => (
               <div key={a.id} className="achievement earned">
                 <span className="achievement-name">{a.name}</span>
                 <span className="achievement-desc">{a.description}</span>
               </div>
             ))}
-            {achievementList.length - earnedCount > 0 && (
+            {filteredLocked.length > 0 && (
               <div className="achievement locked">
-                <span className="achievement-name">+ {achievementList.length - earnedCount} hidden</span>
+                <span className="achievement-name">+ {filteredLocked.length} hidden</span>
                 <span className="achievement-desc">Keep playing to discover them!</span>
               </div>
             )}
           </div>
         </>
-      )}
+        );
+      })()}
     </div>
   );
 });

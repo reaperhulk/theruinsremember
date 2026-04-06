@@ -22,6 +22,7 @@ import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
 import { setMuted, playPrestige } from './AudioManager.js';
 import { StatsPanel } from './StatsPanel.jsx';
+import { EventLog } from './EventLog.jsx';
 import { PrestigePanel } from './PrestigePanel.jsx';
 import { EraTransition } from './EraTransition.jsx';
 import { Toast } from './Toast.jsx';
@@ -383,6 +384,9 @@ export function App() {
         <div className="left-column">
           <GameCanvas state={state} onUpdate={updateState} />
           <ResourcePanel state={state} onUpdate={updateState} />
+          {(state.eventLog?.length > 0 || state.activeEffects?.length > 0) && (
+            <EventLog state={state} />
+          )}
         </div>
         <div className="right-column">
           <div className="tab-bar" role="tablist" aria-label="Game tabs">
