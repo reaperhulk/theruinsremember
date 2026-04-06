@@ -303,8 +303,8 @@ export function App() {
                   const data = JSON.parse(ev.target.result);
                   if (data.era && data.resources) {
                     const migrated = migrateState(data);
-                    localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() }));
-                    window.location.reload();
+                    updateState(() => ({ ...migrated, lastSaved: Date.now() }));
+                    try { localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() })); } catch {}
                   }
                 } catch { alert('Invalid save file. Please select a valid .json save.'); }
               };
