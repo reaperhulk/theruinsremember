@@ -340,7 +340,7 @@ export function EraProgress({ state }) {
         {state.bestEraTimes?.[state.era] !== undefined && state.era > 1 && (
           <span style={{ color: '#888' }}> (best: {formatTime(state.bestEraTimes[state.era])})</span>
         )}
-        <span> | {upgradeCount} upgrades | {techCount} tech</span>
+        <span> | {upgradeCount} upgrades | {techCount} tech{state.totalTime > 60 && ` | ${(upgradeCount / (state.totalTime / 60)).toFixed(1)}/min`}</span>
         {(state.totalGems || 0) > 0 && <span> | {state.totalGems} gems</span>}
         {state.prestigeMultiplier > 1 && (() => {
           const raw = state.prestigeMultiplier;
