@@ -5,7 +5,7 @@ import { eraNames } from '../engine/eras.js';
 import { getFactoryBonus } from '../engine/factory.js';
 import { getColonyBonus } from '../engine/colonies.js';
 import { getRouteBonus } from '../engine/starChart.js';
-import { formatNumber } from './format.js';
+import { formatNumber, formatTime } from './format.js';
 
 export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
   const [collapsed, setCollapsed] = useState({});
@@ -288,6 +288,15 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                           )}
                           <div style={{ color: '#88dd88' }}>Effective: {formatNumber(r.rate)}/s{net !== r.rate ? ` (net: ${formatNumber(net)}/s)` : ''}</div>
                           {cap > 0 && <div>Cap: {formatNumber(cap)} ({pctFull}% full)</div>}
+                          {net > 0 && cap > 0 && r.amount < cap && (
+                            <div style={{ color: '#aabbcc' }}>Full in: {formatTime(Math.ceil((cap - r.amount) / net))}</div>
+                          )}
+                          {net > 0 && cap === 0 && (
+                            <div style={{ color: '#aabbcc' }}>+{formatNumber(net * 60)} per min</div>
+                          )}
+                          {net < 0 && r.amount > 0 && (
+                            <div style={{ color: '#ff9966' }}>Empty in: {formatTime(Math.ceil(r.amount / Math.abs(net)))}</div>
+                          )}
                         </div>
                       );
                     })()}
