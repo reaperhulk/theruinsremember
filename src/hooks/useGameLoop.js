@@ -46,14 +46,17 @@ export function useGameLoop(initialState) {
               if (gained > 0) gains[id] = gained;
             }
           }
+          // Track upgrades and achievements earned offline
+          const upgradesGained = Object.keys(after.upgrades || {}).length - Object.keys(before.upgrades || {}).length;
+          const achievementsGained = Object.keys(after.achievements || {}).length - Object.keys(before.achievements || {}).length;
           // Store offline report (will be shown by UI)
           // For large offline periods, show processing indicator briefly
           const eraChanged = after.era > before.era;
           if (chunks > 100) {
-            setOfflineReport({ elapsed: offlineDt, processing: true, gains: {}, era: after.era, prevEra: before.era, eraChanged });
-            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged }), 300);
+            setOfflineReport({ elapsed: offlineDt, processing: true, gains: {}, era: after.era, prevEra: before.era, eraChanged, upgradesGained: 0, achievementsGained: 0 });
+            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged, upgradesGained, achievementsGained }), 300);
           } else {
-            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged }), 100);
+            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged, upgradesGained, achievementsGained }), 100);
           }
           return after;
         }

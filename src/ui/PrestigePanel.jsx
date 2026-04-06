@@ -111,29 +111,105 @@ export function PrestigePanel({ state, onUpdate }) {
               'Every ending is a library. You carry what matters into the next beginning.',
             ];
             const loreFlav = PRESTIGE_LORE[(state.prestigeCount || 0) % PRESTIGE_LORE.length];
+            const owned = state.prestigeUpgrades || {};
+            const hasPerfectMemory = !!owned.perfectMemory;
+            const activePerks = [];
+            if (owned.fastStart) activePerks.push({ name: 'Fast Start', desc: 'Auto-buy Era 1 upgrades' });
+            if (owned.cosmicInsight) activePerks.push({ name: 'Cosmic Insight', desc: 'Start at Era 2' });
+            if (owned.temporalMastery) activePerks.push({ name: 'Temporal Mastery', desc: 'Start at Era 3' });
+            if (owned.instantKnowledge) activePerks.push({ name: 'Instant Knowledge', desc: 'Era 1 tech pre-researched' });
+            if (owned.primordialMemory) activePerks.push({ name: 'Primordial Memory', desc: 'Era 1-3 tech pre-researched' });
+            if (owned.headStart) activePerks.push({ name: 'Head Start', desc: '+50% starting multiplier' });
+            if (owned.deepPockets) activePerks.push({ name: 'Deep Pockets', desc: 'Resource caps x3' });
+            if (owned.quantumMemory) activePerks.push({ name: 'Quantum Memory', desc: 'Keep 10% of resources' });
+            if (owned.cycleMastery) activePerks.push({ name: 'Cycle Mastery', desc: 'All production x2' });
+            if (owned.acceleratedDecay) activePerks.push({ name: 'Accelerated Decay', desc: 'All production x5' });
+            if (owned.eraMomentum) activePerks.push({ name: 'Era Momentum', desc: 'Keep 5% of production rates' });
+            if (hasPerfectMemory) activePerks.push({ name: 'Perfect Memory', desc: 'Keep mini-game progress' });
+            if (owned.cosmicAwareness) activePerks.push({ name: 'Cosmic Awareness', desc: 'Auto-buy lore upgrades' });
+
+            const rowStyle = { display: 'flex', justifyContent: 'space-between', padding: '2px 0' };
+            const labelStyle = { color: '#888', fontSize: '0.9em' };
+            const valStyle = { color: '#aaddff', fontSize: '0.9em' };
+            const sectionStyle = { marginTop: '6px', paddingTop: '5px', borderTop: '1px solid #223' };
+            const keepColor = '#66cc88';
+            const loseColor = '#cc6666';
+
             return (
               <div style={{ marginTop: '8px', padding: '10px', background: '#0e0e1a', border: '1px solid #336', borderRadius: '4px', fontSize: '0.85em' }}>
                 <p style={{ fontStyle: 'italic', color: '#7799bb', margin: '0 0 8px' }}>{loreFlav}</p>
-                <div style={{ display: 'grid', gap: '4px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#888' }}>Points earned:</span>
-                    <span style={{ color: '#aaddff' }}>+{summary.points} pts (total: {summary.totalPoints})</span>
+
+                {/* Multiplier before/after */}
+                <div style={{ display: 'grid', gap: '2px' }}>
+                  <div style={rowStyle}>
+                    <span style={labelStyle}>Multiplier:</span>
+                    <span style={valStyle}>
+                      x{formatNumber(state.prestigeMultiplier)}
+                      {state.prestigeMultiplier > 10 && ` (eff: x${formatNumber(getEffectivePrestige(state.prestigeMultiplier))})`}
+                      {' \u2192 '}
+                      <span style={{ color: '#88ffaa' }}>x{formatNumber(summary.newMultiplier)}</span>
+                      {summary.newMultiplier > 10 && ` (eff: x${formatNumber(getEffectivePrestige(summary.newMultiplier))})`}
+                      <span style={{ color: '#668' }}> (+{formatNumber(summary.bonus)})</span>
+                    </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#888' }}>Multiplier:</span>
-                    <span style={{ color: '#aaddff' }}>x{formatNumber(state.prestigeMultiplier)} → x{formatNumber(summary.newMultiplier)} (eff: x{formatNumber(getEffectivePrestige(summary.newMultiplier))})</span>
+                  <div style={rowStyle}>
+                    <span style={labelStyle}>Prestige Points:</span>
+                    <span style={valStyle}>
+                      {points} {'\u2192 '}
+                      <span style={{ color: '#88ffaa' }}>{summary.totalPoints}</span>
+                      <span style={{ color: '#668' }}> (+{summary.points} this run)</span>
+                    </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#888' }}>Build style:</span>
-                    <span style={{ color: archLabel.color }}>{archLabel.name} — {archLabel.desc}</span>
+                  <div style={rowStyle}>
+                    <span style={labelStyle}>Build style:</span>
+                    <span style={{ color: archLabel.color, fontSize: '0.9em' }}>{archLabel.name} — {archLabel.desc}</span>
                   </div>
-                  {firstUpgrades.length > 0 && (
-                    <div>
-                      <span style={{ color: '#888' }}>Suggested first buys: </span>
-                      <span style={{ color: '#ccaa66' }}>{firstUpgrades.map(u => u.name).join(', ')}</span>
-                    </div>
-                  )}
                 </div>
+
+                {/* What you keep */}
+                <div style={sectionStyle}>
+                  <div style={{ color: keepColor, fontWeight: 'bold', fontSize: '0.85em', marginBottom: '3px' }}>KEPT</div>
+                  <div style={{ display: 'grid', gap: '1px', fontSize: '0.9em', color: '#aac' }}>
+                    <span>Prestige upgrades ({Object.keys(owned).length} owned)</span>
+                    <span>Achievements ({Object.keys(state.achievements || {}).length} earned)</span>
+                    <span>Reality keys ({Object.keys(state.realityKeys || {}).length} found)</span>
+                    <span>Prestige points ({summary.totalPoints} after reset)</span>
+                    <span>Lifetime stats and best era times</span>
+                    {hasPerfectMemory && <span>Mini-game progress (via Perfect Memory)</span>}
+                  </div>
+                </div>
+
+                {/* What you lose */}
+                <div style={sectionStyle}>
+                  <div style={{ color: loseColor, fontWeight: 'bold', fontSize: '0.85em', marginBottom: '3px' }}>RESET</div>
+                  <div style={{ display: 'grid', gap: '1px', fontSize: '0.9em', color: '#aa8888' }}>
+                    <span>All resources{owned.quantumMemory ? ' (10% kept via Quantum Memory)' : ''}</span>
+                    <span>Upgrades ({Object.keys(state.upgrades || {}).length} owned)</span>
+                    <span>Tech research ({Object.keys(state.tech || {}).length} unlocked)</span>
+                    {!hasPerfectMemory && <span>Mini-game progress (hack, docking, weave)</span>}
+                    <span>Current era (Era {state.era} {'\u2192'} Era {owned.temporalMastery ? 3 : owned.cosmicInsight ? 2 : 1})</span>
+                  </div>
+                </div>
+
+                {/* Active prestige perks */}
+                {activePerks.length > 0 && (
+                  <div style={sectionStyle}>
+                    <div style={{ color: '#ccaa66', fontWeight: 'bold', fontSize: '0.85em', marginBottom: '3px' }}>ACTIVE PERKS</div>
+                    <div style={{ display: 'grid', gap: '1px', fontSize: '0.9em', color: '#bbaa77' }}>
+                      {activePerks.map(p => (
+                        <span key={p.name}>{p.name} — {p.desc}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Suggested first buys */}
+                {firstUpgrades.length > 0 && (
+                  <div style={sectionStyle}>
+                    <span style={{ color: '#888', fontSize: '0.9em' }}>Suggested buys: </span>
+                    <span style={{ color: '#ccaa66', fontSize: '0.9em' }}>{firstUpgrades.map(u => u.name).join(', ')}</span>
+                  </div>
+                )}
               </div>
             );
           })()}

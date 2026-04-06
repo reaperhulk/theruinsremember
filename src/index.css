@@ -2451,10 +2451,27 @@ canvas:hover {
   100% { background: transparent; box-shadow: none; }
 }
 
-/* Resource capped — visual indicator when production is wasted */
+/* Resource near cap — subtle pulse when 90-98% full */
+@keyframes near-cap-pulse {
+  0%, 100% { border-left-color: rgba(204, 170, 50, 0.4); background: rgba(204, 170, 50, 0.03); }
+  50% { border-left-color: rgba(204, 170, 50, 0.8); background: rgba(204, 170, 50, 0.08); }
+}
+
+.resource-row.resource-near-cap {
+  border-left: 2px solid rgba(204, 170, 50, 0.4);
+  animation: near-cap-pulse 3s ease-in-out infinite;
+}
+
+/* Resource capped — pulsing glow when production is wasted */
+@keyframes cap-pulse {
+  0%, 100% { border-left-color: #cc6633; background: rgba(204, 100, 50, 0.06); box-shadow: none; }
+  50% { border-left-color: #ee8844; background: rgba(204, 100, 50, 0.14); box-shadow: inset 0 0 8px rgba(204, 100, 50, 0.12); }
+}
+
 .resource-row.resource-capped {
   border-left: 2px solid #cc6633;
   background: rgba(204, 100, 50, 0.06);
+  animation: cap-pulse 2s ease-in-out infinite;
 }
 
 /* Mechanic upgrade styling */

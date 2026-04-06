@@ -67,6 +67,16 @@ export function OfflineReport({ report, onDismiss }) {
             Total: +{formatNumber(gains.reduce((s, [, v]) => s + v, 0))} resources earned
           </p>
         )}
+        {(report.upgradesGained > 0 || report.achievementsGained > 0) && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '4px', fontSize: '0.85em' }}>
+            {report.upgradesGained > 0 && (
+              <span style={{ color: '#aaddff' }}>+{report.upgradesGained} upgrade{report.upgradesGained > 1 ? 's' : ''} auto-bought</span>
+            )}
+            {report.achievementsGained > 0 && (
+              <span style={{ color: '#ffdd88' }}>+{report.achievementsGained} achievement{report.achievementsGained > 1 ? 's' : ''}</span>
+            )}
+          </div>
+        )}
         <button className="mine-btn" onClick={onDismiss}>Continue</button>
       </div>
     </div>
