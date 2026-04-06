@@ -142,6 +142,27 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
           The routes trace paths already worn into spacetime.
         </p>
       )}
+      {systems.length >= 2 && routes.length < 10 && (
+        <button
+          className="mine-btn"
+          style={{ marginTop: '4px', fontSize: '0.8em' }}
+          onClick={() => onUpdate(s => {
+            let st = s;
+            const sysList = getUnlockedSystems(st);
+            for (let i = 0; i < sysList.length && getRoutes(st).length < 10; i++) {
+              for (let j = i + 1; j < sysList.length && getRoutes(st).length < 10; j++) {
+                if (!routeExists(st, sysList[i].id, sysList[j].id)) {
+                  const result = createRoute(st, sysList[i].id, sysList[j].id);
+                  if (result) st = result;
+                }
+              }
+            }
+            return st;
+          })}
+        >
+          Auto-Connect ({Math.min(10 - routes.length, systems.length * (systems.length - 1) / 2 - routes.length)} slots)
+        </button>
+      )}
       <p className="mining-hint">
         {selected ? 'Click another system to create a route, or same system to deselect.' : 'Click/tap two systems to create or remove routes (5 dark energy + 1 star system).'}
         {stats.hubSystems > 0 && ' Hub systems (2+ routes) get +50% bonus.'}
