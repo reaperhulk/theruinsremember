@@ -322,6 +322,19 @@ export function App() {
           }}>
             Import
           </button>
+          <button className="reset-btn" aria-label="Paste save from clipboard" onClick={async () => {
+            try {
+              const text = await navigator.clipboard.readText();
+              const data = JSON.parse(text);
+              if (data.era && data.resources) {
+                const migrated = migrateState(data);
+                updateState(() => ({ ...migrated, lastSaved: Date.now() }));
+                try { localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() })); } catch {}
+              }
+            } catch { /* clipboard unavailable or invalid data */ }
+          }} title="Import save from clipboard">
+            Paste
+          </button>
           <button className="reset-btn" aria-label="Hard reset all progress" onClick={() => {
             setConfirmDialog({
               lines: ['Hard reset?', 'This erases ALL progress including prestige upgrades!'],
