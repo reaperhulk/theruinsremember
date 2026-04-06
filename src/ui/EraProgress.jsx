@@ -360,6 +360,19 @@ export function EraProgress({ state }) {
           );
         })()}
       </div>
+      {state.era > 2 && state.bestEraTimes && Object.keys(state.bestEraTimes).length > 1 && (
+        <div className="era-splits" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '3px', fontSize: '0.65em', color: '#777' }}>
+          {Array.from({ length: state.era - 1 }, (_, i) => i + 2).map(era => {
+            const time = state.bestEraTimes[era];
+            if (time === undefined) return null;
+            return (
+              <span key={era} style={{ padding: '0 3px', borderRight: '1px solid #333' }}>
+                E{era}: {formatTime(time)}
+              </span>
+            );
+          })}
+        </div>
+      )}
       {hasOrbitalResonance && miniGameCount > 0 && (
         <p style={{ fontSize: '0.75em', color: '#aaddff', marginTop: '4px' }}>
           Orbital Resonance: {miniGameCount} mini-game{miniGameCount !== 1 ? 's' : ''} active (+{miniGameCount * 10}% all production)
