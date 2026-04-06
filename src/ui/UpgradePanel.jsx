@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useMemo, useEffect, memo } from 'react';
-import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades } from '../engine/upgrades.js';
+import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades, buyAllAffordable } from '../engine/upgrades.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
@@ -396,6 +396,25 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 <option key={id} value={id}>{resourceDefs[id]?.name || id}</option>
               ))}
           </select>
+          {sortedAvailable.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id))).length > 1 && (
+            <>
+              <span style={{ borderLeft: '1px solid #333', margin: '0 4px' }} />
+              <button
+                className="buy-all-btn"
+                onClick={() => {
+                  const { state: newState, count } = buyAllAffordable(state);
+                  if (count > 0) {
+                    playUpgrade();
+                    onUpdate(() => newState);
+                  }
+                }}
+                title="Purchase all affordable non-repeatable upgrades"
+                style={{ background: '#1a2a1a', border: '1px solid #3a5a3a', color: '#88cc88', fontFamily: 'inherit', fontSize: '0.75em', padding: '2px 8px', borderRadius: '3px', cursor: 'pointer' }}
+              >
+                Buy All ({sortedAvailable.filter(u => !u.repeatable && canAfford(state, getUpgradeCost(state, u.id))).length})
+              </button>
+            </>
+          )}
         </div>
       )}
       <div className="upgrade-list">

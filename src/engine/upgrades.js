@@ -257,6 +257,29 @@ export function getUpcomingUpgrades(state) {
   }).slice(0, 5); // Show max 5 upcoming
 }
 
+// Buy all affordable non-repeatable upgrades (multi-pass for chains).
+// Returns { state, count } where count is the number purchased.
+export function buyAllAffordable(state) {
+  let current = state;
+  let total = 0;
+  for (let pass = 0; pass < 10; pass++) {
+    let boughtAny = false;
+    for (const def of Object.values(upgradeDefs)) {
+      if (def.era > current.era) continue;
+      if (def.repeatable) continue;
+      if (current.upgrades[def.id]) continue;
+      const result = purchaseUpgrade(current, def.id);
+      if (result) {
+        current = result;
+        total++;
+        boughtAny = true;
+      }
+    }
+    if (!boughtAny) break;
+  }
+  return { state: current, count: total };
+}
+
 // Get list of purchased upgrades
 export function getPurchasedUpgrades(state) {
   return Object.keys(state.upgrades).map(id => {
