@@ -76,6 +76,7 @@ export function App() {
   const [victoryDismissed, setVictoryDismissed] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(null);
+  const touchStartRef = useRef(null);
   const prevPerfectsRef = useRef(state.dockingPerfects || 0);
 
   // Sync audio muted state
@@ -415,7 +416,23 @@ export function App() {
               );
             })}
           </div>
-          <div className="tab-content" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+          <div
+            className="tab-content"
+            role="tabpanel"
+            id={`tabpanel-${activeTab}`}
+            aria-labelledby={`tab-${activeTab}`}
+            onTouchStart={e => { touchStartRef.current = e.touches[0].clientX; }}
+            onTouchEnd={e => {
+              if (touchStartRef.current === null) return;
+              const dx = e.changedTouches[0].clientX - touchStartRef.current;
+              touchStartRef.current = null;
+              if (Math.abs(dx) < 60) return;
+              const tabIds = tabs.map(t => t.id);
+              const idx = tabIds.indexOf(activeTab);
+              if (dx < 0 && idx < tabIds.length - 1) setActiveTab(tabIds[idx + 1]);
+              if (dx > 0 && idx > 0) setActiveTab(tabIds[idx - 1]);
+            }}
+          >
             {activeTab === 'upgrades' && (
               <UpgradePanel state={state} onUpdate={updateState} />
             )}
