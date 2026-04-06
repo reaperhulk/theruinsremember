@@ -293,6 +293,12 @@ export function App() {
           }}>
             Export
           </button>
+          <button className="reset-btn" aria-label="Copy save to clipboard" onClick={() => {
+            const save = localStorage.getItem('incremental-game-save');
+            if (save) { navigator.clipboard.writeText(save).catch(() => {}); }
+          }} title="Copy save data to clipboard">
+            Copy
+          </button>
           <button className="reset-btn" aria-label="Import save file" onClick={() => {
             const input = document.createElement('input');
             input.type = 'file'; input.accept = '.json';
