@@ -182,23 +182,23 @@ describe('tick', () => {
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount, 5);
   });
 
-  it('orbitalResonance gives +10% per mini-game interacted with', () => {
+  it('orbitalResonance gives +10% per operation system engaged', () => {
     const state = createInitialState();
     state.upgrades = { orbitalResonance: true };
-    // Interact with 3 mini-games: mining (totalGems), factory, hacking
-    state.totalGems = 1;
-    state.factoryAllocation = { steel: 1 };
-    state.hackSuccesses = 1;
+    // Engage with three current systems: expeditions, orbital operations, routes.
+    state.expedition.totalFinds = 1;
+    state.dockingAttempts = 1;
+    state.starRoutes = [{ from: 'sol', to: 'alpha' }];
     const baseTick = tick(createInitialState(), 1, NO_EVENT);
     const bonusTick = tick(state, 1, NO_EVENT);
-    // 3 mini-games * 10% = 30% bonus on food: 1.5 + 1.5*0.3 = 1.95
+    // 3 systems * 10% = 30% bonus on food: 1.5 + 1.5*0.3 = 1.95
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount * 1.3, 1);
   });
 
-  it('orbitalResonance gives no bonus with zero mini-game interaction', () => {
+  it('orbitalResonance gives no bonus with zero operation activity', () => {
     const state = createInitialState();
     state.upgrades = { orbitalResonance: true };
-    // No mini-game interactions
+    // No operation activity
     const baseTick = tick(createInitialState(), 1, NO_EVENT);
     const bonusTick = tick(state, 1, NO_EVENT);
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount, 5);

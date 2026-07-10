@@ -146,8 +146,7 @@ export const HackingPanel = memo(function HackingPanel({ state, onUpdate }) {
               const eraScale = 1 + (state.era - 3) * 0.3;
               const savantMult = state.prestigeUpgrades?.miniGameSavant ? 1.5 : 1;
               const mult = challenge.multiplier * Math.max(1, eraScale) * savantMult;
-              const secs = state.prestigeUpgrades?.hackMaster ? 60 : 30;
-              return `x${mult.toFixed(1)} × ${secs}s burst of Data & Software`;
+              return `x${mult.toFixed(1)} × 30s burst of Data & Software`;
             })()}
             {difficulty > 0 && <span style={{ color: '#888' }}> (difficulty {difficulty})</span>}
           </div>

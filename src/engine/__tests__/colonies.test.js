@@ -53,6 +53,16 @@ describe('colonies', () => {
     expect(getColonyBonus(state)).toEqual({});
   });
 
+  it('doubles focus output with Colony Logistics', () => {
+    let state = makeEra5State();
+    state = assignColonies(state, 'growth', 2);
+    const baseline = getColonyBonus(state);
+    state.prestigeUpgrades.factoryExpert = true;
+    const improved = getColonyBonus(state);
+    expect(improved.food).toBeCloseTo(baseline.food * 2);
+    expect(improved.labor).toBeCloseTo(baseline.labor * 2);
+  });
+
   it('allows reassigning colony counts', () => {
     const state = makeEra5State();
     let s = assignColonies(state, 'growth', 3);

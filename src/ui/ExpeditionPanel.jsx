@@ -1,7 +1,8 @@
 import { memo, useState } from 'react';
 import {
   EXPEDITION_MAX_SUPPLIES,
-  EXPEDITION_SUPPLY_INTERVAL,
+  getExpeditionSupplyInterval,
+  getExpeditionSuccessChance,
   getExpeditionRoutes,
   runExpedition,
 } from '../engine/expeditions.js';
@@ -18,10 +19,11 @@ export const ExpeditionPanel = memo(function ExpeditionPanel({ state, onUpdate }
   const [lastResult, setLastResult] = useState(null);
   const expedition = state.expedition;
   const routes = getExpeditionRoutes(state.era);
-  const secondsRemaining = Math.max(0, EXPEDITION_SUPPLY_INTERVAL - expedition.supplyProgress);
+  const supplyInterval = getExpeditionSupplyInterval(state);
+  const secondsRemaining = Math.max(0, supplyInterval - expedition.supplyProgress);
   const progress = expedition.supplies >= EXPEDITION_MAX_SUPPLIES
     ? 100
-    : (expedition.supplyProgress / EXPEDITION_SUPPLY_INTERVAL) * 100;
+    : (expedition.supplyProgress / supplyInterval) * 100;
 
   const handleRoute = routeId => {
     const outcome = runExpedition(state, routeId);
@@ -69,7 +71,7 @@ export const ExpeditionPanel = memo(function ExpeditionPanel({ state, onUpdate }
           >
             <span className="expedition-route-topline">
               <strong>{route.name}</strong>
-              <span>{Math.round(route.chance * 100)}% success</span>
+              <span>{Math.round(getExpeditionSuccessChance(state, route) * 100)}% success</span>
             </span>
             <span className="expedition-route-desc">{route.description}</span>
             <span className="expedition-route-reward">{route.discovery} discovery {formatRewards(route.rewards)}</span>

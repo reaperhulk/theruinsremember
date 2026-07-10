@@ -4,14 +4,14 @@ import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.j
 import { getFactoryBonus } from './factory.js';
 import { getColonyBonus } from './colonies.js';
 import { getRouteBonus } from './starChart.js';
-import { mine } from './mining.js';
 import { checkAchievements } from './achievements.js';
 import { checkComboReset } from './weaving.js';
 import { purchaseUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { getSenatePctBonuses } from './senate.js';
 import { getTuningProductionBonus } from './tuning.js';
-import { advanceExpeditionSupplies } from './expeditions.js';
+import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes, runExpedition } from './expeditions.js';
+import { getActiveSystems } from './operations.js';
 
 // Resource consumption rates — moderate tension without breaking non-minigame paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
@@ -192,6 +192,10 @@ export function tick(state, dt, rng = Math.random) {
   };
 
   newState = advanceExpeditionSupplies(newState, dt);
+  if (newState.era <= 3 && newState.prestigeUpgrades?.autoClicker && newState.expedition?.supplies >= EXPEDITION_MAX_SUPPLIES) {
+    const safeRoute = getExpeditionRoutes(newState.era)[0];
+    newState = runExpedition(newState, safeRoute.id, rng).state;
+  }
 
   const eventResult = checkForEvent(newState, dt, rng());
   newState = eventResult.state;
@@ -235,21 +239,6 @@ export function tick(state, dt, rng = Math.random) {
 
   // Check weave combo reset (120s inactivity)
   newState = checkComboReset(newState);
-
-  // Auto-mine (prestige upgrade)
-  if (newState.prestigeUpgrades && newState.prestigeUpgrades.autoClicker) {
-    const autoMineTimer = (newState.autoMineTimer || 0) + dt;
-    if (autoMineTimer >= 1) {
-      const { state: minedState, foundGem } = mine(newState, rng(), { skipCooldown: true });
-      newState = {
-        ...minedState,
-        autoMineTimer: autoMineTimer - 1,
-        totalGems: foundGem ? (minedState.totalGems || 0) + 1 : (minedState.totalGems || 0),
-      };
-    } else {
-      newState = { ...newState, autoMineTimer };
-    }
-  }
 
   // Track total production for stats
   {
@@ -391,19 +380,11 @@ export function tick(state, dt, rng = Math.random) {
     }
   }
 
-  // miniGameSynergy: +10% per mini-game interacted with
+  // System synergy: +10% per operation system engaged with this cycle.
   if (newState.upgrades?.orbitalResonance) {
-    let miniCount = 0;
-    if ((newState.totalGems || 0) > 0) miniCount++;
-    if ((newState.factoryAllocation?.steel || 0) > 0 || (newState.factoryAllocation?.electronics || 0) > 0) miniCount++;
-    if ((newState.hackSuccesses || 0) > 0) miniCount++;
-    if ((newState.dockingAttempts || 0) > 0) miniCount++;
-    if ((newState.colonyAssignments?.growth || 0) > 0 || (newState.colonyAssignments?.science || 0) > 0) miniCount++;
-    if ((newState.starRoutes?.length || 0) > 0) miniCount++;
-    if ((newState.totalWeaves || 0) > 0) miniCount++;
-
-    if (miniCount > 0) {
-      newState = applyProductionBonus(newState, miniCount * 0.10 * complexityTaxFactor, dt);
+    const activeSystemCount = getActiveSystems(newState).length;
+    if (activeSystemCount > 0) {
+      newState = applyProductionBonus(newState, activeSystemCount * 0.10 * complexityTaxFactor, dt);
     }
   }
 

@@ -143,7 +143,7 @@ export function PrestigePanel({ state, onUpdate }) {
             if (owned.cycleMastery) activePerks.push({ name: 'Cycle Mastery', desc: 'All production x2' });
             if (owned.acceleratedDecay) activePerks.push({ name: 'Accelerated Decay', desc: 'All production x5' });
             if (owned.eraMomentum) activePerks.push({ name: 'Era Momentum', desc: 'Keep 5% of production rates' });
-            if (hasPerfectMemory) activePerks.push({ name: 'Perfect Memory', desc: 'Keep mini-game progress' });
+            if (hasPerfectMemory) activePerks.push({ name: 'Perfect Memory', desc: 'Keep operation progress' });
             if (owned.cosmicAwareness) activePerks.push({ name: 'Cosmic Awareness', desc: 'Auto-buy lore upgrades' });
 
             const rowStyle = { display: 'flex', justifyContent: 'space-between', padding: '2px 0' };
@@ -204,7 +204,7 @@ export function PrestigePanel({ state, onUpdate }) {
                     <span>All resources{owned.quantumMemory ? ' (10% kept via Quantum Memory)' : ''}</span>
                     <span>Upgrades ({Object.keys(state.upgrades || {}).length} owned)</span>
                     <span>Tech research ({Object.keys(state.tech || {}).length} unlocked)</span>
-                    {!hasPerfectMemory && <span>Mini-game progress (hack, docking, weave)</span>}
+                    {!hasPerfectMemory && <span>Operation progress (docking, routes, weaving, assembly, tuning)</span>}
                     <span>Current era (Era {state.era} {'\u2192'} Era {owned.temporalMastery ? 3 : owned.cosmicInsight ? 2 : 1})</span>
                   </div>
                 </div>

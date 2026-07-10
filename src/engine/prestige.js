@@ -72,8 +72,8 @@ export function calculatePrestigePoints(state) {
   // Bonus for upgrade completion across all eras (rewards thorough play)
   const totalUpgrades = Object.keys(state.upgrades).length;
   points += Math.floor(totalUpgrades / 20); // 1 point per 20 upgrades
-  // Small bonus for mini-game mastery (deep engagement reward)
-  points += Math.floor((state.hackSuccesses || 0) / 30);
+  // Small bonus for operation mastery (deep engagement reward)
+  points += Math.floor((state.expedition?.totalFinds || 0) / 10);
   points += Math.floor((state.dockingPerfects || 0) / 20);
   points += Math.floor((state.totalWeaves || 0) / 15);
   return points;
@@ -255,12 +255,13 @@ export function performPrestige(state) {
   if (state.gameComplete) newState.gameComplete = true;
   if (state.trueEnding) newState.trueEnding = true;
 
-  // Perfect Memory: keep mini-game progress
+  // Perfect Memory: keep current operation progress.
   if (hasPrestigeUpgrade(state, 'perfectMemory')) {
-    newState.hackDifficulty = state.hackDifficulty || 0;
-    newState.hackSuccesses = state.hackSuccesses || 0;
     newState.dockingSuccesses = state.dockingSuccesses || 0;
     newState.dockingPerfects = state.dockingPerfects || 0;
+    newState.dockingMissions = state.dockingMissions || { cargo: 0, crew: 0, science: 0 };
+    newState.colonyAssignments = state.colonyAssignments || { growth: 0, science: 0, industry: 0 };
+    newState.starRoutes = state.starRoutes || [];
     newState.totalWeaves = state.totalWeaves || 0;
     newState.dysonSegments = state.dysonSegments || 0;
     newState.tuningScore = state.tuningScore || 0;

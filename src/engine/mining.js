@@ -13,9 +13,7 @@ const MINE_COOLDOWN = 0.5;         // seconds between manual mines
 // Calculate current gem chance based on mining streak
 export function getGemChance(state) {
   const streak = state.miningStreak || 0;
-  const hasLuckyMiner = state.prestigeUpgrades && state.prestigeUpgrades.luckyMiner;
-  const baseChance = hasLuckyMiner ? BASE_GEM_CHANCE * 2 : BASE_GEM_CHANCE;
-  return Math.min(baseChance + streak * STREAK_BONUS, MAX_GEM_CHANCE);
+  return Math.min(BASE_GEM_CHANCE + streak * STREAK_BONUS, MAX_GEM_CHANCE);
 }
 
 // Perform a mine action. Returns { state, foundGem }.

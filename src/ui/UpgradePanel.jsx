@@ -34,7 +34,7 @@ const mechanicDescriptions = {
   purchaseBurst: 'Buying upgrades grants 5s of all resources',
   eraCompounding: '1.1x multiplier per era (compounds)',
   canvasDataCache: '20% chance on click to find data cache',
-  miniGameSynergy: '+10% production per mini-game used',
+  miniGameSynergy: '+10% production per operation system engaged',
   dockingBoost: 'Perfect docks boost all production 5% for 30s',
   colonyMultiplier: 'Colony focus multiplies target resources 1.5x',
   autoDeposit: 'Canvas deposits auto-collected after 5s',

@@ -103,15 +103,25 @@ describe('prestige', () => {
     it('calculates points based on era reached', () => {
       const state = createInitialState();
       state.era = 7;
-      // Era 7 = 5 points (no upgrades, no mini-games)
+      // Era 7 = 5 points (no upgrades or operation activity)
       expect(calculatePrestigePoints(state)).toBe(5);
     });
 
     it('gives graduated points for deep eras', () => {
       const state = createInitialState();
       state.era = 10;
-      // Era 7=5, 8=+7, 9=+8, 10=+10 = 30 (no upgrades, no mini-games)
+      // Era 7=5, 8=+7, 9=+8, 10=+10 = 30 (no upgrades or operation activity)
       expect(calculatePrestigePoints(state)).toBe(30);
+    });
+
+    it('rewards mastery of reachable operations', () => {
+      const state = createInitialState();
+      state.era = 10;
+      state.expedition.totalFinds = 20;
+      state.dockingPerfects = 20;
+      state.totalWeaves = 15;
+
+      expect(calculatePrestigePoints(state)).toBe(34);
     });
   });
 
@@ -204,6 +214,24 @@ describe('prestige', () => {
       const after = performPrestige(state);
       expect(after.prestigeUpgrades.luckyMiner).toBe(true);
       expect(after.prestigeUpgrades.fastStart).toBe(true);
+    });
+
+    it('Perfect Memory preserves current operation progress', () => {
+      const state = createInitialState();
+      state.era = 10;
+      state.prestigeUpgrades = { perfectMemory: true };
+      state.dockingMissions = { cargo: 3, crew: 2, science: 1 };
+      state.colonyAssignments = { growth: 2, science: 1, industry: 1 };
+      state.starRoutes = [{ from: 'sol', to: 'alpha' }];
+      state.dysonSegments = 30;
+      state.tuningScore = 50;
+
+      const after = performPrestige(state);
+      expect(after.dockingMissions).toEqual(state.dockingMissions);
+      expect(after.colonyAssignments).toEqual(state.colonyAssignments);
+      expect(after.starRoutes).toEqual(state.starRoutes);
+      expect(after.dysonSegments).toBe(30);
+      expect(after.tuningScore).toBe(50);
     });
   });
 });

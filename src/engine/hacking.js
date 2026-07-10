@@ -45,8 +45,7 @@ export function submitHack(state, playerSequence, rng = Math.random) {
     challenge.sequence.every((s, i) => s === playerSequence[i]);
 
   if (success) {
-    const hasHackMaster = state.prestigeUpgrades && state.prestigeUpgrades.hackMaster;
-    const burstSeconds = hasHackMaster ? BONUS_DURATION * 2 : BONUS_DURATION;
+    const burstSeconds = BONUS_DURATION;
     // Era scaling: hacks give bigger bonuses in later eras
     const eraScale = 1 + (state.era - 3) * 0.3;
     const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;

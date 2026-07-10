@@ -9,9 +9,6 @@ import { tick } from '../src/engine/tick.js';
 import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable } from '../src/engine/upgrades.js';
 import { unlockTech, getAvailableTech } from '../src/engine/tech.js';
 import { canAfford, gather, getNetRate } from '../src/engine/resources.js';
-import { mine } from '../src/engine/mining.js';
-import { allocateWorker, getWorkerPool } from '../src/engine/factory.js';
-import { startHack, submitHack } from '../src/engine/hacking.js';
 import { attemptDock, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
 import { assignColonies, getAssignableColonies } from '../src/engine/colonies.js';
 import { createRoute, getUnlockedSystems, routeExists, getRoutes } from '../src/engine/starChart.js';
@@ -87,11 +84,9 @@ function parseArgs(argv) {
 const PROFILES = {
   optimal: {
     description: 'Engage everything, buy everything, perfect mini-game play. Baseline for pacing.',
-    mine: true, gather: true, gatherInterval: 5,
+    gather: true, gatherInterval: 5,
     expeditions: true, expeditionStrategy: 'deep',
     buyUpgrades: true, buyTech: true,
-    factory: false, factoryStrategy: 'balanced',
-    hacking: false, hackInterval: 35,
     docking: true, dockInterval: 3, dockAccuracy: 0,
     colonies: true, colonyStrategy: 'diversified',
     starChart: true,
@@ -115,11 +110,9 @@ const PROFILES = {
   },
   noMinigames: {
     description: 'Buy upgrades/tech, gather, but skip all mini-games. Tests: are mini-games required?',
-    mine: true, gather: true, gatherInterval: 5,
+    gather: true, gatherInterval: 5,
     expeditions: false, expeditionStrategy: 'safe',
     buyUpgrades: true, buyTech: true,
-    factory: false, factoryStrategy: 'balanced',
-    hacking: false, hackInterval: 35,
     docking: false, dockInterval: 3, dockAccuracy: 0,
     colonies: false, colonyStrategy: 'diversified',
     starChart: false,
@@ -139,11 +132,9 @@ const PROFILES = {
   },
   passive: {
     description: 'Only auto-production + upgrade buying. No clicking or mini-games. Tests: minimum viable progression.',
-    mine: false, gather: false, gatherInterval: 0,
+    gather: false, gatherInterval: 0,
     expeditions: false, expeditionStrategy: 'safe',
     buyUpgrades: true, buyTech: true,
-    factory: false, factoryStrategy: 'balanced',
-    hacking: false, hackInterval: 0,
     docking: false, dockInterval: 0, dockAccuracy: 0,
     colonies: false, colonyStrategy: 'diversified',
     starChart: false,
@@ -160,12 +151,10 @@ const PROFILES = {
     ],
   },
   clickerOnly: {
-    description: 'Mining + gathering every tick, no mini-games. Tests: how far can clicking carry you?',
-    mine: true, gather: true, gatherInterval: 1,
+    description: 'Gather every tick, but skip operations. Tests: how far can manual resource clicks carry you?',
+    gather: true, gatherInterval: 1,
     expeditions: false, expeditionStrategy: 'safe',
     buyUpgrades: true, buyTech: true,
-    factory: false, factoryStrategy: 'balanced',
-    hacking: false, hackInterval: 0,
     docking: false, dockInterval: 0, dockAccuracy: 0,
     colonies: false, colonyStrategy: 'diversified',
     starChart: false,
@@ -183,11 +172,9 @@ const PROFILES = {
   },
   tradingHeavy: {
     description: 'All systems + aggressive trading of surplus into bottleneck resources. Tests: trading impact.',
-    mine: true, gather: true, gatherInterval: 5,
+    gather: true, gatherInterval: 5,
     expeditions: true, expeditionStrategy: 'deep',
     buyUpgrades: true, buyTech: true,
-    factory: false, factoryStrategy: 'balanced',
-    hacking: false, hackInterval: 35,
     docking: true, dockInterval: 3, dockAccuracy: 0,
     colonies: true, colonyStrategy: 'diversified',
     starChart: true,
@@ -210,11 +197,9 @@ const PROFILES = {
   },
   casual: {
     description: 'Simulates a regular player: gathers infrequently, misses docks, skips some mini-games.',
-    mine: true, gather: true, gatherInterval: 15,
+    gather: true, gatherInterval: 15,
     expeditions: true, expeditionStrategy: 'measured',
     buyUpgrades: true, buyTech: true,
-    factory: false, factoryStrategy: 'balanced',
-    hacking: false, hackInterval: 60,
     docking: true, dockInterval: 5, dockAccuracy: 0.15,
     colonies: true, colonyStrategy: 'growth',
     starChart: true,
@@ -273,15 +258,6 @@ const BALANCE_TARGETS = {
 
 // ─── Bot Action Functions ───────────────────────────────────────────────────
 
-function botMine(state, profile, t, rng) {
-  if (!profile.mine) return state;
-  const { state: afterMine, foundGem } = mine(state, rng(), { skipCooldown: true });
-  if (foundGem) {
-    return { ...afterMine, totalGems: (afterMine.totalGems || 0) + 1 };
-  }
-  return afterMine;
-}
-
 function botGather(state, profile, t, rng) {
   if (!profile.gather || !profile.gatherInterval) return state;
   if (t % profile.gatherInterval !== 0) return state;
@@ -334,57 +310,6 @@ function botBuyTech(state, profile, _t, _rng) {
       const result = unlockTech(state, tech.id);
       if (result) state = result;
     }
-  }
-  return state;
-}
-
-function botFactory(state, profile, t, _rng) {
-  if (!profile.factory || state.era < 2) return state;
-  // Re-allocate every 30s to adjust for changing worker pool
-  if (t % 30 !== 0) return state;
-
-  const pool = getWorkerPool(state);
-  if (pool < 1) return state;
-
-  const strategy = profile.factoryStrategy || 'balanced';
-  let alloc;
-  if (strategy === 'balanced') {
-    const perLine = Math.floor(pool / 3);
-    const remainder = pool - perLine * 3;
-    alloc = { steel: perLine, electronics: perLine, research: perLine + remainder };
-  } else if (strategy === 'steel') {
-    alloc = { steel: pool, electronics: 0, research: 0 };
-  } else if (strategy === 'electronics') {
-    alloc = { steel: 0, electronics: pool, research: 0 };
-  } else if (strategy === 'research') {
-    alloc = { steel: 0, electronics: 0, research: pool };
-  } else {
-    // Default balanced
-    const perLine = Math.floor(pool / 3);
-    const remainder = pool - perLine * 3;
-    alloc = { steel: perLine, electronics: perLine, research: perLine + remainder };
-  }
-
-  // Apply allocations (must set each line individually via allocateWorker)
-  for (const [line, count] of Object.entries(alloc)) {
-    const result = allocateWorker(state, line, count);
-    if (result) state = result;
-  }
-  return state;
-}
-
-function botHack(state, profile, t, rng) {
-  if (!profile.hacking || state.era < 3) return state;
-  const interval = profile.hackInterval || 35;
-  if (t % interval !== 0) return state;
-
-  // Start a hack and immediately solve it (bot always knows the answer)
-  const rolls = [];
-  for (let i = 0; i < 8; i++) rolls.push(rng());
-  state = startHack(state, rolls);
-  if (state.hackChallenge) {
-    const { state: afterHack } = submitHack(state, state.hackChallenge.sequence, rng);
-    state = afterHack;
   }
   return state;
 }
@@ -643,9 +568,7 @@ function createCollector() {
     resourceSnapshots: [],
     upgradeTimeline: [],
     miniGameStats: {
-      mining: { attempts: 0, gems: 0 },
-      factory: { allocations: 0 },
-      hacking: { attempts: 0, successes: 0 },
+      expeditions: { finds: 0, gems: 0 },
       docking: { attempts: 0, successes: 0, perfects: 0 },
       colonies: { assignments: 0 },
       starChart: { routes: 0 },
@@ -715,8 +638,8 @@ function recordUpgradeTimeline(state, t, collector) {
 
 function updateMiniGameStats(prevState, state, collector) {
   const s = collector.miniGameStats;
-  s.mining.gems = state.totalGems || 0;
-  s.hacking.successes = state.hackSuccesses || 0;
+  s.expeditions.gems = state.totalGems || 0;
+  s.expeditions.finds = state.expedition?.totalFinds || 0;
   s.docking.attempts = state.dockingAttempts || 0;
   s.docking.successes = state.dockingSuccesses || 0;
   s.docking.perfects = state.dockingPerfects || 0;
@@ -811,13 +734,10 @@ function runScenario(opts) {
     const prevState = state;
 
     // --- Bot actions ---
-    state = botMine(state, profileDef, t, rng);
     state = botGather(state, profileDef, t, rng);
     state = botExpedition(state, profileDef, t, rng);
     state = botBuyUpgrades(state, profileDef, t, rng);
     state = botBuyTech(state, profileDef, t, rng);
-    state = botFactory(state, profileDef, t, rng);
-    state = botHack(state, profileDef, t, rng);
     state = botDock(state, profileDef, t, rng);
     state = botColonies(state, profileDef, t, rng);
     state = botStarChart(state, profileDef, t, rng);
@@ -987,15 +907,13 @@ function printHumanReport(scenarioName, opts, collector) {
 
   // Mini-Game Contribution
   const mg = collector.miniGameStats;
-  const hasAnyMini = mg.mining.gems > 0 || mg.hacking.successes > 0 || mg.docking.attempts > 0 ||
+  const hasAnyMini = mg.expeditions.finds > 0 || mg.docking.attempts > 0 ||
     mg.starChart.routes > 0 || mg.weaving.weaves > 0 || mg.dyson.segments > 0 ||
     mg.tuning.score > 0 || mg.senate.allocations > 0 || mg.realityForge.keys > 0;
 
   if (hasAnyMini) {
     console.log('\n── Mini-Game Stats ──');
-    if (mg.mining.gems > 0) console.log(`  Mining: ${mg.mining.gems} gems found`);
-    if (mg.factory.allocations >= 0) console.log(`  Factory: active`);
-    if (mg.hacking.successes > 0) console.log(`  Hacking: ${mg.hacking.successes} successes`);
+    if (mg.expeditions.finds > 0) console.log(`  Expeditions: ${mg.expeditions.finds} discoveries, ${mg.expeditions.gems} gems`);
     if (mg.docking.attempts > 0) console.log(`  Docking: ${mg.docking.successes}/${mg.docking.attempts} hits (${mg.docking.perfects} perfect)`);
     if (mg.starChart.routes > 0) console.log(`  Star Chart: ${mg.starChart.routes} routes`);
     if (mg.weaving.weaves > 0) console.log(`  Weaving: ${mg.weaving.weaves} weaves`);

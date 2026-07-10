@@ -120,17 +120,28 @@ export function getExpeditionRoutes(era) {
   return EXPEDITION_ROUTES[3];
 }
 
+export function getExpeditionSupplyInterval(state) {
+  return state.prestigeUpgrades?.luckyMiner ? 60 : EXPEDITION_SUPPLY_INTERVAL;
+}
+
+export function getExpeditionSuccessChance(state, route) {
+  const successBonus = state.prestigeUpgrades?.hackMaster ? 0.1 : 0;
+  return Math.min(1, route.chance + successBonus);
+}
+
 function grantRewards(state, rewards) {
   const resources = { ...state.resources };
   const granted = {};
+  const rewardMultiplier = state.prestigeUpgrades?.miniGameSavant ? 1.5 : 1;
 
   for (const [id, amount] of Object.entries(rewards || {})) {
     const resource = resources[id];
     if (!resource?.unlocked) continue;
     const cap = getEffectiveCap(state, id);
+    const boostedAmount = amount * rewardMultiplier;
     const nextAmount = cap > 0
-      ? Math.min(cap, resource.amount + amount)
-      : resource.amount + amount;
+      ? Math.min(cap, resource.amount + boostedAmount)
+      : resource.amount + boostedAmount;
     const actual = Math.max(0, nextAmount - resource.amount);
     resources[id] = { ...resource, amount: nextAmount };
     if (actual > 0) granted[id] = actual;
@@ -143,8 +154,9 @@ export function advanceExpeditionSupplies(state, dt) {
   const expedition = state.expedition || createExpeditionState();
   if (dt <= 0 || expedition.supplies >= EXPEDITION_MAX_SUPPLIES) return state;
 
+  const supplyInterval = getExpeditionSupplyInterval(state);
   const totalProgress = expedition.supplyProgress + dt;
-  const gained = Math.floor(totalProgress / EXPEDITION_SUPPLY_INTERVAL);
+  const gained = Math.floor(totalProgress / supplyInterval);
   if (gained <= 0) {
     return { ...state, expedition: { ...expedition, supplyProgress: totalProgress } };
   }
@@ -152,7 +164,7 @@ export function advanceExpeditionSupplies(state, dt) {
   const supplies = Math.min(EXPEDITION_MAX_SUPPLIES, expedition.supplies + gained);
   const supplyProgress = supplies >= EXPEDITION_MAX_SUPPLIES
     ? 0
-    : totalProgress % EXPEDITION_SUPPLY_INTERVAL;
+    : totalProgress % supplyInterval;
   return { ...state, expedition: { ...expedition, supplies, supplyProgress } };
 }
 
@@ -163,7 +175,7 @@ export function runExpedition(state, routeId, rng = Math.random) {
     return { state, result: null };
   }
 
-  const success = rng() < route.chance;
+  const success = rng() < getExpeditionSuccessChance(state, route);
   const rewardSet = success ? route.rewards : route.failureRewards;
   const rewarded = grantRewards(state, rewardSet);
   const discovery = success ? route.discovery : 0;

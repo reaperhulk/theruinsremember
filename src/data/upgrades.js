@@ -3178,7 +3178,7 @@ export const upgrades = {
     id: 'orbitalResonance', name: 'Orbital Resonance', era: 4,
     cost: { rocketFuel: 40, orbitalInfra: 20, research: 60 },
     effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.0 }],
-    description: 'Orbital platforms harmonize like a precursor orchestra. +10% all production per mini-game engaged.',
+    description: 'Orbital platforms harmonize like a precursor orchestra. +10% all production per operation system engaged.',
     prerequisites: ['spaceStation', 'orbitalTelescope'],
     mechanic: 'miniGameSynergy',
   },
