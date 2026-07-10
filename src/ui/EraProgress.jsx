@@ -7,6 +7,7 @@ import { getAvailableTech } from '../engine/tech.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber, formatTime } from './format.js';
+import { getCycleReadiness } from '../engine/realityForge.js';
 
 function pickHint(options, era, totalTime) {
   const arr = options[era];
@@ -236,6 +237,7 @@ export function EraProgress({ state }) {
   const eraCompletion = totalEraUpgrades > 0 ? Math.floor(eraUpgradeCount / totalEraUpgrades * 100) : 0;
   const loreHint = getLoreHint(eraCompletion, isMaxEra, state.era, state.totalTime || 0);
   const director = buildDirector(state, readiness);
+  const cycleReadiness = getCycleReadiness(state);
 
   // Calculate total production rate across all unlocked resources
   const rates = calculateProduction(state);
@@ -358,7 +360,9 @@ export function EraProgress({ state }) {
             ? 'The cycle is complete. The cycle begins again. The eternal return.'
             : state.prestigeUpgrades?.eternalReturn
             ? 'The Eternal Return is yours. There is nothing more.'
-            : 'You have reached the Multiverse — Prestige available for permanent bonuses!'}
+            : cycleReadiness.ready
+            ? 'The cycle is ready to close. Prestige will carry keys and memory into the next beginning.'
+            : `Stabilize the cycle in the Reality Forge (${cycleReadiness.completed}/${cycleReadiness.total}).`}
         </p>
       )}
       <div className="era-stats">

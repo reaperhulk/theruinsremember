@@ -21,6 +21,7 @@ import { assembleDysonSegment } from '../src/engine/dyson.js';
 import { applyTuning } from '../src/engine/tuning.js';
 import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
 import { getEraReadiness } from '../src/engine/eras.js';
+import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
 import { allocateSenateInfluence, getMaxSenateInfluence } from '../src/engine/senate.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
 import { readFileSync } from 'fs';
@@ -252,6 +253,7 @@ const BALANCE_TARGETS = {
     minTime: 720,
     maxTime: 1800,
     requiredEra: 10,
+    cycleReady: true,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
@@ -264,9 +266,9 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10 },
-  noMinigames: { minTime: 4800, maxTime: 25200, requiredEra: 10 },
-  passive: { minTime: 5400, maxTime: 25200, requiredEra: 10 },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true },
+  noMinigames: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
+  passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true },
 };
 
 // ─── Bot Action Functions ───────────────────────────────────────────────────
@@ -591,34 +593,13 @@ function botRealityForge(state, profile, t, _rng) {
   // Forge every 30s
   if (t % 30 !== 0) return state;
 
-  const rf = state.resources.realityFragments;
-  const qe = state.resources.quantumEchoes;
-  if (!rf?.unlocked || !qe?.unlocked) return state;
-
-  // Try each recipe, pick the cheapest affordable one
-  const recipes = [
-    { id: 'temporal', fragments: 50, echoes: 20 },
-    { id: 'spatial', fragments: 30, echoes: 40 },
-    { id: 'causal', fragments: 40, echoes: 30 },
-    { id: 'quantum', fragments: 20, echoes: 50 },
-  ];
-
-  for (const recipe of recipes) {
-    if (rf.amount >= recipe.fragments && qe.amount >= recipe.echoes) {
-      const newKeys = { ...(state.realityKeys || {}) };
-      newKeys[recipe.id] = (newKeys[recipe.id] || 0) + 1;
-      return {
-        ...state,
-        realityKeys: newKeys,
-        resources: {
-          ...state.resources,
-          realityFragments: { ...rf, amount: rf.amount - recipe.fragments },
-          quantumEchoes: { ...qe, amount: qe.amount - recipe.echoes },
-        },
-      };
-    }
-  }
-  return state;
+  const recipes = getRealityForgeRecipes(state)
+    .filter(recipe => recipe.affordable)
+    .sort((a, b) => {
+      if ((a.count === 0) !== (b.count === 0)) return a.count === 0 ? -1 : 1;
+      return (a.fragments + a.echoes) - (b.fragments + b.echoes);
+    });
+  return recipes.length > 0 ? (forgeRealityKey(state, recipes[0].id) || state) : state;
 }
 
 function botPrestigeUpgrades(state, profile, t, _rng) {
@@ -952,7 +933,8 @@ function runScenario(opts) {
       logWrite(`  [${fmtTime(state.totalTime)}] Era ${state.era} | ${upgCount} upgrades, ${techCount} techs\r`);
     }
 
-    // Done? Run 120 more ticks in the target era to exercise late-game systems
+    // Done? Era 10 runs until the cycle is actually ready; earlier targets get
+    // 120 extra ticks to exercise their newly unlocked systems.
     if (state.era >= targetEra) {
       if (!reachedTargetAt) {
         reachedTargetAt = t;
@@ -960,7 +942,7 @@ function runScenario(opts) {
           log(`  Reached era ${targetEra} at ${fmtTime(state.totalTime)}`);
         }
       }
-      if (t - reachedTargetAt >= 120) break;
+      if (targetEra >= 10 ? getCycleReadiness(state).ready : t - reachedTargetAt >= 120) break;
     }
   }
 
@@ -974,6 +956,7 @@ function runScenario(opts) {
     totalTime: state.totalTime,
     finalEra: state.era,
     gameComplete: state.gameComplete || false,
+    cycleReady: getCycleReadiness(state).ready,
     upgradeCount: Object.keys(state.upgrades || {}).length,
     techCount: Object.keys(state.tech || {}).length,
     prestigeCount: prestigesDone,
@@ -1165,6 +1148,7 @@ function assertBalanceTargets(allResults) {
     const status = collector.completionStatus;
     const issues = [];
     if (status.finalEra < target.requiredEra) issues.push(`final era ${status.finalEra} < ${target.requiredEra}`);
+    if (target.cycleReady && !status.cycleReady) issues.push('cycle not ready to prestige');
     if (target.minTime != null && status.totalTime < target.minTime) issues.push(`too fast (${fmtTime(status.totalTime)} < ${fmtTime(target.minTime)})`);
     if (target.maxTime != null && status.totalTime > target.maxTime) issues.push(`too slow (${fmtTime(status.totalTime)} > ${fmtTime(target.maxTime)})`);
     for (const [era, [minDuration, maxDuration]] of Object.entries(target.eraRanges || {})) {

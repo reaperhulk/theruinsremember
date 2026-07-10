@@ -12,6 +12,7 @@ import { Browser, computeExecutablePath, detectBrowserPlatform } from '@puppetee
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
+import { upgrades } from '../src/data/upgrades.js';
 
 const PRESTIGE_CYCLES = parseInt(process.argv.find((_, i, a) => a[i-1] === '--prestige') || '0');
 const MOBILE = process.argv.includes('--mobile');
@@ -87,17 +88,22 @@ async function getState(page) {
 }
 
 async function promoteToEra10(page) {
-  await page.evaluate(() => {
+  const era10UpgradeIds = Object.values(upgrades).filter(upgrade => upgrade.era === 10).slice(0, 20).map(upgrade => upgrade.id);
+  await page.evaluate((upgradeIds) => {
     window.__game.setState(state => ({
       ...state,
       era: 10,
+      tuningScore: 50,
+      dockingSuccesses: 9,
+      realityKeys: { temporal: 1, spatial: 1, quantum: 2 },
+      upgrades: { ...state.upgrades, ...Object.fromEntries(upgradeIds.map(id => [id, true])) },
       lifetimeHighestEra: Math.max(10, state.lifetimeHighestEra || 1),
       resources: Object.fromEntries(Object.entries(state.resources).map(([id, resource]) => [
         id,
         { ...resource, unlocked: true, amount: Math.max(resource.amount || 0, 1000) },
       ])),
     }));
-  });
+  }, era10UpgradeIds);
   await new Promise(resolve => setTimeout(resolve, 300));
 }
 
@@ -283,6 +289,18 @@ async function run() {
   const tuningVisible = tuningMounted && await page.evaluate(() => !!document.querySelector('.tuning-panel'));
   const tuningFailed = !tuningVisible;
   console.log(`  Cosmic tuning panel: ${tuningVisible ? 'visible' : 'FAILED'}`);
+  const forgeReady = await page.evaluate(() => {
+    const button = [...document.querySelectorAll('.mini-game-tabs button')].find(candidate => candidate.textContent.includes('Forge'));
+    button?.click();
+    return !!button;
+  });
+  await new Promise(resolve => setTimeout(resolve, 150));
+  const cycleReadyVisible = forgeReady && await page.evaluate(() => (
+    !!document.querySelector('.reality-forge-panel .cycle-readiness') &&
+    !!document.querySelector('.prestige-btn')
+  ));
+  const forgeFailed = !cycleReadyVisible;
+  console.log(`  Reality Forge cycle readiness: ${cycleReadyVisible ? 'visible' : 'FAILED'}`);
 
   for (let cycle = 0; cycle < PRESTIGE_CYCLES; cycle++) {
     await page.evaluate(() => document.querySelector('.prestige-btn')?.click());
@@ -346,7 +364,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || tuningFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || tuningFailed || forgeFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

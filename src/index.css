@@ -228,6 +228,43 @@ g[role="button"]:focus-visible {
   border-color: #465960;
 }
 
+.cycle-readiness {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 8px 0;
+  padding: 8px;
+  color: #9aa6ac;
+  background: #10161a;
+  border: 1px solid #35434a;
+  border-radius: 6px;
+  font-size: 0.72em;
+}
+
+.cycle-readiness strong {
+  grid-column: 1 / -1;
+  color: #d6b065;
+}
+
+.cycle-readiness span {
+  padding-left: 10px;
+  position: relative;
+}
+
+.cycle-readiness span::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 5px;
+  height: 5px;
+  background: #59636a;
+  border-radius: 50%;
+}
+
+.cycle-readiness span.ready { color: #82bd94; }
+.cycle-readiness span.ready::before { background: #82bd94; }
+
 /* reset-btn and prestige-btn: primary definitions below */
 
 .game-layout {

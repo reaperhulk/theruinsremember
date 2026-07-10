@@ -32,6 +32,7 @@ import { getAvailableTech } from '../engine/tech.js';
 import { canAfford, getEffectivePrestige } from '../engine/resources.js';
 import { getAchievementsNearComplete } from '../engine/achievements.js';
 import { formatNumber } from './format.js';
+import { getCycleReadiness } from '../engine/realityForge.js';
 
 const initialState = createInitialState();
 
@@ -127,6 +128,7 @@ export function App() {
 
   const handlePrestige = () => {
     if (state.era < ERA_COUNT) return;
+    if (!getCycleReadiness(state).ready) return;
     // Game is truly complete once Eternal Return is purchased — no more cycles
     if (state.prestigeUpgrades?.eternalReturn) return;
     const summary = getPrestigeSummary(state);
@@ -178,6 +180,7 @@ export function App() {
   }, [handleKeyDown]);
 
   const prestigeBonus = calculatePrestigeBonus(state);
+  const cycleReadiness = getCycleReadiness(state);
   const tabs = getAvailableTabs(state.era);
 
   // Badge counts for tabs
@@ -251,7 +254,7 @@ export function App() {
           <p className="header-omen">{ERA_OMENS[state.era]}</p>
         </div>
         <div className="header-controls">
-          {state.era >= ERA_COUNT && !state.prestigeUpgrades?.eternalReturn && (
+          {cycleReadiness.ready && !state.prestigeUpgrades?.eternalReturn && (
             <button className="prestige-btn" onClick={handlePrestige}>
               Prestige (x{prestigeBonus.toFixed(1)} bonus)
             </button>
@@ -329,7 +332,9 @@ export function App() {
         <span className="control-chip">Era {state.era}: {eraNames[state.era]}</span>
         <span className="control-chip">{affordableUpgrades} options ready</span>
         <span className="control-chip">{affordableTech} tech options</span>
-        {state.era >= ERA_COUNT && <span className="control-chip">Prestige available</span>}
+        {state.era >= ERA_COUNT && (
+          <span className="control-chip">{cycleReadiness.ready ? 'Prestige available' : `Cycle ${cycleReadiness.completed}/${cycleReadiness.total}`}</span>
+        )}
         {availableMiniGames.length > 1 && (
           <span className="mini-status-dots" aria-label="Mini-game activity">
             {availableMiniGames.map(g => {

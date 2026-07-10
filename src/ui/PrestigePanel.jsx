@@ -5,6 +5,7 @@ import { eraNames } from '../engine/eras.js';
 import { events as eventDefs } from '../data/events.js';
 import { detectArchetype, ARCHETYPE_LABELS } from '../engine/advisor.js';
 import { formatNumber, formatTime } from './format.js';
+import { getCycleReadiness } from '../engine/realityForge.js';
 
 function getPrestigeInsight(state) {
   const owned = state.prestigeUpgrades || {};
@@ -29,6 +30,7 @@ export function PrestigePanel({ state, onUpdate }) {
   const summary = getPrestigeSummary(state);
   const points = state.prestigePoints || 0;
   const bestTimes = state.bestEraTimes || {};
+  const cycle = getCycleReadiness(state);
 
   const cycleCount = state.prestigeCount || 0;
   const prestigeLore = cycleCount === 0
@@ -92,6 +94,22 @@ export function PrestigePanel({ state, onUpdate }) {
           </>
         )}
       </div>
+
+      {state.era >= 10 && (
+        <div className="cycle-readiness" aria-label="Prestige cycle readiness">
+          <strong>{cycle.ready ? 'Cycle ready to close' : `Cycle readiness ${cycle.completed}/${cycle.total}`}</strong>
+          {cycle.requirements.map(requirement => (
+            <span key={requirement.id} className={requirement.met ? 'ready' : ''}>
+              {requirement.label}: {requirement.current}/{requirement.target}
+            </span>
+          ))}
+          {!cycle.directlyReady && (
+            <span className={cycle.fallbackReady ? 'ready' : ''}>
+              Passive resonance: {formatTime(cycle.fallbackRemaining)}
+            </span>
+          )}
+        </div>
+      )}
 
       {state.era >= 7 && !state.prestigeUpgrades?.eternalReturn && (
         <div style={{ marginBottom: '8px' }}>
