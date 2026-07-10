@@ -14,7 +14,7 @@ import { assignColonies, getAssignableColonies, getColonyBonus } from '../src/en
 import { createRoute, getUnlockedSystems, routeExists, getRoutes, getRouteBonus } from '../src/engine/starChart.js';
 import { drawFragment, resolveWeave } from '../src/engine/weaving.js';
 import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
-import { assembleDysonSegment } from '../src/engine/dyson.js';
+import { commissionDysonModule, getDysonStats } from '../src/engine/dyson.js';
 import { applyTuning, getTuningProductionBonus } from '../src/engine/tuning.js';
 import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
 import { getEraReadiness } from '../src/engine/eras.js';
@@ -249,6 +249,7 @@ const BALANCE_TARGETS = {
     maxFirstRelicTime: 600,
     minRelics: 2,
     maxDockingAttempts: 30,
+    maxDysonCommissions: 3,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
@@ -261,7 +262,7 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50 },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3 },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true },
 };
@@ -483,10 +484,12 @@ function botTrade(state, profile, t, _rng) {
 
 function botDyson(state, profile, t, _rng) {
   if (!profile.dysonAssembly || state.era < 7) return state;
-  // Assemble every 5s (clicking manually)
+  // Commission at most three modules; automation handles later growth.
   if (t % 5 !== 0) return state;
-
-  const result = assembleDysonSegment(state);
+  const stats = getDysonStats(state);
+  if (stats.remainingModules <= 0) return state;
+  const moduleOrder = ['frame', 'collector', 'forge'];
+  const result = commissionDysonModule(state, moduleOrder[stats.totalModules % moduleOrder.length]);
   return result ? result.state : state;
 }
 
@@ -1263,6 +1266,10 @@ function assertBalanceTargets(allResults) {
     if (target.minRelics != null && status.activeRelics.length < target.minRelics) issues.push(`only ${status.activeRelics.length}/${target.minRelics} relics equipped`);
     if (target.maxDockingAttempts != null && collector.operationStats.docking.attempts > target.maxDockingAttempts) {
       issues.push(`docking repeated ${collector.operationStats.docking.attempts} times`);
+    }
+    if (target.maxDysonCommissions != null) {
+      const commissions = Object.values(collector.engagement.actionsByEra).reduce((sum, actions) => sum + (actions.dyson || 0), 0);
+      if (commissions > target.maxDysonCommissions) issues.push(`Dyson commissioned ${commissions} times`);
     }
     if (target.maxFirstOperationLatency != null) {
       for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {

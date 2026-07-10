@@ -10,7 +10,7 @@ describe('tick', () => {
     const state = createInitialState();
     // Food has baseRate 1.5, rateMult 1
     const before = state.resources.food.amount;
-    const after = tick(state, 1);
+    const after = tick(state, 1, NO_EVENT);
     expect(after.resources.food.amount).toBeCloseTo(before + 1.5, 5);
   });
 
@@ -18,7 +18,7 @@ describe('tick', () => {
     const state = createInitialState();
     // Set materials near cap — materials have no consumption chain so it should cap exactly
     state.resources.materials.amount = 4999.5;
-    const after = tick(state, 1);
+    const after = tick(state, 1, NO_EVENT);
     // Cap enforced at 5000 (baseCap * capMult * eraCapScale = 5000 * 1 * 1)
     expect(after.resources.materials.amount).toBe(5000);
   });

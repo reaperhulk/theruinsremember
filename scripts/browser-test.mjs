@@ -310,6 +310,22 @@ async function run() {
   }));
   const operationShellFailed = operationShell.heading !== 'Reality Forge' || operationShell.archiveOptions < 8 || operationShell.legacyTabs !== 0;
   console.log(`  Era-focused operation shell: ${operationShellFailed ? 'FAILED' : `${operationShell.archiveOptions - 1} archived systems`}`);
+  const dysonMounted = await page.evaluate(() => {
+    const select = document.querySelector('.operation-archive select');
+    if (!select) return false;
+    select.value = 'dyson';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+  });
+  await new Promise(resolve => setTimeout(resolve, 100));
+  if (dysonMounted) await page.evaluate(() => document.querySelector('.dyson-modules button')?.click());
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const dysonAudit = dysonMounted && await page.evaluate(() => ({
+    moduleChoices: document.querySelectorAll('.dyson-modules button').length,
+    commissioned: document.querySelector('.dyson-heading strong')?.textContent || '',
+  }));
+  const dysonFailed = !dysonAudit || dysonAudit.moduleChoices !== 3 || !dysonAudit.commissioned.includes('1/3');
+  console.log(`  Dyson commissions: ${dysonFailed ? 'FAILED' : '3 choices, first wing commissioned'}`);
   const tuningMounted = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return false;
@@ -431,7 +447,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || tuningFailed || weavingFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

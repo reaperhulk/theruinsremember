@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { detectArchetype, getArchetypeSuggestions } from '../advisor.js';
-import { assembleDysonSegment, getDysonStats } from '../dyson.js';
+import { commissionDysonModule, getDysonStats } from '../dyson.js';
 import {
   allocateSenateInfluence,
   getSenateInfo,
@@ -16,15 +16,32 @@ import {
 import { createInitialState } from '../state.js';
 
 describe('late-game systems', () => {
-  it('assembles Dyson segments and reports scaling stats', () => {
+  it('commissions a Dyson module and reports scaling stats', () => {
     const state = createInitialState();
     state.era = 7;
     state.resources.stellarForge = { ...state.resources.stellarForge, unlocked: true };
     state.resources.megastructures = { ...state.resources.megastructures, unlocked: true };
-    const result = assembleDysonSegment(state);
-    expect(result.state.dysonSegments).toBe(1);
-    expect(result.sfGain).toBeGreaterThan(0);
+    const result = commissionDysonModule(state, 'forge');
+    expect(result.state.dysonSegments).toBe(10);
+    expect(result.reserve).toBeGreaterThan(0);
+    expect(result.state.dysonModules.forge).toBe(1);
     expect(getDysonStats({ ...result.state, dysonSegments: 25 }).bonusMult).toBe(1.25);
+  });
+
+  it('limits manual Dyson work to three strategic commissions', () => {
+    let state = createInitialState();
+    state.era = 7;
+    for (const id of ['stellarForge', 'megastructures', 'energy']) {
+      state.resources[id] = { ...state.resources[id], unlocked: true };
+    }
+    for (const moduleId of ['frame', 'collector', 'forge']) {
+      state = commissionDysonModule(state, moduleId).state;
+      state.totalTime += 61;
+    }
+
+    expect(state.dysonSegments).toBe(30);
+    expect(getDysonStats(state).remainingModules).toBe(0);
+    expect(commissionDysonModule(state, 'forge')).toBeNull();
   });
 
   it('allocates senate influence and keeps directives normalized', () => {

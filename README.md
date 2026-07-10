@@ -28,6 +28,7 @@ Prestige isn't just a mechanic. It's the cycle itself.
 - **Reality keys with different identities**: faster expeditions, larger storage, stronger operation rewards, or seeded starting resources
 - **Recovered Relics** with guaranteed Echo Pressure offers and a two-slot, run-only loadout that dissolves at prestige
 - **Finite orbital contracts** with approach risk, one decisive docking attempt, and permanent run payoffs instead of unlimited farming
+- **Finite Dyson commissions** that turn thirty assembly clicks into three module choices before automation takes over
 - **30 prestige upgrades** including 5 "Ascension" tier endgame upgrades
 - **270 reachable achievements** tracking everything from speed milestones to narrative discovery
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players

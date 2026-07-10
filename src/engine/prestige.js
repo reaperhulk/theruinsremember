@@ -277,6 +277,7 @@ export function performPrestige(state) {
     newState.starRoutes = state.starRoutes || [];
     newState.totalWeaves = state.totalWeaves || 0;
     newState.dysonSegments = state.dysonSegments || 0;
+    newState.dysonModules = state.dysonModules || { frame: 0, collector: 0, forge: 0 };
     newState.tuningScore = state.tuningScore || 0;
     newState.senate = state.senate || { merchants: 0, scholars: 0, warriors: 0 };
   }

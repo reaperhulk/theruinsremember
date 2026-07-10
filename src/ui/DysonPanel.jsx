@@ -1,55 +1,63 @@
-import { useState, memo } from 'react';
+import { memo, useState } from 'react';
+import { commissionDysonModule, DYSON_MODULES, getDysonStats } from '../engine/dyson.js';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
-import { assembleDysonSegment, getDysonStats } from '../engine/dyson.js';
 
 export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
-  const [lastGain, setLastGain] = useState(null);
-  const { segments: totalSegments, milestone, nextMilestone, autoRate, bonusMult } = getDysonStats(state);
+  const [lastCommission, setLastCommission] = useState(null);
+  const stats = getDysonStats(state);
 
-  const handleAssemble = () => {
+  const handleCommission = moduleId => {
     playClick();
-    onUpdate(s => {
-      const result = assembleDysonSegment(s);
-      if (!result) return null;
-      setLastGain({ sf: result.sfGain, mg: result.mgGain });
-      setTimeout(() => setLastGain(null), 800);
-      return result.state;
-    });
+    const result = commissionDysonModule(state, moduleId);
+    if (!result) return;
+    onUpdate(() => result.state);
+    setLastCommission({ name: result.module.name, reserve: result.reserve, rateAdd: result.rateAdd });
+    setTimeout(() => setLastCommission(null), 1200);
   };
 
   return (
     <div className="panel dyson-panel">
-      <h2>Dyson Assembly ({totalSegments} segments)</h2>
-      <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#cc8844', margin: '0 0 4px' }}>
-        The sphere remembers its shape. You just have to remind it.
+      <div className="dyson-heading">
+        <div>
+          <span className="panel-kicker">Stellar construction</span>
+          <h2>Dyson Assembly</h2>
+        </div>
+        <strong>{stats.totalModules}/3 commissions{stats.commissionCooldown > 0 ? ` | ${Math.ceil(stats.commissionCooldown)}s` : ''}</strong>
+      </div>
+
+      <div className="upgrade-progress-bar" style={{ margin: '7px 0' }}>
+        <div className="upgrade-progress-fill" style={{ width: `${Math.min(100, stats.totalModules / 3 * 100)}%` }} />
+      </div>
+
+      <div className="dyson-modules" role="group" aria-label="Dyson construction commission">
+        {Object.values(DYSON_MODULES).map(module => (
+          <button
+            key={module.id}
+            disabled={stats.remainingModules === 0 || stats.commissionCooldown > 0}
+            onClick={() => handleCommission(module.id)}
+          >
+            <strong>{module.name}</strong>
+            <span>{module.description}</span>
+            <span>Commissioned: {stats.modules[module.id]}</span>
+          </button>
+        ))}
+      </div>
+
+      {lastCommission && (
+        <div className="operation-result success" role="status">
+          {lastCommission.name}: +{formatNumber(lastCommission.reserve)} reserve, +{formatNumber(lastCommission.rateAdd)}/s
+        </div>
+      )}
+
+      <div className="dyson-status">
+        <span>{stats.segments} segments</span>
+        <span>x{stats.bonusMult.toFixed(1)} assembly value</span>
+        <span>{stats.autoRate} automated segments/min</span>
+      </div>
+      <p className="operation-hint">
+        Construction wings recover every 60s | Choose any mix of three modules | Each commission adds 10 segments
       </p>
-      <div className="upgrade-progress-bar" style={{ margin: '4px 0 8px' }}>
-        <div className="upgrade-progress-fill" style={{ width: `${Math.min(100, (totalSegments % 10) * 10)}%`, background: 'linear-gradient(90deg, #d08030, #e8a040)' }} />
-      </div>
-      <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '4px' }}>
-        Next milestone: {nextMilestone} segments | Bonus: x{bonusMult.toFixed(1)} assembly value
-      </div>
-      <button className="mine-btn" onClick={handleAssemble} style={{ background: 'linear-gradient(90deg, #3a2a1a, #4a3020)' }} aria-label={`Assemble Dyson segment (${totalSegments} segments built)`}>
-        {lastGain ? (
-          <span style={{ color: '#e8a040' }}>
-            +{formatNumber(lastGain.sf)} forge, +{formatNumber(lastGain.mg)} mega
-          </span>
-        ) : (
-          <>Assemble Segment</>
-        )}
-      </button>
-      <p className="operation-hint">Click to assemble | Rewards scale with production rate | Every 10 segments = milestone</p>
-      {milestone > 0 && (
-        <div style={{ fontSize: '0.75em', color: '#d08030', marginTop: '4px' }}>
-          Milestones reached: {milestone} | Assembly bonus: x{bonusMult.toFixed(1)}
-        </div>
-      )}
-      {totalSegments > 0 && (
-        <div style={{ fontSize: '0.75em', color: '#888', marginTop: '4px' }}>
-          Auto-assembly: {autoRate} segments/min{autoRate >= 20 ? ' (max)' : ''}
-        </div>
-      )}
     </div>
   );
 });

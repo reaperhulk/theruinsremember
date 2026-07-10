@@ -97,6 +97,7 @@ export function createInitialState() {
     achievements: {},
     // Dyson Assembly (Era 7+)
     dysonSegments: 0,
+    dysonModules: { frame: 0, collector: 0, forge: 0 },
     // Cosmic Tuning (Era 9+)
     tuningScore: 0,
     // Galactic Senate (Era 8+)

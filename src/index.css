@@ -2871,8 +2871,14 @@ canvas:hover {
   .signal-readout,
   .cycle-doctrines,
   .active-relics,
-  .relic-offer {
+  .relic-offer,
+  .dyson-modules {
     grid-template-columns: 1fr;
+  }
+
+  .dyson-status {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .relic-choice button {
@@ -3091,6 +3097,49 @@ canvas:hover {
 .dyson-panel {
   background: #1e1a10;
   border-color: #5a4020;
+}
+
+.dyson-heading,
+.dyson-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.dyson-heading h2 {
+  margin: 0;
+}
+
+.dyson-modules {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin: 6px 0;
+}
+
+.dyson-modules button {
+  display: grid;
+  gap: 4px;
+  min-height: 78px;
+  padding: 7px;
+  border: 1px solid #675338;
+  border-radius: 4px;
+  background: #241d14;
+  color: #dfc08b;
+  text-align: left;
+}
+
+.dyson-modules button span {
+  color: #ad9d84;
+  font-size: 0.68em;
+  line-height: 1.25;
+}
+
+.dyson-status {
+  margin-top: 6px;
+  color: #b49a70;
+  font-size: 0.7em;
 }
 
 /* Cosmic Tuning panel */
