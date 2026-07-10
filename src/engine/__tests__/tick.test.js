@@ -285,7 +285,7 @@ describe('tick', () => {
     expect(after.resources.electronics.amount).toBeGreaterThan(0);
   });
 
-  it('initial state includes new mini-game fields', () => {
+  it('initial state includes late operation fields', () => {
     const state = createInitialState();
     expect(state.dysonSegments).toBe(0);
     expect(state.tuningScore).toBe(0);
@@ -326,7 +326,19 @@ describe('tick', () => {
     expect(after.dysonSegments).toBe(520);
   });
 
-  it('applies activeEffects created by events and mini-games', () => {
+  it('Forge Memory scales Stellar Forge output with Dyson completion', () => {
+    const baseline = createInitialState();
+    baseline.era = 7;
+    baseline.resources.stellarForge = { ...baseline.resources.stellarForge, unlocked: true, amount: 0, rateAdd: 1 };
+    const remembered = structuredClone(baseline);
+    remembered.upgrades.forgeMemory = true;
+    remembered.dysonSegments = 100;
+
+    expect(tick(remembered, 1, NO_EVENT).resources.stellarForge.amount)
+      .toBeCloseTo(tick(baseline, 1, NO_EVENT).resources.stellarForge.amount * 2);
+  });
+
+  it('applies activeEffects created by events and operations', () => {
     const base = createInitialState();
     const boosted = createInitialState();
     boosted.activeEffects = [{

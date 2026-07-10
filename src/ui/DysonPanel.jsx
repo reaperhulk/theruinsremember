@@ -39,7 +39,7 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
           <>Assemble Segment</>
         )}
       </button>
-      <p className="mining-hint">Click to assemble | Rewards scale with production rate | Every 10 segments = milestone</p>
+      <p className="operation-hint">Click to assemble | Rewards scale with production rate | Every 10 segments = milestone</p>
       {milestone > 0 && (
         <div style={{ fontSize: '0.75em', color: '#d08030', marginTop: '4px' }}>
           Milestones reached: {milestone} | Assembly bonus: x{bonusMult.toFixed(1)}

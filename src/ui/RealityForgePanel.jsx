@@ -36,7 +36,7 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
         </div>
       )}
       {lastForged && (
-        <div className="hack-result success" style={{ marginBottom: '4px' }}>
+        <div className="operation-result success" style={{ marginBottom: '4px' }}>
           Forged {lastForged}!
         </div>
       )}
@@ -66,13 +66,13 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
           </span>
         )}
       </div>
-      <div className="factory-lines">
+      <div className="allocation-lines">
         {recipes.map(recipe => {
           const count = recipe.count;
           const affordable = recipe.affordable;
           const hasKey = count > 0;
           return (
-            <div key={recipe.id} className="factory-line" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '2px' }}>
+            <div key={recipe.id} className="allocation-line" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '2px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span className="line-label" style={{ color: recipe.color, flex: 1 }}>
                   {recipe.label}: {count} {hasKey && recipe.lore && recipe.id !== 'quantum' && <span style={{ color: '#88ddcc', fontSize: '0.85em' }}>✓</span>}
@@ -111,7 +111,7 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
           ))}
         </div>
       )}
-      <p className="mining-hint">
+      <p className="operation-hint">
         Keys and cycle marks survive prestige | Choose one doctrine before closing the cycle
       </p>
     </div>

@@ -27,7 +27,7 @@ const ERA_MIN_UPGRADES = {
   6: 30,   // ~52% of ~58
   7: 30,   // ~49% of ~61
   8: 30,   // ~50% of ~60
-  9: 5,    // 5 CP-only entry upgrades form a viable path; later upgrades need mini-game resources
+  9: 5,    // 5 CP-only entry upgrades form a viable path; later upgrades need operation resources
   10: 30,  // ~51% of ~59
 };
 
@@ -79,30 +79,46 @@ export function getEraMastery(state, era = state.era) {
 
   if (era === 5) {
     title = 'Colony Doctrine';
-    detail = 'Assign at least one colony to growth, science, and industry.';
-    current = Object.values(state.colonyAssignments || {}).filter(count => count > 0).length;
-    target = 3;
+    const assignments = Object.values(state.colonyAssignments || {});
+    if (state.cycleDoctrine === 'expansion') {
+      detail = 'Expansion doctrine: assign five colonies in any configuration.';
+      current = assignments.reduce((sum, count) => sum + count, 0);
+      target = 5;
+    } else {
+      detail = 'Assign at least one colony to growth, science, and industry.';
+      current = assignments.filter(count => count > 0).length;
+      target = 3;
+    }
   } else if (era === 6) {
     title = 'Route Network';
-    detail = 'Establish ten routes on the star chart.';
+    detail = state.cycleDoctrine === 'expansion'
+      ? 'Expansion doctrine: establish seven high-priority routes.'
+      : 'Establish ten routes on the star chart.';
     current = state.starRoutes?.length || 0;
-    target = 10;
+    target = state.cycleDoctrine === 'expansion' ? 7 : 10;
   } else if (era === 7) {
     title = 'Sphere Assembly';
-    detail = 'Assemble thirty Dyson segments.';
+    detail = state.cycleDoctrine === 'expansion'
+      ? 'Expansion doctrine: assemble twenty load-bearing Dyson segments.'
+      : 'Assemble thirty Dyson segments.';
     current = state.dysonSegments || 0;
-    target = 30;
+    target = state.cycleDoctrine === 'expansion' ? 20 : 30;
   } else if (era === 8) {
     title = 'Galactic Mandate';
-    detail = 'Allocate nine Senate seats or complete three reality weaves.';
+    const transcendent = state.cycleDoctrine === 'transcendence';
+    detail = transcendent
+      ? 'Transcendence doctrine: allocate six Senate seats or complete two reality weaves.'
+      : 'Allocate nine Senate seats or complete three reality weaves.';
     const senateSeats = Object.values(state.senate || {}).reduce((sum, count) => sum + count, 0);
     current = Math.max(senateSeats, (state.totalWeaves || 0) * 3);
-    target = 9;
+    target = transcendent ? 6 : 9;
   } else if (era === 9) {
     title = 'Cosmic Alignment';
-    detail = 'Reach tuning score 50.';
+    detail = state.cycleDoctrine === 'transcendence'
+      ? 'Transcendence doctrine: reach tuning score 30.'
+      : 'Reach tuning score 50.';
     current = state.tuningScore || 0;
-    target = 50;
+    target = state.cycleDoctrine === 'transcendence' ? 30 : 50;
   }
 
   const required = target > 0;
@@ -124,15 +140,17 @@ export function getEraReadiness(state, era = state.era) {
   const currentUpgrades = countEraUpgrades(state, era);
   const minTechs = getMinTechsForEra(era);
   const currentTechs = countEraTechs(state, era);
+  const discoveryValue = state.cycleDoctrine === 'reconstruction' ? 3 : 2;
+  const discoveryCap = state.cycleDoctrine === 'reconstruction' ? 10 : 8;
   const discoveryCredits = era <= 3 && era === state.era
-    ? Math.min(8, (state.expedition?.eraFinds || 0) * 2)
+    ? Math.min(discoveryCap, (state.expedition?.eraFinds || 0) * discoveryValue)
     : 0;
   const operationCredits = era === 4 && era === state.era
     ? Object.values(state.dockingMissions || {}).reduce((sum, count) => sum + Math.min(3, count), 0)
     : 0;
   const activityCredits = discoveryCredits + operationCredits;
   const minimumEconomicUpgrades = era <= 3
-    ? Math.ceil(minUpgrades * 0.4)
+    ? Math.ceil(minUpgrades * (state.cycleDoctrine === 'reconstruction' ? 0.3 : 0.4))
     : era === 4 ? 12 : minUpgrades;
   const foundationProgress = currentUpgrades + activityCredits;
   const mastery = getEraMastery(state, era);

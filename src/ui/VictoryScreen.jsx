@@ -1,4 +1,5 @@
 import { formatTime } from './format.js';
+import { achievements } from '../data/achievements.js';
 
 export function VictoryScreen({ state, onDismiss }) {
   if (!state.gameComplete && !state.trueEnding) return null;
@@ -31,7 +32,7 @@ export function VictoryScreen({ state, onDismiss }) {
           <div className="victory-card">
             <strong>World Left Behind</strong>
             <div>Upgrades: {Object.keys(state.upgrades || {}).length} | Tech: {Object.keys(state.tech || {}).length}</div>
-            <div>Achievements: {Object.keys(state.achievements || {}).length}/289</div>
+            <div>Achievements: {Object.keys(state.achievements || {}).length}/{achievements.length}</div>
             {state.totalGems > 0 && <div>Gems: {state.totalGems} | Trades: {state.totalTrades || 0}</div>}
             <div>Discoveries: {state.expedition?.totalFinds || 0} | Docks: {state.dockingPerfects || 0} | Weaves: {state.totalWeaves || 0}</div>
             {state.dysonSegments > 0 && <div>Dyson: {state.dysonSegments} segments | Tuning: {state.tuningScore || 0} score</div>}
@@ -46,7 +47,7 @@ export function VictoryScreen({ state, onDismiss }) {
           <div>Prestige upgrades: {Object.keys(state.prestigeUpgrades || {}).length}/30</div>
           <div>Total play time: {formatTime((state.lifetimePlayTime || 0) + (state.totalTime || 0))}</div>
           <div>Upgrades purchased: {Object.keys(state.upgrades || {}).length}</div>
-          <div>Achievements: {Object.keys(state.achievements || {}).length}/289</div>
+          <div>Achievements: {Object.keys(state.achievements || {}).length}/{achievements.length}</div>
           {state.totalGems > 0 && <div>Gems found: {state.totalGems}</div>}
           {state.dysonSegments > 0 && <div>Dyson segments: {state.dysonSegments}</div>}
         </div>

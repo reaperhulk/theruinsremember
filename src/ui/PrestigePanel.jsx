@@ -6,6 +6,7 @@ import { events as eventDefs } from '../data/events.js';
 import { detectArchetype, ARCHETYPE_LABELS } from '../engine/advisor.js';
 import { formatNumber, formatTime } from './format.js';
 import { getCycleReadiness } from '../engine/realityForge.js';
+import { CYCLE_DOCTRINES, getCycleGoal } from '../engine/cycles.js';
 
 function getPrestigeInsight(state) {
   const owned = state.prestigeUpgrades || {};
@@ -31,6 +32,9 @@ export function PrestigePanel({ state, onUpdate }) {
   const points = state.prestigePoints || 0;
   const bestTimes = state.bestEraTimes || {};
   const cycle = getCycleReadiness(state);
+  const currentDoctrine = CYCLE_DOCTRINES[state.cycleDoctrine];
+  const nextDoctrine = CYCLE_DOCTRINES[state.nextCycleDoctrine];
+  const cycleGoal = getCycleGoal(state);
 
   const cycleCount = state.prestigeCount || 0;
   const prestigeLore = cycleCount === 0
@@ -94,6 +98,16 @@ export function PrestigePanel({ state, onUpdate }) {
           </>
         )}
       </div>
+
+      {(currentDoctrine || state.cycleMarks > 0) && (
+        <div className={`cycle-goal ${state.cycleGoalRewarded ? 'ready' : ''}`}>
+          <strong>{currentDoctrine ? `${currentDoctrine.name} doctrine` : 'Cycle memory'}</strong>
+          {currentDoctrine && <span>{currentDoctrine.description}</span>}
+          {cycleGoal && <span>{cycleGoal.label}: {Math.min(cycleGoal.current, cycleGoal.target)}/{cycleGoal.target}</span>}
+          <span>{state.cycleMarks || 0} cycle marks: +{state.cycleMarks || 0}% all production</span>
+          {nextDoctrine && <span>Next cycle: {nextDoctrine.name}</span>}
+        </div>
+      )}
 
       {state.era >= 10 && (
         <div className="cycle-readiness" aria-label="Prestige cycle readiness">
@@ -190,10 +204,11 @@ export function PrestigePanel({ state, onUpdate }) {
                   <div style={{ display: 'grid', gap: '1px', fontSize: '0.9em', color: '#aac' }}>
                     <span>Prestige upgrades ({Object.keys(owned).length} owned)</span>
                     <span>Achievements ({Object.keys(state.achievements || {}).length} earned)</span>
-                    <span>Reality keys ({Object.keys(state.realityKeys || {}).length} found)</span>
+                    <span>Reality keys ({Object.values(state.realityKeys || {}).reduce((sum, count) => sum + count, 0)} forged)</span>
+                    <span>Cycle marks ({state.cycleMarks || 0}) and next doctrine ({nextDoctrine?.name || 'not selected'})</span>
                     <span>Prestige points ({summary.totalPoints} after reset)</span>
                     <span>Lifetime stats and best era times</span>
-                    {hasPerfectMemory && <span>Mini-game progress (via Perfect Memory)</span>}
+                    {hasPerfectMemory && <span>Operation progress (via Perfect Memory)</span>}
                   </div>
                 </div>
 

@@ -15,8 +15,8 @@ export const echoUpgrades = {
     id: 'echoResonanceLock',
     name: 'Resonance Lock',
     cost: 800,
-    description: 'Factory allocation bonuses persist through prestige. The machines remember your configuration.',
-    effect: 'echo_resonance_lock',
+    description: 'The active cycle doctrine gains another +10% production. The next universe accepts your mandate immediately.',
+    effect: 'echo_doctrine_lock',
   },
   echoMultiplier: {
     id: 'echoMultiplier',
@@ -139,7 +139,7 @@ export const prestigeUpgrades = {
     name: 'Perfect Memory',
     cost: 7,
     description: 'Keep operation progress across resets: docking, colonies, routes, weaving, Dyson assembly, tuning, and senate influence.',
-    effect: 'keep_minigame',
+    effect: 'keep_operations',
   },
   universalOptimizer: {
     id: 'universalOptimizer',
@@ -175,7 +175,7 @@ export const prestigeUpgrades = {
     name: 'Operations Savant',
     cost: 6,
     description: 'Expedition, docking, colony, route, and weaving rewards x1.5.',
-    effect: 'minigame_boost',
+    effect: 'operation_boost',
   },
   instantKnowledge: {
     id: 'instantKnowledge',

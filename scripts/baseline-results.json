@@ -1,54 +1,27 @@
 {
   "timestamp": "2026-07-10",
-  "description": "Regression baseline after deterministic time and event integration fixes",
-  "profiles": {
-    "optimal": {
-      "finalEra": 10,
-      "completed": true,
-      "timeMinutes": 10.87,
-      "upgradeCount": 579,
-      "techCount": 101,
-      "prestiges": 0,
-      "gems": 106,
-      "tuningScore": 65,
-      "senateInfluence": 14,
-      "realityKeys": 4
-    },
-    "casual": {
-      "finalEra": 10,
-      "completed": true,
-      "timeMinutes": 28.97,
-      "upgradeCount": 520,
-      "techCount": 101,
-      "prestiges": 0,
-      "gems": 274,
-      "tuningScore": 60,
-      "senateInfluence": 54,
-      "realityKeys": 4
-    },
-    "noMinigames": {
-      "finalEra": 10,
-      "completed": true,
-      "timeMinutes": 217.73,
-      "upgradeCount": 467,
-      "techCount": 101,
-      "prestiges": 0,
-      "gems": 2235
-    },
-    "passive": {
-      "finalEra": 10,
-      "completed": true,
-      "timeMinutes": 148.17,
-      "upgradeCount": 467,
-      "techCount": 97,
-      "prestiges": 0,
-      "gems": 0
-    }
+  "description": "Seeded pacing baseline after the operations and strategic-cycle redesign",
+  "seed": 424242,
+  "scenarios": {
+    "full": { "finalEra": 10, "cycleReady": true, "timeSeconds": 811 },
+    "casual": { "finalEra": 10, "cycleReady": true, "timeSeconds": 5431 },
+    "lowInteraction": { "finalEra": 10, "cycleReady": true, "timeSeconds": 9599 },
+    "passive": { "finalEra": 10, "cycleReady": true, "timeSeconds": 9974 }
   },
-  "notes": [
-    "Optimal: 10m52s; casual: 28m58s",
-    "No-minigames: 3h37m44s; passive: 2h28m10s",
-    "All 257 tests pass with clean lint and production build",
-    "Timed events and mini-game effects now share one runtime path; periodic systems use elapsed time"
+  "quality": {
+    "testFiles": 21,
+    "unitTests": 262,
+    "desktopPrestigeCycles": 2,
+    "mobileViewport": "375x812"
+  },
+  "engagementMetrics": [
+    "actionsByEra",
+    "directRewardsByOperation",
+    "finalPassiveRatesByOperation",
+    "economicWaitSecondsByEra",
+    "firstOperationLatencyByEra",
+    "upgradeSelections",
+    "doctrineSelections",
+    "ignoredOperations"
   ]
 }

@@ -115,7 +115,7 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
         </div>
       )}
       {lastMatch && (
-        <div className="hack-result success">
+        <div className="operation-result success">
           Woven {lastMatch}! Boosting {lastMatch === 'temporal' ? 'Cosmic Power' : lastMatch === 'spatial' ? 'Exotic Matter' : lastMatch === 'causal' ? 'Universal Constants' : 'Reality Fragments'} for 60s
         </div>
       )}
@@ -132,7 +132,7 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
           </button>
         )}
       </div>
-      <p className="mining-hint">
+      <p className="operation-hint">
         TMP=Temporal SPC=Spatial CSL=Causal QNT=Quantum ***=Chaos(wild)
         <br />Choose one of three surveyed threads | Select a placed thread to discard it | 3 of a kind to weave
         <br />Keys: [D] survey | [W] weave | [C] clear

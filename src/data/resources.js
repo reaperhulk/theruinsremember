@@ -25,7 +25,7 @@ export const resources = {
   colonies: { id: 'colonies', name: 'Colonies', era: 5, baseCap: 2000, baseRate: 0.1, description: 'Off-world settlements' },
   exoticMaterials: { id: 'exoticMaterials', name: 'Exotic Materials', era: 5, baseCap: 3000, baseRate: 0.08, description: 'Rare space resources' },
 
-  // Era 6: Interstellar — higher base rates for passive/noMinigames bootstrapping
+  // Era 6: Interstellar — higher base rates for passive/lowInteraction bootstrapping
   starSystems: { id: 'starSystems', name: 'Star Systems', era: 6, baseCap: 5000, baseRate: 0.7, description: 'Colonized star systems' },
   darkEnergy: { id: 'darkEnergy', name: 'Dark Energy', era: 6, baseCap: 5000, baseRate: 0.9, description: 'Mysterious cosmic force' },
 
@@ -33,7 +33,7 @@ export const resources = {
   megastructures: { id: 'megastructures', name: 'Megastructures', era: 7, baseCap: 2000, baseRate: 0.25, description: 'Massive stellar-scale constructions' },
   stellarForge: { id: 'stellarForge', name: 'Stellar Forge Output', era: 7, baseCap: 2000, baseRate: 0.35, description: 'Output from star-powered forges' },
 
-  // Era 8: Galactic — higher base rates for passive/noMinigames bootstrapping
+  // Era 8: Galactic — higher base rates for passive/lowInteraction bootstrapping
   galacticInfluence: { id: 'galacticInfluence', name: 'Galactic Influence', era: 8, baseCap: 100000, baseRate: 0.9, description: 'Political power across the galaxy' },
   exoticMatter: { id: 'exoticMatter', name: 'Exotic Matter', era: 8, baseCap: 10000, baseRate: 0.75, description: 'Matter with unusual properties' },
 

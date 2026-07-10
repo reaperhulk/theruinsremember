@@ -123,6 +123,10 @@ export function tick(state, dt, rng = Math.random) {
       effectiveRate *= getTuningProductionBonus(state.tuningScore);
     }
 
+    if (id === 'stellarForge' && state.upgrades?.forgeMemory) {
+      effectiveRate *= 1 + Math.min(100, state.dysonSegments || 0) / 100;
+    }
+
     const cap = getEffectiveCap(state, id);
     let newAmount = r.amount + effectiveRate * dt;
     // Enforce resource cap: production cannot push above cap

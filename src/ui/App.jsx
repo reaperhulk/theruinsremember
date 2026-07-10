@@ -36,6 +36,7 @@ import { formatNumber } from './format.js';
 import { getCycleReadiness } from '../engine/realityForge.js';
 import { getDefaultOperation, getUnlockedOperations } from '../data/operations.js';
 import { getActiveSystems } from '../engine/operations.js';
+import { CYCLE_DOCTRINES } from '../engine/cycles.js';
 
 const initialState = createInitialState();
 
@@ -134,6 +135,7 @@ export function App() {
       `Multiplier: x${formatNumber(getEffectivePrestige(summary.currentMultiplier))} → x${formatNumber(getEffectivePrestige(summary.newMultiplier))} (x${summary.bonus.toFixed(1)} bonus)`,
       `Prestige Points: +${summary.points} (total: ${summary.totalPoints})`,
       `Cycle: #${summary.prestigeCount}`,
+      `Next doctrine: ${CYCLE_DOCTRINES[state.nextCycleDoctrine]?.name || 'None selected'}`,
       '',
       'KEPT: Achievements, prestige upgrades, multiplier, reality keys, lifetime stats',
       'LOST: All resources, upgrades, tech, era progress, operation state',

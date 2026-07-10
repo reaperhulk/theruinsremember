@@ -43,8 +43,8 @@ export function HelpOverlay({ onClose }) {
             <p>Era advances require enough upgrades, enough era research, and the starred breakthrough tech. The Run Director tells you what is missing.</p>
           </div>
           <div className="help-card">
-            <strong>Mini-Games</strong>
-            <p>Each era adds a specialized system. They should accelerate a run, not be the only thing keeping it alive.</p>
+            <strong>Operations</strong>
+            <p>Each era introduces a focused operation. The current system stays prominent; previous systems remain available from the archive.</p>
           </div>
           <div className="help-card">
             <strong>Prestige</strong>

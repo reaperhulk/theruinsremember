@@ -1,4 +1,4 @@
-// Galactic Senate — Era 8 mini-game
+// Galactic Senate operation — Era 8
 // Allocate influence to factions for resource bonuses.
 
 const FACTIONS = [

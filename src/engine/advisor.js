@@ -1,6 +1,6 @@
 // Build planner / playstyle advisor
 // Reads current tech choices and suggests the next 2-3 unlocks per archetype.
-// Archetypes: Extractor (mining/resources), Engineer (factory/efficiency), Explorer (mini-game/events)
+// Archetypes: Extractor (raw resources), Engineer (efficiency), Explorer (operations/events)
 
 import { techTree } from '../data/tech-tree.js';
 import { getAvailableTech } from './tech.js';
@@ -63,5 +63,5 @@ export function getArchetypeSuggestions(state) {
 export const ARCHETYPE_LABELS = {
   extractor: { name: 'Extractor', desc: 'Mining, resources, raw output', color: '#cc8844' },
   engineer: { name: 'Engineer', desc: 'Factory, efficiency, scaling', color: '#4488cc' },
-  explorer: { name: 'Explorer', desc: 'Mini-games, events, discovery', color: '#44cc88' },
+  explorer: { name: 'Explorer', desc: 'Operations, events, discovery', color: '#44cc88' },
 };

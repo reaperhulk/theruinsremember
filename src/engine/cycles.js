@@ -29,6 +29,7 @@ export function getCycleProductionMultiplier(state) {
   if (state.cycleDoctrine === 'reconstruction' && state.era <= 3) multiplier *= 1.35;
   if (state.cycleDoctrine === 'expansion' && state.era >= 4 && state.era <= 7) multiplier *= 1.3;
   if (state.cycleDoctrine === 'transcendence' && state.era >= 8) multiplier *= 1.3;
+  if (state.cycleDoctrine && state.echoUpgrades?.echoResonanceLock) multiplier *= 1.1;
   return multiplier;
 }
 

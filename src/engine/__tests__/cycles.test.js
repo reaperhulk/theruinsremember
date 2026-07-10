@@ -20,6 +20,13 @@ describe('cycle doctrines', () => {
     expect(getCycleProductionMultiplier(state)).toBe(1);
   });
 
+  it('amplifies an active doctrine with Resonance Lock', () => {
+    const state = createInitialState();
+    state.cycleDoctrine = 'reconstruction';
+    state.echoUpgrades.echoResonanceLock = true;
+    expect(getCycleProductionMultiplier(state)).toBeCloseTo(1.35 * 1.1);
+  });
+
   it('awards each cycle goal once', () => {
     const state = createInitialState();
     state.cycleDoctrine = 'reconstruction';

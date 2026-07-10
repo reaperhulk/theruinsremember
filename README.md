@@ -23,9 +23,11 @@ Prestige isn't just a mechanic. It's the cycle itself.
 - **10 Eras** spanning primitive survival to multiverse exploration
 - **579 upgrades** forming deep prerequisite chains with meaningful branching choices
 - **115 tech nodes** including mutually exclusive paths that shape each run differently
-- **Expeditions and active systems** that evolve from early ruin exploration into orbital docking, colonies, star charts, trading, Dyson assembly, reality weaving, galactic politics, and the reality forge
+- **Era-focused operations** that evolve from ruin expeditions into orbital missions, colony mandates, star-network directives, Dyson assembly, reality weaving, galactic politics, cosmic tuning, and the Reality Forge
+- **Distinct cycle doctrines** that reshape early, middle, or late eras and award permanent cycle marks for doctrine-specific goals
+- **Reality keys with different identities**: faster expeditions, larger storage, stronger operation rewards, or seeded starting resources
 - **30 prestige upgrades** including 5 "Ascension" tier endgame upgrades
-- **290 achievements** tracking everything from speed milestones to narrative discovery
+- **267 reachable achievements** tracking everything from speed milestones to narrative discovery
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players
 - **Progression-gated era advancement** — new eras require sufficient upgrade depth, era-local research depth, and the starred breakthrough technology instead of passive waiting
 - **Resource caps that matter** — storage is a real constraint requiring strategic cap upgrades
@@ -85,25 +87,26 @@ node scripts/browser-test.mjs
 node scripts/browser-test.mjs --mobile
 ```
 
-The browser smoke test drives a real early-game flow, hydrates a deterministic
-Era 10 state to exercise every tab, and fails on progression misses, console
-errors, or viewport overflow. Use `--prestige 1` to include a prestige cycle.
+The browser smoke test drives a real early-game flow, exercises orbital mission
+choices, fragment selection, limited tuning probes, the operation archive, all
+three cycle doctrines, and an Era 10 prestige. It fails on progression misses,
+console errors, or viewport overflow. Use `--prestige 1` to include a reset.
 
 The balance harness currently validates four seeded scenarios:
 
 - `full` for optimal completion pacing
 - `casual` for a normal active run
-- `noMinigames` for low-interaction viability
+- `lowInteraction` for low-interaction viability
 - `passive` for mostly idle viability
 
 ## Recent Direction
 
 Recent iteration work focused on:
 
-- Removing fixed era timers in favor of progression-based readiness checks
-- Adding stronger late-run doctrine branches to differentiate builds
-- Improving the shell UI with better run guidance, stronger lore surfacing, and clearer resource pressure indicators
-- Expanding regression coverage so pacing drift and browser-level usability regressions are caught automatically
+- Presenting the current era operation prominently while keeping prior systems in an archive
+- Replacing blind or solved interactions with fragment choices, signal probes, docking approaches, colony mandates, and star directives
+- Making Reality Forge keys and cycle doctrines materially change the next run
+- Measuring repeated actions, economic waiting, operation latency, direct rewards, and ignored systems in the seeded playtest harness
 
 ## Tech Stack
 

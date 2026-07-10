@@ -39,7 +39,7 @@ const mechanicDescriptions = {
   colonyMultiplier: 'Colony focus multiplies target resources 1.5x',
   autoDeposit: 'Canvas deposits auto-collected after 5s',
   routeBonus: '+3% production per star route',
-  hackPermanentBoost: 'Hack successes permanently +1% a random resource',
+  dysonForgeMemory: 'Dyson progress raises Stellar Forge output, up to x2',
   prestigeAccumulator: '+5% production per prestige run completed',
   crisisInversion: 'Crisis events boost production instead of reducing it',
   diversityBonus: '1.05x per unlocked resource type',

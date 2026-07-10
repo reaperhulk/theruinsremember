@@ -45,7 +45,7 @@ const ACHIEVEMENT_CATEGORIES = [
   { key: 'eras', label: 'Eras' },
   { key: 'upgrades', label: 'Upgrades' },
   { key: 'trading', label: 'Trading' },
-  { key: 'minigames', label: 'Mini-Games' },
+  { key: 'operations', label: 'Operations' },
   { key: 'prestige', label: 'Prestige' },
   { key: 'collection', label: 'Collection' },
   { key: 'milestones', label: 'Milestones' },
@@ -142,7 +142,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
           <span>{state.prestigePoints || 0}</span>
         </div>
         <div className="stat-row">
-          <span>Mini-game Combos</span>
+          <span>Operation Combos</span>
           <span>Dock: {state.dockingCombo || 0} | Weave: {state.weaveCombo || 0}</span>
         </div>
         <div className="stat-row">

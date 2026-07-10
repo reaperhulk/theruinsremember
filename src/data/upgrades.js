@@ -3224,9 +3224,9 @@ export const upgrades = {
     id: 'forgeMemory', name: 'Forge Memory', era: 7,
     cost: { megastructures: 20, stellarForge: 50, research: 200 },
     effects: [{ type: 'production_add', target: 'stellarForge', value: 3.0 }],
-    description: 'The forge remembers schematics from previous cycles. Each hack success permanently boosts a random resource by 1%.',
+    description: 'The forge remembers every completed segment. Stellar Forge output rises up to x2 as the Dyson structure reaches 100 segments.',
     prerequisites: ['dysonSphere', 'starLifting'],
-    mechanic: 'hackPermanentBoost',
+    mechanic: 'dysonForgeMemory',
   },
 
   // Era 8

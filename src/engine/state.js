@@ -20,6 +20,13 @@ export function migrateState(saved) {
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
   migrated.expedition = { ...createExpeditionState(), ...(saved.expedition || {}) };
   migrated.dockingMissions = { cargo: 0, crew: 0, science: 0, ...(saved.dockingMissions || {}) };
+  for (const retiredField of [
+    'miningStreak', 'lastMineTime', 'autoMineTimer',
+    'factoryAllocation', 'factoryWorkers',
+    'hackChallenge', 'hackDifficulty', 'hackSuccesses', 'hackMastery', 'lastHackTime',
+  ]) {
+    delete migrated[retiredField];
+  }
   // Guard against broken resource fields from corrupt saves
   for (const [id, r] of Object.entries(migrated.resources)) {
     if (!Number.isFinite(r.capMult) || r.capMult <= 0) migrated.resources[id] = { ...migrated.resources[id], capMult: 1 };

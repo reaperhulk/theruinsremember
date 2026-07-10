@@ -15,7 +15,7 @@ const eraLore = {
   10: "The cycle spans realities. You have done this before. Prestige is not a game mechanic — it is the loop itself.",
 };
 
-// What unlocks per era (resources + mini-games)
+// What unlocks per era (resources and operations)
 const eraUnlocks = {
   2: { resources: ['Steel', 'Electronics', 'Research'], features: ['Industrial expedition routes'] },
   3: { resources: ['Software', 'Data'], features: ['Signal expedition routes'] },

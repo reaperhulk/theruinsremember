@@ -156,7 +156,7 @@ export function getTimedRateMultiplier(state, resourceId) {
         mult *= ae.effect.rateMultBonus;
       }
     }
-    // Support plural .effects array format (hacking)
+    // Support event definitions containing multiple timed effects.
     if (ae.effects) {
       for (const eff of ae.effects) {
         const matches = eff.resourceId === resourceId || eff.resourceId === 'all';

@@ -8,18 +8,18 @@ import { createInitialState } from '../src/engine/state.js';
 import { tick } from '../src/engine/tick.js';
 import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable } from '../src/engine/upgrades.js';
 import { unlockTech, getAvailableTech } from '../src/engine/tech.js';
-import { canAfford, gather, getNetRate } from '../src/engine/resources.js';
+import { canAfford, gather, getEffectiveRate, getNetRate } from '../src/engine/resources.js';
 import { attemptDock, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
-import { assignColonies, getAssignableColonies } from '../src/engine/colonies.js';
-import { createRoute, getUnlockedSystems, routeExists, getRoutes } from '../src/engine/starChart.js';
+import { assignColonies, getAssignableColonies, getColonyBonus } from '../src/engine/colonies.js';
+import { createRoute, getUnlockedSystems, routeExists, getRoutes, getRouteBonus } from '../src/engine/starChart.js';
 import { drawFragment, resolveWeave } from '../src/engine/weaving.js';
 import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
 import { assembleDysonSegment } from '../src/engine/dyson.js';
-import { applyTuning } from '../src/engine/tuning.js';
+import { applyTuning, getTuningProductionBonus } from '../src/engine/tuning.js';
 import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
 import { getEraReadiness } from '../src/engine/eras.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
-import { allocateSenateInfluence, getMaxSenateInfluence } from '../src/engine/senate.js';
+import { allocateSenateInfluence, getMaxSenateInfluence, getSenatePctBonuses } from '../src/engine/senate.js';
 import { selectNextCycleDoctrine } from '../src/engine/cycles.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
 import { readFileSync } from 'fs';
@@ -84,7 +84,7 @@ function parseArgs(argv) {
 // ─── Profiles ───────────────────────────────────────────────────────────────
 const PROFILES = {
   optimal: {
-    description: 'Engage everything, buy everything, perfect mini-game play. Baseline for pacing.',
+    description: 'Engage every operation and buy every viable decision. Baseline for pacing.',
     gather: true, gatherInterval: 5,
     expeditions: true, expeditionStrategy: 'deep',
     buyUpgrades: true, buyTech: true,
@@ -109,8 +109,8 @@ const PROFILES = {
       'acceleratedDecay', 'cosmicAwareness', 'eternalReturn',
     ],
   },
-  noMinigames: {
-    description: 'Buy upgrades/tech, gather, but skip all mini-games. Tests: are mini-games required?',
+  lowInteraction: {
+    description: 'Buy upgrades and tech, gather, but skip optional operations. Tests low-interaction viability.',
     gather: true, gatherInterval: 5,
     expeditions: false, expeditionStrategy: 'safe',
     buyUpgrades: true, buyTech: true,
@@ -132,7 +132,7 @@ const PROFILES = {
     ],
   },
   passive: {
-    description: 'Only auto-production + upgrade buying. No clicking or mini-games. Tests: minimum viable progression.',
+    description: 'Only auto-production and upgrade buying. Tests minimum viable progression.',
     gather: false, gatherInterval: 0,
     expeditions: false, expeditionStrategy: 'safe',
     buyUpgrades: true, buyTech: true,
@@ -197,7 +197,7 @@ const PROFILES = {
     ],
   },
   casual: {
-    description: 'Simulates a regular player: gathers infrequently, misses docks, skips some mini-games.',
+    description: 'Simulates a regular player: gathers infrequently, misses docks, and skips some operations.',
     gather: true, gatherInterval: 15,
     expeditions: true, expeditionStrategy: 'measured',
     buyUpgrades: true, buyTech: true,
@@ -225,7 +225,7 @@ const SCENARIOS = {
   speedrun:     { profile: 'optimal',      prestige: 0,  targetEra: 10, maxTime: 7200,  purpose: 'Optimal time-to-completion' },
   prestige3:    { profile: 'optimal',      prestige: 3,  targetEra: 10, maxTime: 28800, purpose: 'Prestige loop balance' },
   prestige10:   { profile: 'optimal',      prestige: 10, targetEra: 10, maxTime: 86400, purpose: 'Prestige stress test' },
-  noMinigames:  { profile: 'noMinigames',  prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Mini-game necessity' },
+  lowInteraction:  { profile: 'lowInteraction',  prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Optional operation viability' },
   passive:      { profile: 'passive',      prestige: 0,  targetEra: 10, maxTime: 43200, purpose: 'Minimum viable progression' },
   clickerOnly:  { profile: 'clickerOnly',  prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Click-only viability' },
   regression:   { profile: 'optimal',      prestige: 0,  targetEra: 5,  maxTime: 1800,  purpose: 'Quick pacing sanity check' },
@@ -240,6 +240,8 @@ const BALANCE_TARGETS = {
     maxTime: 1800,
     requiredEra: 10,
     cycleReady: true,
+    maxFirstOperationLatency: 60,
+    maxIgnoredOperations: 0,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
@@ -252,8 +254,8 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true },
-  noMinigames: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0 },
+  lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true },
 };
 
@@ -573,7 +575,7 @@ function createCollector() {
     eraTimings: { 1: { reachedAt: 0, duration: 0 } },
     resourceSnapshots: [],
     upgradeTimeline: [],
-    miniGameStats: {
+    operationStats: {
       expeditions: { finds: 0, gems: 0 },
       docking: { attempts: 0, successes: 0, perfects: 0 },
       colonies: { assignments: 0 },
@@ -586,6 +588,17 @@ function createCollector() {
     },
     prestigeLog: [],
     bottlenecks: [],
+    engagement: {
+      actionsByEra: {},
+      directRewardsByOperation: {},
+      economicWaitSecondsByEra: {},
+      firstOperationLatencyByEra: {},
+      upgradeSelections: {},
+      techSelections: {},
+      doctrineSelections: {},
+      ignoredOperations: [],
+      finalPassiveRatesByOperation: {},
+    },
     completionStatus: { reachedTargetEra: false, totalTime: 0, finalEra: 1, gameComplete: false },
   };
 }
@@ -642,8 +655,8 @@ function recordUpgradeTimeline(state, t, collector) {
   });
 }
 
-function updateMiniGameStats(prevState, state, collector) {
-  const s = collector.miniGameStats;
+function updateOperationStats(prevState, state, collector) {
+  const s = collector.operationStats;
   s.expeditions.gems = state.totalGems || 0;
   s.expeditions.finds = state.expedition?.totalFinds || 0;
   s.docking.attempts = state.dockingAttempts || 0;
@@ -655,6 +668,83 @@ function updateMiniGameStats(prevState, state, collector) {
   s.starChart.routes = (state.starRoutes || []).length;
   s.realityForge.keys = Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0);
   s.senate.allocations = (state.senate?.merchants || 0) + (state.senate?.scholars || 0) + (state.senate?.warriors || 0);
+}
+
+function totalResourceAmounts(state) {
+  return Object.values(state.resources || {}).reduce((sum, resource) => sum + (resource.amount || 0), 0);
+}
+
+function recordSelections(before, after, collector) {
+  const engagement = collector.engagement;
+  for (const [id, value] of Object.entries(after.upgrades || {})) {
+    const previous = before.upgrades?.[id];
+    const gained = typeof value === 'number' ? value - (typeof previous === 'number' ? previous : 0) : !previous && value ? 1 : 0;
+    if (gained > 0) engagement.upgradeSelections[id] = (engagement.upgradeSelections[id] || 0) + gained;
+  }
+  for (const id of Object.keys(after.tech || {})) {
+    if (!before.tech?.[id]) engagement.techSelections[id] = (engagement.techSelections[id] || 0) + 1;
+  }
+  if (after.nextCycleDoctrine && after.nextCycleDoctrine !== before.nextCycleDoctrine) {
+    engagement.doctrineSelections[after.nextCycleDoctrine] = (engagement.doctrineSelections[after.nextCycleDoctrine] || 0) + 1;
+  }
+}
+
+function recordBotAction(before, after, action, collector) {
+  if (after === before) return;
+  const era = before.era || 1;
+  const byEra = collector.engagement.actionsByEra[era] || {};
+  byEra[action] = (byEra[action] || 0) + 1;
+  collector.engagement.actionsByEra[era] = byEra;
+
+  const rewardActions = new Set(['expedition', 'docking', 'weaving', 'trading', 'dyson', 'tuning', 'senate', 'realityForge']);
+  const directReward = Math.max(0, totalResourceAmounts(after) - totalResourceAmounts(before));
+  if (rewardActions.has(action) && directReward > 0) {
+    collector.engagement.directRewardsByOperation[action] =
+      (collector.engagement.directRewardsByOperation[action] || 0) + directReward;
+  }
+  recordSelections(before, after, collector);
+}
+
+function hasEraOperationProgress(state) {
+  if (state.era <= 3) return (state.expedition?.eraFinds || 0) > 0;
+  if (state.era === 4) return Object.values(state.dockingMissions || {}).some(count => count > 0);
+  if (state.era === 5) return Object.values(state.colonyAssignments || {}).some(count => count > 0);
+  if (state.era === 6) return (state.starRoutes?.length || 0) > 0;
+  if (state.era === 7) return (state.dysonSegments || 0) > 0;
+  if (state.era === 8) return Object.values(state.senate || {}).some(count => count > 0) || (state.totalWeaves || 0) > 0;
+  if (state.era === 9) return (state.tuningScore || 0) > 0;
+  return Object.values(state.realityKeys || {}).some(count => count > 0);
+}
+
+function recordEngagementTick(state, collector) {
+  const era = state.era || 1;
+  const affordableUpgrade = getAvailableUpgrades(state).some(upgrade => canAfford(state, getUpgradeCost(state, upgrade.id)));
+  const affordableTech = getAvailableTech(state).some(tech => canAfford(state, tech.cost));
+  if (!affordableUpgrade && !affordableTech) {
+    collector.engagement.economicWaitSecondsByEra[era] = (collector.engagement.economicWaitSecondsByEra[era] || 0) + 1;
+  }
+  if (collector.engagement.firstOperationLatencyByEra[era] === undefined && hasEraOperationProgress(state)) {
+    collector.engagement.firstOperationLatencyByEra[era] = Math.max(0, state.totalTime - (state.eraStartTime || 0));
+  }
+}
+
+function getPassiveOperationRates(state) {
+  const sumRates = rates => Object.values(rates).reduce((sum, rate) => sum + Math.max(0, rate), 0);
+  const tuningRate = getEffectiveRate(state, 'cosmicPower') * Math.max(0, getTuningProductionBonus(state.tuningScore) - 1);
+  const senateRate = Object.entries(getSenatePctBonuses(state)).reduce(
+    (sum, [resourceId, multiplier]) => sum + getEffectiveRate(state, resourceId) * Math.max(0, multiplier - 1),
+    0,
+  );
+  const weavingRate = (state.activeEffects || [])
+    .filter(effect => effect.id?.startsWith('weave_') && effect.effect?.resourceId)
+    .reduce((sum, effect) => sum + getEffectiveRate(state, effect.effect.resourceId) * Math.max(0, (effect.effect.rateMultBonus || 1) - 1), 0);
+  return {
+    colonies: sumRates(getColonyBonus(state)),
+    starChart: sumRates(getRouteBonus(state)),
+    senate: senateRate,
+    weaving: weavingRate,
+    tuning: tuningRate,
+  };
 }
 
 function detectBottlenecks(state, collector) {
@@ -738,25 +828,31 @@ function runScenario(opts) {
 
   for (let t = 0; t < maxTicks; t++) {
     const prevState = state;
+    const applyAction = (name, action) => {
+      const before = state;
+      state = action(state);
+      recordBotAction(before, state, name, collector);
+    };
 
     // --- Bot actions ---
-    state = botGather(state, profileDef, t, rng);
-    state = botExpedition(state, profileDef, t, rng);
-    state = botBuyUpgrades(state, profileDef, t, rng);
-    state = botBuyTech(state, profileDef, t, rng);
-    state = botDock(state, profileDef, t, rng);
-    state = botColonies(state, profileDef, t, rng);
-    state = botStarChart(state, profileDef, t, rng);
-    state = botWeave(state, profileDef, t, rng);
-    state = botTrade(state, profileDef, t, rng);
-    state = botDyson(state, profileDef, t, rng);
-    state = botCosmicTuning(state, profileDef, t, rng);
-    state = botSenate(state, profileDef, t, rng);
-    state = botRealityForge(state, profileDef, t, rng);
-    state = botPrestigeUpgrades(state, profileDef, t, rng);
+    applyAction('gather', current => botGather(current, profileDef, t, rng));
+    applyAction('expedition', current => botExpedition(current, profileDef, t, rng));
+    applyAction('upgrade', current => botBuyUpgrades(current, profileDef, t, rng));
+    applyAction('technology', current => botBuyTech(current, profileDef, t, rng));
+    applyAction('docking', current => botDock(current, profileDef, t, rng));
+    applyAction('colonies', current => botColonies(current, profileDef, t, rng));
+    applyAction('starChart', current => botStarChart(current, profileDef, t, rng));
+    applyAction('weaving', current => botWeave(current, profileDef, t, rng));
+    applyAction('trading', current => botTrade(current, profileDef, t, rng));
+    applyAction('dyson', current => botDyson(current, profileDef, t, rng));
+    applyAction('tuning', current => botCosmicTuning(current, profileDef, t, rng));
+    applyAction('senate', current => botSenate(current, profileDef, t, rng));
+    applyAction('realityForge', current => botRealityForge(current, profileDef, t, rng));
+    applyAction('prestigeUpgrade', current => botPrestigeUpgrades(current, profileDef, t, rng));
 
     // Tick the engine
     state = tick(state, DT, rng);
+    recordEngagementTick(state, collector);
 
     // Track era transitions
     if (state.era !== lastEra) {
@@ -807,8 +903,8 @@ function runScenario(opts) {
       recordUpgradeTimeline(state, t, collector);
     }
 
-    // Mini-game stats
-    updateMiniGameStats(prevState, state, collector);
+    // Operation stats
+    updateOperationStats(prevState, state, collector);
 
     // Bottleneck detection every 5 min
     if (t % 300 === 0) {
@@ -889,6 +985,32 @@ function runScenario(opts) {
     prestigeMultiplier: state.prestigeMultiplier || 1,
   };
 
+  const operationActivity = {
+    expedition: collector.operationStats.expeditions.finds,
+    docking: collector.operationStats.docking.attempts,
+    colonies: Object.values(state.colonyAssignments || {}).reduce((sum, count) => sum + count, 0),
+    starChart: collector.operationStats.starChart.routes,
+    dyson: collector.operationStats.dyson.segments,
+    senate: collector.operationStats.senate.allocations,
+    weaving: collector.operationStats.weaving.weaves,
+    tuning: collector.operationStats.tuning.score,
+    realityForge: collector.operationStats.realityForge.keys,
+  };
+  const configuredOperations = {
+    expedition: profileDef.expeditions,
+    docking: profileDef.docking,
+    colonies: profileDef.colonies,
+    starChart: profileDef.starChart,
+    dyson: profileDef.dysonAssembly,
+    senate: !!profileDef.senateFocus,
+    weaving: profileDef.weaving,
+    tuning: profileDef.cosmicTuning,
+    realityForge: profileDef.realityForge,
+  };
+  collector.engagement.ignoredOperations = Object.keys(configuredOperations)
+    .filter(operation => configuredOperations[operation] && !operationActivity[operation]);
+  collector.engagement.finalPassiveRatesByOperation = getPassiveOperationRates(state);
+
   return { state, collector };
 }
 
@@ -911,14 +1033,14 @@ function printHumanReport(scenarioName, opts, collector) {
     }
   }
 
-  // Mini-Game Contribution
-  const mg = collector.miniGameStats;
-  const hasAnyMini = mg.expeditions.finds > 0 || mg.docking.attempts > 0 ||
+  // Operation contribution
+  const mg = collector.operationStats;
+  const hasAnyOperation = mg.expeditions.finds > 0 || mg.docking.attempts > 0 ||
     mg.starChart.routes > 0 || mg.weaving.weaves > 0 || mg.dyson.segments > 0 ||
     mg.tuning.score > 0 || mg.senate.allocations > 0 || mg.realityForge.keys > 0;
 
-  if (hasAnyMini) {
-    console.log('\n── Mini-Game Stats ──');
+  if (hasAnyOperation) {
+    console.log('\n── Operation Stats ──');
     if (mg.expeditions.finds > 0) console.log(`  Expeditions: ${mg.expeditions.finds} discoveries, ${mg.expeditions.gems} gems`);
     if (mg.docking.attempts > 0) console.log(`  Docking: ${mg.docking.successes}/${mg.docking.attempts} hits (${mg.docking.perfects} perfect)`);
     if (mg.starChart.routes > 0) console.log(`  Star Chart: ${mg.starChart.routes} routes`);
@@ -928,6 +1050,28 @@ function printHumanReport(scenarioName, opts, collector) {
     if (mg.senate.allocations > 0) console.log(`  Senate: ${mg.senate.allocations} influence allocated`);
     if (mg.realityForge.keys > 0) console.log(`  Reality Forge: ${mg.realityForge.keys} keys forged`);
   }
+
+  const engagement = collector.engagement;
+  console.log('\n── Engagement Audit ──');
+  for (const [era, actions] of Object.entries(engagement.actionsByEra)) {
+    const repeated = Object.entries(actions).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const wait = engagement.economicWaitSecondsByEra[era] || 0;
+    const latency = engagement.firstOperationLatencyByEra[era];
+    console.log(`  Era ${era}: ${repeated.map(([name, count]) => `${name} x${count}`).join(', ') || 'no active actions'} | economic wait ${fmtTime(wait)}${latency === undefined ? '' : ` | first operation ${fmtTime(latency)}`}`);
+  }
+  const rewardEntries = Object.entries(engagement.directRewardsByOperation).sort((a, b) => b[1] - a[1]);
+  if (rewardEntries.length > 0) {
+    console.log(`  Direct action rewards: ${rewardEntries.map(([name, amount]) => `${name} ${fmtNum(amount)}`).join(', ')}`);
+  }
+  const passiveRates = Object.entries(engagement.finalPassiveRatesByOperation).filter(([, rate]) => rate > 0);
+  if (passiveRates.length > 0) {
+    console.log(`  Final passive operation rates: ${passiveRates.map(([name, rate]) => `${name} +${fmtNum(rate)}/s`).join(', ')}`);
+  }
+  const doctrines = Object.entries(engagement.doctrineSelections);
+  if (doctrines.length > 0) console.log(`  Doctrines: ${doctrines.map(([name, count]) => `${name} x${count}`).join(', ')}`);
+  const upgrades = Object.entries(engagement.upgradeSelections).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  if (upgrades.length > 0) console.log(`  Most selected upgrades: ${upgrades.map(([name, count]) => `${name} x${count}`).join(', ')}`);
+  if (engagement.ignoredOperations.length > 0) console.log(`  Configured but ignored: ${engagement.ignoredOperations.join(', ')}`);
 
   // Prestige Cycles
   if (collector.prestigeLog.length > 0) {
@@ -1073,6 +1217,14 @@ function assertBalanceTargets(allResults) {
     const issues = [];
     if (status.finalEra < target.requiredEra) issues.push(`final era ${status.finalEra} < ${target.requiredEra}`);
     if (target.cycleReady && !status.cycleReady) issues.push('cycle not ready to prestige');
+    if (target.maxIgnoredOperations != null && collector.engagement.ignoredOperations.length > target.maxIgnoredOperations) {
+      issues.push(`ignored configured operations: ${collector.engagement.ignoredOperations.join(', ')}`);
+    }
+    if (target.maxFirstOperationLatency != null) {
+      for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {
+        if (latency > target.maxFirstOperationLatency) issues.push(`era ${era} first operation took ${fmtTime(latency)}`);
+      }
+    }
     if (target.minTime != null && status.totalTime < target.minTime) issues.push(`too fast (${fmtTime(status.totalTime)} < ${fmtTime(target.minTime)})`);
     if (target.maxTime != null && status.totalTime > target.maxTime) issues.push(`too slow (${fmtTime(status.totalTime)} > ${fmtTime(target.maxTime)})`);
     for (const [era, [minDuration, maxDuration]] of Object.entries(target.eraRanges || {})) {
@@ -1158,10 +1310,10 @@ Options:
 Examples:
   node scripts/bot-playtest.js --scenario full --json > baseline.json
   node scripts/bot-playtest.js --scenario full --json --compare baseline.json
-  node scripts/bot-playtest.js --scenario full,noMinigames,passive --quiet
+  node scripts/bot-playtest.js --scenario full,lowInteraction,passive --quiet
   node scripts/bot-playtest.js --scenario prestige3 --verbose
   node scripts/bot-playtest.js --seed 42 --verbose
-  node scripts/bot-playtest.js --scenario full,casual,noMinigames,passive --seed 424242 --quiet --assert-balance
+  node scripts/bot-playtest.js --scenario full,casual,lowInteraction,passive --seed 424242 --quiet --assert-balance
 `);
 }
 
@@ -1189,10 +1341,7 @@ if (args.listProfiles) {
   console.log('\nBot Profiles:');
   for (const [name, p] of Object.entries(PROFILES)) {
     const systems = [];
-    if (p.mine) systems.push('mine');
     if (p.gather) systems.push('gather');
-    if (p.factory) systems.push('factory');
-    if (p.hacking) systems.push('hack');
     if (p.docking) systems.push('dock');
     if (p.colonies) systems.push('colonies');
     if (p.starChart) systems.push('starChart');

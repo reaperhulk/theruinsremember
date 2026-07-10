@@ -1,7 +1,7 @@
 # The Ruins Remember — Incremental Game
 
 ## Project Structure
-- `src/engine/` — Pure game logic (tick, resources, upgrades, tech, mini-games). No browser deps.
+- `src/engine/` — Pure game logic (tick, resources, upgrades, tech, operations, cycles). No browser deps.
 - `src/ui/` — React components (App, panels, canvas).
 - `src/hooks/` — React hooks including `useGameLoop.js` (the main game loop).
 - `src/data/` — Static data definitions (upgrades, tech, resources, prestige).
@@ -27,8 +27,9 @@ node scripts/browser-test.mjs --screenshots      # Save screenshots to /tmp/game
 ```
 
 The Puppeteer test drives a real headless Chrome through the early game, then hydrates
-a deterministic Era 10 state to validate every tab. It exits nonzero for progression
-misses, console errors, or layout/viewport overflow.
+a deterministic Era 10 state to validate the operation archive, Weaving choices,
+Tuning probes, cycle doctrines, every main tab, and prestige. It exits nonzero for
+progression misses, console errors, or layout/viewport overflow.
 
 ### Manual Browser Testing (inject harness)
 1. Start the dev server: `npm run dev`
@@ -113,6 +114,7 @@ node scripts/bot-playtest.js --compare results.json  # Regression detection
 - `purchaseUpgrade(state, id)` / `getAvailableUpgrades(state)` / `getUpgradeCost(state, id)`
 - `unlockTech(state, id)` / `getAvailableTech(state)`
 - `canAfford(state, cost)` / `spend(state, cost)` / `gather(state, resourceId)`
-- `mine(state)` — Manual mining action
+- `runExpedition(state, routeId)` — Resolve an early-era expedition
+- `getCycleGoal(state)` / `selectNextCycleDoctrine(state, id)` — Cycle strategy
 - `performPrestige(state)` — Reset with prestige bonuses
 - `createInitialState()` — Fresh game state

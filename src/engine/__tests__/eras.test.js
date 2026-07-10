@@ -91,6 +91,44 @@ describe('eras', () => {
       expect(getEraMastery(state).met).toBe(true);
       expect(getEraMastery(state).fallbackRemaining).toBe(0);
     });
+
+    it('gives Expansion a different colony and route mastery path', () => {
+      const state = createInitialState();
+      state.cycleDoctrine = 'expansion';
+      state.era = 5;
+      state.colonyAssignments = { growth: 5, science: 0, industry: 0 };
+      expect(getEraMastery(state).completedDirectly).toBe(true);
+
+      state.era = 6;
+      state.starRoutes = Array.from({ length: 7 }, (_, index) => ({ from: `a${index}`, to: `b${index}` }));
+      expect(getEraMastery(state).target).toBe(7);
+      expect(getEraMastery(state).completedDirectly).toBe(true);
+    });
+
+    it('gives Transcendence shorter late-operation mastery paths', () => {
+      const state = createInitialState();
+      state.cycleDoctrine = 'transcendence';
+      state.era = 8;
+      state.totalWeaves = 2;
+      expect(getEraMastery(state).completedDirectly).toBe(true);
+
+      state.era = 9;
+      state.tuningScore = 30;
+      expect(getEraMastery(state).completedDirectly).toBe(true);
+    });
+  });
+
+  it('lets Reconstruction substitute more discoveries for early build-out', () => {
+    const state = createInitialState();
+    state.cycleDoctrine = 'reconstruction';
+    state.expedition.eraFinds = 3;
+    const era1Upgrades = Object.values(upgradeDefs).filter(upgrade => upgrade.era === 1);
+    for (let index = 0; index < 5; index++) state.upgrades[era1Upgrades[index].id] = true;
+
+    const readiness = getEraReadiness(state);
+    expect(readiness.discoveryCredits).toBe(9);
+    expect(readiness.minimumEconomicUpgrades).toBe(5);
+    expect(readiness.upgradesMet).toBe(true);
   });
 
   describe('checkEraTransition', () => {

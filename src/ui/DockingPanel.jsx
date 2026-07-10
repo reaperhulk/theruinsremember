@@ -141,7 +141,7 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
       <button className="mine-btn" onClick={handleDock} disabled={onCooldown} aria-label={onCooldown ? `Docking cooldown: ${cooldownRemaining.toFixed(1)} seconds remaining` : 'Dock now. Press D key as shortcut.'}>
         {onCooldown ? `Wait ${cooldownRemaining.toFixed(1)}s` : 'Dock! (d)'}
       </button>
-      <p className="mining-hint">
+      <p className="operation-hint">
         Complete each mission three times to stabilize orbital operations | Combo streaks boost rewards up to x2
       </p>
     </div>

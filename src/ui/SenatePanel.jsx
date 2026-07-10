@@ -28,13 +28,13 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
         <span>Influence: {available}/{maxInfluence} available</span>
         {majorityFaction && <span style={{ color: FACTION_UI[majorityFaction].color }}>Majority: {FACTION_UI[majorityFaction].label} (x2)</span>}
       </div>
-      <div className="factory-lines">
+      <div className="allocation-lines">
         {factions.map(faction => {
           const count = senate[faction.id] || 0;
           const isMaj = majorityFaction === faction.id;
           const ui = FACTION_UI[faction.id];
           return (
-            <div key={faction.id} className="factory-line">
+            <div key={faction.id} className="allocation-line">
               <span className="line-label" style={{ color: ui.color }}>
                 {ui.label}: {count}
               </span>
@@ -63,7 +63,7 @@ export const SenatePanel = memo(function SenatePanel({ state, onUpdate }) {
           Next allocation costs {formatNumber(allocateCost)} Galactic Influence. Majority faction gets x2 bonus.
         </div>
       )}
-      <p className="mining-hint">
+      <p className="operation-hint">
         Allocate influence to factions (cost scales with total) | Majority faction gets x2 | Max slots scale with GI
       </p>
 

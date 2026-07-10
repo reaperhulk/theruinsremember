@@ -44,7 +44,7 @@ export const ColonyPanel = memo(function ColonyPanel({ state, onUpdate }) {
   return (
     <div className="panel colony-panel">
       <h2>Colonies ({Math.floor(maxColonies)}){strategy.type !== 'none' ? `, ${strategy.type}` : ''}</h2>
-      <div className="factory-info">
+      <div className="allocation-info">
         <span>Colonies: {Math.floor(available)}/{Math.floor(maxColonies)} available</span>
         {maxColonies >= 3 && (
           <button className="gather-btn" onClick={handleEvenSplit} style={{ fontSize: '0.7em', padding: '2px 8px' }} aria-label="Evenly split colonies across all focus types">
@@ -76,11 +76,11 @@ export const ColonyPanel = memo(function ColonyPanel({ state, onUpdate }) {
           ))}
         </div>
       )}
-      <div className="factory-lines">
+      <div className="allocation-lines">
         {FOCUS_TYPES.map(focus => {
           const count = assignments[focus.id] || 0;
           return (
-            <div key={focus.id} className="factory-line">
+            <div key={focus.id} className="allocation-line">
               <span className="line-label" style={{ color: focus.color }}>
                 {focus.label}: {count}
               </span>
@@ -119,7 +119,7 @@ export const ColonyPanel = memo(function ColonyPanel({ state, onUpdate }) {
           Every colony site matches coordinates from the ancient maps.
         </p>
       )}
-      <p className="mining-hint">Specialize x2 | Diversify x1.25 | Era bonus scales output</p>
+      <p className="operation-hint">Specialize x2 | Diversify x1.25 | Era bonus scales output</p>
     </div>
   );
 });

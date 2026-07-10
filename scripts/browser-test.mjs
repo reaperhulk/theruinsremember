@@ -281,6 +281,13 @@ async function run() {
   await promoteToEra10(page);
   await page.evaluate(() => document.querySelector('#tab-mini')?.click());
   await new Promise(resolve => setTimeout(resolve, 150));
+  const operationShell = await page.evaluate(() => ({
+    heading: document.querySelector('.operations-heading h2')?.textContent || '',
+    archiveOptions: document.querySelectorAll('.operation-archive option').length,
+    legacyTabs: document.querySelectorAll('.mini-game-tabs').length,
+  }));
+  const operationShellFailed = operationShell.heading !== 'Reality Forge' || operationShell.archiveOptions < 8 || operationShell.legacyTabs !== 0;
+  console.log(`  Era-focused operation shell: ${operationShellFailed ? 'FAILED' : `${operationShell.archiveOptions - 1} archived systems`}`);
   const tuningMounted = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return false;
@@ -289,9 +296,29 @@ async function run() {
     return true;
   });
   await new Promise(resolve => setTimeout(resolve, 150));
-  const tuningVisible = tuningMounted && await page.evaluate(() => !!document.querySelector('.tuning-panel'));
-  const tuningFailed = !tuningVisible;
-  console.log(`  Cosmic tuning panel: ${tuningVisible ? 'visible' : 'FAILED'}`);
+  if (tuningMounted) await page.evaluate(() => document.querySelector('.tuning-actions button')?.click());
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const tuningAudit = tuningMounted && await page.evaluate(() => ({
+      visible: !!document.querySelector('.tuning-panel'),
+      actionCount: document.querySelectorAll('.tuning-actions button').length,
+      readout: document.querySelector('.signal-readout')?.textContent || '',
+    }));
+  const tuningFailed = !tuningAudit?.visible || tuningAudit.actionCount !== 2 || tuningAudit.readout.includes('NO READING');
+  console.log(`  Cosmic tuning probes: ${tuningFailed ? 'FAILED' : 'limited probe and lock controls ready'}`);
+
+  const weavingChoices = await page.evaluate(() => {
+    const select = document.querySelector('.operation-archive select');
+    if (!select) return 0;
+    select.value = 'weaving';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    return 1;
+  });
+  await new Promise(resolve => setTimeout(resolve, 100));
+  if (weavingChoices) await page.evaluate(() => document.querySelector('.weave-controls button')?.click());
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const weavingChoiceCount = weavingChoices && await page.evaluate(() => document.querySelectorAll('.weave-offer button').length);
+  const weavingFailed = weavingChoiceCount !== 3;
+  console.log(`  Reality weaving choices: ${weavingFailed ? 'FAILED' : `${weavingChoiceCount} threads offered`}`);
   const forgeReady = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return false;
@@ -302,16 +329,29 @@ async function run() {
   await new Promise(resolve => setTimeout(resolve, 150));
   const cycleReadyVisible = forgeReady && await page.evaluate(() => (
     !!document.querySelector('.reality-forge-panel .cycle-readiness') &&
-    !!document.querySelector('.prestige-btn')
+    !!document.querySelector('.prestige-btn') &&
+    document.querySelectorAll('.cycle-doctrines button').length === 3
   ));
   const forgeFailed = !cycleReadyVisible;
   console.log(`  Reality Forge cycle readiness: ${cycleReadyVisible ? 'visible' : 'FAILED'}`);
 
+  let doctrineCycleFailed = false;
+  const doctrineOrder = ['reconstruction', 'expansion', 'transcendence'];
   for (let cycle = 0; cycle < PRESTIGE_CYCLES; cycle++) {
+    const doctrineId = doctrineOrder[cycle % doctrineOrder.length];
+    await page.evaluate(index => document.querySelectorAll('.cycle-doctrines button')[index]?.click(), cycle % doctrineOrder.length);
+    await new Promise(r => setTimeout(r, 100));
     await page.evaluate(() => document.querySelector('.prestige-btn')?.click());
     await new Promise(r => setTimeout(r, 200));
     await page.evaluate(() => document.querySelector('.confirm-yes')?.click());
     await new Promise(r => setTimeout(r, 300));
+    const cycleStart = await page.evaluate(() => {
+      const state = window.__game.getState();
+      return { doctrine: state.cycleDoctrine, food: state.resources.food.amount, quantumKeys: state.realityKeys?.quantum || 0 };
+    });
+    const expectedSeed = cycleStart.quantumKeys * 25;
+    if (cycleStart.doctrine !== doctrineId || cycleStart.food < expectedSeed) doctrineCycleFailed = true;
+    console.log(`  Cycle ${cycle + 1} begins with ${cycleStart.doctrine || 'no'} doctrine and ${Math.floor(cycleStart.food)} food`);
     await promoteToEra10(page);
     console.log(`  Prestige cycle ${cycle + 1} completed`);
   }
@@ -369,7 +409,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || tuningFailed || forgeFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || operationShellFailed || tuningFailed || weavingFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

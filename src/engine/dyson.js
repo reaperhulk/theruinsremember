@@ -1,4 +1,4 @@
-// Dyson Sphere Assembly — Era 7 mini-game
+// Dyson Sphere Assembly operation — Era 7
 // Click to assemble segments; rewards scale with stellarForge & megastructures production.
 
 import { getEffectivePrestige } from './resources.js';

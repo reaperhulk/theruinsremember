@@ -10,6 +10,19 @@ describe('migrateState', () => {
     expect(migrated.saveVersion).toBe(5);
   });
 
+  it('drops retired operation state during migration', () => {
+    const migrated = migrateState({
+      ...createInitialState(),
+      miningStreak: 12,
+      factoryAllocation: { steel: 3 },
+      hackSuccesses: 9,
+    });
+
+    expect(migrated).not.toHaveProperty('miningStreak');
+    expect(migrated).not.toHaveProperty('factoryAllocation');
+    expect(migrated).not.toHaveProperty('hackSuccesses');
+  });
+
   it('fills missing fields from fresh state', () => {
     const oldSave = { era: 3, resources: { food: { unlocked: true, amount: 100 } } };
     const migrated = migrateState(oldSave);

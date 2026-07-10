@@ -179,7 +179,7 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
           Auto-Connect ({Math.min(10 - routes.length, systems.length * (systems.length - 1) / 2 - routes.length)} slots)
         </button>
       )}
-      <p className="mining-hint">
+      <p className="operation-hint">
         {selected ? 'Click another system to create a route, or same system to deselect.' : 'Click/tap two systems to create or remove routes (5 dark energy + 1 star system).'}
         {stats.hubSystems > 0 && ' Hub systems (2+ routes) get +50% bonus.'}
         {' '}Longer routes give more resources.
