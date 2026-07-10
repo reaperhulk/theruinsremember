@@ -62,7 +62,7 @@ const MINI_GAME_DEFS = [
 // Tab definitions — which tabs are available at which era
 function getAvailableTabs(era) {
   const tabs = [
-    { id: 'upgrades', label: era <= 3 ? 'Decisions' : 'Upgrades', sublabel: 'shape the economy', key: '1' },
+    { id: 'upgrades', label: 'Decisions', sublabel: 'shape the economy', key: '1' },
     { id: 'tech', label: 'Tech', sublabel: 'unlock the next age', key: '2' },
   ];
   if (era >= 5) tabs.push({ id: 'mini', label: 'Operations', sublabel: 'active systems', key: '3' });
@@ -327,7 +327,7 @@ export function App() {
       </header>
       <div className="control-ribbon">
         <span className="control-chip">Era {state.era}: {eraNames[state.era]}</span>
-        <span className="control-chip">{affordableUpgrades} upgrades ready</span>
+        <span className="control-chip">{affordableUpgrades} options ready</span>
         <span className="control-chip">{affordableTech} tech options</span>
         {state.era >= ERA_COUNT && <span className="control-chip">Prestige available</span>}
         {availableMiniGames.length > 1 && (

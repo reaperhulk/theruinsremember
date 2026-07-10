@@ -231,7 +231,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
     ? searchFiltered
     : searchFiltered.filter(u => !hiddenUpgrades[u.id]);
 
-  const focusMode = state.era <= 3 && !showCatalog;
+  const focusMode = !showCatalog;
   const visibleAvailable = focusMode
     ? [...filteredAvailable]
         .filter(upgrade => !upgrade.repeatable)
@@ -288,12 +288,10 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         {mechanicCount > 0 && <span className="upgrade-summary-pill">{mechanicCount} mechanic shifts</span>}
         {loreCount > 0 && <span className="upgrade-summary-pill">{loreCount} lore fragments</span>}
       </div>
-      {state.era <= 3 && (
-        <div className="catalog-mode" role="group" aria-label="Upgrade display mode">
-          <button className={!showCatalog ? 'active' : ''} onClick={() => setShowCatalog(false)}>Priority decisions</button>
-          <button className={showCatalog ? 'active' : ''} onClick={() => setShowCatalog(true)}>Full catalog ({available.length})</button>
-        </div>
-      )}
+      <div className="catalog-mode" role="group" aria-label="Upgrade display mode">
+        <button className={!showCatalog ? 'active' : ''} onClick={() => setShowCatalog(false)}>Priority decisions</button>
+        <button className={showCatalog ? 'active' : ''} onClick={() => setShowCatalog(true)}>Full catalog ({available.length})</button>
+      </div>
       {visibleAvailable.some(u => LORE_UPGRADE_ID_SET.has(u.id)) && (
         <div className="text-hint" style={{ color: '#bb88ff', marginBottom: '4px' }}>
           Purple border = story upgrades — collected in Stats → Codex
