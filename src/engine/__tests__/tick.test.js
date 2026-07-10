@@ -3,6 +3,8 @@ import { tick } from '../tick.js';
 import { createInitialState } from '../state.js';
 import { upgrades as allUpgradeDefs } from '../../data/upgrades.js';
 
+const NO_EVENT = () => 0.99;
+
 describe('tick', () => {
   it('advances resources by their production rates', () => {
     const state = createInitialState();
@@ -66,8 +68,8 @@ describe('tick', () => {
   it('communalEffort gives bonus per upgrade', () => {
     const state = createInitialState();
     state.upgrades = { communalEffort: true, tools: true, irrigation: true }; // 3 upgrades = +3%
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     // With communalEffort, production should be slightly higher
     expect(bonusTick.resources.food.amount).toBeGreaterThan(baseTick.resources.food.amount);
   });
@@ -76,8 +78,8 @@ describe('tick', () => {
     const state = createInitialState();
     state.upgrades = { galacticMemory: true };
     state.prestigeCount = 4; // 4 * 5% = 20% bonus
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     // Food should be higher with 20% prestige bonus
     expect(bonusTick.resources.food.amount).toBeGreaterThan(baseTick.resources.food.amount);
   });
@@ -88,8 +90,8 @@ describe('tick', () => {
     const state = createInitialState();
     state.upgrades = { echoMultiplier: true };
     // Era 1 has ~5 unlocked resources
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     // 1.05^5 - 1 = ~27.6% bonus
     expect(bonusTick.resources.food.amount).toBeGreaterThan(baseTick.resources.food.amount);
   });
@@ -97,8 +99,8 @@ describe('tick', () => {
   it('infiniteLoop (compoundingTick) adds small compounding bonus', () => {
     const state = createInitialState();
     state.upgrades = { infiniteLoop: true };
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     // Should be slightly higher due to compounding
     expect(bonusTick.resources.food.amount).toBeGreaterThan(baseTick.resources.food.amount);
   });
@@ -163,8 +165,8 @@ describe('tick', () => {
     state.era = 5;
     const baseState = createInitialState();
     baseState.era = 5;
-    const baseTick = tick(baseState, 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(baseState, 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     // Era 5: 1.1^4 = 1.4641, so bonus fraction = 0.4641
     // Food: 1.5 base + 1.5 * 0.4641 = 1.5 + 0.696 = 2.196
     expect(bonusTick.resources.food.amount).toBeGreaterThan(baseTick.resources.food.amount * 1.4);
@@ -174,8 +176,8 @@ describe('tick', () => {
     const state = createInitialState();
     state.upgrades = { recursiveOptimizer: true };
     state.era = 1;
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     // Era 1: 1.1^0 = 1, no bonus
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount, 5);
   });
@@ -187,8 +189,8 @@ describe('tick', () => {
     state.totalGems = 1;
     state.factoryAllocation = { steel: 1 };
     state.hackSuccesses = 1;
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     // 3 mini-games * 10% = 30% bonus on food: 1.5 + 1.5*0.3 = 1.95
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount * 1.3, 1);
   });
@@ -197,8 +199,8 @@ describe('tick', () => {
     const state = createInitialState();
     state.upgrades = { orbitalResonance: true };
     // No mini-game interactions
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount, 5);
   });
 
@@ -206,8 +208,8 @@ describe('tick', () => {
     const state = createInitialState();
     state.upgrades = { warpEcho: true };
     state.starRoutes = [{ from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 }, { from: 4, to: 5 }];
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     // 5 routes * 3% = 15% bonus: 1.5 * 1.15 = 1.725
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount * 1.15, 1);
   });
@@ -216,8 +218,8 @@ describe('tick', () => {
     const state = createInitialState();
     state.upgrades = { warpEcho: true };
     state.starRoutes = [];
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount, 5);
   });
 
@@ -298,8 +300,8 @@ describe('tick', () => {
   it('reality key bonus at 1% per key affects production', () => {
     const state = createInitialState();
     state.realityKeys = { temporal: 10, spatial: 10 }; // 20 keys = +20%
-    const baseTick = tick(createInitialState(), 1);
-    const bonusTick = tick(state, 1);
+    const baseTick = tick(createInitialState(), 1, NO_EVENT);
+    const bonusTick = tick(state, 1, NO_EVENT);
     // Food: 1.5 * 1.20 = 1.8
     expect(bonusTick.resources.food.amount).toBeCloseTo(baseTick.resources.food.amount * 1.20, 1);
   });

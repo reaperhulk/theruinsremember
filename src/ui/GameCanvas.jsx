@@ -3116,14 +3116,9 @@ export function GameCanvas({ state, onUpdate }) {
     const ordered = [...specific, ...catchAll];
 
     for (const el of ordered) {
-      let hit = false;
-      if (el.hitTest) {
-        hit = el.hitTest(cx, cy);
-      } else {
-        const dx = cx - el.x;
-        const dy = cy - el.y;
-        hit = (dx * dx + dy * dy) <= el.r * el.r;
-      }
+      const dx = cx - el.x;
+      const dy = cy - el.y;
+      const hit = el.hitTest ? el.hitTest(cx, cy) : (dx * dx + dy * dy) <= el.r * el.r;
 
       if (!hit) continue;
 

@@ -7,8 +7,11 @@
  * Usage: node scripts/browser-test.mjs [--prestige N] [--mobile] [--screenshots]
  */
 
-import puppeteer from 'puppeteer';
-import { mkdirSync, writeFileSync } from 'fs';
+import puppeteer, { PUPPETEER_REVISIONS } from 'puppeteer';
+import { Browser, computeExecutablePath, detectBrowserPlatform } from '@puppeteer/browsers';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { homedir } from 'os';
+import { join } from 'path';
 
 const PRESTIGE_CYCLES = parseInt(process.argv.find((_, i, a) => a[i-1] === '--prestige') || '0');
 const MOBILE = process.argv.includes('--mobile');
@@ -16,6 +19,13 @@ const SCREENSHOTS = process.argv.includes('--screenshots');
 const GAME_URL = process.env.GAME_URL || 'http://localhost:5173';
 const SCREENSHOT_DIR = '/tmp/game-screenshots';
 if (SCREENSHOTS) mkdirSync(SCREENSHOT_DIR, { recursive: true });
+
+const managedHeadlessShell = computeExecutablePath({
+  browser: Browser.CHROMEHEADLESSSHELL,
+  buildId: PUPPETEER_REVISIONS['chrome-headless-shell'],
+  cacheDir: process.env.PUPPETEER_CACHE_DIR || join(homedir(), '.cache', 'puppeteer'),
+  platform: detectBrowserPlatform(),
+});
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -182,7 +192,12 @@ async function run() {
 
   console.log(`Browser test: ${MOBILE ? 'mobile (375x812)' : 'desktop (1280x900)'}, ${PRESTIGE_CYCLES} prestige cycles`);
 
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'], protocolTimeout: 120000 });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox'],
+    protocolTimeout: 120000,
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || (existsSync(managedHeadlessShell) ? managedHeadlessShell : undefined),
+  });
   const page = await browser.newPage();
   await page.setViewport(viewport);
 
