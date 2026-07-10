@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { attemptDock, getDockingInfo, getIndicatorPosition } from '../engine/docking.js';
+import { attemptDock, DOCKING_MISSIONS, getDockingInfo, getIndicatorPosition, selectDockingMission } from '../engine/docking.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber } from './format.js';
 
@@ -44,31 +44,26 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
   const onCooldown = cooldownRemaining > 0;
 
   const handleDock = useCallback(() => {
-    onUpdate(s => {
-      const before = {};
-      for (const [id, r] of Object.entries(s.resources)) {
-        before[id] = r.amount || 0;
+    const before = {};
+    for (const [id, resource] of Object.entries(state.resources)) before[id] = resource.amount || 0;
+    const { state: newState, result } = attemptDock(state, position);
+    if (result === 'cooldown') return;
+    setLastResult(result);
+    if (result !== 'miss') {
+      const gained = {};
+      for (const [id, resource] of Object.entries(newState.resources)) {
+        const diff = (resource.amount || 0) - (before[id] || 0);
+        if (diff > 0.001) gained[id] = diff;
       }
-      const { state: newState, result } = attemptDock(s, position);
-      if (result !== 'cooldown') {
-        setLastResult(result);
-        if (result !== 'miss') {
-          const gained = {};
-          for (const [id, r] of Object.entries(newState.resources)) {
-            const diff = (r.amount || 0) - (before[id] || 0);
-            if (diff > 0.001) gained[id] = diff;
-          }
-          if (Object.keys(gained).length > 0) {
-            setLastReward(gained);
-            setTimeout(() => setLastReward(null), 2000);
-          }
-        } else {
-          setLastReward(null);
-        }
+      if (Object.keys(gained).length > 0) {
+        setLastReward(gained);
+        setTimeout(() => setLastReward(null), 2000);
       }
-      return newState;
-    });
-  }, [onUpdate, position]);
+    } else {
+      setLastReward(null);
+    }
+    onUpdate(() => newState);
+  }, [onUpdate, position, state]);
 
   // Keyboard shortcut: Enter or 'd' to dock
   useEffect(() => {
@@ -89,12 +84,26 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
 
   return (
     <div className="panel docking-panel">
-      <h2>Orbital Docking ({info.successes} docks){info.perfects > 0 ? `, ${info.perfects} perfect` : ''}</h2>
+      <h2>Orbital Operations ({info.successes} docks){info.perfects > 0 ? `, ${info.perfects} perfect` : ''}</h2>
       <div className="dock-info">
         <span>Docks: {info.successes}/{info.attempts}{info.attempts > 0 && ` (${Math.floor(info.successes/info.attempts*100)}%)`}</span>
         <span>Perfect: {info.perfects}</span>
         {combo > 0 && <span className={comboFlash ? 'combo-flash' : ''} style={{ color: '#ffdd44', display: 'inline-block' }}>Combo: x{combo} (+{Math.min(combo, 5) * 20}%)</span>}
       </div>
+      <div className="docking-missions" role="group" aria-label="Docking mission">
+        {Object.values(DOCKING_MISSIONS).map(mission => (
+          <button
+            key={mission.id}
+            className={info.missionId === mission.id ? 'active' : ''}
+            onClick={() => onUpdate(current => selectDockingMission(current, mission.id))}
+            title={mission.description}
+          >
+            <strong>{mission.name}</strong>
+            <span>{info.missions[mission.id] || 0}/3 readiness</span>
+          </button>
+        ))}
+      </div>
+      <p className="docking-mission-brief">{DOCKING_MISSIONS[info.missionId].description}</p>
       <div className="dock-bar">
         <div className="dock-zone" style={{ left: `${zoneLeft}%`, width: `${zoneWidth}%` }} />
         <div className="dock-perfect" style={{ left: `${perfectLeft}%`, width: `${perfectWidth}%` }} />
@@ -116,7 +125,7 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
         {onCooldown ? `Wait ${cooldownRemaining.toFixed(1)}s` : 'Dock! (d)'}
       </button>
       <p className="mining-hint">
-        Press D when indicator is in the green zone | Perfect = bonus exotic materials | Combo streaks boost rewards up to x2
+        Complete each mission three times to stabilize orbital operations | Combo streaks boost rewards up to x2
       </p>
     </div>
   );

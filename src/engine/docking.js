@@ -2,15 +2,40 @@
 // Timing-based click game: hit the target zone for bonus resources.
 // The docking indicator moves back and forth; click when it's in the zone.
 
-import { getEffectivePrestige } from './resources.js';
+import { getEffectiveCap, getEffectivePrestige } from './resources.js';
 
-const ZONE_SIZE = 0.30;      // 30% of the bar is the target zone
 const PERFECT_ZONE = 0.10;   // 10% center for perfect dock
 const BASE_SPEED = 0.6;      // cycles per second at era 4 (~1.7s full sweep)
 
 // Resource rewards for docking — now calculated dynamically based on production rates
 const REWARD_MISS = {};
 const COOLDOWN = 2; // seconds between dock attempts
+
+export const DOCKING_MISSIONS = {
+  cargo: {
+    id: 'cargo',
+    name: 'Cargo Lift',
+    description: 'Wide approach. Prioritizes fuel and steel deliveries.',
+    zoneSize: 0.34,
+  },
+  crew: {
+    id: 'crew',
+    name: 'Crew Transfer',
+    description: 'Balanced approach. Builds orbital infrastructure and returns food.',
+    zoneSize: 0.26,
+  },
+  science: {
+    id: 'science',
+    name: 'Science Return',
+    description: 'Narrow approach. Recovers research and precursor data.',
+    zoneSize: 0.20,
+  },
+};
+
+export function selectDockingMission(state, missionId) {
+  if (!DOCKING_MISSIONS[missionId]) return state;
+  return { ...state, dockingMission: missionId };
+}
 
 // Calculate indicator position (0-1) based on time.
 // Speed increases slightly with era for higher difficulty.
@@ -36,13 +61,15 @@ export function attemptDock(state, position) {
   if (state.totalTime - lastDock < COOLDOWN) return { state, result: 'cooldown' };
 
   const zoneCenter = getTargetZone(state);
+  const missionId = DOCKING_MISSIONS[state.dockingMission] ? state.dockingMission : 'cargo';
+  const mission = DOCKING_MISSIONS[missionId];
   const distFromCenter = Math.abs(position - zoneCenter);
 
   let result;
 
   if (distFromCenter <= PERFECT_ZONE / 2) {
     result = 'perfect';
-  } else if (distFromCenter <= ZONE_SIZE / 2) {
+  } else if (distFromCenter <= mission.zoneSize / 2) {
     result = 'good';
   } else {
     result = 'miss';
@@ -52,20 +79,16 @@ export function attemptDock(state, position) {
   const fuelRes = state.resources?.rocketFuel;
   const fuelRate = fuelRes ? ((fuelRes.baseRate || 0) + (fuelRes.rateAdd || 0)) * (fuelRes.rateMult || 1) : 1;
   const effectiveFuelRate = Math.max(1, fuelRate); // minimum 1 so rewards are never zero
-  let rewards;
-  if (result === 'perfect') {
-    rewards = {
-      rocketFuel: effectiveFuelRate * 15,
-      orbitalInfra: 3 + Math.floor(effectiveFuelRate * 0.5),
-      exoticMaterials: Math.max(1, Math.floor(effectiveFuelRate * 0.2)),
-    };
-  } else if (result === 'good') {
-    rewards = {
-      rocketFuel: effectiveFuelRate * 5,
-      orbitalInfra: 1 + Math.floor(effectiveFuelRate * 0.2),
-    };
-  } else {
-    rewards = REWARD_MISS;
+  const quality = result === 'perfect' ? 1 : result === 'good' ? 0.4 : 0;
+  let rewards = REWARD_MISS;
+  if (quality > 0 && missionId === 'cargo') {
+    rewards = { rocketFuel: effectiveFuelRate * 18 * quality, steel: effectiveFuelRate * 4 * quality };
+  }
+  if (quality > 0 && missionId === 'crew') {
+    rewards = { orbitalInfra: (4 + effectiveFuelRate * 0.6) * quality, food: effectiveFuelRate * 6 * quality };
+  }
+  if (quality > 0 && missionId === 'science') {
+    rewards = { research: effectiveFuelRate * 14 * quality, data: effectiveFuelRate * 8 * quality };
   }
 
   // Combo: consecutive successes multiply rewards
@@ -85,7 +108,8 @@ export function attemptDock(state, position) {
     const r = newResources[resourceId];
     if (r && r.unlocked) {
       const scaled = amount * getEffectivePrestige(state.prestigeMultiplier || 1) * comboMult * dockPrestigeMult * eraScale * savantMult;
-      newResources[resourceId] = { ...r, amount: r.amount + scaled };
+      const cap = getEffectiveCap({ ...state, resources: newResources }, resourceId);
+      newResources[resourceId] = { ...r, amount: cap > 0 ? Math.min(cap, r.amount + scaled) : r.amount + scaled };
     }
   }
 
@@ -101,6 +125,10 @@ export function attemptDock(state, position) {
     dockingPerfects: result === 'perfect'
       ? (state.dockingPerfects || 0) + 1
       : (state.dockingPerfects || 0),
+    dockingMissions: {
+      ...(state.dockingMissions || { cargo: 0, crew: 0, science: 0 }),
+      [missionId]: (state.dockingMissions?.[missionId] || 0) + (result !== 'miss' ? 1 : 0),
+    },
   };
 
 
@@ -112,10 +140,13 @@ export function attemptDock(state, position) {
 
 // Get zone info for UI rendering
 export function getDockingInfo(state) {
+  const missionId = DOCKING_MISSIONS[state.dockingMission] ? state.dockingMission : 'cargo';
   return {
     zoneCenter: getTargetZone(state),
-    zoneSize: ZONE_SIZE,
+    zoneSize: DOCKING_MISSIONS[missionId].zoneSize,
     perfectSize: PERFECT_ZONE,
+    missionId,
+    missions: state.dockingMissions || { cargo: 0, crew: 0, science: 0 },
     attempts: state.dockingAttempts || 0,
     successes: state.dockingSuccesses || 0,
     perfects: state.dockingPerfects || 0,

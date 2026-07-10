@@ -1463,8 +1463,8 @@ canvas:hover {
 
 /* Docking */
 .docking-panel {
-  background: #1a1a2e;
-  border-color: #3a3a6a;
+  background: #171c21;
+  border-color: #40535b;
 }
 
 .dock-info {
@@ -1473,6 +1473,44 @@ canvas:hover {
   font-size: 0.8em;
   color: #aaa;
   margin-bottom: 8px;
+}
+
+.docking-missions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 5px;
+}
+
+.docking-missions button {
+  display: grid;
+  gap: 3px;
+  min-height: 48px;
+  padding: 6px;
+  color: #96a2a7;
+  background: #11161a;
+  border: 1px solid #303b40;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.docking-missions button.active {
+  color: #eef1ed;
+  background: #26333a;
+  border-color: #6eb5b0;
+}
+
+.docking-missions button strong { font-size: 0.72em; }
+.docking-missions button span { color: #8daaa7; font-size: 0.62em; }
+
+.docking-mission-brief {
+  min-height: 2.5em;
+  color: #aeb9bc;
+  font-family: system-ui, sans-serif;
+  font-size: 0.74em;
+  line-height: 1.35;
+  margin-bottom: 7px;
 }
 
 .dock-bar {

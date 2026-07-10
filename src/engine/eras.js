@@ -22,7 +22,7 @@ const ERA_MIN_UPGRADES = {
   1: 14,
   2: 16,
   3: 16,
-  4: 30,   // ~52% of ~58
+  4: 20,
   5: 30,   // ~52% of ~58 — reduced from 42 to avoid stalls
   6: 30,   // ~52% of ~58
   7: 30,   // ~49% of ~61
@@ -75,13 +75,22 @@ export function getEraReadiness(state, era = state.era) {
   const discoveryCredits = era <= 3 && era === state.era
     ? Math.min(8, (state.expedition?.eraFinds || 0) * 2)
     : 0;
-  const minimumEconomicUpgrades = era <= 3 ? Math.ceil(minUpgrades * 0.4) : minUpgrades;
-  const foundationProgress = currentUpgrades + discoveryCredits;
+  const operationCredits = era === 4 && era === state.era
+    ? Object.values(state.dockingMissions || {}).reduce((sum, count) => sum + Math.min(3, count), 0)
+    : 0;
+  const activityCredits = discoveryCredits + operationCredits;
+  const minimumEconomicUpgrades = era <= 3
+    ? Math.ceil(minUpgrades * 0.4)
+    : era === 4 ? 12 : minUpgrades;
+  const foundationProgress = currentUpgrades + activityCredits;
 
   return {
     minUpgrades,
     currentUpgrades,
     discoveryCredits,
+    operationCredits,
+    activityCredits,
+    activityLabel: era <= 3 ? 'discovery' : era === 4 ? 'operation' : 'activity',
     minimumEconomicUpgrades,
     foundationProgress,
     upgradesMet: currentUpgrades >= minimumEconomicUpgrades && foundationProgress >= minUpgrades,

@@ -19,6 +19,7 @@ export function migrateState(saved) {
   if (!migrated.tuningScore) migrated.tuningScore = 0;
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
   migrated.expedition = { ...createExpeditionState(), ...(saved.expedition || {}) };
+  migrated.dockingMissions = { cargo: 0, crew: 0, science: 0, ...(saved.dockingMissions || {}) };
   // Guard against broken resource fields from corrupt saves
   for (const [id, r] of Object.entries(migrated.resources)) {
     if (!Number.isFinite(r.capMult) || r.capMult <= 0) migrated.resources[id] = { ...migrated.resources[id], capMult: 1 };
@@ -74,6 +75,8 @@ export function createInitialState() {
     dockingSuccesses: 0,
     dockingPerfects: 0,
     dockingCombo: 0,
+    dockingMission: 'cargo',
+    dockingMissions: { cargo: 0, crew: 0, science: 0 },
     // Trading (Era 6+)
     totalTrades: 0,
     // Era time tracking
@@ -106,6 +109,6 @@ export function createInitialState() {
     seenLoreEvents: {},
     // UI: hidden repeatable upgrades
     hiddenUpgrades: {},
-    saveVersion: 3,
+    saveVersion: 4,
   };
 }

@@ -147,12 +147,12 @@ function buildDirector(state, readiness) {
     return {
       title: needsEconomicBase ? 'Establish The Economy' : 'Stabilize The Era',
       detail: needsEconomicBase
-        ? `${readiness.minimumEconomicUpgrades - readiness.currentUpgrades} more economic decisions are needed before discoveries can carry the rest.`
-        : `${readiness.minUpgrades - readiness.foundationProgress} more foundation progress needed. Buy an upgrade or recover discoveries on an expedition.`,
+        ? `${readiness.minimumEconomicUpgrades - readiness.currentUpgrades} more economic decisions are needed before ${readiness.activityLabel} work can carry the rest.`
+        : `${readiness.minUpgrades - readiness.foundationProgress} more foundation progress needed. Buy an upgrade or complete a ${readiness.activityLabel === 'operation' ? 'docking operation' : 'ruin expedition'}.`,
       chips: [
         `${affordableUpgrades.length} upgrades affordable now`,
         `${readiness.currentUpgrades} economic decisions`,
-        `${readiness.discoveryCredits} discovery credit`,
+        `${readiness.activityCredits} ${readiness.activityLabel} credit`,
       ],
       tone: 'warning',
       supplyAlerts,
@@ -275,7 +275,7 @@ export function EraProgress({ state }) {
           return <p className="era-hint" style={{ color: '#88ff88' }}>Era transition imminent...</p>;
         }
         if (!upgradesMet) {
-          return <p className="era-hint">Build the economy or recover discoveries until the foundation is stable, then finish the breakthrough research.</p>;
+          return <p className="era-hint">Build the economy or {state.era <= 3 ? 'recover discoveries' : state.era === 4 ? 'complete orbital operations' : 'expand the foundation'} until the era is stable, then finish the breakthrough research.</p>;
         }
         if (!readiness.techsMet) {
           return <p className="era-hint" style={{ color: '#ddcc44' }}>Research {readiness.minTechs - readiness.currentTechs} more era tech{readiness.minTechs - readiness.currentTechs === 1 ? '' : 's'} to prove the economy is ready.</p>;
@@ -288,7 +288,7 @@ export function EraProgress({ state }) {
             <div className={`readiness-card${upgradesMet ? ' ready' : ''}`}>
               <span className="readiness-label">Foundation</span>
               <strong>{Math.min(readiness.foundationProgress, minUpgrades)}/{minUpgrades}</strong>
-              <span>{eraUpgradeCount} decisions + {readiness.discoveryCredits} discovery credit</span>
+              <span>{eraUpgradeCount} decisions + {readiness.activityCredits} {readiness.activityLabel} credit</span>
             </div>
             <div className={`readiness-card${readiness.techsMet ? ' ready' : ''}`}>
               <span className="readiness-label">Era Research</span>

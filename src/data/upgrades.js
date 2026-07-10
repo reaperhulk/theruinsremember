@@ -328,7 +328,7 @@ export const upgrades = {
   },
   spaceStation: {
     id: 'spaceStation', name: 'Space Station', era: 4,
-    cost: { rocketFuel: 60, steel: 80, electronics: 40, food: 120 },
+    cost: { rocketFuel: 60, steel: 80, electronics: 40, materials: 120 },
     effects: [{ type: 'production_add', target: 'orbitalInfra', value: 1.0 }, { type: 'cap_mult', target: 'orbitalInfra', value: 2 }],
     description: 'Docking clamps engage with a familiar click — the station has received visitors before',
     prerequisites: ['reusableRockets'],

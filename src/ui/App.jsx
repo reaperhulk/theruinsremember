@@ -48,7 +48,7 @@ const ERA_OMENS = {
 };
 
 const MINI_GAME_DEFS = [
-  { id: 'docking', label: 'Docking', era: 4, desc: 'Timing game for fuel and infra' },
+  { id: 'docking', label: 'Orbital Ops', era: 4, desc: 'Run cargo, crew, and science docking missions' },
   { id: 'colony', label: 'Colonies', era: 5, desc: 'Manage colony focus for bonuses' },
   { id: 'starChart', label: 'Star Chart', era: 6, desc: 'Connect systems for passive bonuses' },
   { id: 'dyson', label: 'Dyson', era: 7, desc: 'Build sphere segments for forge output' },
@@ -63,7 +63,7 @@ function getAvailableTabs(era) {
     { id: 'upgrades', label: era <= 3 ? 'Decisions' : 'Upgrades', sublabel: 'shape the economy', key: '1' },
     { id: 'tech', label: 'Tech', sublabel: 'unlock the next age', key: '2' },
   ];
-  if (era >= 4) tabs.push({ id: 'mini', label: 'Operations', sublabel: 'active systems', key: '3' });
+  if (era >= 5) tabs.push({ id: 'mini', label: 'Operations', sublabel: 'active systems', key: '3' });
   if (era >= 4) tabs.push({ id: 'trading', label: 'Trading', sublabel: 'reroute surplus', key: '4' });
   tabs.push({ id: 'prestige', label: 'Prestige', sublabel: 'bank the cycle', key: '5' });
   tabs.push({ id: 'stats', label: 'Stats', sublabel: 'codex and run data', key: '6' });
@@ -367,7 +367,7 @@ export function App() {
       )}
       <EraTransition era={state.era} />
       <Toast state={state} />
-      {state.era > 3 && <EraProgress state={state} />}
+      {state.era > 4 && <EraProgress state={state} />}
       {!hintsDismissed && state.totalTime >= 60 && state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
         <div style={{ textAlign: 'center', fontSize: '0.85em', color: '#998866', padding: '4px 0', position: 'relative' }}>
           Expeditions recover resources and discoveries; discoveries reduce routine build-out
@@ -375,12 +375,12 @@ export function App() {
         </div>
       )}
 
-      <main className={`game-layout ${state.era <= 3 ? 'early-game-layout' : ''}`}>
+      <main className={`game-layout ${state.era <= 4 ? 'early-game-layout' : ''}`}>
         <div className="left-column">
-          {state.era <= 3
-            ? <ExpeditionPanel state={state} onUpdate={updateState} />
-            : <GameCanvas state={state} onUpdate={updateState} />}
-          {state.era <= 3 && <EraProgress state={state} />}
+          {state.era <= 3 && <ExpeditionPanel state={state} onUpdate={updateState} />}
+          {state.era === 4 && <DockingPanel state={state} onUpdate={updateState} />}
+          {state.era > 4 && <GameCanvas state={state} onUpdate={updateState} />}
+          {state.era <= 4 && <EraProgress state={state} />}
           <ResourcePanel state={state} onUpdate={updateState} />
           {(state.eventLog?.length > 0 || state.activeEffects?.length > 0) && (
             <EventLog state={state} />

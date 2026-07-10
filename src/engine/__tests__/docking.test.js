@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { attemptDock, getDockingInfo, getTargetZone, getIndicatorPosition } from '../docking.js';
+import { attemptDock, getDockingInfo, getTargetZone, getIndicatorPosition, selectDockingMission } from '../docking.js';
 import { createInitialState } from '../state.js';
 
 describe('docking', () => {
@@ -35,12 +35,10 @@ describe('docking', () => {
     const zone = getTargetZone(state);
     const { state: after, result } = attemptDock(state, zone);
     expect(result).toBe('perfect');
-    // effectiveFuelRate=max(1,0)=1, combo=1 → comboMult=1.2
-    // perfect: rocketFuel=15*1.2=18, orbitalInfra=(3+0)*1.2=3.6, exoticMaterials=max(1,0)=1*1.2=1.2
-    expect(after.resources.rocketFuel.amount).toBeCloseTo(18);
-    expect(after.resources.orbitalInfra.amount).toBeCloseTo(3.6);
-    expect(after.resources.exoticMaterials.amount).toBeCloseTo(1.2);
+    // Cargo reward: rocketFuel=18*1.2=21.6.
+    expect(after.resources.rocketFuel.amount).toBeCloseTo(21.6);
     expect(after.dockingPerfects).toBe(1);
+    expect(after.dockingMissions.cargo).toBe(1);
   });
 
   it('good dock gives moderate rewards', () => {
@@ -49,8 +47,8 @@ describe('docking', () => {
     // Offset from center but within zone
     const { state: after, result } = attemptDock(state, zone + 0.08);
     expect(result).toBe('good');
-    // effectiveFuelRate=1, combo=1 → comboMult=1.2, reward: 5*1.2=6
-    expect(after.resources.rocketFuel.amount).toBeCloseTo(6);
+    // Good cargo reward is 40% of perfect, with the x1.2 first-combo bonus.
+    expect(after.resources.rocketFuel.amount).toBeCloseTo(8.64);
     expect(after.dockingSuccesses).toBe(1);
   });
 
@@ -103,7 +101,7 @@ describe('docking', () => {
   it('getDockingInfo returns zone details', () => {
     const state = makeEra4State();
     const info = getDockingInfo(state);
-    expect(info.zoneSize).toBe(0.30);
+    expect(info.zoneSize).toBe(0.34);
     expect(info.perfectSize).toBe(0.10);
     expect(info.attempts).toBe(0);
   });
@@ -119,11 +117,24 @@ describe('docking', () => {
     const { state: after, result } = attemptDock(state, zone);
     expect(result).toBe('perfect');
     // effectiveFuelRate = max(1, 10) = 10
-    // perfect reward: rocketFuel = 10 * 15 = 150
+    // perfect cargo reward: rocketFuel = 10 * 18 = 180
     // combo = 1 → comboMult = 1 + 1*0.2 = 1.2
     // eraScale = 1.5^(4-4) = 1, prestige = 1
-    // total fuel gained = 150 * 1 * 1.2 * 1 * 1 * 1 = 180
-    expect(after.resources.rocketFuel.amount).toBe(100 + 180);
+    // total fuel gained = 180 * 1 * 1.2 * 1 * 1 * 1 = 216
+    expect(after.resources.rocketFuel.amount).toBe(100 + 216);
     expect(after.resources.rocketFuel.amount).toBeGreaterThan(200);
+  });
+
+  it('offers mission-specific difficulty and tracks each mission separately', () => {
+    let state = makeEra4State();
+    state = selectDockingMission(state, 'science');
+    const info = getDockingInfo(state);
+    expect(info.missionId).toBe('science');
+    expect(info.zoneSize).toBe(0.20);
+
+    const { state: after, result } = attemptDock(state, getTargetZone(state));
+    expect(result).toBe('perfect');
+    expect(after.dockingMissions.science).toBe(1);
+    expect(after.dockingMissions.cargo).toBe(0);
   });
 });

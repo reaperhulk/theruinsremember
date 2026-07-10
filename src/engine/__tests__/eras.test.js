@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkEraTransition, transitionEra, getMinUpgradesForEra, getMinTechsForEra, countEraUpgrades, countEraTechs } from '../eras.js';
+import { checkEraTransition, transitionEra, getEraReadiness, getMinUpgradesForEra, getMinTechsForEra, countEraUpgrades, countEraTechs } from '../eras.js';
 import { createInitialState } from '../state.js';
 import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 
@@ -56,6 +56,19 @@ describe('eras', () => {
       expect(countEraTechs(state, 1)).toBe(2);
       expect(countEraTechs(state, 2)).toBe(1);
     });
+  });
+
+  it('counts distinct orbital operations toward the Era 4 foundation', () => {
+    const state = createInitialState();
+    state.era = 4;
+    const era4Upgrades = Object.values(upgradeDefs).filter(upgrade => upgrade.era === 4);
+    for (let index = 0; index < 12; index++) state.upgrades[era4Upgrades[index].id] = true;
+    state.dockingMissions = { cargo: 3, crew: 3, science: 3 };
+
+    const readiness = getEraReadiness(state);
+    expect(readiness.operationCredits).toBe(9);
+    expect(readiness.foundationProgress).toBe(21);
+    expect(readiness.upgradesMet).toBe(true);
   });
 
   describe('checkEraTransition', () => {

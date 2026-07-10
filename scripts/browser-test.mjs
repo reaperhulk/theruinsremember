@@ -101,6 +101,29 @@ async function promoteToEra10(page) {
   await new Promise(resolve => setTimeout(resolve, 300));
 }
 
+async function exerciseOrbitalOperations(page) {
+  await page.evaluate(() => {
+    window.__game.setState(state => ({
+      ...state,
+      era: 4,
+      totalTime: Math.max(100, state.totalTime),
+      resources: Object.fromEntries(Object.entries(state.resources).map(([id, resource]) => [
+        id,
+        { ...resource, unlocked: resource.unlocked || ['rocketFuel', 'orbitalInfra'].includes(id), amount: Math.max(resource.amount || 0, 1000) },
+      ])),
+    }));
+  });
+  await new Promise(resolve => setTimeout(resolve, 300));
+  return page.evaluate(() => {
+    const missions = [...document.querySelectorAll('.docking-missions button')];
+    missions[1]?.click();
+    return {
+      missionCount: missions.length,
+      panelVisible: !!document.querySelector('.docking-panel'),
+    };
+  });
+}
+
 async function checkLayout(page) {
   return page.evaluate(() => {
     const issues = [];
@@ -243,6 +266,11 @@ async function run() {
   }
 
   await stopPump(page);
+  const orbitalOperations = await exerciseOrbitalOperations(page);
+  const operationFailed = !orbitalOperations.panelVisible || orbitalOperations.missionCount !== 3;
+  console.log(`  Orbital operations: ${orbitalOperations.missionCount}/3 mission choices${operationFailed ? ' (FAILED)' : ''}`);
+  await screenshot(page, 'orbital_operations');
+  await stopPump(page);
   await promoteToEra10(page);
 
   for (let cycle = 0; cycle < PRESTIGE_CYCLES; cycle++) {
@@ -307,7 +335,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

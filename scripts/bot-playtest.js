@@ -8,11 +8,11 @@ import { createInitialState } from '../src/engine/state.js';
 import { tick } from '../src/engine/tick.js';
 import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable } from '../src/engine/upgrades.js';
 import { unlockTech, getAvailableTech } from '../src/engine/tech.js';
-import { canAfford, gather } from '../src/engine/resources.js';
+import { canAfford, gather, getNetRate } from '../src/engine/resources.js';
 import { mine } from '../src/engine/mining.js';
 import { allocateWorker, getWorkerPool } from '../src/engine/factory.js';
 import { startHack, submitHack } from '../src/engine/hacking.js';
-import { attemptDock, getTargetZone } from '../src/engine/docking.js';
+import { attemptDock, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
 import { assignColonies, getAssignableColonies } from '../src/engine/colonies.js';
 import { createRoute, getUnlockedSystems, routeExists, getRoutes } from '../src/engine/starChart.js';
 import { drawFragment, resolveWeave } from '../src/engine/weaving.js';
@@ -20,6 +20,7 @@ import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
 import { assembleDysonSegment } from '../src/engine/dyson.js';
 import { applyTuning } from '../src/engine/tuning.js';
 import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
+import { getEraReadiness } from '../src/engine/eras.js';
 import { allocateSenateInfluence, getMaxSenateInfluence } from '../src/engine/senate.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
 import { readFileSync } from 'fs';
@@ -248,18 +249,18 @@ const SCENARIOS = {
 
 const BALANCE_TARGETS = {
   full: {
-    minTime: 1800,
-    maxTime: 5400,
+    minTime: 480,
+    maxTime: 1800,
     requiredEra: 10,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
-      4: [60, 300],
-      5: [900, 2400],
+      4: [5, 180],
+      5: [30, 180],
     },
   },
   casual: { minTime: 1500, maxTime: 14400, requiredEra: 10 },
-  noMinigames: { minTime: 5400, maxTime: 25200, requiredEra: 10 },
+  noMinigames: { minTime: 4800, maxTime: 25200, requiredEra: 10 },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10 },
 };
 
@@ -306,6 +307,9 @@ function botBuyUpgrades(state, profile, _t, _rng) {
       if (result) state = result;
     }
   }
+  // Repeatables are a resource sink, not progression. A competent player
+  // finishes the era foundation before spending the bottleneck stockpile.
+  if (!getEraReadiness(state).upgradesMet) return state;
   // Then repeatable (buy max)
   for (const upgrade of available) {
     if (!upgrade.repeatable) continue;
@@ -382,6 +386,9 @@ function botDock(state, profile, t, rng) {
   if (!profile.docking || state.era < 4) return state;
   const interval = profile.dockInterval || 3;
   if (t % interval !== 0) return state;
+
+  const missions = ['cargo', 'crew', 'science'];
+  state = selectDockingMission(state, missions[(state.dockingAttempts || 0) % missions.length]);
 
   // Hit the zone center with optional accuracy offset
   const zoneCenter = getTargetZone(state);
@@ -669,13 +676,45 @@ function createCollector() {
 }
 
 function takeSnapshot(state, t, collector) {
-  const snap = { time: t, era: state.era, resources: {} };
+  const readiness = getEraReadiness(state);
+  const snap = {
+    time: t,
+    era: state.era,
+    readiness: {
+      upgrades: readiness.currentUpgrades,
+      upgradeTarget: readiness.minUpgrades,
+      foundationProgress: readiness.foundationProgress,
+      techs: readiness.currentTechs,
+      techTarget: readiness.minTechs,
+    },
+    resources: {},
+  };
   for (const [id, r] of Object.entries(state.resources)) {
     if (r.unlocked) {
       const rate = (r.baseRate + r.rateAdd) * r.rateMult * (state.prestigeMultiplier || 1);
       snap.resources[id] = { amount: Math.floor(r.amount * 10) / 10, rate: Math.floor(rate * 100) / 100 };
     }
   }
+  snap.purchaseBlockers = getAvailableUpgrades(state)
+    .filter(upgrade => upgrade.era === state.era)
+    .map(upgrade => {
+      const cost = getUpgradeCost(state, upgrade.id);
+      const missing = Object.entries(cost)
+        .map(([resource, amount]) => {
+          const current = state.resources[resource]?.amount || 0;
+          const rate = getNetRate(state, resource);
+          const deficit = Math.max(0, amount - current);
+          return { resource, deficit, eta: deficit <= 0 ? 0 : rate > 0 ? deficit / rate : null };
+        })
+        .filter(entry => entry.deficit > 0);
+      const eta = missing.some(entry => entry.eta === null)
+        ? null
+        : Math.max(0, ...missing.map(entry => entry.eta));
+      return { id: upgrade.id, eta, missing };
+    })
+    .filter(entry => entry.missing.length > 0)
+    .sort((a, b) => (b.eta ?? Infinity) - (a.eta ?? Infinity))
+    .slice(0, 5);
   collector.resourceSnapshots.push(snap);
 }
 

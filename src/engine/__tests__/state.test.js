@@ -6,7 +6,8 @@ describe('migrateState', () => {
     const migrated = migrateState({ era: 1, resources: createInitialState().resources, saveVersion: 2 });
     expect(migrated.expedition.supplies).toBe(2);
     expect(migrated.expedition.eraFinds).toBe(0);
-    expect(migrated.saveVersion).toBe(3);
+    expect(migrated.dockingMissions).toEqual({ cargo: 0, crew: 0, science: 0 });
+    expect(migrated.saveVersion).toBe(4);
   });
 
   it('fills missing fields from fresh state', () => {
