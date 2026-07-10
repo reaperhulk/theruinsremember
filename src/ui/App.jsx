@@ -16,6 +16,7 @@ import { DysonPanel } from './DysonPanel.jsx';
 import { TradingPanel } from './TradingPanel.jsx';
 import { SenatePanel } from './SenatePanel.jsx';
 import { RealityForgePanel } from './RealityForgePanel.jsx';
+import { OperationsPanel } from './OperationsPanel.jsx';
 import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
 import { setMuted, playPrestige } from './AudioManager.js';
@@ -33,6 +34,8 @@ import { canAfford, getEffectivePrestige } from '../engine/resources.js';
 import { getAchievementsNearComplete } from '../engine/achievements.js';
 import { formatNumber } from './format.js';
 import { getCycleReadiness } from '../engine/realityForge.js';
+import { getDefaultOperation, getUnlockedOperations } from '../data/operations.js';
+import { getActiveSystems } from '../engine/operations.js';
 
 const initialState = createInitialState();
 
@@ -48,17 +51,6 @@ const ERA_OMENS = {
   9: 'The laws of reality bend like material under remembered strain.',
   10: 'Every universe you touch feels less discovered than revisited.',
 };
-
-const MINI_GAME_DEFS = [
-  { id: 'docking', label: 'Orbital Ops', era: 4, desc: 'Run cargo, crew, and science docking missions' },
-  { id: 'colony', label: 'Colonies', era: 5, desc: 'Manage colony focus for bonuses' },
-  { id: 'starChart', label: 'Star Chart', era: 6, desc: 'Connect systems for passive bonuses' },
-  { id: 'dyson', label: 'Dyson', era: 7, desc: 'Build sphere segments for forge output' },
-  { id: 'senate', label: 'Senate', era: 8, desc: 'Allocate influence to factions' },
-  { id: 'weaving', label: 'Weaving', era: 8, desc: 'Match reality fragments for boosts' },
-  { id: 'tuning', label: 'Tuning', era: 9, desc: 'Align cosmic frequencies to stabilize local reality' },
-  { id: 'realityForge', label: 'Forge', era: 10, desc: 'Craft keys for permanent bonuses' },
-];
 
 // Tab definitions — which tabs are available at which era
 function getAvailableTabs(era) {
@@ -76,7 +68,7 @@ function getAvailableTabs(era) {
 export function App() {
   const { state, updateState, resetSave, offlineReport, dismissOfflineReport } = useGameLoop(initialState);
   const [activeTab, setActiveTab] = useState('upgrades');
-  const [activeMiniGame, setActiveMiniGame] = useState('docking');
+  const [activeOperation, setActiveOperation] = useState(null);
   const prevEraRef = useRef(state.era);
   const keyboardStateRef = useRef(state);
   useEffect(() => {
@@ -144,7 +136,7 @@ export function App() {
       `Cycle: #${summary.prestigeCount}`,
       '',
       'KEPT: Achievements, prestige upgrades, multiplier, reality keys, lifetime stats',
-      'LOST: All resources, upgrades, tech, era progress, mini-game state',
+      'LOST: All resources, upgrades, tech, era progress, operation state',
       ...milestones,
       '',
       '"We tried to stop. We could not. Neither will you."',
@@ -163,8 +155,6 @@ export function App() {
     const tabs = getAvailableTabs(currentState.era);
     const tabByKey = tabs.find(t => t.key === e.key);
     if (tabByKey) {
-      // Don't switch tabs on 0-3 keys during hack challenge
-      if (currentState.hackChallenge && ['0','1','2','3'].includes(e.key)) return;
       setActiveTab(tabByKey.id);
       return;
     }
@@ -186,26 +176,19 @@ export function App() {
   // Badge counts for tabs
   const affordableUpgrades = getAvailableUpgrades(state).filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
   const affordableTech = getAvailableTech(state).filter(t => canAfford(state, t.cost)).length;
-  const activeEffectCount = state.activeEffects?.length || 0;
+  const unlockedOperations = getUnlockedOperations(state.era);
+  const activeSystemCount = getActiveSystems(state).length;
 
-  // Mini-game definitions with era requirements
-  const availableMiniGames = MINI_GAME_DEFS.filter(g => state.era >= g.era);
-
-  // Auto-select newest mini-game only when the era actually changes
+  // Focus the operation introduced by the current era.
   useEffect(() => {
     if (state.era !== prevEraRef.current) {
-      const available = MINI_GAME_DEFS.filter(g => state.era >= g.era);
-      const newGames = available.filter(g => g.era === state.era);
-      if (newGames.length > 0) {
-        setActiveMiniGame(newGames[newGames.length - 1].id);
-      }
+      setActiveOperation(getDefaultOperation(state.era));
       prevEraRef.current = state.era;
     }
   }, [state.era]);
 
-  // Render the selected mini-game panel
-  const getMiniGamePanel = () => {
-    const miniGameComponents = {
+  const renderOperation = operationId => {
+    const operationComponents = {
       docking: <DockingPanel key="docking" state={state} onUpdate={updateState} />,
       colony: <ColonyPanel key="colony" state={state} onUpdate={updateState} />,
       starChart: <StarChartPanel key="starChart" state={state} onUpdate={updateState} />,
@@ -215,35 +198,7 @@ export function App() {
       tuning: <TuningPanel key="tuning" state={state} onUpdate={updateState} />,
       realityForge: <RealityForgePanel key="realityForge" state={state} onUpdate={updateState} />,
     };
-
-    return (
-      <>
-        {availableMiniGames.length > 1 && (
-          <div className="mini-game-tabs" role="tablist" aria-label="Mini-game tabs" style={{ display: 'flex', gap: '2px', marginBottom: '6px', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
-            {availableMiniGames.map(g => (
-              <button
-                key={g.id}
-                className={`tab-btn ${activeMiniGame === g.id ? 'active' : ''}`}
-                onClick={() => setActiveMiniGame(g.id)}
-                style={{ padding: '3px 6px', fontSize: '0.7em', whiteSpace: 'nowrap', minWidth: 'auto' }}
-                role="tab"
-                aria-selected={activeMiniGame === g.id}
-                aria-label={`Switch to ${g.label} mini-game`}
-                title={`${g.label}: ${g.desc}`}
-              >
-                {g.label}
-              </button>
-            ))}
-          </div>
-        )}
-        {availableMiniGames.find(g => g.id === activeMiniGame) && (
-          <div className="mini-game-caption">
-            {availableMiniGames.find(g => g.id === activeMiniGame)?.desc}
-          </div>
-        )}
-        {miniGameComponents[activeMiniGame] || miniGameComponents.docking}
-      </>
-    );
+    return operationComponents[operationId] || null;
   };
 
   return (
@@ -335,36 +290,7 @@ export function App() {
         {state.era >= ERA_COUNT && (
           <span className="control-chip">{cycleReadiness.ready ? 'Prestige available' : `Cycle ${cycleReadiness.completed}/${cycleReadiness.total}`}</span>
         )}
-        {availableMiniGames.length > 1 && (
-          <span className="mini-status-dots" aria-label="Mini-game activity">
-            {availableMiniGames.map(g => {
-              const active = (
-                (g.id === 'mining' && (state.totalGems || 0) > 0) ||
-                (g.id === 'factory' && ((state.factoryAllocation?.steel || 0) > 0 || (state.factoryAllocation?.electronics || 0) > 0)) ||
-                (g.id === 'hacking' && (state.hackSuccesses || 0) > 0) ||
-                (g.id === 'docking' && (state.dockingAttempts || 0) > 0) ||
-                (g.id === 'colony' && Object.values(state.colonyAssignments || {}).some(v => v > 0)) ||
-                (g.id === 'starChart' && (state.starRoutes?.length || 0) > 0) ||
-                (g.id === 'dyson' && (state.dysonSegments || 0) > 0) ||
-                (g.id === 'senate' && Object.values(state.senate || {}).some(v => v > 0)) ||
-                (g.id === 'weaving' && (state.totalWeaves || 0) > 0) ||
-                (g.id === 'tuning' && (state.tuningScore || 0) > 0) ||
-                (g.id === 'realityForge' && Object.values(state.realityKeys || {}).some(v => v > 0))
-              );
-              return (
-                <button
-                  key={g.id}
-                  className={`mini-dot ${active ? 'active' : 'inactive'} ${activeMiniGame === g.id && activeTab === 'mini' ? 'current' : ''}`}
-                  title={`${g.label}: ${active ? 'active' : 'inactive'}`}
-                  onClick={() => { setActiveTab('mini'); setActiveMiniGame(g.id); }}
-                  aria-label={`${g.label} mini-game (${active ? 'active' : 'inactive'})`}
-                >
-                  {g.label[0]}
-                </button>
-              );
-            })}
-          </span>
-        )}
+        {unlockedOperations.length > 0 && <span className="control-chip">{activeSystemCount}/{unlockedOperations.length} operations engaged</span>}
       </div>
 
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
@@ -401,7 +327,7 @@ export function App() {
               let badge = 0;
               if (tab.id === 'upgrades') badge = affordableUpgrades;
               if (tab.id === 'tech') badge = affordableTech;
-              if (tab.id === 'mini') badge = activeEffectCount;
+              if (tab.id === 'mini') badge = 0;
               if (tab.id === 'prestige') {
                 badge = state.prestigePoints || 0;
                 // Show notification dot when prestige is available
@@ -412,7 +338,7 @@ export function App() {
               return (
                 <button
                   key={tab.id}
-                  className={`tab-btn ${activeTab === tab.id ? 'active' : ''} ${tab.id === 'mini' && state.totalGems === 0 && state.era >= 1 && (state.totalTime || 0) < 120 ? 'mini-game-pulse' : ''}`}
+                  className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
                   onClick={() => tab.id === 'stats' ? handleStatsTabClick() : setActiveTab(tab.id)}
                   title={`Press ${tab.key}`}
                   role="tab"
@@ -450,7 +376,14 @@ export function App() {
             {activeTab === 'tech' && (
               <TechTree state={state} onUpdate={updateState} />
             )}
-            {activeTab === 'mini' && getMiniGamePanel()}
+            {activeTab === 'mini' && (
+              <OperationsPanel
+                state={state}
+                activeOperation={activeOperation || getDefaultOperation(state.era)}
+                onSelect={setActiveOperation}
+                renderOperation={renderOperation}
+              />
+            )}
             {activeTab === 'trading' && state.era >= 4 && (
               <TradingPanel state={state} onUpdate={updateState} />
             )}

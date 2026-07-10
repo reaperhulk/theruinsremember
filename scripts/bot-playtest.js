@@ -20,6 +20,7 @@ import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js
 import { getEraReadiness } from '../src/engine/eras.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
 import { allocateSenateInfluence, getMaxSenateInfluence } from '../src/engine/senate.js';
+import { selectNextCycleDoctrine } from '../src/engine/cycles.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
 import { readFileSync } from 'fs';
 
@@ -514,7 +515,12 @@ function botSenate(state, profile, t, _rng) {
 }
 
 function botRealityForge(state, profile, t, _rng) {
-  if (!profile.realityForge || state.era < 10) return state;
+  if (state.era < 10) return state;
+  if (!state.nextCycleDoctrine) {
+    const doctrines = ['reconstruction', 'expansion', 'transcendence'];
+    state = selectNextCycleDoctrine(state, doctrines[(state.prestigeCount || 0) % doctrines.length]);
+  }
+  if (!profile.realityForge) return state;
   // Forge every 30s
   if (t % 30 !== 0) return state;
 
@@ -767,7 +773,7 @@ function runScenario(opts) {
     }
 
     // Prestige check
-    if (prestigesDone < prestige && state.era >= prestigeAtEra) {
+    if (prestigesDone < prestige && state.era >= prestigeAtEra && getCycleReadiness(state).ready) {
       const bonus = calculatePrestigeBonus(state);
       const points = calculatePrestigePoints(state);
       collector.prestigeLog.push({

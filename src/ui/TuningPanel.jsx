@@ -1,175 +1,140 @@
-import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { applyTuning, getNextTuningTier, getTuningMultiplier, getTuningProductionBonus, getTuningQuality, TUNING_TIERS } from '../engine/tuning.js';
 import { formatNumber } from './format.js';
 import { playClick } from './AudioManager.js';
-import { getTuningQuality, applyTuning, TUNING_TIERS, getTuningProductionBonus, getNextTuningTier } from '../engine/tuning.js';
+
+const MAX_PROBES = 3;
+
+function createTarget() {
+  return 12 + Math.floor(Math.random() * 77);
+}
 
 export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
   const [frequency, setFrequency] = useState(50);
-  const [target, setTarget] = useState(50);
-  const [result, setResult] = useState(null);
+  const [target, setTarget] = useState(createTarget);
+  const [probesLeft, setProbesLeft] = useState(MAX_PROBES);
+  const [reading, setReading] = useState(null);
+  const [bestQuality, setBestQuality] = useState(null);
   const [lastTune, setLastTune] = useState(null);
-  const targetTimerRef = useRef(null);
   const tuningScore = state.tuningScore || 0;
   const tuningBonus = getTuningProductionBonus(tuningScore);
   const nextTier = getNextTuningTier(tuningScore);
 
-  // Change target every 30 seconds
-  useEffect(() => {
-    targetTimerRef.current = setInterval(() => {
-      setTarget(10 + Math.floor(Math.random() * 80));
-      setResult(null);
-    }, 30000);
-    return () => clearInterval(targetTimerRef.current);
+  const resetSignal = useCallback(() => {
+    setTarget(createTarget());
+    setProbesLeft(MAX_PROBES);
+    setReading(null);
+    setBestQuality(null);
   }, []);
 
-  const handleTune = useCallback(() => {
+  const handleProbe = useCallback(() => {
+    if (probesLeft <= 0) return;
     playClick();
-    const diff = Math.abs(frequency - target);
-    const quality = getTuningQuality(diff);
+    const distance = Math.abs(frequency - target);
+    const quality = getTuningQuality(distance);
+    const direction = frequency < target ? 'higher' : frequency > target ? 'lower' : 'locked';
+    const previousDistance = reading?.distance;
+    const trend = previousDistance === undefined ? null : distance < previousDistance ? 'warmer' : distance > previousDistance ? 'colder' : 'steady';
+    const nextBest = !bestQuality || getTuningMultiplier(quality) > getTuningMultiplier(bestQuality) ? quality : bestQuality;
 
-    setResult(quality);
-    setTimeout(() => setResult(null), 1500);
+    setBestQuality(nextBest);
+    setReading({ distance, direction, quality, trend });
+    setProbesLeft(count => count - 1);
 
-    if (quality !== 'miss') {
-      onUpdate(s => {
-        const tuneResult = applyTuning(s, quality);
-        if (!tuneResult) return null;
-        setLastTune({ cp: tuneResult.cpGain, uc: tuneResult.ucGain });
-        setTimeout(() => setLastTune(null), 800);
-        return tuneResult.state;
-      });
+    // The signal drifts after every probe, so another attempt can improve or
+    // lose position. Its direction is deterministic within the three-probe run.
+    const drift = probesLeft % 2 === 1 ? 3 : -2;
+    setTarget(current => Math.max(5, Math.min(95, current + drift)));
+  }, [bestQuality, frequency, probesLeft, reading, target]);
+
+  const handleLock = useCallback(() => {
+    if (!bestQuality || bestQuality === 'miss') {
+      resetSignal();
+      return;
     }
-  }, [frequency, target, onUpdate]);
+    onUpdate(current => {
+      const result = applyTuning(current, bestQuality);
+      if (!result) return current;
+      setLastTune({ cp: result.cpGain, uc: result.ucGain, quality: bestQuality });
+      setTimeout(() => setLastTune(null), 1200);
+      return result.state;
+    });
+    resetSignal();
+  }, [bestQuality, onUpdate, resetSignal]);
 
-  // Keyboard support: arrow keys to adjust, Enter to tune
   useEffect(() => {
-    const handler = (e) => {
-      if (e.key === 'ArrowLeft') { e.preventDefault(); setFrequency(f => Math.max(0, f - 2)); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); setFrequency(f => Math.min(100, f + 2)); }
-      if (e.key === 'Enter') { e.preventDefault(); handleTune(); }
+    const handler = event => {
+      if (event.key === 'ArrowLeft') { event.preventDefault(); setFrequency(value => Math.max(0, value - 2)); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); setFrequency(value => Math.min(100, value + 2)); }
+      if (event.key === 'Enter') { event.preventDefault(); handleProbe(); }
+      if (event.key === 'l' || event.key === 'L') { event.preventDefault(); handleLock(); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleTune]);
+  }, [handleLock, handleProbe]);
 
-  const distance = Math.abs(frequency - target);
-  const resultColors = { perfect: '#ffdd44', good: '#88dd88', ok: '#aaaaaa', miss: '#ff6666' };
-  const resultTexts = { perfect: 'PERFECT TUNE!', good: 'Good match', ok: 'Partial tune', miss: 'Off frequency' };
+  const qualityColors = { perfect: '#e6c766', good: '#73c49b', ok: '#aeb8c5', miss: '#d77878' };
+  const canLock = bestQuality && bestQuality !== 'miss';
 
   return (
     <div className="panel tuning-panel">
-      <h2>Cosmic Tuning ({tuningScore} score)</h2>
-      <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#50b098', margin: '0 0 4px' }}>
-        The universe hums at a frequency only the patient can hear.
-      </p>
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '6px' }}>
-        {TUNING_TIERS.slice().reverse().map(tier => {
-          const reached = tuningScore >= tier.threshold;
-          return (
-            <span
-              key={tier.threshold}
-              style={{
-                fontSize: '0.7em',
-                padding: '2px 6px',
-                borderRadius: '3px',
-                background: reached ? 'rgba(80,176,152,0.2)' : '#1a1a2a',
-                border: `1px solid ${reached ? '#50b098' : '#333'}`,
-                color: reached ? '#88ddcc' : '#555',
-              }}
-            >
-              {tier.threshold} — {((tier.bonus - 1) * 100).toFixed(0)}%{reached ? ' ✓' : ''}
-            </span>
-          );
-        })}
-      </div>
-      {tuningBonus > 1 && (
-        <div style={{ fontSize: '0.8em', color: '#50b098', marginBottom: '4px' }}>
-          Current bonus: <strong>+{((tuningBonus - 1) * 100).toFixed(0)}% Cosmic Power</strong>
+      <div className="tuning-header">
+        <div>
+          <span className="panel-kicker">Unstable signal</span>
+          <h2>Cosmic Tuning</h2>
         </div>
-      )}
-      {nextTier && (
-        <div style={{ fontSize: '0.75em', color: '#778899', marginBottom: '6px' }}>
-          Next: {nextTier.label} at score {nextTier.threshold} ({nextTier.threshold - tuningScore} more)
-        </div>
-      )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8em', marginBottom: '6px' }}>
-        <span>Your frequency: <strong style={{ color: '#aaddff' }}>{frequency}</strong></span>
-        <span style={{ color: distance <= 2 ? '#ffdd44' : distance <= 8 ? '#88dd88' : distance <= 20 ? '#aaaaaa' : '#ff6666' }}>
-          Distance: <strong>{distance}</strong>
-          {distance <= 2 ? ' (perfect zone!)' : distance <= 8 ? ' (close!)' : distance <= 20 ? ' (getting warmer)' : ' (far)'}
-        </span>
+        <strong>{probesLeft}/{MAX_PROBES} probes</strong>
       </div>
-      <div style={{ position: 'relative', height: '20px', background: '#111', border: '1px solid #333', marginBottom: '6px' }}>
-        {/* Target zone indicator — wide glow */}
-        <div style={{
-          position: 'absolute',
-          left: `${Math.max(0, target - 10)}%`,
-          width: `${Math.min(20, 100 - Math.max(0, target - 10))}%`,
-          height: '100%',
-          background: 'rgba(255, 221, 68, 0.08)',
-          borderRadius: '2px',
-        }} />
-        {/* Good zone */}
-        <div style={{
-          position: 'absolute',
-          left: `${Math.max(0, target - 4)}%`,
-          width: `${Math.min(8, 100 - Math.max(0, target - 4))}%`,
-          height: '100%',
-          background: 'rgba(136, 221, 136, 0.15)',
-        }} />
-        {/* Perfect zone */}
-        <div style={{
-          position: 'absolute',
-          left: `${Math.max(0, target - 1)}%`,
-          width: `${Math.min(2, 100 - Math.max(0, target - 1))}%`,
-          height: '100%',
-          background: 'rgba(255, 221, 68, 0.35)',
-        }} />
-        {/* Target marker */}
-        <div style={{
-          position: 'absolute',
-          left: `${target}%`,
-          width: '2px',
-          height: '100%',
-          background: '#ffdd44',
-          transform: 'translateX(-1px)',
-          opacity: 0.6,
-        }} />
-        {/* Player frequency indicator */}
-        <div style={{
-          position: 'absolute',
-          left: `${frequency}%`,
-          width: '3px',
-          height: '100%',
-          background: '#aaddff',
-          transform: 'translateX(-1px)',
-          transition: 'left 0.1s',
-        }} />
-      </div>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        value={frequency}
-        onChange={e => setFrequency(Number(e.target.value))}
-        style={{ width: '100%', marginBottom: '6px' }}
-        aria-label={`Frequency tuner — current: ${frequency}, target: ${target}`}
-      />
-      {result && (
-        <div style={{ textAlign: 'center', fontSize: '0.9em', color: resultColors[result], marginBottom: '4px', fontWeight: result === 'perfect' ? 'bold' : 'normal' }}>
-          {resultTexts[result]}
-        </div>
-      )}
-      <button className="mine-btn" onClick={handleTune} style={{ background: 'linear-gradient(90deg, #1a2a2a, #203030)' }} aria-label="Tune frequency">
-        {lastTune ? (
-          <span style={{ color: '#50b098' }}>
-            +{formatNumber(lastTune.cp)} power, +{formatNumber(lastTune.uc)} constants
+
+      <div className="tuning-tiers">
+        {TUNING_TIERS.slice().reverse().map(tier => (
+          <span key={tier.threshold} className={tuningScore >= tier.threshold ? 'reached' : ''}>
+            {tier.threshold}: +{((tier.bonus - 1) * 100).toFixed(0)}%
           </span>
+        ))}
+      </div>
+
+      <div className="tuning-status">
+        <span>Score <strong>{tuningScore}</strong></span>
+        <span>Output <strong>+{((tuningBonus - 1) * 100).toFixed(0)}%</strong></span>
+        {nextTier && <span>Next tier <strong>{nextTier.threshold - tuningScore} away</strong></span>}
+      </div>
+
+      <div className="signal-readout" aria-live="polite">
+        {reading ? (
+          <>
+            <strong style={{ color: qualityColors[reading.quality] }}>{reading.quality.toUpperCase()} SIGNAL</strong>
+            <span>{reading.direction === 'locked' ? 'Frequency aligned' : `Signal lies ${reading.direction}`}</span>
+            <span>{reading.trend ? `${reading.trend} than the previous probe` : 'The signal will drift after this reading'}</span>
+          </>
         ) : (
-          <>Tune Frequency</>
+          <>
+            <strong>NO READING</strong>
+            <span>Choose a frequency and spend a probe.</span>
+            <span>You may bank the best reading before the signal moves again.</span>
+          </>
         )}
-      </button>
-      <p className="mining-hint">Adjust the slider to match the yellow target marker | Target changes every 30s | Perfect (dist &le; 2) = 5x reward | Arrow keys to adjust, Enter to tune</p>
+      </div>
+
+      <label className="tuning-control">
+        <span>Probe frequency <strong>{frequency}</strong></span>
+        <input type="range" min="0" max="100" value={frequency} onChange={event => setFrequency(Number(event.target.value))} />
+      </label>
+
+      <div className="tuning-actions">
+        <button className="mine-btn" onClick={handleProbe} disabled={probesLeft <= 0}>
+          {probesLeft > 0 ? 'Probe Signal' : 'No probes left'}
+        </button>
+        <button className="mine-btn" onClick={handleLock} disabled={!canLock && probesLeft > 0}>
+          {canLock ? `Lock ${bestQuality} signal` : probesLeft > 0 ? 'No signal to lock' : 'Abandon signal'}
+        </button>
+      </div>
+
+      {lastTune && (
+        <div className="tuning-reward" role="status">
+          {lastTune.quality} lock: +{formatNumber(lastTune.cp)} power, +{formatNumber(lastTune.uc)} constants
+        </div>
+      )}
     </div>
   );
 });

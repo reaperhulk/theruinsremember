@@ -1,8 +1,9 @@
-// Orbital Docking mini-game for Era 4
+// Orbital docking operation for Era 4
 // Timing-based click game: hit the target zone for bonus resources.
 // The docking indicator moves back and forth; click when it's in the zone.
 
 import { getEffectiveCap, getEffectivePrestige } from './resources.js';
+import { getOperationRewardMultiplier } from './cycles.js';
 
 const PERFECT_ZONE = 0.10;   // 10% center for perfect dock
 const BASE_SPEED = 0.6;      // cycles per second at era 4 (~1.7s full sweep)
@@ -32,9 +33,41 @@ export const DOCKING_MISSIONS = {
   },
 };
 
+export const DOCKING_APPROACHES = {
+  cautious: {
+    id: 'cautious',
+    name: 'Cautious',
+    description: 'Wider capture window, but only 70% rewards.',
+    zoneMult: 1.3,
+    rewardMult: 0.7,
+    fuelCost: 0,
+  },
+  standard: {
+    id: 'standard',
+    name: 'Standard',
+    description: 'Normal capture window and rewards.',
+    zoneMult: 1,
+    rewardMult: 1,
+    fuelCost: 0,
+  },
+  burn: {
+    id: 'burn',
+    name: 'Hard Burn',
+    description: 'Spend 4 fuel for a narrow approach and 80% more rewards.',
+    zoneMult: 0.72,
+    rewardMult: 1.8,
+    fuelCost: 4,
+  },
+};
+
 export function selectDockingMission(state, missionId) {
   if (!DOCKING_MISSIONS[missionId]) return state;
   return { ...state, dockingMission: missionId };
+}
+
+export function selectDockingApproach(state, approachId) {
+  if (!DOCKING_APPROACHES[approachId]) return state;
+  return { ...state, dockingApproach: approachId };
 }
 
 // Calculate indicator position (0-1) based on time.
@@ -63,13 +96,16 @@ export function attemptDock(state, position) {
   const zoneCenter = getTargetZone(state);
   const missionId = DOCKING_MISSIONS[state.dockingMission] ? state.dockingMission : 'cargo';
   const mission = DOCKING_MISSIONS[missionId];
+  const approachId = DOCKING_APPROACHES[state.dockingApproach] ? state.dockingApproach : 'standard';
+  const approach = DOCKING_APPROACHES[approachId];
+  if ((state.resources.rocketFuel?.amount || 0) < approach.fuelCost) return { state, result: 'insufficient' };
   const distFromCenter = Math.abs(position - zoneCenter);
 
   let result;
 
-  if (distFromCenter <= PERFECT_ZONE / 2) {
+  if (distFromCenter <= PERFECT_ZONE * approach.zoneMult / 2) {
     result = 'perfect';
-  } else if (distFromCenter <= mission.zoneSize / 2) {
+  } else if (distFromCenter <= mission.zoneSize * approach.zoneMult / 2) {
     result = 'good';
   } else {
     result = 'miss';
@@ -104,10 +140,16 @@ export function attemptDock(state, position) {
 
   // Apply rewards scaled by prestige, combo, and era
   const newResources = { ...state.resources };
+  if (approach.fuelCost > 0) {
+    newResources.rocketFuel = {
+      ...newResources.rocketFuel,
+      amount: newResources.rocketFuel.amount - approach.fuelCost,
+    };
+  }
   for (const [resourceId, amount] of Object.entries(rewards)) {
     const r = newResources[resourceId];
     if (r && r.unlocked) {
-      const scaled = amount * getEffectivePrestige(state.prestigeMultiplier || 1) * comboMult * dockPrestigeMult * eraScale * savantMult;
+      const scaled = amount * approach.rewardMult * getOperationRewardMultiplier(state) * getEffectivePrestige(state.prestigeMultiplier || 1) * comboMult * dockPrestigeMult * eraScale * savantMult;
       const cap = getEffectiveCap({ ...state, resources: newResources }, resourceId);
       newResources[resourceId] = { ...r, amount: cap > 0 ? Math.min(cap, r.amount + scaled) : r.amount + scaled };
     }
@@ -141,11 +183,14 @@ export function attemptDock(state, position) {
 // Get zone info for UI rendering
 export function getDockingInfo(state) {
   const missionId = DOCKING_MISSIONS[state.dockingMission] ? state.dockingMission : 'cargo';
+  const approachId = DOCKING_APPROACHES[state.dockingApproach] ? state.dockingApproach : 'standard';
+  const approach = DOCKING_APPROACHES[approachId];
   return {
     zoneCenter: getTargetZone(state),
-    zoneSize: DOCKING_MISSIONS[missionId].zoneSize,
-    perfectSize: PERFECT_ZONE,
+    zoneSize: DOCKING_MISSIONS[missionId].zoneSize * approach.zoneMult,
+    perfectSize: PERFECT_ZONE * approach.zoneMult,
     missionId,
+    approachId,
     missions: state.dockingMissions || { cargo: 0, crew: 0, science: 0 },
     attempts: state.dockingAttempts || 0,
     successes: state.dockingSuccesses || 0,

@@ -7,7 +7,7 @@ export const REALITY_KEY_RECIPES = [
     fragments: 50,
     echoes: 20,
     color: '#ff8866',
-    description: '+1% all production, +25% Quantum Echoes',
+    description: 'Next cycles recover expedition supplies 5 seconds faster per key.',
     lore: 'Frozen moments compressed into a key. Time bends around whoever holds it.',
     milestone: 'Reach Cosmic Tuning score 50',
     unlocked: state => (state.tuningScore || 0) >= 50,
@@ -18,7 +18,7 @@ export const REALITY_KEY_RECIPES = [
     fragments: 30,
     echoes: 40,
     color: '#66aaff',
-    description: '+1% all production, +25% Quantum Echoes',
+    description: 'Resource capacity increases 15% per key in every future cycle.',
     lore: 'Space itself yields a path. The forge routes echoes through folded geometry.',
     milestone: 'Complete 9 successful orbital operations',
     unlocked: state => (state.dockingSuccesses || 0) >= 9,
@@ -29,7 +29,7 @@ export const REALITY_KEY_RECIPES = [
     fragments: 40,
     echoes: 30,
     color: '#88dd88',
-    description: '+1% all production, +25% Quantum Echoes',
+    description: 'Operation rewards increase 10% per key in every future cycle.',
     lore: 'Effect becomes cause. The causal loop feeds more echoes into the present.',
     milestone: 'Complete 3 reality weaves',
     unlocked: state => (state.totalWeaves || 0) >= 3,
@@ -40,7 +40,7 @@ export const REALITY_KEY_RECIPES = [
     fragments: 20,
     echoes: 50,
     color: '#dd88ff',
-    description: '+1% all production',
+    description: 'Each future cycle begins with 25 extra basic resources per key.',
     lore: 'Superposition of states collapsed into permanence. The forge approves.',
     milestone: 'Reach the Reality Forge',
     unlocked: state => state.era >= 10,
@@ -93,12 +93,13 @@ export function getCycleReadiness(state) {
     { id: 'upgrades', label: 'Era 10 decisions', current: era10Upgrades, target: 20, met: era10Upgrades >= 20 },
     { id: 'totalKeys', label: 'Reality keys forged', current: totalKeys, target: 4, met: totalKeys >= 4 },
     { id: 'distinctKeys', label: 'Distinct key types', current: distinctKeys, target: 3, met: distinctKeys >= 3 },
+    { id: 'doctrine', label: 'Next-cycle doctrine selected', current: state.nextCycleDoctrine ? 1 : 0, target: 1, met: !!state.nextCycleDoctrine },
   ];
   const era10Elapsed = state.era >= 10 ? Math.max(0, state.totalTime - (state.eraStartTime || 0)) : 0;
   const completed = requirements.filter(requirement => requirement.met).length;
   const directlyReady = requirements.every(requirement => requirement.met);
   const fallbackRemaining = Math.max(0, CYCLE_FALLBACK_SECONDS - era10Elapsed);
-  const fallbackReady = state.era >= 10 && fallbackRemaining === 0;
+  const fallbackReady = state.era >= 10 && fallbackRemaining === 0 && !!state.nextCycleDoctrine;
 
   return {
     ready: directlyReady || fallbackReady,

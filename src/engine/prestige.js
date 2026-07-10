@@ -157,6 +157,10 @@ export function performPrestige(state) {
     lifetimePlayTime: (state.lifetimePlayTime || 0) + state.totalTime,
     // Track best time per era
     bestEraTimes: state.bestEraTimes || {},
+    cycleDoctrine: state.nextCycleDoctrine || state.cycleDoctrine,
+    nextCycleDoctrine: null,
+    cycleGoalRewarded: false,
+    cycleMarks: state.cycleMarks || 0,
   };
 
   // Fast Start: auto-purchase era 1 upgrades
@@ -249,6 +253,15 @@ export function performPrestige(state) {
   // Persist achievements, reality keys, echo state, and completion flags across prestige
   newState.achievements = state.achievements || {};
   newState.realityKeys = state.realityKeys || {};
+  const quantumSeed = (state.realityKeys?.quantum || 0) * 25;
+  if (quantumSeed > 0) {
+    for (const id of ['food', 'labor', 'materials', 'energy']) {
+      newState.resources[id] = {
+        ...newState.resources[id],
+        amount: newState.resources[id].amount + quantumSeed,
+      };
+    }
+  }
   newState.echoMode = state.echoMode || false;
   newState.echoResource = state.echoResource || 0;
   newState.echoUpgrades = state.echoUpgrades || {};
@@ -443,9 +456,6 @@ export function performPrestige(state) {
         newState.resources[id] = { ...r, unlocked: true };
       }
     }
-  }
-  if (echoOwned.echoResonanceLock) {
-    newState.factoryAllocation = state.factoryAllocation || {};
   }
   if (echoOwned.echoVoidResonance) {
     // Start with 1.5x the previous run's prestige multiplier as a floor

@@ -1,5 +1,4 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
-import { mine } from '../engine/mining.js';
 import { gather, getEffectiveCap, getEffectiveRate } from '../engine/resources.js';
 import { countEraUpgrades, getMinUpgradesForEra } from '../engine/eras.js';
 import { playClick } from './AudioManager.js';
@@ -2964,9 +2963,7 @@ export function GameCanvas({ state, onUpdate }) {
   const bonusOrbRef = useRef(null); // { x, y, spawnTime, type, resource }
   const lastOrbTimeRef = useRef(0);
   const nextOrbDelayRef = useRef(40);
-  const prevHackRef = useRef(state.hackSuccesses || 0);
   const prevDockRef = useRef(state.dockingPerfects || 0);
-  const hackFlashRef = useRef(0); // timestamp of last hack flash
   const dockFlashRef = useRef(0); // timestamp of last dock flash
   const mouseRef = useRef({ x: 0, y: 0 }); // for parallax
   const [canvasTooltip, setCanvasTooltip] = useState(null); // {x, y, text} in CSS px
@@ -3134,19 +3131,7 @@ export function GameCanvas({ state, onUpdate }) {
         floatingTextsRef.current.push({ x: cx, y: cy, label: el.label, startTime: performance.now() });
       }
 
-      // Era 1 ground triggers mining mini-game
-      if (era === 1 && el.type === 'ground') {
-        onUpdateRef.current(s => {
-          const result = mine(s);
-          if (result.foundGem) {
-            spawnParticles(particlesRef.current, cx, cy, 15, 'rgba(255,215,0,1)', 80);
-          }
-          return result.state;
-        });
-        return;
-      }
-
-      // All other clicks use gather + spawn small particles
+      // Scene clicks gather the resource associated with the visible object.
       const resourceColors = {
         materials: 'rgba(180,140,100,1)', food: 'rgba(100,200,100,1)',
         energy: 'rgba(255,220,50,1)', steel: 'rgba(150,170,190,1)',
@@ -3591,32 +3576,12 @@ export function GameCanvas({ state, onUpdate }) {
         prevEraRef.current = currentEra;
       }
 
-      // Detect hack success and docking perfect increases — spawn visual effects
-      const curHacks = stateRef.current.hackSuccesses || 0;
-      if (curHacks > prevHackRef.current) {
-        hackFlashRef.current = t;
-        prevHackRef.current = curHacks;
-      }
+      // Detect docking perfect increases and spawn a visual effect.
       const curDocks = stateRef.current.dockingPerfects || 0;
       if (curDocks > prevDockRef.current) {
         dockFlashRef.current = t;
         spawnParticles(particlesRef.current, w * 0.5, h * 0.3, 8, 'rgba(100,200,255,1)', 50);
         prevDockRef.current = curDocks;
-      }
-
-      // Hack success: green data streams flash for 0.6s
-      const hackAge = t - hackFlashRef.current;
-      if (hackAge < 0.6) {
-        const alpha = (0.6 - hackAge) / 0.6 * 0.3;
-        ctx.strokeStyle = `rgba(0, 255, 120, ${alpha})`;
-        ctx.lineWidth = 1;
-        for (let s = 0; s < 5; s++) {
-          const sx = (s * 61 + 20) % w;
-          ctx.beginPath();
-          ctx.moveTo(sx, 0);
-          ctx.lineTo(sx + (Math.sin(t * 8 + s) * 10), h);
-          ctx.stroke();
-        }
       }
 
       // Dock perfect: brief white ring flash for 0.4s

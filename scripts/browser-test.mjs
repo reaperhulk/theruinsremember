@@ -96,6 +96,7 @@ async function promoteToEra10(page) {
       tuningScore: 50,
       dockingSuccesses: 9,
       realityKeys: { temporal: 1, spatial: 1, quantum: 2 },
+      nextCycleDoctrine: 'reconstruction',
       upgrades: { ...state.upgrades, ...Object.fromEntries(upgradeIds.map(id => [id, true])) },
       lifetimeHighestEra: Math.max(10, state.lifetimeHighestEra || 1),
       resources: Object.fromEntries(Object.entries(state.resources).map(([id, resource]) => [
@@ -281,18 +282,22 @@ async function run() {
   await page.evaluate(() => document.querySelector('#tab-mini')?.click());
   await new Promise(resolve => setTimeout(resolve, 150));
   const tuningMounted = await page.evaluate(() => {
-    const button = [...document.querySelectorAll('.mini-game-tabs button')].find(candidate => candidate.textContent.includes('Tuning'));
-    button?.click();
-    return !!button;
+    const select = document.querySelector('.operation-archive select');
+    if (!select) return false;
+    select.value = 'tuning';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
   });
   await new Promise(resolve => setTimeout(resolve, 150));
   const tuningVisible = tuningMounted && await page.evaluate(() => !!document.querySelector('.tuning-panel'));
   const tuningFailed = !tuningVisible;
   console.log(`  Cosmic tuning panel: ${tuningVisible ? 'visible' : 'FAILED'}`);
   const forgeReady = await page.evaluate(() => {
-    const button = [...document.querySelectorAll('.mini-game-tabs button')].find(candidate => candidate.textContent.includes('Forge'));
-    button?.click();
-    return !!button;
+    const select = document.querySelector('.operation-archive select');
+    if (!select) return false;
+    select.value = '';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
   });
   await new Promise(resolve => setTimeout(resolve, 150));
   const cycleReadyVisible = forgeReady && await page.evaluate(() => (

@@ -2,15 +2,15 @@ import { useState, memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick, playUpgrade } from './AudioManager.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../engine/realityForge.js';
+import { CYCLE_DOCTRINES, getCycleGoal, selectNextCycleDoctrine } from '../engine/cycles.js';
 
 export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpdate }) {
   const [lastForged, setLastForged] = useState(null);
   const keys = state.realityKeys || {};
   const recipes = getRealityForgeRecipes(state);
   const cycle = getCycleReadiness(state);
+  const cycleGoal = getCycleGoal(state);
   const totalKeys = Object.values(keys).reduce((s, v) => s + v, 0);
-  const bonus = totalKeys * 1;
-  const echoesSlots = ((keys.temporal || 0) > 0 ? 1 : 0) + ((keys.spatial || 0) > 0 ? 1 : 0) + ((keys.causal || 0) > 0 ? 1 : 0);
 
   const handleForge = (recipe) => {
     playClick();
@@ -24,13 +24,15 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
 
   return (
     <div className="panel reality-forge-panel">
-      <h2>Reality Forge ({totalKeys} keys, +{bonus}% all{echoesSlots > 0 ? `, +${echoesSlots * 25}% echoes` : ''})</h2>
+      <h2>Reality Forge ({totalKeys} keys)</h2>
       <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#dd88ff', margin: '0 0 4px' }}>
         The forge was here before you arrived. It remembers every key ever made — including the ones you are about to make.
       </p>
-      {echoesSlots > 0 && (
-        <div style={{ fontSize: '0.75em', color: '#88ddcc', marginBottom: '4px' }}>
-          Key slots active: {echoesSlots}/3 — Quantum Echoes +{echoesSlots * 25}% production
+      {cycleGoal && (
+        <div className={`cycle-goal ${state.cycleGoalRewarded ? 'ready' : ''}`}>
+          <strong>{CYCLE_DOCTRINES[state.cycleDoctrine]?.name} doctrine</strong>
+          <span>{cycleGoal.label}: {Math.min(cycleGoal.current, cycleGoal.target)}/{cycleGoal.target}</span>
+          <span>{state.cycleGoalRewarded ? 'Complete: +1 cycle mark and +4 prestige points' : 'Complete this cycle for a permanent cycle mark'}</span>
         </div>
       )}
       {lastForged && (
@@ -38,8 +40,18 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
           Forged {lastForged}!
         </div>
       )}
-      <div style={{ fontSize: '0.8em', color: '#888', marginBottom: '6px' }}>
-        Each key grants +1% all production. Temporal/Spatial/Causal keys also unlock +25% Quantum Echoes each.
+      <div className="cycle-doctrines" role="group" aria-label="Choose next-cycle doctrine">
+        {Object.values(CYCLE_DOCTRINES).map(doctrine => (
+          <button
+            key={doctrine.id}
+            className={state.nextCycleDoctrine === doctrine.id ? 'active' : ''}
+            onClick={() => onUpdate(current => selectNextCycleDoctrine(current, doctrine.id))}
+          >
+            <strong>{doctrine.name}</strong>
+            <span>{doctrine.eraRange}</span>
+            <span>{doctrine.description}</span>
+          </button>
+        ))}
       </div>
       <div className="cycle-readiness" aria-label="Cycle readiness">
         <strong>Cycle readiness {cycle.completed}/{cycle.total}</strong>
@@ -79,7 +91,7 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
                 </button>
               </div>
               <div style={{ fontSize: '0.68em', color: '#776688', fontStyle: 'italic', paddingLeft: '2px' }}>
-                {recipe.lore}
+                {recipe.description} {recipe.lore}
               </div>
               {!recipe.isUnlocked && (
                 <div style={{ fontSize: '0.68em', color: '#556677', paddingLeft: '2px' }}>
@@ -100,7 +112,7 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
         </div>
       )}
       <p className="mining-hint">
-        Forge reality keys from fragments + echoes | Each key = permanent +1% all production | Keys survive prestige
+        Keys and cycle marks survive prestige | Choose one doctrine before closing the cycle
       </p>
     </div>
   );

@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { getAssignableColonies, getColonyAssignments, getTotalColoniesAssigned, assignColonies, getColonyBonus, getColonyStrategy } from '../engine/colonies.js';
+import { assignColonies, COLONY_MANDATES, getAssignableColonies, getColonyAssignments, getColonyBonus, getColonyMandateInfo, getColonyStrategy, getTotalColoniesAssigned, selectColonyMandate } from '../engine/colonies.js';
 import { resources as resourceDefs } from '../data/resources.js';
 
 function resourceName(id) { return resourceDefs[id]?.name || id; }
@@ -17,6 +17,7 @@ export const ColonyPanel = memo(function ColonyPanel({ state, onUpdate }) {
   const available = maxColonies - totalAssigned;
   const bonus = getColonyBonus(state);
   const strategy = getColonyStrategy(state);
+  const mandateInfo = getColonyMandateInfo(state);
 
   // Quick-assign: evenly split all colonies (spread remainder across focuses)
   const handleEvenSplit = () => {
@@ -51,6 +52,21 @@ export const ColonyPanel = memo(function ColonyPanel({ state, onUpdate }) {
           </button>
         )}
       </div>
+      <div className="colony-mandates" role="group" aria-label="Colony mandate">
+        {Object.values(COLONY_MANDATES).map(mandate => (
+          <button
+            key={mandate.id}
+            className={mandateInfo.mandate?.id === mandate.id ? 'active' : ''}
+            disabled={mandateInfo.cooldown > 0 && mandateInfo.mandate?.id !== mandate.id}
+            onClick={() => onUpdate(current => selectColonyMandate(current, mandate.id))}
+            title={mandate.description}
+          >
+            <strong>{mandate.name}</strong>
+            <span>{mandate.description}</span>
+          </button>
+        ))}
+      </div>
+      {mandateInfo.cooldown > 0 && <p className="operation-commitment">Mandate committed for {Math.ceil(mandateInfo.cooldown)}s</p>}
       {maxColonies > 0 && totalAssigned > 0 && (
         <div className="colony-bar">
           {barSegments.map((seg, i) => (

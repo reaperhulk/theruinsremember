@@ -297,9 +297,9 @@ describe('tick', () => {
     expect(Object.keys(state.realityKeys).length).toBe(0);
   });
 
-  it('reality key bonus at 1% per key affects production', () => {
+  it('cycle marks add 1% production each', () => {
     const state = createInitialState();
-    state.realityKeys = { temporal: 10, spatial: 10 }; // 20 keys = +20%
+    state.cycleMarks = 20;
     const baseTick = tick(createInitialState(), 1, NO_EVENT);
     const bonusTick = tick(state, 1, NO_EVENT);
     // Food: 1.5 * 1.20 = 1.8

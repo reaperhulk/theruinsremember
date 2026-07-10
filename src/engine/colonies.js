@@ -1,4 +1,5 @@
-// Colony Management mini-game for Era 5
+// Colony command operation for Era 5
+import { getOperationRewardMultiplier } from './cycles.js';
 // Assign colonies to different focus areas for varied outputs.
 // Focus types: 'growth' (food+labor), 'science' (research+data), 'industry' (exoticMaterials+energy)
 
@@ -9,6 +10,28 @@ const FOCUS_BONUSES = {
   science: { research: 8, data: 4 },
   industry: { exoticMaterials: 2, energy: 25 },
 };
+
+export const COLONY_MANDATES = {
+  resilience: { id: 'resilience', name: 'Resilience', description: 'Growth output +60%; other focuses -15%.', focus: 'growth', focusMult: 1.6, otherMult: 0.85 },
+  inquiry: { id: 'inquiry', name: 'Inquiry', description: 'Science output +60%; other focuses -15%.', focus: 'science', focusMult: 1.6, otherMult: 0.85 },
+  extraction: { id: 'extraction', name: 'Extraction', description: 'Industry output +60%; other focuses -15%.', focus: 'industry', focusMult: 1.6, otherMult: 0.85 },
+  federation: { id: 'federation', name: 'Federation', description: 'All output +20% while every focus is staffed.', focus: null, focusMult: 1.2, otherMult: 1 },
+};
+
+export const COLONY_MANDATE_DURATION = 120;
+
+export function selectColonyMandate(state, mandateId) {
+  if (!COLONY_MANDATES[mandateId]) return state;
+  const lastChange = state.lastColonyMandateTime;
+  if (lastChange !== undefined && state.totalTime - lastChange < COLONY_MANDATE_DURATION) return state;
+  return { ...state, colonyMandate: mandateId, lastColonyMandateTime: state.totalTime };
+}
+
+export function getColonyMandateInfo(state) {
+  const mandate = COLONY_MANDATES[state.colonyMandate] || null;
+  const elapsed = state.totalTime - (state.lastColonyMandateTime ?? -COLONY_MANDATE_DURATION);
+  return { mandate, cooldown: Math.max(0, COLONY_MANDATE_DURATION - elapsed) };
+}
 
 // Get max assignable colonies (based on colonies resource amount)
 export function getAssignableColonies(state) {
@@ -70,6 +93,8 @@ export function getColonyBonus(state) {
   const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
   const savantMult = hasSavant ? 1.5 : 1;
   const logisticsMult = state.prestigeUpgrades?.factoryExpert ? 2 : 1;
+  const operationMult = getOperationRewardMultiplier(state);
+  const mandate = COLONY_MANDATES[state.colonyMandate];
 
   // Terraform Sync mechanic: colony focus assignments multiply output by 1.5x
   const hasTerraformSync = !!state.upgrades?.terraformSync;
@@ -80,11 +105,18 @@ export function getColonyBonus(state) {
     const count = assignments[focus] || 0;
     if (count > 0) {
       const focusBonus = FOCUS_BONUSES[focus];
+      const mandateMult = !mandate
+        ? 1
+        : mandate.focus === focus
+          ? mandate.focusMult
+          : mandate.focus === null && isDiversified
+            ? mandate.focusMult
+            : mandate.otherMult;
       for (const [resource, rate] of Object.entries(focusBonus)) {
         // Scale with the resource's production multiplier so colonies stay relevant
         const r = state.resources[resource];
         const resourceMult = r ? (r.rateMult || 1) : 1;
-        bonus[resource] = (bonus[resource] || 0) + count * rate * resourceMult * focusMult * eraScale * savantMult * terraformMult * logisticsMult;
+        bonus[resource] = (bonus[resource] || 0) + count * rate * resourceMult * focusMult * mandateMult * eraScale * savantMult * terraformMult * logisticsMult * operationMult;
       }
     }
   }

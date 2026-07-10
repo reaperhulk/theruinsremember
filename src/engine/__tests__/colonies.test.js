@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getAssignableColonies, assignColonies, getColonyAssignments, getColonyBonus } from '../colonies.js';
+import { getAssignableColonies, assignColonies, getColonyAssignments, getColonyBonus, selectColonyMandate } from '../colonies.js';
 import { createInitialState } from '../state.js';
 
 describe('colonies', () => {
@@ -68,5 +68,18 @@ describe('colonies', () => {
     let s = assignColonies(state, 'growth', 3);
     s = assignColonies(s, 'growth', 1);
     expect(getColonyAssignments(s).growth).toBe(1);
+  });
+
+  it('commits to a time-bound mandate with focus tradeoffs', () => {
+    let state = makeEra5State();
+    state = assignColonies(state, 'growth', 2);
+    state = assignColonies(state, 'science', 1);
+    const baseline = getColonyBonus(state);
+    const mandated = selectColonyMandate(state, 'resilience');
+    const bonus = getColonyBonus(mandated);
+
+    expect(bonus.food).toBeGreaterThan(baseline.food);
+    expect(bonus.research).toBeLessThan(baseline.research);
+    expect(selectColonyMandate(mandated, 'inquiry').colonyMandate).toBe('resilience');
   });
 });

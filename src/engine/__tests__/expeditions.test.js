@@ -40,6 +40,12 @@ describe('expeditions', () => {
     expect(recovered.expedition.supplies).toBe(1);
   });
 
+  it('uses Temporal Keys to accelerate future expedition supplies', () => {
+    const state = createInitialState();
+    state.realityKeys.temporal = 2;
+    expect(getExpeditionSupplyInterval(state)).toBe(80);
+  });
+
   it('spends a supply and grants discovery credit and capped rewards on success', () => {
     const state = createInitialState();
     state.resources.materials.amount = 4990;
@@ -62,6 +68,13 @@ describe('expeditions', () => {
 
     expect(after.resources.materials.amount).toBe(state.resources.materials.amount + 36);
     expect(after.resources.food.amount).toBe(state.resources.food.amount + 24);
+  });
+
+  it('uses Causal Keys to increase operation rewards', () => {
+    const state = createInitialState();
+    state.realityKeys.causal = 2;
+    const { state: after } = runExpedition(state, 'surveyRidge', () => 0);
+    expect(after.resources.materials.amount).toBeCloseTo(state.resources.materials.amount + 28.8);
   });
 
   it('records a failed risky route without awarding discoveries', () => {

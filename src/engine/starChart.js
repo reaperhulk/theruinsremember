@@ -1,10 +1,32 @@
-// Star Chart mini-game for Eras 6-7
+// Star Chart operation for Eras 6-10
+import { getOperationRewardMultiplier } from './cycles.js';
 // Connect star systems to form trade routes for bonus production.
 // Each route connects two systems and gives production bonuses.
 // Max routes limited by star systems owned.
 
 const MAX_ROUTES = 10;
 const ROUTE_COST = { darkEnergy: 5, starSystems: 1 };
+
+export const STAR_DIRECTIVES = {
+  throughput: { id: 'throughput', name: 'Throughput', description: '+30% route output from every connected system.' },
+  discovery: { id: 'discovery', name: 'Discovery', description: 'Routes add research and data, but base route output falls 10%.' },
+  frontier: { id: 'frontier', name: 'Frontier', description: 'Long routes gain another 60%; short routes lose 20%.' },
+};
+
+export const STAR_DIRECTIVE_DURATION = 120;
+
+export function selectStarDirective(state, directiveId) {
+  if (!STAR_DIRECTIVES[directiveId]) return state;
+  const lastChange = state.lastStarDirectiveTime;
+  if (lastChange !== undefined && state.totalTime - lastChange < STAR_DIRECTIVE_DURATION) return state;
+  return { ...state, starDirective: directiveId, lastStarDirectiveTime: state.totalTime };
+}
+
+export function getStarDirectiveInfo(state) {
+  const directive = STAR_DIRECTIVES[state.starDirective] || null;
+  const elapsed = state.totalTime - (state.lastStarDirectiveTime ?? -STAR_DIRECTIVE_DURATION);
+  return { directive, cooldown: Math.max(0, STAR_DIRECTIVE_DURATION - elapsed) };
+}
 
 // Available star system nodes (unlocked progressively)
 const STAR_SYSTEMS = [
@@ -107,6 +129,8 @@ export function getRouteBonus(state) {
   const bonus = {};
   const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
   const savantMult = hasSavant ? 1.5 : 1;
+  const operationMult = getOperationRewardMultiplier(state);
+  const directive = state.starDirective || 'throughput';
 
   // Count connections per system for network bonus
   const connections = {};
@@ -123,6 +147,11 @@ export function getRouteBonus(state) {
     // Distance multiplier: longer routes = better (1x to 2x)
     const dist = getRouteDistance(fromSys, toSys);
     const distMult = 1 + dist;
+    const directiveMult = directive === 'throughput'
+      ? 1.3
+      : directive === 'discovery'
+        ? 0.9
+        : dist >= 0.5 ? 1.6 : 0.8;
 
     // Network bonus: systems with 2+ connections get +50%
     const fromNetBonus = (connections[route.from] || 0) >= 2 ? 1.5 : 1;
@@ -139,7 +168,11 @@ export function getRouteBonus(state) {
     for (const [resource, amount] of Object.entries(combined)) {
       const r = state.resources[resource];
       const resourceMult = r ? (r.rateMult || 1) : 1;
-      bonus[resource] = (bonus[resource] || 0) + amount * 0.5 * distMult * networkMult * resourceMult * savantMult;
+      bonus[resource] = (bonus[resource] || 0) + amount * 0.5 * distMult * networkMult * directiveMult * resourceMult * savantMult * operationMult;
+    }
+    if (directive === 'discovery') {
+      bonus.research = (bonus.research || 0) + 2 * distMult * networkMult * savantMult * operationMult;
+      bonus.data = (bonus.data || 0) + distMult * networkMult * savantMult * operationMult;
     }
   }
 

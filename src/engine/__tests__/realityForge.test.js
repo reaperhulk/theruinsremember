@@ -34,6 +34,7 @@ describe('reality forge', () => {
     const era10 = Object.values(upgrades).filter(upgrade => upgrade.era === 10);
     for (const upgrade of era10.slice(0, 20)) state.upgrades[upgrade.id] = true;
     state.realityKeys = { temporal: 1, spatial: 1, quantum: 2 };
+    state.nextCycleDoctrine = 'reconstruction';
 
     expect(getCycleReadiness(state).ready).toBe(true);
     state.realityKeys = { quantum: 4 };
@@ -44,6 +45,7 @@ describe('reality forge', () => {
     const state = makeForgeState();
     state.eraStartTime = 100;
     state.totalTime = 3700;
+    state.nextCycleDoctrine = 'reconstruction';
 
     const readiness = getCycleReadiness(state);
     expect(readiness.directlyReady).toBe(false);

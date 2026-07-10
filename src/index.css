@@ -689,14 +689,243 @@ g[role="button"]:focus-visible {
   letter-spacing: 0.08em;
 }
 
-.mini-game-caption {
-  margin: 0 0 8px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(214, 176, 101, 0.14);
-  background: rgba(255, 255, 255, 0.03);
-  color: #bfc7d2;
-  font-size: 0.78em;
+.operations-shell {
+  display: grid;
+  gap: 8px;
+}
+
+.operations-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(214, 176, 101, 0.2);
+}
+
+.operations-heading h2,
+.operations-heading p {
+  margin: 0;
+}
+
+.operations-heading p {
+  max-width: 58ch;
+  color: #aeb8c5;
+  font-size: 0.76em;
+}
+
+.operation-archive {
+  display: grid;
+  gap: 3px;
+  min-width: 160px;
+  color: #8f9baa;
+  font-size: 0.68em;
+}
+
+.operation-archive select {
+  min-height: 32px;
+  border: 1px solid #4c5361;
+  border-radius: 4px;
+  background: #161a22;
+  color: #d9e0e8;
+  padding: 4px 24px 4px 7px;
+}
+
+.operation-modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 4px;
+}
+
+.operation-modes button,
+.operation-return {
+  min-height: 34px;
+  border: 1px solid #4b5360;
+  border-radius: 4px;
+  background: #1b2029;
+  color: #aeb8c5;
+}
+
+.operation-modes button.active {
+  border-color: #c9a85c;
+  color: #f0ddb0;
+  background: #29271f;
+}
+
+.operation-return {
+  justify-self: start;
+  padding: 4px 10px;
+}
+
+.operation-stage > .panel {
+  margin: 0;
+}
+
+.docking-approaches,
+.colony-mandates,
+.star-directives,
+.weave-offer,
+.tuning-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 5px;
+  margin: 6px 0;
+}
+
+.docking-approaches button,
+.colony-mandates button,
+.star-directives button,
+.weave-offer button {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  min-height: 48px;
+  padding: 6px 7px;
+  border: 1px solid #444c59;
+  border-radius: 4px;
+  background: #171c24;
+  color: #aeb8c5;
+  text-align: left;
+}
+
+.docking-approaches button.active,
+.colony-mandates button.active,
+.star-directives button.active {
+  border-color: #c7a85e;
+  background: #29271f;
+  color: #edddb5;
+}
+
+.docking-approaches button span,
+.colony-mandates button span,
+.star-directives button span,
+.weave-offer button span {
+  font-size: 0.68em;
+  line-height: 1.25;
+}
+
+.operation-commitment {
+  margin: 3px 0 6px;
+  color: #8793a2;
+  font-size: 0.7em;
+}
+
+.weave-fragment {
+  cursor: pointer;
+}
+
+.tuning-header,
+.tuning-status,
+.tuning-control > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tuning-header {
+  align-items: center;
+}
+
+.tuning-header h2 {
+  margin: 0;
+}
+
+.tuning-tiers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 7px 0;
+}
+
+.tuning-tiers span,
+.tuning-status span {
+  padding: 4px 5px;
+  border: 1px solid #39414e;
+  border-radius: 3px;
+  color: #778493;
+  font-size: 0.68em;
+  text-align: center;
+}
+
+.tuning-tiers span.reached {
+  border-color: #4b927e;
+  color: #85c8b4;
+  background: rgba(75, 146, 126, 0.12);
+}
+
+.signal-readout {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1.4fr;
+  gap: 6px;
+  min-height: 46px;
+  align-items: center;
+  margin: 8px 0;
+  padding: 7px;
+  border-left: 3px solid #60788f;
+  background: #111720;
+  font-size: 0.72em;
+}
+
+.tuning-control {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.tuning-control input {
+  width: 100%;
+}
+
+.tuning-reward {
+  margin-top: 5px;
+  color: #79c6a9;
+  font-size: 0.76em;
+  text-align: center;
+}
+
+.cycle-doctrines {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin: 8px 0;
+}
+
+.cycle-doctrines button {
+  display: grid;
+  gap: 3px;
+  min-height: 76px;
+  padding: 7px;
+  border: 1px solid #4a4156;
+  border-radius: 4px;
+  background: #191621;
+  color: #aeb2c1;
+  text-align: left;
+}
+
+.cycle-doctrines button.active {
+  border-color: #c390cb;
+  background: #28202d;
+  color: #efd9f2;
+}
+
+.cycle-doctrines button span {
+  font-size: 0.68em;
+  line-height: 1.25;
+}
+
+.cycle-goal {
+  display: grid;
+  gap: 2px;
+  margin: 6px 0;
+  padding: 7px 9px;
+  border-left: 3px solid #9273a0;
+  background: #17141d;
+  font-size: 0.72em;
+}
+
+.cycle-goal.ready {
+  border-color: #62a98c;
+  color: #91cfb5;
 }
 
 @media (max-width: 720px) {
@@ -2678,11 +2907,29 @@ canvas:hover {
     padding: 6px 8px;
   }
 
-  /* Mini-game sub-tab buttons need adequate touch targets */
-  .mini-game-tabs button {
-    min-height: 36px;
-    padding: 6px 8px !important;
-    font-size: 0.75em !important;
+  .operations-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .operation-archive {
+    width: 100%;
+  }
+
+  .operation-archive select,
+  .operation-modes button,
+  .operation-return {
+    min-height: 44px;
+  }
+
+  .docking-approaches,
+  .colony-mandates,
+  .star-directives,
+  .weave-offer,
+  .tuning-tiers,
+  .signal-readout,
+  .cycle-doctrines {
+    grid-template-columns: 1fr;
   }
 
   /* Upgrade search input needs adequate height for touch */

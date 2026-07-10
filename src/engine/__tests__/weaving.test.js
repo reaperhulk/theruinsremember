@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateFragment, drawFragment, resolveWeave, clearGrid, getWeavingStats } from '../weaving.js';
+import { chooseFragment, clearGrid, discardFragment, drawFragment, generateFragment, getWeavingStats, resolveWeave, surveyFragments } from '../weaving.js';
 import { createInitialState } from '../state.js';
 
 describe('weaving', () => {
@@ -29,6 +29,22 @@ describe('weaving', () => {
     expect(fragment).toBe('temporal');
     expect(after.weavingGrid).toHaveLength(1);
     expect(after.resources.realityFragments.amount).toBe(95);
+  });
+
+  it('offers three surveyed threads and lets the player choose one', () => {
+    const state = makeEra8State();
+    const surveyed = surveyFragments(state, [0.2, 0.5, 0.9]);
+    const chosen = chooseFragment(surveyed, 2);
+
+    expect(surveyed.weavingOffer).toEqual(['temporal', 'spatial', 'quantum']);
+    expect(chosen.weavingGrid).toEqual(['quantum']);
+    expect(chosen.weavingOffer).toEqual([]);
+  });
+
+  it('allows discarding one placed thread without clearing the pattern', () => {
+    const state = makeEra8State();
+    state.weavingGrid = ['temporal', 'spatial', 'causal'];
+    expect(discardFragment(state, 1).weavingGrid).toEqual(['temporal', 'causal']);
   });
 
   it('rejects draw when cannot afford', () => {

@@ -61,10 +61,7 @@ export function createInitialState() {
     totalTime: 0,       // seconds
     prestigeMultiplier: 1,
     lastSaved: Date.now(),
-    // Mining mini-game (Era 1+)
-    miningStreak: 0,    // consecutive clicks without gem
-    totalGems: 0,       // lifetime gems found
-    lastMineTime: 0,    // cooldown tracking for manual mines
+    totalGems: 0,       // relic gems recovered by expeditions
     // Expeditions (Eras 1-3)
     expedition: createExpeditionState(),
     // Events system (Era 3+)
@@ -99,16 +96,18 @@ export function createInitialState() {
     senatePct: { merchants: 34, scholars: 33, warriors: 33 },
     // Reality Forge (Era 10+)
     realityKeys: {},
+    cycleDoctrine: null,
+    nextCycleDoctrine: null,
+    cycleGoalRewarded: false,
+    cycleMarks: 0,
     // NG+ Echoed Mode (unlocked after True Ending)
     echoMode: false,
     echoResource: 0,
     echoUpgrades: {},
-    // Hacking mastery (one-time max difficulty reward, resets on prestige)
-    hackMastery: false,
     // Lore event deduplication
     seenLoreEvents: {},
     // UI: hidden repeatable upgrades
     hiddenUpgrades: {},
-    saveVersion: 4,
+    saveVersion: 5,
   };
 }

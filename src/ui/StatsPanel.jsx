@@ -110,7 +110,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
           <span>{Object.keys(state.tech || {}).length}</span>
         </div>
         <div className="stat-row">
-          <span>Gems Found</span>
+          <span>Relic Gems</span>
           <span>{state.totalGems || 0}</span>
         </div>
         <div className="stat-row">
@@ -122,8 +122,8 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
           <span>{state.starRoutes?.length || 0}</span>
         </div>
         <div className="stat-row">
-          <span>Hacks</span>
-          <span>{state.hackSuccesses || 0}</span>
+          <span>Expedition Discoveries</span>
+          <span>{state.expedition?.totalFinds || 0}</span>
         </div>
         <div className="stat-row">
           <span>Perfect Docks</span>

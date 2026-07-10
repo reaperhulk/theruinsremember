@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateProduction, canAfford, spend, getEffectiveRate, getNetRate, gather } from '../resources.js';
+import { calculateProduction, canAfford, spend, getEffectiveCap, getEffectiveRate, getNetRate, gather } from '../resources.js';
 import { createInitialState } from '../state.js';
 
 describe('resources', () => {
@@ -24,14 +24,13 @@ describe('resources', () => {
       expect(getEffectiveRate(state, 'food')).toBeCloseTo(5, 5);
     });
 
-    it('applies reality key bonus correctly', () => {
+    it('applies cycle doctrine production bonuses in its era range', () => {
       const state = createInitialState();
-      state.realityKeys = { temporal: 5, spatial: 5 }; // 10 total = +10%
-      // food: (baseRate 1.5 + 0) * 1 * prestige 1 * 1.10 = 1.65
-      expect(getEffectiveRate(state, 'food')).toBeCloseTo(1.65, 5);
+      state.cycleDoctrine = 'reconstruction';
+      expect(getEffectiveRate(state, 'food')).toBeCloseTo(1.5 * 1.35, 5);
     });
 
-    it('applies reality key bonus with zero keys', () => {
+    it('uses baseline production without a cycle doctrine', () => {
       const state = createInitialState();
       state.realityKeys = {};
       // No bonus: (baseRate 1.5 + 0) * 1 * 1 * 1.0 = 1.5
@@ -46,6 +45,13 @@ describe('resources', () => {
       expect(rates.food).toBeCloseTo(1.5, 5);
       expect(rates.steel).toBe(0); // locked
     });
+  });
+
+  it('uses Spatial Keys to expand resource capacity', () => {
+    const state = createInitialState();
+    const baseline = getEffectiveCap(state, 'food');
+    state.realityKeys.spatial = 2;
+    expect(getEffectiveCap(state, 'food')).toBeCloseTo(baseline * 1.3);
   });
 
   describe('canAfford', () => {

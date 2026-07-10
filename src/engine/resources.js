@@ -1,5 +1,6 @@
 import { resources as resourceDefs } from '../data/resources.js';
 import { ERA_COST_MULTIPLIERS } from './upgrades.js';
+import { getCycleProductionMultiplier } from './cycles.js';
 
 // Soft-scale prestige multiplier: first 10x is linear, beyond that sqrt.
 // Prevents early prestiges from trivializing the game while still rewarding
@@ -19,9 +20,8 @@ export function getEffectiveRate(state, resourceId) {
   if (!r || !r.unlocked) return 0;
   const def = resourceDefs[resourceId];
   if (!def) return 0;
-  const realityKeyBonus = 1 + (Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0) * 0.01);
   const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
-  return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * realityKeyBonus;
+  return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * getCycleProductionMultiplier(state);
 }
 
 // Calculate all production rates
@@ -158,5 +158,6 @@ export function getEffectiveCap(state, resourceId) {
   // Era scaling: caps grow proportionally to cost multipliers so cross-era costs stay affordable
   const currentEra = state.era || 1;
   const eraCapScale = ERA_COST_MULTIPLIERS[currentEra] || 1;
-  return def.baseCap * r.capMult * eraCapScale;
+  const spatialKeyBonus = 1 + (state.realityKeys?.spatial || 0) * 0.15;
+  return def.baseCap * r.capMult * eraCapScale * spatialKeyBonus;
 }

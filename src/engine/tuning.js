@@ -1,5 +1,4 @@
-// Cosmic Tuning — Era 9 mini-game
-// Match a frequency slider to a target for cosmicPower & universalConstants rewards.
+// Cosmic Tuning operation — probe an unstable signal, then bank the best lock.
 
 import { getEffectivePrestige } from './resources.js';
 

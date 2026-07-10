@@ -1,4 +1,4 @@
-import { drawFragment, resolveWeave, clearGrid, getWeavingStats } from '../engine/weaving.js';
+import { chooseFragment, clearGrid, discardFragment, getWeaveDrawCost, getWeavingStats, resolveWeave, surveyFragments } from '../engine/weaving.js';
 import { useState, useRef, useEffect, useCallback, memo } from 'react';
 
 const TYPE_COLORS = {
@@ -15,12 +15,25 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
   const flashRef = useRef(null);
   const stats = getWeavingStats(state);
   const grid = stats.grid;
+  const offer = state.weavingOffer || [];
+  const drawCost = getWeaveDrawCost(state);
 
-  const handleDraw = useCallback(() => {
-    onUpdate(s => {
-      const { state: newState } = drawFragment(s);
-      return newState;
-    });
+  const counts = {};
+  for (const fragment of grid) counts[fragment] = (counts[fragment] || 0) + 1;
+  const chaosCount = counts.chaos || 0;
+  const hasMatch = Object.values(counts).some(count => count >= 3) ||
+    ['temporal', 'spatial', 'causal', 'quantum'].some(type => ((counts[type] || 0) + chaosCount) >= 3);
+
+  const handleSurvey = useCallback(() => {
+    onUpdate(current => surveyFragments(current) || current);
+  }, [onUpdate]);
+
+  const handleChoose = useCallback(index => {
+    onUpdate(current => chooseFragment(current, index) || current);
+  }, [onUpdate]);
+
+  const handleDiscard = useCallback(index => {
+    onUpdate(current => discardFragment(current, index));
   }, [onUpdate]);
 
   const handleWeave = useCallback(() => {
@@ -41,25 +54,16 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
     onUpdate(s => clearGrid(s));
   }, [onUpdate]);
 
-  // Keyboard shortcuts: D = draw, W = weave, C = clear
+  // Keyboard shortcuts: D = survey, W = weave, C = clear
   useEffect(() => {
     const handler = (e) => {
-      if (e.key === 'd' || e.key === 'D') { e.preventDefault(); handleDraw(); }
+      if (e.key === 'd' || e.key === 'D') { e.preventDefault(); handleSurvey(); }
       if ((e.key === 'w' || e.key === 'W') && hasMatch) { e.preventDefault(); handleWeave(); }
       if ((e.key === 'c' || e.key === 'C') && grid.length > 0) { e.preventDefault(); handleClear(); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleDraw, handleWeave, handleClear, hasMatch, grid.length]);
-
-  // Count fragments by type
-  const counts = {};
-  for (const f of grid) {
-    counts[f] = (counts[f] || 0) + 1;
-  }
-  const chaosCount = counts.chaos || 0;
-  const hasMatch = Object.values(counts).some(c => c >= 3) ||
-    ['temporal','spatial','causal','quantum'].some(t => ((counts[t]||0) + chaosCount) >= 3);
+  }, [handleSurvey, handleWeave, handleClear, hasMatch, grid.length]);
 
   return (
     <div className={`panel weaving-panel${borderFlash ? ' weave-match-flash' : ''}`}
@@ -74,12 +78,22 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
       </div>
       <div className="weave-grid" role="list" aria-label="Weaving grid">
         {grid.map((f, i) => (
-          <span key={i} className="weave-fragment" style={{ color: TYPE_COLORS[f], borderColor: TYPE_COLORS[f] + '88' }} title={`${f}${f === 'chaos' ? ' (wild — counts as any type)' : ''}`} role="listitem">
+          <button key={`${f}-${i}`} className="weave-fragment" style={{ color: TYPE_COLORS[f], borderColor: TYPE_COLORS[f] + '88' }} title={`Discard ${f}${f === 'chaos' ? ' wild thread' : ' thread'}`} role="listitem" onClick={() => handleDiscard(i)}>
             {f === 'chaos' ? '***' : f === 'temporal' ? 'TMP' : f === 'spatial' ? 'SPC' : f === 'causal' ? 'CSL' : 'QNT'}
-          </span>
+          </button>
         ))}
-        {grid.length === 0 && <span className="empty-message">Draw fragments to begin (costs 5 reality fragments)</span>}
+        {grid.length === 0 && <span className="empty-message">Survey possible threads, then choose what enters the pattern.</span>}
       </div>
+      {offer.length > 0 && (
+        <div className="weave-offer" role="group" aria-label="Choose a surveyed reality thread">
+          {offer.map((fragment, index) => (
+            <button key={`${fragment}-${index}`} onClick={() => handleChoose(index)} style={{ color: TYPE_COLORS[fragment], borderColor: TYPE_COLORS[fragment] }}>
+              <strong>{fragment === 'chaos' ? 'Chaos' : fragment}</strong>
+              <span>{fragment === 'chaos' ? 'Wild thread' : `Build ${fragment} recipe`}</span>
+            </button>
+          ))}
+        </div>
+      )}
       {grid.length > 0 && (
         <div className="weave-counts" style={{ display: 'flex', gap: '8px', fontSize: '0.75em', marginBottom: '4px' }}>
           {['temporal','spatial','causal','quantum'].map(t => {
@@ -106,8 +120,8 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
         </div>
       )}
       <div className="weave-controls">
-        <button className="mine-btn" onClick={handleDraw} aria-label="Draw a random fragment for 5 reality fragments">
-          Draw Fragment (5 reality fragments)
+        <button className="mine-btn" onClick={handleSurvey} disabled={offer.length > 0} aria-label={`Survey three threads for ${drawCost} reality fragments`}>
+          {offer.length > 0 ? 'Choose a thread' : `Survey Threads (${drawCost} fragments)`}
         </button>
         <button className="mine-btn" onClick={handleWeave} disabled={!hasMatch} aria-label={hasMatch ? 'Weave matching fragments' : 'Need 3 matching fragments to weave'}>
           {hasMatch ? 'Weave Match!' : 'Weave Match'}
@@ -120,8 +134,8 @@ export const WeavingPanel = memo(function WeavingPanel({ state, onUpdate }) {
       </div>
       <p className="mining-hint">
         TMP=Temporal SPC=Spatial CSL=Causal QNT=Quantum ***=Chaos(wild)
-        <br />3 of a kind to weave | Chaos counts as any type | Combos boost rewards | Grid clears after 120s
-        <br />Keys: [D] draw | [W] weave | [C] clear
+        <br />Choose one of three surveyed threads | Select a placed thread to discard it | 3 of a kind to weave
+        <br />Keys: [D] survey | [W] weave | [C] clear
       </p>
     </div>
   );

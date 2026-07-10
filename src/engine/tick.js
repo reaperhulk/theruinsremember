@@ -1,7 +1,6 @@
 import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
 import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
-import { getFactoryBonus } from './factory.js';
 import { getColonyBonus } from './colonies.js';
 import { getRouteBonus } from './starChart.js';
 import { checkAchievements } from './achievements.js';
@@ -12,8 +11,9 @@ import { getSenatePctBonuses } from './senate.js';
 import { getTuningProductionBonus } from './tuning.js';
 import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes, runExpedition } from './expeditions.js';
 import { getActiveSystems } from './operations.js';
+import { awardCycleGoal } from './cycles.js';
 
-// Resource consumption rates — moderate tension without breaking non-minigame paths
+// Resource consumption rates — moderate tension without breaking low-interaction paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
 const ENERGY_PER_ELECTRONICS = 0.4; // Energy consumed per electronics/s
 const FUEL_PER_ORBITAL = 0.5;     // Fuel consumed per orbitalInfra/s
@@ -45,11 +45,10 @@ export function tick(state, dt, rng = Math.random) {
   state = expireEffects(state);
   const rates = calculateProduction(state);
 
-  // Add mini-game bonuses to production rates
-  const factoryBonus = getFactoryBonus(state);
+  // Add operation bonuses to production rates.
   const colonyBonus = getColonyBonus(state);
   const routeBonus = getRouteBonus(state);
-  for (const bonus of [factoryBonus, colonyBonus, routeBonus]) {
+  for (const bonus of [colonyBonus, routeBonus]) {
     for (const [id, amount] of Object.entries(bonus)) {
       rates[id] = (rates[id] || 0) + amount;
     }
@@ -122,14 +121,6 @@ export function tick(state, dt, rng = Math.random) {
     // Apply cosmic tuning production bonus to cosmicPower (era 9+)
     if (id === 'cosmicPower' && state.era >= 9) {
       effectiveRate *= getTuningProductionBonus(state.tuningScore);
-    }
-
-    // Apply reality forge key bonuses to quantumEchoes (era 10+)
-    // Temporal, Spatial, Causal keys each give +25% quantumEchoes production (max +75%)
-    if (id === 'quantumEchoes' && state.era >= 10) {
-      const rk = state.realityKeys || {};
-      const slotBonus = ((rk.temporal || 0) > 0 ? 1 : 0) + ((rk.spatial || 0) > 0 ? 1 : 0) + ((rk.causal || 0) > 0 ? 1 : 0);
-      if (slotBonus > 0) effectiveRate *= (1 + slotBonus * 0.25);
     }
 
     const cap = getEffectiveCap(state, id);
@@ -429,6 +420,8 @@ export function tick(state, dt, rng = Math.random) {
   }
 
   // Check achievements (every 60 ticks to reduce overhead)
+  newState = awardCycleGoal(newState);
+
   if (intervalCrossings(state.totalTime, newState.totalTime, 60) > 0) {
     const { state: afterAchievements, newAchievements } = checkAchievements(newState);
     if (newAchievements.length > 0) {

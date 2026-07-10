@@ -1,4 +1,5 @@
-// Reality Weaving mini-game for Eras 8-10
+// Reality Weaving operation for Eras 8-10
+import { getOperationRewardMultiplier } from './cycles.js';
 // Combine reality fragments in patterns for multiplier bonuses.
 // Match 3 fragments of the same type for a production multiplier.
 
@@ -16,6 +17,10 @@ const WEAVE_COST = { realityFragments: 5 };
 const BONUS_DURATION = 60; // seconds
 const CHAOS_CHANCE = 0.15; // 15% chance for chaos (wild card) fragment
 const COMBO_RESET_TIME = 120; // seconds of no weaving before combo resets
+
+export function getWeaveDrawCost(state) {
+  return state.prestigeUpgrades?.masterWeaver ? Math.ceil(WEAVE_COST.realityFragments / 2) : WEAVE_COST.realityFragments;
+}
 
 // Generate a random fragment type.
 // roll is 0-1 for deterministic testing.
@@ -46,10 +51,7 @@ export function drawFragment(state, roll = Math.random()) {
   if (state.era < 8) return { state: null, fragment: null };
 
   // Master Weaver prestige upgrade: halve fragment draw cost
-  const cost = {};
-  for (const [resourceId, amount] of Object.entries(WEAVE_COST)) {
-    cost[resourceId] = (state.prestigeUpgrades?.masterWeaver) ? Math.ceil(amount / 2) : amount;
-  }
+  const cost = { realityFragments: getWeaveDrawCost(state) };
 
   // Check cost
   for (const [resourceId, amount] of Object.entries(cost)) {
@@ -76,6 +78,44 @@ export function drawFragment(state, roll = Math.random()) {
       weavingGrid: grid,
     },
     fragment,
+  };
+}
+
+// Spend one draw cost to reveal three threads. The player chooses which one
+// enters the grid, turning fragment acquisition into a planning decision.
+export function surveyFragments(state, rolls = [Math.random(), Math.random(), Math.random()]) {
+  if (state.era < 8 || state.weavingOffer?.length) return null;
+  const cost = getWeaveDrawCost(state);
+  const fragments = state.resources.realityFragments;
+  if (!fragments?.unlocked || fragments.amount < cost) return null;
+
+  return {
+    ...state,
+    resources: {
+      ...state.resources,
+      realityFragments: { ...fragments, amount: fragments.amount - cost },
+    },
+    weavingOffer: rolls.slice(0, 3).map(generateFragment),
+  };
+}
+
+export function chooseFragment(state, index) {
+  const offer = state.weavingOffer || [];
+  const fragment = offer[index];
+  if (!fragment) return null;
+  return {
+    ...state,
+    weavingGrid: [...getWeavingGrid(state), fragment],
+    weavingOffer: [],
+  };
+}
+
+export function discardFragment(state, index) {
+  const grid = getWeavingGrid(state);
+  if (!grid[index]) return state;
+  return {
+    ...state,
+    weavingGrid: grid.filter((_, fragmentIndex) => fragmentIndex !== index),
   };
 }
 
@@ -134,7 +174,7 @@ export function resolveWeave(state) {
   const eraScale = 1 + (state.era - 8) * 0.5; // x1 at era 8, x2 at era 10
   const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
   const savantMult = hasSavant ? 1.5 : 1;
-  const effectMult = bonus.mult * comboMult * Math.max(1, eraScale) * savantMult;
+  const effectMult = bonus.mult * comboMult * Math.max(1, eraScale) * savantMult * getOperationRewardMultiplier(state);
   const effect = {
     id: `weave_${matchType}_${state.totalTime}`,
     startedAt: state.totalTime,
@@ -170,5 +210,5 @@ export function checkComboReset(state) {
 
 // Clear the weaving grid (discard fragments)
 export function clearGrid(state) {
-  return { ...state, weavingGrid: [] };
+  return { ...state, weavingGrid: [], weavingOffer: [] };
 }

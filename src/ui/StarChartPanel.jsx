@@ -1,5 +1,5 @@
 import { useState, memo } from 'react';
-import { getUnlockedSystems, getRoutes, createRoute, removeRoute, getRouteBonus, routeExists, getRouteStats } from '../engine/starChart.js';
+import { createRoute, getRoutes, getRouteBonus, getRouteStats, getStarDirectiveInfo, getUnlockedSystems, removeRoute, routeExists, selectStarDirective, STAR_DIRECTIVES } from '../engine/starChart.js';
 import { resources as resourceDefs } from '../data/resources.js';
 
 function resourceName(id) { return resourceDefs[id]?.name || id; }
@@ -11,6 +11,7 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
   const routes = getRoutes(state);
   const bonus = getRouteBonus(state);
   const stats = getRouteStats(state);
+  const directiveInfo = getStarDirectiveInfo(state);
 
   const handleSystemClick = (sysId) => {
     if (selected === null) {
@@ -39,6 +40,21 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
         {stats.hubSystems > 0 && <span style={{ color: '#88ccff' }}>Hubs: {stats.hubSystems}</span>}
         {stats.allConnected && <span style={{ color: '#ffdd44' }}>All Connected!</span>}
       </div>
+      <div className="star-directives" role="group" aria-label="Star network directive">
+        {Object.values(STAR_DIRECTIVES).map(directive => (
+          <button
+            key={directive.id}
+            className={(directiveInfo.directive?.id || 'throughput') === directive.id ? 'active' : ''}
+            disabled={directiveInfo.cooldown > 0 && directiveInfo.directive?.id !== directive.id}
+            onClick={() => onUpdate(current => selectStarDirective(current, directive.id))}
+            title={directive.description}
+          >
+            <strong>{directive.name}</strong>
+            <span>{directive.description}</span>
+          </button>
+        ))}
+      </div>
+      {directiveInfo.cooldown > 0 && <p className="operation-commitment">Network directive committed for {Math.ceil(directiveInfo.cooldown)}s</p>}
       <div className="star-chart">
         <svg viewBox="0 0 100 100" className="star-svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Star chart showing connected star systems">
           {routes.map((route, i) => {

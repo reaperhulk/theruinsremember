@@ -8,9 +8,6 @@ describe('operation systems', () => {
     state.expedition.totalFinds = 2;
     state.dockingAttempts = 1;
     state.starRoutes = [{ from: 'sol', to: 'alpha' }];
-    state.factoryAllocation = { steel: 10 };
-    state.hackSuccesses = 10;
-
     expect(getActiveSystems(state)).toEqual(['expeditions', 'orbitalOperations', 'starChart']);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { attemptDock, getDockingInfo, getTargetZone, getIndicatorPosition, selectDockingMission } from '../docking.js';
+import { attemptDock, getDockingInfo, getTargetZone, getIndicatorPosition, selectDockingApproach, selectDockingMission } from '../docking.js';
 import { createInitialState } from '../state.js';
 
 describe('docking', () => {
@@ -136,5 +136,23 @@ describe('docking', () => {
     expect(result).toBe('perfect');
     expect(after.dockingMissions.science).toBe(1);
     expect(after.dockingMissions.cargo).toBe(0);
+  });
+
+  it('makes Hard Burn narrower and more rewarding at a fuel cost', () => {
+    let state = makeEra4State();
+    state.resources.rocketFuel.amount = 100;
+    const standardWidth = getDockingInfo(state).zoneSize;
+    state = selectDockingApproach(state, 'burn');
+    const burnWidth = getDockingInfo(state).zoneSize;
+    const { state: after, result } = attemptDock(state, getTargetZone(state));
+
+    expect(burnWidth).toBeLessThan(standardWidth);
+    expect(result).toBe('perfect');
+    expect(after.resources.rocketFuel.amount).toBeGreaterThan(100);
+  });
+
+  it('rejects Hard Burn without its fuel reserve', () => {
+    const state = selectDockingApproach(makeEra4State(), 'burn');
+    expect(attemptDock(state, getTargetZone(state)).result).toBe('insufficient');
   });
 });

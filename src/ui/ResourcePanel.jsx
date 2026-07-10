@@ -2,7 +2,6 @@ import { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
 import { getEffectiveRate, getEffectiveCap, getEffectivePrestige, getNetRate, gather } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
-import { getFactoryBonus } from '../engine/factory.js';
 import { getColonyBonus } from '../engine/colonies.js';
 import { getRouteBonus } from '../engine/starChart.js';
 import { formatNumber, formatTime } from './format.js';
@@ -160,9 +159,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                   if (r.baseRate > 0) tooltipParts.push(`Base: ${r.baseRate}/s`);
                   if (r.rateAdd > 0) tooltipParts.push(`Upgrade bonus: +${r.rateAdd.toFixed(1)}/s`);
                   if (r.rateMult > 1) tooltipParts.push(`Upgrade mult: x${r.rateMult}`);
-                  // Mini-game bonuses
-                  const fb = getFactoryBonus(state);
-                  if (fb[r.id]) tooltipParts.push(`Factory: +${fb[r.id].toFixed(1)}/s`);
+                  // Operation bonuses
                   const cb = getColonyBonus(state);
                   if (cb[r.id]) tooltipParts.push(`Colonies: +${cb[r.id].toFixed(1)}/s`);
                   const rb = getRouteBonus(state);
@@ -256,7 +253,6 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                       const baseRate = r.def?.baseRate || 0;
                       const upgradeAdd = r.rateAdd || 0;
                       const mult = r.rateMult || 1;
-                      const fb = getFactoryBonus(state);
                       const cb = getColonyBonus(state);
                       const rb = getRouteBonus(state);
                       const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
@@ -268,7 +264,6 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                           <div>Base: {baseRate}/s</div>
                           {upgradeAdd > 0 && <div>Upgrades: +{upgradeAdd.toFixed(1)}/s</div>}
                           {mult > 1 && <div>Multiplier: x{mult}</div>}
-                          {fb[r.id] > 0 && <div>Factory: +{fb[r.id].toFixed(1)}/s</div>}
                           {cb[r.id] > 0 && <div>Colonies: +{cb[r.id].toFixed(1)}/s</div>}
                           {rb[r.id] > 0 && <div>Star routes: +{rb[r.id].toFixed(1)}/s</div>}
                           {prestigeMult > 1 && <div>Prestige: x{formatNumber(prestigeMult)}</div>}

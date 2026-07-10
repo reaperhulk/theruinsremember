@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { attemptDock, DOCKING_MISSIONS, getDockingInfo, getIndicatorPosition, selectDockingMission } from '../engine/docking.js';
+import { attemptDock, DOCKING_APPROACHES, DOCKING_MISSIONS, getDockingInfo, getIndicatorPosition, selectDockingApproach, selectDockingMission } from '../engine/docking.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber } from './format.js';
 
@@ -47,7 +47,10 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
     const before = {};
     for (const [id, resource] of Object.entries(state.resources)) before[id] = resource.amount || 0;
     const { state: newState, result } = attemptDock(state, position);
-    if (result === 'cooldown') return;
+    if (result === 'cooldown' || result === 'insufficient') {
+      setLastResult(result);
+      return;
+    }
     setLastResult(result);
     if (result !== 'miss') {
       const gained = {};
@@ -104,6 +107,20 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
         ))}
       </div>
       <p className="docking-mission-brief">{DOCKING_MISSIONS[info.missionId].description}</p>
+      <div className="docking-approaches" role="group" aria-label="Docking approach">
+        {Object.values(DOCKING_APPROACHES).map(approach => (
+          <button
+            key={approach.id}
+            className={info.approachId === approach.id ? 'active' : ''}
+            onClick={() => onUpdate(current => selectDockingApproach(current, approach.id))}
+            title={approach.description}
+          >
+            <strong>{approach.name}</strong>
+            <span>{approach.rewardMult}x reward</span>
+          </button>
+        ))}
+      </div>
+      <p className="docking-mission-brief">{DOCKING_APPROACHES[info.approachId].description}</p>
       <div className="dock-bar">
         <div className="dock-zone" style={{ left: `${zoneLeft}%`, width: `${zoneWidth}%` }} />
         <div className="dock-perfect" style={{ left: `${perfectLeft}%`, width: `${perfectWidth}%` }} />
@@ -111,7 +128,7 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
       </div>
       {lastResult && (
         <div className={`dock-result dock-${lastResult}`}>
-          {lastResult === 'perfect' ? 'PERFECT DOCK!' : lastResult === 'good' ? 'Good dock!' : 'Missed... combo reset!'}
+          {lastResult === 'perfect' ? 'PERFECT DOCK!' : lastResult === 'good' ? 'Good dock!' : lastResult === 'insufficient' ? 'Hard Burn needs 4 fuel.' : 'Missed... combo reset!'}
         </div>
       )}
       {lastReward && (

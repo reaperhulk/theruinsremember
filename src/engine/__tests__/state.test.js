@@ -7,7 +7,7 @@ describe('migrateState', () => {
     expect(migrated.expedition.supplies).toBe(2);
     expect(migrated.expedition.eraFinds).toBe(0);
     expect(migrated.dockingMissions).toEqual({ cargo: 0, crew: 0, science: 0 });
-    expect(migrated.saveVersion).toBe(4);
+    expect(migrated.saveVersion).toBe(5);
   });
 
   it('fills missing fields from fresh state', () => {

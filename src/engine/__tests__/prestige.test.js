@@ -216,6 +216,18 @@ describe('prestige', () => {
       expect(after.prestigeUpgrades.fastStart).toBe(true);
     });
 
+    it('uses Quantum Keys to seed the next cycle with basic resources', () => {
+      const state = createInitialState();
+      state.era = 10;
+      state.realityKeys = { quantum: 2 };
+      const after = performPrestige(state);
+
+      expect(after.resources.food.amount).toBe(50);
+      expect(after.resources.labor.amount).toBe(60);
+      expect(after.resources.materials.amount).toBe(50);
+      expect(after.resources.energy.amount).toBe(50);
+    });
+
     it('Perfect Memory preserves current operation progress', () => {
       const state = createInitialState();
       state.era = 10;

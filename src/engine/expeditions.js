@@ -1,4 +1,5 @@
 import { getEffectiveCap } from './resources.js';
+import { getOperationRewardMultiplier } from './cycles.js';
 
 export const EXPEDITION_SUPPLY_INTERVAL = 90;
 export const EXPEDITION_MAX_SUPPLIES = 3;
@@ -121,7 +122,8 @@ export function getExpeditionRoutes(era) {
 }
 
 export function getExpeditionSupplyInterval(state) {
-  return state.prestigeUpgrades?.luckyMiner ? 60 : EXPEDITION_SUPPLY_INTERVAL;
+  const baseInterval = state.prestigeUpgrades?.luckyMiner ? 60 : EXPEDITION_SUPPLY_INTERVAL;
+  return Math.max(30, baseInterval - (state.realityKeys?.temporal || 0) * 5);
 }
 
 export function getExpeditionSuccessChance(state, route) {
@@ -132,7 +134,7 @@ export function getExpeditionSuccessChance(state, route) {
 function grantRewards(state, rewards) {
   const resources = { ...state.resources };
   const granted = {};
-  const rewardMultiplier = state.prestigeUpgrades?.miniGameSavant ? 1.5 : 1;
+  const rewardMultiplier = (state.prestigeUpgrades?.miniGameSavant ? 1.5 : 1) * getOperationRewardMultiplier(state);
 
   for (const [id, amount] of Object.entries(rewards || {})) {
     const resource = resources[id];

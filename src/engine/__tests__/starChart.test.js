@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getUnlockedSystems, createRoute, removeRoute, getRoutes, getRouteBonus, routeExists } from '../starChart.js';
+import { getUnlockedSystems, createRoute, removeRoute, getRoutes, getRouteBonus, routeExists, selectStarDirective } from '../starChart.js';
 import { createInitialState } from '../state.js';
 
 describe('starChart', () => {
@@ -83,5 +83,16 @@ describe('starChart', () => {
     const state = makeEra6State();
     state.resources.darkEnergy.amount = 0;
     expect(createRoute(state, 'sol', 'alpha')).toBeNull();
+  });
+
+  it('changes network output with a committed directive', () => {
+    const routed = createRoute(makeEra6State(), 'sol', 'alpha');
+    const throughput = getRouteBonus(routed);
+    const discoveryState = selectStarDirective(routed, 'discovery');
+    const discovery = getRouteBonus(discoveryState);
+
+    expect(discovery.data).toBeGreaterThan(0);
+    expect(discovery.energy).toBeLessThan(throughput.energy);
+    expect(selectStarDirective(discoveryState, 'frontier').starDirective).toBe('discovery');
   });
 });
