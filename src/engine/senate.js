@@ -1,5 +1,6 @@
 // Galactic Senate operation — Era 8
 // Allocate influence to factions for resource bonuses.
+import { getRelicSenateCostMultiplier, getRelicSenateDirectiveMultiplier } from './relics.js';
 
 const FACTIONS = [
   { id: 'merchants', rate: 1.0, resource: 'exoticMatter' },
@@ -8,8 +9,8 @@ const FACTIONS = [
 ];
 
 // Get the cost to allocate the next influence point.
-export function getSenateAllocateCost(totalInfluence) {
-  return Math.ceil(5 * Math.pow(1.5, totalInfluence / 10));
+export function getSenateAllocateCost(totalInfluence, state = null) {
+  return Math.ceil(5 * Math.pow(1.5, totalInfluence / 10) * (state ? getRelicSenateCostMultiplier(state) : 1));
 }
 
 // Get the maximum influence slots available.
@@ -39,7 +40,7 @@ export function allocateSenateInfluence(state, factionId, delta) {
   // Adding costs galacticInfluence; removing is free
   if (delta > 0) {
     const currentTotal = (sen.merchants || 0) + (sen.scholars || 0) + (sen.warriors || 0);
-    const cost = getSenateAllocateCost(currentTotal);
+    const cost = getSenateAllocateCost(currentTotal, state);
     const gi = resources.galacticInfluence;
     if (!gi || gi.amount < cost) return null;
     resources.galacticInfluence = { ...gi, amount: gi.amount - cost };
@@ -89,10 +90,11 @@ export function setSenateDirective(state, factionId, pct) {
 // Returns { galacticInfluence: mult, exoticMatter: mult, stellarForge: mult }
 export function getSenatePctBonuses(state) {
   const pct = state.senatePct || { merchants: 34, scholars: 33, warriors: 33 };
+  const relicMult = getRelicSenateDirectiveMultiplier(state);
   return {
-    galacticInfluence: 1 + (pct.merchants || 0) * 0.001,   // up to +10%
-    exoticMatter:      1 + (pct.scholars || 0) * 0.001,    // up to +10%
-    stellarForge:      1 + (pct.warriors || 0) * 0.001,    // up to +10%
+    galacticInfluence: 1 + (pct.merchants || 0) * 0.001 * relicMult,
+    exoticMatter:      1 + (pct.scholars || 0) * 0.001 * relicMult,
+    stellarForge:      1 + (pct.warriors || 0) * 0.001 * relicMult,
   };
 }
 
@@ -111,7 +113,7 @@ export function getSenateInfo(state) {
     totalInfluence,
     maxInfluence,
     available: maxInfluence - totalInfluence,
-    allocateCost: getSenateAllocateCost(totalInfluence),
+    allocateCost: getSenateAllocateCost(totalInfluence, state),
     majorityFaction: majorityFaction?.id || null,
     factions: FACTIONS,
   };

@@ -17,6 +17,7 @@ import { TradingPanel } from './TradingPanel.jsx';
 import { SenatePanel } from './SenatePanel.jsx';
 import { RealityForgePanel } from './RealityForgePanel.jsx';
 import { OperationsPanel } from './OperationsPanel.jsx';
+import { RelicPanel } from './RelicPanel.jsx';
 import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
 import { setMuted, playPrestige } from './AudioManager.js';
@@ -139,6 +140,7 @@ export function App() {
       '',
       'KEPT: Achievements, prestige upgrades, multiplier, reality keys, lifetime stats',
       'LOST: All resources, upgrades, tech, era progress, operation state',
+      `LOST: ${state.activeRelics?.length || 0} equipped relics and current Echo Pressure`,
       ...milestones,
       '',
       '"We tried to stop. We could not. Neither will you."',
@@ -289,6 +291,7 @@ export function App() {
         <span className="control-chip">Era {state.era}: {eraNames[state.era]}</span>
         <span className="control-chip">{affordableUpgrades} options ready</span>
         <span className="control-chip">{affordableTech} tech options</span>
+        <span className="control-chip">{state.activeRelics?.length || 0}/2 relics | {Math.floor(state.echoPressure || 0)} pressure</span>
         {state.era >= ERA_COUNT && (
           <span className="control-chip">{cycleReadiness.ready ? 'Prestige available' : `Cycle ${cycleReadiness.completed}/${cycleReadiness.total}`}</span>
         )}
@@ -317,6 +320,7 @@ export function App() {
           {state.era <= 3 && <ExpeditionPanel state={state} onUpdate={updateState} />}
           {state.era === 4 && <DockingPanel state={state} onUpdate={updateState} />}
           {state.era > 4 && <GameCanvas state={state} onUpdate={updateState} />}
+          <RelicPanel state={state} onUpdate={updateState} />
           {state.era <= 4 && <EraProgress state={state} />}
           <ResourcePanel state={state} onUpdate={updateState} />
           {(state.eventLog?.length > 0 || state.activeEffects?.length > 0) && (

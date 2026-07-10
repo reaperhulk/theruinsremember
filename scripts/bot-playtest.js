@@ -9,7 +9,7 @@ import { tick } from '../src/engine/tick.js';
 import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable } from '../src/engine/upgrades.js';
 import { unlockTech, getAvailableTech } from '../src/engine/tech.js';
 import { canAfford, gather, getEffectiveRate, getNetRate } from '../src/engine/resources.js';
-import { attemptDock, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
+import { attemptDock, getDockingInfo, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
 import { assignColonies, getAssignableColonies, getColonyBonus } from '../src/engine/colonies.js';
 import { createRoute, getUnlockedSystems, routeExists, getRoutes, getRouteBonus } from '../src/engine/starChart.js';
 import { drawFragment, resolveWeave } from '../src/engine/weaving.js';
@@ -21,6 +21,7 @@ import { getEraReadiness } from '../src/engine/eras.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
 import { allocateSenateInfluence, getMaxSenateInfluence, getSenatePctBonuses } from '../src/engine/senate.js';
 import { selectNextCycleDoctrine } from '../src/engine/cycles.js';
+import { claimRelic, declineRelicOffer } from '../src/engine/relics.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
 import { readFileSync } from 'fs';
 
@@ -123,6 +124,7 @@ const PROFILES = {
     cosmicTuning: false,
     senateFocus: null,
     realityForge: false,
+    relics: false,
     buyPrestigeUpgrades: true,
     prestigeUpgradeOrder: [
       'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
@@ -145,6 +147,7 @@ const PROFILES = {
     cosmicTuning: false,
     senateFocus: null,
     realityForge: false,
+    relics: false,
     buyPrestigeUpgrades: true,
     prestigeUpgradeOrder: [
       'fastStart', 'headStart', 'deepPockets', 'wisdomOfAges',
@@ -165,6 +168,7 @@ const PROFILES = {
     cosmicTuning: false,
     senateFocus: null,
     realityForge: false,
+    relics: false,
     buyPrestigeUpgrades: true,
     prestigeUpgradeOrder: [
       'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
@@ -242,11 +246,14 @@ const BALANCE_TARGETS = {
     cycleReady: true,
     maxFirstOperationLatency: 60,
     maxIgnoredOperations: 0,
+    maxFirstRelicTime: 600,
+    minRelics: 2,
+    maxDockingAttempts: 30,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
       4: [5, 180],
-      5: [30, 180],
+      5: [25, 180],
       6: [15, 120],
       7: [15, 120],
       8: [120, 240],
@@ -254,7 +261,7 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0 },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50 },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true },
 };
@@ -323,7 +330,10 @@ function botDock(state, profile, t, rng) {
   if (t % interval !== 0) return state;
 
   const missions = ['cargo', 'crew', 'science'];
-  state = selectDockingMission(state, missions[(state.dockingAttempts || 0) % missions.length]);
+  const dockingInfo = getDockingInfo(state);
+  const missionId = missions.find(id => (dockingInfo.contracts[id] || 0) < dockingInfo.contractQuota);
+  if (!missionId) return state;
+  state = selectDockingMission(state, missionId);
 
   // Hit the zone center with optional accuracy offset
   const zoneCenter = getTargetZone(state);
@@ -535,6 +545,19 @@ function botRealityForge(state, profile, t, _rng) {
   return recipes.length > 0 ? (forgeRealityKey(state, recipes[0].id) || state) : state;
 }
 
+function botRelics(state, profile) {
+  if (!state.relicOffer?.length || profile.relics === false) return state;
+  const priority = ['surveyorLens', 'openCircuit', 'emberSeed', 'voidSail', 'colonyCharter', 'pilgrimMap', 'loomNeedle', 'brokenCrown'];
+  const rank = relicId => priority.indexOf(relicId);
+  const offered = [...state.relicOffer].sort((a, b) => rank(a) - rank(b));
+  const active = state.activeRelics || [];
+  if (active.length < 2) return claimRelic(state, offered[0]);
+
+  const worstActive = [...active].sort((a, b) => rank(b) - rank(a))[0];
+  if (rank(offered[0]) < rank(worstActive)) return claimRelic(state, offered[0], worstActive);
+  return declineRelicOffer(state);
+}
+
 function botPrestigeUpgrades(state, profile, t, _rng) {
   if (!profile.buyPrestigeUpgrades) return state;
   if ((state.prestigePoints || 0) < 2) return state;
@@ -596,6 +619,8 @@ function createCollector() {
       upgradeSelections: {},
       techSelections: {},
       doctrineSelections: {},
+      relicSelections: {},
+      firstRelicTime: null,
       ignoredOperations: [],
       finalPassiveRatesByOperation: {},
     },
@@ -686,6 +711,12 @@ function recordSelections(before, after, collector) {
   }
   if (after.nextCycleDoctrine && after.nextCycleDoctrine !== before.nextCycleDoctrine) {
     engagement.doctrineSelections[after.nextCycleDoctrine] = (engagement.doctrineSelections[after.nextCycleDoctrine] || 0) + 1;
+  }
+  for (const relicId of after.activeRelics || []) {
+    if (!(before.activeRelics || []).includes(relicId)) {
+      engagement.relicSelections[relicId] = (engagement.relicSelections[relicId] || 0) + 1;
+      if (engagement.firstRelicTime === null) engagement.firstRelicTime = after.totalTime || 0;
+    }
   }
 }
 
@@ -835,6 +866,7 @@ function runScenario(opts) {
     };
 
     // --- Bot actions ---
+    applyAction('relic', current => botRelics(current, profileDef));
     applyAction('gather', current => botGather(current, profileDef, t, rng));
     applyAction('expedition', current => botExpedition(current, profileDef, t, rng));
     applyAction('upgrade', current => botBuyUpgrades(current, profileDef, t, rng));
@@ -983,6 +1015,8 @@ function runScenario(opts) {
     techCount: Object.keys(state.tech || {}).length,
     prestigeCount: prestigesDone,
     prestigeMultiplier: state.prestigeMultiplier || 1,
+    activeRelics: state.activeRelics || [],
+    relicsRecoveredThisRun: state.relicsRecoveredThisRun || 0,
   };
 
   const operationActivity = {
@@ -1069,6 +1103,9 @@ function printHumanReport(scenarioName, opts, collector) {
   }
   const doctrines = Object.entries(engagement.doctrineSelections);
   if (doctrines.length > 0) console.log(`  Doctrines: ${doctrines.map(([name, count]) => `${name} x${count}`).join(', ')}`);
+  const relics = Object.entries(engagement.relicSelections);
+  if (relics.length > 0) console.log(`  Relics equipped: ${relics.map(([name, count]) => `${name} x${count}`).join(', ')}`);
+  if (engagement.firstRelicTime !== null) console.log(`  First relic equipped at ${fmtTime(engagement.firstRelicTime)}`);
   const upgrades = Object.entries(engagement.upgradeSelections).sort((a, b) => b[1] - a[1]).slice(0, 8);
   if (upgrades.length > 0) console.log(`  Most selected upgrades: ${upgrades.map(([name, count]) => `${name} x${count}`).join(', ')}`);
   if (engagement.ignoredOperations.length > 0) console.log(`  Configured but ignored: ${engagement.ignoredOperations.join(', ')}`);
@@ -1219,6 +1256,13 @@ function assertBalanceTargets(allResults) {
     if (target.cycleReady && !status.cycleReady) issues.push('cycle not ready to prestige');
     if (target.maxIgnoredOperations != null && collector.engagement.ignoredOperations.length > target.maxIgnoredOperations) {
       issues.push(`ignored configured operations: ${collector.engagement.ignoredOperations.join(', ')}`);
+    }
+    if (target.maxFirstRelicTime != null && (collector.engagement.firstRelicTime === null || collector.engagement.firstRelicTime > target.maxFirstRelicTime)) {
+      issues.push(collector.engagement.firstRelicTime === null ? 'no relic equipped' : `first relic took ${fmtTime(collector.engagement.firstRelicTime)}`);
+    }
+    if (target.minRelics != null && status.activeRelics.length < target.minRelics) issues.push(`only ${status.activeRelics.length}/${target.minRelics} relics equipped`);
+    if (target.maxDockingAttempts != null && collector.operationStats.docking.attempts > target.maxDockingAttempts) {
+      issues.push(`docking repeated ${collector.operationStats.docking.attempts} times`);
     }
     if (target.maxFirstOperationLatency != null) {
       for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {

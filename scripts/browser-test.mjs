@@ -131,6 +131,25 @@ async function exerciseOrbitalOperations(page) {
   });
 }
 
+async function exerciseRelicOffer(page) {
+  await page.evaluate(() => {
+    window.__game.setState(state => ({
+      ...state,
+      echoPressure: 100,
+      relicOffer: ['surveyorLens', 'voidSail', 'loomNeedle'],
+    }));
+  });
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const offered = await page.evaluate(() => document.querySelectorAll('.relic-choice').length);
+  await page.evaluate(() => document.querySelector('.relic-choice button')?.click());
+  await new Promise(resolve => setTimeout(resolve, 100));
+  return page.evaluate(offeredCount => ({
+    offeredCount,
+    activeCount: document.querySelectorAll('.active-relics > div').length,
+    pressure: window.__game.getState().echoPressure,
+  }), offered);
+}
+
 async function checkLayout(page) {
   return page.evaluate(() => {
     const issues = [];
@@ -276,6 +295,9 @@ async function run() {
   const orbitalOperations = await exerciseOrbitalOperations(page);
   const operationFailed = !orbitalOperations.panelVisible || orbitalOperations.missionCount !== 3;
   console.log(`  Orbital operations: ${orbitalOperations.missionCount}/3 mission choices${operationFailed ? ' (FAILED)' : ''}`);
+  const relicAudit = await exerciseRelicOffer(page);
+  const relicFailed = relicAudit.offeredCount !== 3 || relicAudit.activeCount !== 1 || relicAudit.pressure >= 1;
+  console.log(`  Recovered relic offer: ${relicFailed ? 'FAILED' : '3 choices, 1 equipped'}`);
   await screenshot(page, 'orbital_operations');
   await stopPump(page);
   await promoteToEra10(page);
@@ -409,7 +431,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || operationShellFailed || tuningFailed || weavingFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || tuningFailed || weavingFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

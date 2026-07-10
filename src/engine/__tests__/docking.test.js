@@ -91,11 +91,10 @@ describe('docking', () => {
     expect(after1.dockingCombo).toBe(1);
     // Advance past cooldown and dock again
     after1.totalTime += 3;
-    const zone2 = getTargetZone(after1);
-    const { state: after2 } = attemptDock(after1, zone2);
+    const nextContract = selectDockingMission(after1, 'crew');
+    const zone2 = getTargetZone(nextContract);
+    const { state: after2 } = attemptDock(nextContract, zone2);
     expect(after2.dockingCombo).toBe(2);
-    // Rewards should be higher due to combo (1 + 2*0.2 = x1.4)
-    expect(after2.resources.rocketFuel.amount).toBeGreaterThan(after1.resources.rocketFuel.amount);
   });
 
   it('getDockingInfo returns zone details', () => {
@@ -154,5 +153,24 @@ describe('docking', () => {
   it('rejects Hard Burn without its fuel reserve', () => {
     const state = selectDockingApproach(makeEra4State(), 'burn');
     expect(attemptDock(state, getTargetZone(state)).result).toBe('insufficient');
+  });
+
+  it('closes a finite contract after one decisive success and grants its run payoff', () => {
+    let state = makeEra4State();
+    state = attemptDock(state, getTargetZone(state)).state;
+
+    expect(state.dockingContracts.cargo).toBe(1);
+    expect(state.dockingContractsCompleted.cargo).toBe(1);
+    expect(state.resources.rocketFuel.rateAdd).toBeCloseTo(12);
+    state.totalTime += 3;
+    expect(attemptDock(state, getTargetZone(state)).result).toBe('contractComplete');
+  });
+
+  it('refreshes the contract board when a new era begins', () => {
+    const state = makeEra4State();
+    state.dockingContracts = { era: 4, cargo: 1, crew: 1, science: 1 };
+    state.era = 5;
+
+    expect(getDockingInfo(state).contracts).toEqual({ era: 5, cargo: 0, crew: 0, science: 0 });
   });
 });

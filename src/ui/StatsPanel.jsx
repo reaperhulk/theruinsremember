@@ -114,6 +114,10 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
           <span>{state.totalGems || 0}</span>
         </div>
         <div className="stat-row">
+          <span>Recovered Relics</span>
+          <span>{state.activeRelics?.length || 0}/2 active ({state.relicsRecoveredThisRun || 0} recovered)</span>
+        </div>
+        <div className="stat-row">
           <span>Trades</span>
           <span>{state.totalTrades || 0}</span>
         </div>

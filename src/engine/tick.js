@@ -12,6 +12,7 @@ import { getTuningProductionBonus } from './tuning.js';
 import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes, runExpedition } from './expeditions.js';
 import { getActiveSystems } from './operations.js';
 import { awardCycleGoal } from './cycles.js';
+import { advanceEchoPressure } from './relics.js';
 
 // Resource consumption rates — moderate tension without breaking low-interaction paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
@@ -187,6 +188,7 @@ export function tick(state, dt, rng = Math.random) {
   };
 
   newState = advanceExpeditionSupplies(newState, dt);
+  newState = advanceEchoPressure(newState, dt, rng);
   if (newState.era <= 3 && newState.prestigeUpgrades?.autoClicker && newState.expedition?.supplies >= EXPEDITION_MAX_SUPPLIES) {
     const safeRoute = getExpeditionRoutes(newState.era)[0];
     newState = runExpedition(newState, safeRoute.id, rng).state;

@@ -47,6 +47,10 @@ export function HelpOverlay({ onClose }) {
             <p>Each era introduces a focused operation. The current system stays prominent; previous systems remain available from the archive.</p>
           </div>
           <div className="help-card">
+            <strong>Recovered Relics</strong>
+            <p>Time and failed risky expeditions build Echo Pressure. At 100, choose one of three run-only relics for a two-slot loadout. Relics dissolve at prestige.</p>
+          </div>
+          <div className="help-card">
             <strong>Prestige</strong>
             <p>At Era 10 you can reset for permanent multipliers and upgrades. The cycle is part of progression, not just a post-game screen.</p>
           </div>

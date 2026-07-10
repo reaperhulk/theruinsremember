@@ -50,6 +50,8 @@ const ACHIEVEMENT_PROGRESS = {
   longGame:        s => ({ current: Math.min(s.totalTime || 0, 28800), target: 28800 }),
   allAchievements: s => ({ current: Object.keys(s.achievements || {}).length, target: 40 }),
   realityForger3:  s => ({ current: Object.values(s.realityKeys || {}).reduce((sum, v) => sum + v, 0), target: 3 }),
+  firstRelic:      s => ({ current: s.relicsRecoveredThisRun || 0, target: 1 }),
+  relicPair:       s => ({ current: s.activeRelics?.length || 0, target: 2 }),
   realityForger10: s => ({ current: Object.values(s.realityKeys || {}).reduce((sum, v) => sum + v, 0), target: 10 }),
   senator10:       s => ({ current: (s.senate?.merchants||0)+(s.senate?.scholars||0)+(s.senate?.warriors||0), target: 10 }),
   senator50:       s => ({ current: (s.senate?.merchants||0)+(s.senate?.scholars||0)+(s.senate?.warriors||0), target: 50 }),

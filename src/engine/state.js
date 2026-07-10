@@ -81,6 +81,8 @@ export function createInitialState() {
     dockingCombo: 0,
     dockingMission: 'cargo',
     dockingMissions: { cargo: 0, crew: 0, science: 0 },
+    dockingContracts: { era: 4, cargo: 0, crew: 0, science: 0 },
+    dockingContractsCompleted: { cargo: 0, crew: 0, science: 0 },
     // Trading (Era 6+)
     totalTrades: 0,
     // Era time tracking
@@ -103,6 +105,10 @@ export function createInitialState() {
     senatePct: { merchants: 34, scholars: 33, warriors: 33 },
     // Reality Forge (Era 10+)
     realityKeys: {},
+    echoPressure: 0,
+    relicOffer: [],
+    activeRelics: [],
+    relicsRecoveredThisRun: 0,
     cycleDoctrine: null,
     nextCycleDoctrine: null,
     cycleGoalRewarded: false,
@@ -115,6 +121,6 @@ export function createInitialState() {
     seenLoreEvents: {},
     // UI: hidden repeatable upgrades
     hiddenUpgrades: {},
-    saveVersion: 5,
+    saveVersion: 6,
   };
 }

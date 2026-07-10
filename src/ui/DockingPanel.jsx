@@ -47,7 +47,7 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
     const before = {};
     for (const [id, resource] of Object.entries(state.resources)) before[id] = resource.amount || 0;
     const { state: newState, result } = attemptDock(state, position);
-    if (result === 'cooldown' || result === 'insufficient') {
+    if (result === 'cooldown' || result === 'insufficient' || result === 'contractComplete') {
       setLastResult(result);
       return;
     }
@@ -98,11 +98,13 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
           <button
             key={mission.id}
             className={info.missionId === mission.id ? 'active' : ''}
+            disabled={(info.contracts[mission.id] || 0) >= info.contractQuota}
             onClick={() => onUpdate(current => selectDockingMission(current, mission.id))}
             title={mission.description}
           >
             <strong>{mission.name}</strong>
-            <span>{info.missions[mission.id] || 0}/3 readiness</span>
+            <span>{info.contracts[mission.id] || 0}/{info.contractQuota} contract</span>
+            <span>{mission.payoff}</span>
           </button>
         ))}
       </div>
@@ -128,7 +130,7 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
       </div>
       {lastResult && (
         <div className={`dock-result dock-${lastResult}`}>
-          {lastResult === 'perfect' ? 'PERFECT DOCK!' : lastResult === 'good' ? 'Good dock!' : lastResult === 'insufficient' ? 'Hard Burn needs 4 fuel.' : 'Missed... combo reset!'}
+          {lastResult === 'perfect' ? 'PERFECT DOCK!' : lastResult === 'good' ? 'Good dock!' : lastResult === 'insufficient' ? 'Hard Burn needs 4 fuel.' : lastResult === 'contractComplete' ? 'Choose an unfinished contract.' : 'Missed... combo reset!'}
         </div>
       )}
       {lastReward && (
@@ -138,11 +140,11 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
           ))}
         </div>
       )}
-      <button className="mine-btn" onClick={handleDock} disabled={onCooldown} aria-label={onCooldown ? `Docking cooldown: ${cooldownRemaining.toFixed(1)} seconds remaining` : 'Dock now. Press D key as shortcut.'}>
-        {onCooldown ? `Wait ${cooldownRemaining.toFixed(1)}s` : 'Dock! (d)'}
+      <button className="mine-btn" onClick={handleDock} disabled={onCooldown || info.contractComplete} aria-label={onCooldown ? `Docking cooldown: ${cooldownRemaining.toFixed(1)} seconds remaining` : info.contractComplete ? 'Current docking contract complete' : 'Dock now. Press D key as shortcut.'}>
+        {onCooldown ? `Wait ${cooldownRemaining.toFixed(1)}s` : info.contractComplete ? 'Contract complete' : 'Dock! (d)'}
       </button>
       <p className="operation-hint">
-        Complete each mission three times to stabilize orbital operations | Combo streaks boost rewards up to x2
+        Each era offers three finite contracts | Complete a contract for a permanent run payoff | Combo streaks boost rewards up to x2
       </p>
     </div>
   );

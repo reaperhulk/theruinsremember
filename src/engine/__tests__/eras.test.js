@@ -63,7 +63,7 @@ describe('eras', () => {
     state.era = 4;
     const era4Upgrades = Object.values(upgradeDefs).filter(upgrade => upgrade.era === 4);
     for (let index = 0; index < 12; index++) state.upgrades[era4Upgrades[index].id] = true;
-    state.dockingMissions = { cargo: 3, crew: 3, science: 3 };
+    state.dockingMissions = { cargo: 1, crew: 1, science: 1 };
 
     const readiness = getEraReadiness(state);
     expect(readiness.operationCredits).toBe(9);

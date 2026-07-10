@@ -1,5 +1,6 @@
 // Star Chart operation for Eras 6-10
 import { getOperationRewardMultiplier } from './cycles.js';
+import { getRelicOperationMultiplier, getRelicRouteCostMultiplier } from './relics.js';
 // Connect star systems to form trade routes for bonus production.
 // Each route connects two systems and gives production bonuses.
 // Max routes limited by star systems owned.
@@ -81,16 +82,18 @@ export function createRoute(state, fromId, toId) {
 
   // Check cost
   for (const [resourceId, amount] of Object.entries(ROUTE_COST)) {
+    const scaledAmount = amount * getRelicRouteCostMultiplier(state);
     const r = state.resources[resourceId];
-    if (!r || r.amount < amount) return null;
+    if (!r || r.amount < scaledAmount) return null;
   }
 
   // Spend cost
   const newResources = { ...state.resources };
   for (const [resourceId, amount] of Object.entries(ROUTE_COST)) {
+    const scaledAmount = amount * getRelicRouteCostMultiplier(state);
     newResources[resourceId] = {
       ...newResources[resourceId],
-      amount: newResources[resourceId].amount - amount,
+      amount: newResources[resourceId].amount - scaledAmount,
     };
   }
 
@@ -130,6 +133,7 @@ export function getRouteBonus(state) {
   const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
   const savantMult = hasSavant ? 1.5 : 1;
   const operationMult = getOperationRewardMultiplier(state);
+  const relicMult = getRelicOperationMultiplier(state, 'starChart');
   const directive = state.starDirective || 'throughput';
 
   // Count connections per system for network bonus
@@ -168,11 +172,11 @@ export function getRouteBonus(state) {
     for (const [resource, amount] of Object.entries(combined)) {
       const r = state.resources[resource];
       const resourceMult = r ? (r.rateMult || 1) : 1;
-      bonus[resource] = (bonus[resource] || 0) + amount * 0.5 * distMult * networkMult * directiveMult * resourceMult * savantMult * operationMult;
+      bonus[resource] = (bonus[resource] || 0) + amount * 0.5 * distMult * networkMult * directiveMult * resourceMult * savantMult * operationMult * relicMult;
     }
     if (directive === 'discovery') {
-      bonus.research = (bonus.research || 0) + 2 * distMult * networkMult * savantMult * operationMult;
-      bonus.data = (bonus.data || 0) + distMult * networkMult * savantMult * operationMult;
+      bonus.research = (bonus.research || 0) + 2 * distMult * networkMult * savantMult * operationMult * relicMult;
+      bonus.data = (bonus.data || 0) + distMult * networkMult * savantMult * operationMult * relicMult;
     }
   }
 

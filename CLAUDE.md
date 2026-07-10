@@ -116,5 +116,7 @@ node scripts/bot-playtest.js --compare results.json  # Regression detection
 - `canAfford(state, cost)` / `spend(state, cost)` / `gather(state, resourceId)`
 - `runExpedition(state, routeId)` — Resolve an early-era expedition
 - `getCycleGoal(state)` / `selectNextCycleDoctrine(state, id)` — Cycle strategy
+- `advanceEchoPressure(state, dt)` / `claimRelic(state, id)` — Run-only relic acquisition
+- `attemptDock(state, position)` — Resolve a finite orbital contract attempt
 - `performPrestige(state)` — Reset with prestige bonuses
 - `createInitialState()` — Fresh game state

@@ -1,6 +1,7 @@
 import { resources as resourceDefs } from '../data/resources.js';
 import { ERA_COST_MULTIPLIERS } from './upgrades.js';
 import { getCycleProductionMultiplier } from './cycles.js';
+import { getRelicCapacityMultiplier, getRelicProductionMultiplier } from './relics.js';
 
 // Soft-scale prestige multiplier: first 10x is linear, beyond that sqrt.
 // Prevents early prestiges from trivializing the game while still rewarding
@@ -21,7 +22,7 @@ export function getEffectiveRate(state, resourceId) {
   const def = resourceDefs[resourceId];
   if (!def) return 0;
   const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
-  return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * getCycleProductionMultiplier(state);
+  return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * getCycleProductionMultiplier(state) * getRelicProductionMultiplier(state, resourceId);
 }
 
 // Calculate all production rates
@@ -159,5 +160,5 @@ export function getEffectiveCap(state, resourceId) {
   const currentEra = state.era || 1;
   const eraCapScale = ERA_COST_MULTIPLIERS[currentEra] || 1;
   const spatialKeyBonus = 1 + (state.realityKeys?.spatial || 0) * 0.15;
-  return def.baseCap * r.capMult * eraCapScale * spatialKeyBonus;
+  return def.baseCap * r.capMult * eraCapScale * spatialKeyBonus * getRelicCapacityMultiplier(state);
 }

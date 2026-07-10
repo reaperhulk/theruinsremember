@@ -1,5 +1,6 @@
 // Colony command operation for Era 5
 import { getOperationRewardMultiplier } from './cycles.js';
+import { getRelicMandateDuration, getRelicOperationMultiplier } from './relics.js';
 // Assign colonies to different focus areas for varied outputs.
 // Focus types: 'growth' (food+labor), 'science' (research+data), 'industry' (exoticMaterials+energy)
 
@@ -23,14 +24,16 @@ export const COLONY_MANDATE_DURATION = 120;
 export function selectColonyMandate(state, mandateId) {
   if (!COLONY_MANDATES[mandateId]) return state;
   const lastChange = state.lastColonyMandateTime;
-  if (lastChange !== undefined && state.totalTime - lastChange < COLONY_MANDATE_DURATION) return state;
+  const duration = getRelicMandateDuration(state, COLONY_MANDATE_DURATION);
+  if (lastChange !== undefined && state.totalTime - lastChange < duration) return state;
   return { ...state, colonyMandate: mandateId, lastColonyMandateTime: state.totalTime };
 }
 
 export function getColonyMandateInfo(state) {
   const mandate = COLONY_MANDATES[state.colonyMandate] || null;
-  const elapsed = state.totalTime - (state.lastColonyMandateTime ?? -COLONY_MANDATE_DURATION);
-  return { mandate, cooldown: Math.max(0, COLONY_MANDATE_DURATION - elapsed) };
+  const duration = getRelicMandateDuration(state, COLONY_MANDATE_DURATION);
+  const elapsed = state.totalTime - (state.lastColonyMandateTime ?? -duration);
+  return { mandate, cooldown: Math.max(0, duration - elapsed) };
 }
 
 // Get max assignable colonies (based on colonies resource amount)
@@ -94,6 +97,7 @@ export function getColonyBonus(state) {
   const savantMult = hasSavant ? 1.5 : 1;
   const logisticsMult = state.prestigeUpgrades?.factoryExpert ? 2 : 1;
   const operationMult = getOperationRewardMultiplier(state);
+  const relicMult = getRelicOperationMultiplier(state, 'colonies');
   const mandate = COLONY_MANDATES[state.colonyMandate];
 
   // Terraform Sync mechanic: colony focus assignments multiply output by 1.5x
@@ -116,7 +120,7 @@ export function getColonyBonus(state) {
         // Scale with the resource's production multiplier so colonies stay relevant
         const r = state.resources[resource];
         const resourceMult = r ? (r.rateMult || 1) : 1;
-        bonus[resource] = (bonus[resource] || 0) + count * rate * resourceMult * focusMult * mandateMult * eraScale * savantMult * terraformMult * logisticsMult * operationMult;
+        bonus[resource] = (bonus[resource] || 0) + count * rate * resourceMult * focusMult * mandateMult * eraScale * savantMult * terraformMult * logisticsMult * operationMult * relicMult;
       }
     }
   }

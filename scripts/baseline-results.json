@@ -3,14 +3,14 @@
   "description": "Seeded pacing baseline after the operations and strategic-cycle redesign",
   "seed": 424242,
   "scenarios": {
-    "full": { "finalEra": 10, "cycleReady": true, "timeSeconds": 811 },
-    "casual": { "finalEra": 10, "cycleReady": true, "timeSeconds": 5431 },
-    "lowInteraction": { "finalEra": 10, "cycleReady": true, "timeSeconds": 9599 },
-    "passive": { "finalEra": 10, "cycleReady": true, "timeSeconds": 9974 }
+    "full": { "finalEra": 10, "cycleReady": true, "timeSeconds": 811, "dockingAttempts": 21, "activeRelics": 2 },
+    "casual": { "finalEra": 10, "cycleReady": true, "timeSeconds": 5401, "activeRelics": 2 },
+    "lowInteraction": { "finalEra": 10, "cycleReady": true, "timeSeconds": 9665 },
+    "passive": { "finalEra": 10, "cycleReady": true, "timeSeconds": 9977 }
   },
   "quality": {
-    "testFiles": 21,
-    "unitTests": 262,
+    "testFiles": 22,
+    "unitTests": 270,
     "desktopPrestigeCycles": 2,
     "mobileViewport": "375x812"
   },
@@ -22,6 +22,8 @@
     "firstOperationLatencyByEra",
     "upgradeSelections",
     "doctrineSelections",
-    "ignoredOperations"
+    "ignoredOperations",
+    "firstRelicTime",
+    "relicSelections"
   ]
 }

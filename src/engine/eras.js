@@ -146,7 +146,7 @@ export function getEraReadiness(state, era = state.era) {
     ? Math.min(discoveryCap, (state.expedition?.eraFinds || 0) * discoveryValue)
     : 0;
   const operationCredits = era === 4 && era === state.era
-    ? Object.values(state.dockingMissions || {}).reduce((sum, count) => sum + Math.min(3, count), 0)
+    ? Object.values(state.dockingMissions || {}).reduce((sum, count) => sum + (count > 0 ? 3 : 0), 0)
     : 0;
   const activityCredits = discoveryCredits + operationCredits;
   const minimumEconomicUpgrades = era <= 3

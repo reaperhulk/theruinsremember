@@ -1,5 +1,6 @@
 // Reality Weaving operation for Eras 8-10
 import { getOperationRewardMultiplier } from './cycles.js';
+import { getRelicOperationMultiplier, getRelicWeaveOfferCount } from './relics.js';
 // Combine reality fragments in patterns for multiplier bonuses.
 // Match 3 fragments of the same type for a production multiplier.
 
@@ -83,7 +84,7 @@ export function drawFragment(state, roll = Math.random()) {
 
 // Spend one draw cost to reveal three threads. The player chooses which one
 // enters the grid, turning fragment acquisition into a planning decision.
-export function surveyFragments(state, rolls = [Math.random(), Math.random(), Math.random()]) {
+export function surveyFragments(state, rolls = null, rng = Math.random) {
   if (state.era < 8 || state.weavingOffer?.length) return null;
   const cost = getWeaveDrawCost(state);
   const fragments = state.resources.realityFragments;
@@ -95,7 +96,9 @@ export function surveyFragments(state, rolls = [Math.random(), Math.random(), Ma
       ...state.resources,
       realityFragments: { ...fragments, amount: fragments.amount - cost },
     },
-    weavingOffer: rolls.slice(0, 3).map(generateFragment),
+    weavingOffer: (rolls || Array.from({ length: getRelicWeaveOfferCount(state) }, () => rng()))
+      .slice(0, getRelicWeaveOfferCount(state))
+      .map(generateFragment),
   };
 }
 
@@ -174,7 +177,7 @@ export function resolveWeave(state) {
   const eraScale = 1 + (state.era - 8) * 0.5; // x1 at era 8, x2 at era 10
   const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
   const savantMult = hasSavant ? 1.5 : 1;
-  const effectMult = bonus.mult * comboMult * Math.max(1, eraScale) * savantMult * getOperationRewardMultiplier(state);
+  const effectMult = bonus.mult * comboMult * Math.max(1, eraScale) * savantMult * getOperationRewardMultiplier(state) * getRelicOperationMultiplier(state, 'weaving');
   const effect = {
     id: `weave_${matchType}_${state.totalTime}`,
     startedAt: state.totalTime,

@@ -26,8 +26,10 @@ Prestige isn't just a mechanic. It's the cycle itself.
 - **Era-focused operations** that evolve from ruin expeditions into orbital missions, colony mandates, star-network directives, Dyson assembly, reality weaving, galactic politics, cosmic tuning, and the Reality Forge
 - **Distinct cycle doctrines** that reshape early, middle, or late eras and award permanent cycle marks for doctrine-specific goals
 - **Reality keys with different identities**: faster expeditions, larger storage, stronger operation rewards, or seeded starting resources
+- **Recovered Relics** with guaranteed Echo Pressure offers and a two-slot, run-only loadout that dissolves at prestige
+- **Finite orbital contracts** with approach risk, one decisive docking attempt, and permanent run payoffs instead of unlimited farming
 - **30 prestige upgrades** including 5 "Ascension" tier endgame upgrades
-- **267 reachable achievements** tracking everything from speed milestones to narrative discovery
+- **270 reachable achievements** tracking everything from speed milestones to narrative discovery
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players
 - **Progression-gated era advancement** — new eras require sufficient upgrade depth, era-local research depth, and the starred breakthrough technology instead of passive waiting
 - **Resource caps that matter** — storage is a real constraint requiring strategic cap upgrades
@@ -106,7 +108,7 @@ Recent iteration work focused on:
 - Presenting the current era operation prominently while keeping prior systems in an archive
 - Replacing blind or solved interactions with fragment choices, signal probes, docking approaches, colony mandates, and star directives
 - Making Reality Forge keys and cycle doctrines materially change the next run
-- Measuring repeated actions, economic waiting, operation latency, direct rewards, and ignored systems in the seeded playtest harness
+- Measuring repeated actions, relic timing, economic waiting, operation latency, direct rewards, and ignored systems in the seeded playtest harness
 
 ## Tech Stack
 

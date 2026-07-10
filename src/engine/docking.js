@@ -4,6 +4,7 @@
 
 import { getEffectiveCap, getEffectivePrestige } from './resources.js';
 import { getOperationRewardMultiplier } from './cycles.js';
+import { getRelicDockingZoneMultiplier, getRelicOperationMultiplier } from './relics.js';
 
 const PERFECT_ZONE = 0.10;   // 10% center for perfect dock
 const BASE_SPEED = 0.6;      // cycles per second at era 4 (~1.7s full sweep)
@@ -11,6 +12,7 @@ const BASE_SPEED = 0.6;      // cycles per second at era 4 (~1.7s full sweep)
 // Resource rewards for docking — now calculated dynamically based on production rates
 const REWARD_MISS = {};
 const COOLDOWN = 2; // seconds between dock attempts
+export const DOCKING_CONTRACT_QUOTA = 1;
 
 export const DOCKING_MISSIONS = {
   cargo: {
@@ -18,20 +20,42 @@ export const DOCKING_MISSIONS = {
     name: 'Cargo Lift',
     description: 'Wide approach. Prioritizes fuel and steel deliveries.',
     zoneSize: 0.34,
+    payoff: 'Complete: permanent fuel production for this run.',
   },
   crew: {
     id: 'crew',
     name: 'Crew Transfer',
     description: 'Balanced approach. Builds orbital infrastructure and returns food.',
     zoneSize: 0.26,
+    payoff: 'Complete: permanent orbital production for this run.',
   },
   science: {
     id: 'science',
     name: 'Science Return',
     description: 'Narrow approach. Recovers research and precursor data.',
     zoneSize: 0.20,
+    payoff: 'Complete: permanent research production for this run.',
   },
 };
+
+export function getDockingContracts(state) {
+  if (state.dockingContracts?.era === state.era) return state.dockingContracts;
+  return { era: state.era, cargo: 0, crew: 0, science: 0 };
+}
+
+function applyContractPayoff(resources, missionId, era) {
+  const payoff = {
+    cargo: { resourceId: 'rocketFuel', rateAdd: 3 * era },
+    crew: { resourceId: 'orbitalInfra', rateAdd: 1.5 * era },
+    science: { resourceId: 'research', rateAdd: 4 * era },
+  }[missionId];
+  const resource = resources[payoff.resourceId];
+  if (!resource) return resources;
+  return {
+    ...resources,
+    [payoff.resourceId]: { ...resource, rateAdd: resource.rateAdd + payoff.rateAdd },
+  };
+}
 
 export const DOCKING_APPROACHES = {
   cautious: {
@@ -98,14 +122,17 @@ export function attemptDock(state, position) {
   const mission = DOCKING_MISSIONS[missionId];
   const approachId = DOCKING_APPROACHES[state.dockingApproach] ? state.dockingApproach : 'standard';
   const approach = DOCKING_APPROACHES[approachId];
+  const relicZoneMult = getRelicDockingZoneMultiplier(state);
+  const contracts = getDockingContracts(state);
+  if ((contracts[missionId] || 0) >= DOCKING_CONTRACT_QUOTA) return { state, result: 'contractComplete' };
   if ((state.resources.rocketFuel?.amount || 0) < approach.fuelCost) return { state, result: 'insufficient' };
   const distFromCenter = Math.abs(position - zoneCenter);
 
   let result;
 
-  if (distFromCenter <= PERFECT_ZONE * approach.zoneMult / 2) {
+  if (distFromCenter <= PERFECT_ZONE * approach.zoneMult * relicZoneMult / 2) {
     result = 'perfect';
-  } else if (distFromCenter <= mission.zoneSize * approach.zoneMult / 2) {
+  } else if (distFromCenter <= mission.zoneSize * approach.zoneMult * relicZoneMult / 2) {
     result = 'good';
   } else {
     result = 'miss';
@@ -139,7 +166,7 @@ export function attemptDock(state, position) {
   const eraScale = Math.pow(1.5, Math.max(0, state.era - 4));
 
   // Apply rewards scaled by prestige, combo, and era
-  const newResources = { ...state.resources };
+  let newResources = { ...state.resources };
   if (approach.fuelCost > 0) {
     newResources.rocketFuel = {
       ...newResources.rocketFuel,
@@ -149,11 +176,15 @@ export function attemptDock(state, position) {
   for (const [resourceId, amount] of Object.entries(rewards)) {
     const r = newResources[resourceId];
     if (r && r.unlocked) {
-      const scaled = amount * approach.rewardMult * getOperationRewardMultiplier(state) * getEffectivePrestige(state.prestigeMultiplier || 1) * comboMult * dockPrestigeMult * eraScale * savantMult;
+      const scaled = amount * approach.rewardMult * getRelicOperationMultiplier(state, 'docking') * getOperationRewardMultiplier(state) * getEffectivePrestige(state.prestigeMultiplier || 1) * comboMult * dockPrestigeMult * eraScale * savantMult;
       const cap = getEffectiveCap({ ...state, resources: newResources }, resourceId);
       newResources[resourceId] = { ...r, amount: cap > 0 ? Math.min(cap, r.amount + scaled) : r.amount + scaled };
     }
   }
+
+  const contractProgress = (contracts[missionId] || 0) + (result !== 'miss' ? 1 : 0);
+  const contractCompleted = result !== 'miss' && contractProgress === DOCKING_CONTRACT_QUOTA;
+  if (contractCompleted) newResources = applyContractPayoff(newResources, missionId, state.era);
 
   const newState = {
     ...state,
@@ -171,6 +202,14 @@ export function attemptDock(state, position) {
       ...(state.dockingMissions || { cargo: 0, crew: 0, science: 0 }),
       [missionId]: (state.dockingMissions?.[missionId] || 0) + (result !== 'miss' ? 1 : 0),
     },
+    dockingContracts: {
+      ...contracts,
+      [missionId]: contractProgress,
+    },
+    dockingContractsCompleted: {
+      ...(state.dockingContractsCompleted || { cargo: 0, crew: 0, science: 0 }),
+      [missionId]: (state.dockingContractsCompleted?.[missionId] || 0) + (contractCompleted ? 1 : 0),
+    },
   };
 
 
@@ -185,13 +224,18 @@ export function getDockingInfo(state) {
   const missionId = DOCKING_MISSIONS[state.dockingMission] ? state.dockingMission : 'cargo';
   const approachId = DOCKING_APPROACHES[state.dockingApproach] ? state.dockingApproach : 'standard';
   const approach = DOCKING_APPROACHES[approachId];
+  const relicZoneMult = getRelicDockingZoneMultiplier(state);
+  const contracts = getDockingContracts(state);
   return {
     zoneCenter: getTargetZone(state),
-    zoneSize: DOCKING_MISSIONS[missionId].zoneSize * approach.zoneMult,
-    perfectSize: PERFECT_ZONE * approach.zoneMult,
+    zoneSize: DOCKING_MISSIONS[missionId].zoneSize * approach.zoneMult * relicZoneMult,
+    perfectSize: PERFECT_ZONE * approach.zoneMult * relicZoneMult,
     missionId,
     approachId,
     missions: state.dockingMissions || { cargo: 0, crew: 0, science: 0 },
+    contracts,
+    contractQuota: DOCKING_CONTRACT_QUOTA,
+    contractComplete: (contracts[missionId] || 0) >= DOCKING_CONTRACT_QUOTA,
     attempts: state.dockingAttempts || 0,
     successes: state.dockingSuccesses || 0,
     perfects: state.dockingPerfects || 0,

@@ -1,5 +1,6 @@
 import { getEffectiveCap } from './resources.js';
 import { getOperationRewardMultiplier } from './cycles.js';
+import { addEchoPressure, getRelicExpeditionChanceBonus, getRelicOperationMultiplier } from './relics.js';
 
 export const EXPEDITION_SUPPLY_INTERVAL = 90;
 export const EXPEDITION_MAX_SUPPLIES = 3;
@@ -127,14 +128,14 @@ export function getExpeditionSupplyInterval(state) {
 }
 
 export function getExpeditionSuccessChance(state, route) {
-  const successBonus = state.prestigeUpgrades?.hackMaster ? 0.1 : 0;
+  const successBonus = (state.prestigeUpgrades?.hackMaster ? 0.1 : 0) + getRelicExpeditionChanceBonus(state);
   return Math.min(1, route.chance + successBonus);
 }
 
 function grantRewards(state, rewards) {
   const resources = { ...state.resources };
   const granted = {};
-  const rewardMultiplier = (state.prestigeUpgrades?.miniGameSavant ? 1.5 : 1) * getOperationRewardMultiplier(state);
+  const rewardMultiplier = (state.prestigeUpgrades?.miniGameSavant ? 1.5 : 1) * getOperationRewardMultiplier(state) * getRelicOperationMultiplier(state, 'expedition');
 
   for (const [id, amount] of Object.entries(rewards || {})) {
     const resource = resources[id];
@@ -179,7 +180,11 @@ export function runExpedition(state, routeId, rng = Math.random) {
 
   const success = rng() < getExpeditionSuccessChance(state, route);
   const rewardSet = success ? route.rewards : route.failureRewards;
-  const rewarded = grantRewards(state, rewardSet);
+  let rewarded = grantRewards(state, rewardSet);
+  if (!success && route.chance < 1) {
+    const pressure = route.chance < 0.6 ? 40 : 25;
+    rewarded = addEchoPressure(rewarded, pressure, [rng(), rng(), rng()]);
+  }
   const discovery = success ? route.discovery : 0;
   const gems = success ? (route.gems || 0) : 0;
   const result = {
