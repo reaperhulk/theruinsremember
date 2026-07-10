@@ -32,7 +32,7 @@ export function HelpOverlay({ onClose }) {
           </div>
           <div className="help-card">
             <strong>Early Survival</strong>
-            <p>Press Space or use + buttons to gather resources. Buy upgrades fast so manual collection becomes a backup, not the plan.</p>
+            <p>Use + buttons for the first resources, then let production take over. During the first three eras, expeditions trade limited supplies for discoveries and targeted rewards.</p>
           </div>
           <div className="help-card">
             <strong>Read The Warnings</strong>
@@ -60,7 +60,7 @@ export function HelpOverlay({ onClose }) {
           </div>
           <div className="help-card help-card-wide">
             <strong>Controls</strong>
-            <p>Tabs: 1-6 | Mine: Space | Dock: D | Hack: 0-3 | Tune: Arrows/Enter | Weave: D/W/C | Help: ?</p>
+            <p>Tabs: 1-6 | Dock: D | Tune: Arrows/Enter | Weave: D/W/C | Help: ?</p>
           </div>
         </div>
         <p style={{ textAlign: 'center', color: '#555', marginTop: '12px', fontSize: '0.8em' }}>Click outside or press Escape to close</p>

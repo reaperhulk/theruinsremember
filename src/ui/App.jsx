@@ -1,15 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createInitialState, migrateState } from '../engine/state.js';
 import { useGameLoop } from '../hooks/useGameLoop.js';
-import { mine } from '../engine/mining.js';
 import { ResourcePanel } from './ResourcePanel.jsx';
 import { UpgradePanel } from './UpgradePanel.jsx';
 import { TechTree } from './TechTree.jsx';
 import { EraProgress } from './EraProgress.jsx';
 import { GameCanvas } from './GameCanvas.jsx';
-import { MiningPanel } from './MiningPanel.jsx';
-import { FactoryPanel } from './FactoryPanel.jsx';
-import { HackingPanel } from './HackingPanel.jsx';
+import { ExpeditionPanel } from './ExpeditionPanel.jsx';
 import { DockingPanel } from './DockingPanel.jsx';
 import { ColonyPanel } from './ColonyPanel.jsx';
 import { StarChartPanel } from './StarChartPanel.jsx';
@@ -51,9 +48,6 @@ const ERA_OMENS = {
 };
 
 const MINI_GAME_DEFS = [
-  { id: 'mining', label: 'Mining', era: 1, desc: 'Click to mine materials and find gems' },
-  { id: 'factory', label: 'Factory', era: 2, desc: 'Assign workers to production lines' },
-  { id: 'hacking', label: 'Hacking', era: 3, desc: 'Memory puzzle for data/software boost' },
   { id: 'docking', label: 'Docking', era: 4, desc: 'Timing game for fuel and infra' },
   { id: 'colony', label: 'Colonies', era: 5, desc: 'Manage colony focus for bonuses' },
   { id: 'starChart', label: 'Star Chart', era: 6, desc: 'Connect systems for passive bonuses' },
@@ -66,10 +60,10 @@ const MINI_GAME_DEFS = [
 // Tab definitions — which tabs are available at which era
 function getAvailableTabs(era) {
   const tabs = [
-    { id: 'upgrades', label: 'Upgrades', sublabel: 'shape the economy', key: '1' },
+    { id: 'upgrades', label: era <= 3 ? 'Decisions' : 'Upgrades', sublabel: 'shape the economy', key: '1' },
     { id: 'tech', label: 'Tech', sublabel: 'unlock the next age', key: '2' },
-    { id: 'mini', label: 'Mini-Game', sublabel: 'active accelerators', key: '3' },
   ];
+  if (era >= 4) tabs.push({ id: 'mini', label: 'Operations', sublabel: 'active systems', key: '3' });
   if (era >= 4) tabs.push({ id: 'trading', label: 'Trading', sublabel: 'reroute surplus', key: '4' });
   tabs.push({ id: 'prestige', label: 'Prestige', sublabel: 'bank the cycle', key: '5' });
   tabs.push({ id: 'stats', label: 'Stats', sublabel: 'codex and run data', key: '6' });
@@ -79,7 +73,7 @@ function getAvailableTabs(era) {
 export function App() {
   const { state, updateState, resetSave, offlineReport, dismissOfflineReport } = useGameLoop(initialState);
   const [activeTab, setActiveTab] = useState('upgrades');
-  const [activeMiniGame, setActiveMiniGame] = useState('mining');
+  const [activeMiniGame, setActiveMiniGame] = useState('docking');
   const prevEraRef = useRef(state.era);
   const keyboardStateRef = useRef(state);
   useEffect(() => {
@@ -174,26 +168,7 @@ export function App() {
       setShowHelp(h => !h);
       return;
     }
-    if (e.code === 'Space') {
-      e.preventDefault();
-      // Check cooldown client-side to avoid unnecessary state updates
-      if ((currentState.totalTime || 0) - (currentState.lastMineTime || 0) < 0.5) return;
-      updateState(s => {
-        const result = mine(s);
-        const newState = {
-          ...result.state,
-          totalGems: result.foundGem ? (result.state.totalGems || 0) + 1 : (result.state.totalGems || 0),
-        };
-        if (result.foundGem) {
-          newState.eventLog = [...(newState.eventLog || []), {
-            message: 'Gem found! Massive material bonus!',
-            time: newState.totalTime,
-          }].slice(-20);
-        }
-        return newState;
-      });
-    }
-  }, [updateState]);
+  }, []);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -226,9 +201,6 @@ export function App() {
   // Render the selected mini-game panel
   const getMiniGamePanel = () => {
     const miniGameComponents = {
-      mining: <MiningPanel key="mining" state={state} onUpdate={updateState} />,
-      factory: <FactoryPanel key="factory" state={state} onUpdate={updateState} />,
-      hacking: <HackingPanel key="hacking" state={state} onUpdate={updateState} />,
       docking: <DockingPanel key="docking" state={state} onUpdate={updateState} />,
       colony: <ColonyPanel key="colony" state={state} onUpdate={updateState} />,
       starChart: <StarChartPanel key="starChart" state={state} onUpdate={updateState} />,
@@ -263,7 +235,7 @@ export function App() {
             {availableMiniGames.find(g => g.id === activeMiniGame)?.desc}
           </div>
         )}
-        {miniGameComponents[activeMiniGame] || miniGameComponents.mining}
+        {miniGameComponents[activeMiniGame] || miniGameComponents.docking}
       </>
     );
   };
@@ -389,23 +361,26 @@ export function App() {
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
       {!hintsDismissed && state.totalTime < 60 && Object.keys(state.upgrades).length === 0 && (
         <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.9em', color: '#c8a850', padding: '6px 0', opacity: Math.max(0.3, 1 - state.totalTime / 60) }}>
-          Click the +1 buttons to gather resources | Buy upgrades on the right | Press Space to mine
+          Gather the resources you need, choose an expedition route, then make a decision on the right
           <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
         </div>
       )}
       <EraTransition era={state.era} />
       <Toast state={state} />
-      <EraProgress state={state} />
+      {state.era > 3 && <EraProgress state={state} />}
       {!hintsDismissed && state.totalTime >= 60 && state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
         <div style={{ textAlign: 'center', fontSize: '0.85em', color: '#998866', padding: '4px 0', position: 'relative' }}>
-          Press Space to mine for materials | Switch to Mini-Game tab (key 3) for more
+          Expeditions recover resources and discoveries; discoveries reduce routine build-out
           <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
         </div>
       )}
 
-      <main className="game-layout">
+      <main className={`game-layout ${state.era <= 3 ? 'early-game-layout' : ''}`}>
         <div className="left-column">
-          <GameCanvas state={state} onUpdate={updateState} />
+          {state.era <= 3
+            ? <ExpeditionPanel state={state} onUpdate={updateState} />
+            : <GameCanvas state={state} onUpdate={updateState} />}
+          {state.era <= 3 && <EraProgress state={state} />}
           <ResourcePanel state={state} onUpdate={updateState} />
           {(state.eventLog?.length > 0 || state.activeEffects?.length > 0) && (
             <EventLog state={state} />
@@ -478,7 +453,7 @@ export function App() {
             )}
           </div>
           <div className="shortcut-legend" aria-hidden="true">
-            [1–6] tabs &nbsp;·&nbsp; [Space] mine &nbsp;·&nbsp; [D] dock &nbsp;·&nbsp; [?] help
+            [1–6] tabs &nbsp;·&nbsp; [D] dock &nbsp;·&nbsp; [?] help
           </div>
         </div>
       </main>

@@ -6,7 +6,7 @@ import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 describe('eras', () => {
   describe('getMinUpgradesForEra', () => {
     it('returns configured minimum per era', () => {
-      expect(getMinUpgradesForEra(1)).toBe(30);
+      expect(getMinUpgradesForEra(1)).toBe(14);
       expect(getMinUpgradesForEra(5)).toBe(30);
       expect(getMinUpgradesForEra(10)).toBe(30);
     });
@@ -75,19 +75,41 @@ describe('eras', () => {
       const state = createInitialState();
       state.tech.metallurgy = true;
       state.tech.industrialRevolution = true;
-      // Purchase 30 era 1 upgrades to meet the minimum
+      // Purchase 14 era 1 upgrades to meet the minimum without expeditions
       const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
-      for (let i = 0; i < 30 && i < era1Upgrades.length; i++) {
+      for (let i = 0; i < 14 && i < era1Upgrades.length; i++) {
         state.upgrades[era1Upgrades[i].id] = true;
       }
       expect(checkEraTransition(state)).toBe(2);
+    });
+
+    it('accepts a smaller economic build-out when expeditions supply discoveries', () => {
+      const state = createInitialState();
+      state.tech.metallurgy = true;
+      state.tech.industrialRevolution = true;
+      state.expedition.eraFinds = 4;
+      const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
+      for (let i = 0; i < 6; i++) state.upgrades[era1Upgrades[i].id] = true;
+
+      expect(checkEraTransition(state)).toBe(2);
+    });
+
+    it('still requires a minimum economic foundation with many discoveries', () => {
+      const state = createInitialState();
+      state.tech.metallurgy = true;
+      state.tech.industrialRevolution = true;
+      state.expedition.eraFinds = 99;
+      const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
+      for (let i = 0; i < 5; i++) state.upgrades[era1Upgrades[i].id] = true;
+
+      expect(checkEraTransition(state)).toBeNull();
     });
 
     it('returns null when gating tech is unlocked but era research depth is too low', () => {
       const state = createInitialState();
       state.tech.industrialRevolution = true;
       const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1);
-      for (let i = 0; i < 30 && i < era1Upgrades.length; i++) {
+      for (let i = 0; i < 14 && i < era1Upgrades.length; i++) {
         state.upgrades[era1Upgrades[i].id] = true;
       }
       expect(checkEraTransition(state)).toBeNull();
@@ -98,7 +120,7 @@ describe('eras', () => {
       state.tech.industrialRevolution = true;
       // Purchase era 2 upgrades instead of era 1
       const era2Upgrades = Object.values(upgradeDefs).filter(u => u.era === 2);
-      for (let i = 0; i < 30 && i < era2Upgrades.length; i++) {
+      for (let i = 0; i < 14 && i < era2Upgrades.length; i++) {
         state.upgrades[era2Upgrades[i].id] = true;
       }
       expect(checkEraTransition(state)).toBeNull();
@@ -119,6 +141,8 @@ describe('eras', () => {
       expect(after.resources.steel.unlocked).toBe(true);
       expect(after.resources.electronics.unlocked).toBe(true);
       expect(after.resources.research.unlocked).toBe(true);
+      expect(after.expedition.eraFinds).toBe(0);
+      expect(after.expedition.supplies).toBeGreaterThanOrEqual(1);
     });
 
     it('unlocks reality fragments on entering era 9', () => {

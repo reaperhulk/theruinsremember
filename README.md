@@ -23,7 +23,7 @@ Prestige isn't just a mechanic. It's the cycle itself.
 - **10 Eras** spanning primitive survival to multiverse exploration
 - **579 upgrades** forming deep prerequisite chains with meaningful branching choices
 - **115 tech nodes** including mutually exclusive paths that shape each run differently
-- **11 mini-games** (mining, factory management, hacking, orbital docking, colony management, star charting, trading, Dyson assembly, reality weaving, galactic senate, reality forge)
+- **Expeditions and active systems** that evolve from early ruin exploration into orbital docking, colonies, star charts, trading, Dyson assembly, reality weaving, galactic politics, and the reality forge
 - **30 prestige upgrades** including 5 "Ascension" tier endgame upgrades
 - **290 achievements** tracking everything from speed milestones to narrative discovery
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players

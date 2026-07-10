@@ -17,10 +17,7 @@ body {
 
 body {
   font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
-  background:
-    radial-gradient(circle at top, rgba(186, 127, 53, 0.18), transparent 28%),
-    radial-gradient(circle at 20% 20%, rgba(78, 145, 140, 0.16), transparent 22%),
-    linear-gradient(180deg, var(--bg-mist), var(--bg-deep) 40%, #09080c);
+  background: linear-gradient(180deg, var(--bg-mist), var(--bg-deep) 40%, #09080c);
   color: #d8d0c8;
   min-height: 100vh;
 }
@@ -59,7 +56,7 @@ g[role="button"]:focus-visible {
 /* skip-link removed — unused */
 
 .game-container {
-  max-width: 1080px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 18px 16px 28px;
   border-top: 2px solid transparent;
@@ -202,6 +199,35 @@ g[role="button"]:focus-visible {
   letter-spacing: 0.05em;
 }
 
+.catalog-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 3px;
+  margin-bottom: 8px;
+  background: #11161b;
+  border: 1px solid #2c363b;
+  border-radius: 5px;
+}
+
+.catalog-mode button {
+  min-height: 32px;
+  padding: 5px 8px;
+  color: #8d999e;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72em;
+}
+
+.catalog-mode button.active {
+  color: #f0e7d5;
+  background: #253137;
+  border-color: #465960;
+}
+
 /* reset-btn and prestige-btn: primary definitions below */
 
 .game-layout {
@@ -209,6 +235,170 @@ g[role="button"]:focus-visible {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
+
+.early-game-layout {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+}
+
+.expedition-panel {
+  border-color: rgba(110, 181, 176, 0.45);
+  background: linear-gradient(180deg, rgba(20, 34, 39, 0.97), rgba(13, 18, 24, 0.98));
+}
+
+.expedition-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.panel-kicker {
+  display: block;
+  color: #7fbcb6;
+  font-size: 0.68em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  margin-bottom: 4px;
+}
+
+.expedition-heading h2 {
+  border: 0;
+  color: #edf3ef;
+  font-size: 1.05em;
+  margin: 0;
+  padding: 0;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.expedition-supply {
+  display: grid;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.expedition-supply strong {
+  color: #e0bf77;
+  font-size: 1.2em;
+}
+
+.expedition-supply span,
+.expedition-meta,
+.expedition-history {
+  color: #8f9da4;
+  font-size: 0.7em;
+}
+
+.expedition-brief {
+  color: #bdc8ca;
+  font-family: system-ui, sans-serif;
+  font-size: 0.84em;
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+
+.expedition-meter {
+  height: 4px;
+  overflow: hidden;
+  background: #101519;
+  border: 1px solid #26343a;
+  border-radius: 2px;
+}
+
+.expedition-meter-fill {
+  height: 100%;
+  background: #6eb5b0;
+  transition: width 0.3s linear;
+}
+
+.expedition-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 5px 0 12px;
+}
+
+.expedition-routes {
+  display: grid;
+  gap: 6px;
+}
+
+.expedition-route {
+  width: 100%;
+  min-height: 78px;
+  padding: 9px 10px;
+  color: #d9e0df;
+  background: #171e23;
+  border: 1px solid #34454b;
+  border-left: 3px solid #6eb5b0;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.expedition-route.risk-measured { border-left-color: #d6b065; }
+.expedition-route.risk-severe { border-left-color: #c87568; }
+
+.expedition-route:hover:not(:disabled) {
+  background: #202a30;
+  border-color: #6eb5b0;
+  transform: translateY(-1px);
+}
+
+.expedition-route:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.expedition-route-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.expedition-route-topline strong { color: #f0e9da; }
+.expedition-route-topline > span { color: #9aa9ae; font-size: 0.72em; white-space: nowrap; }
+
+.expedition-route-desc,
+.expedition-route-reward {
+  display: block;
+  font-family: system-ui, sans-serif;
+  line-height: 1.35;
+}
+
+.expedition-route-desc { color: #aab5b8; font-size: 0.76em; }
+.expedition-route-reward { color: #d6b065; font-size: 0.7em; margin-top: 5px; }
+
+.expedition-result {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border: 1px solid #36474d;
+  border-radius: 4px;
+  font-size: 0.76em;
+}
+
+.expedition-result.success strong { color: #83c89b; }
+.expedition-result.failure strong { color: #d47b70; }
+.expedition-result span { color: #c0c9c9; }
+
+.expedition-history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.expedition-history .success { color: #76ae89; }
+.expedition-history .failure { color: #a76f68; }
 
 .game-layout > *,
 .tab-content,
@@ -223,7 +413,7 @@ g[role="button"]:focus-visible {
   border: 1px solid var(--panel-border);
   box-shadow: var(--panel-shadow);
   backdrop-filter: blur(10px);
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
 }
@@ -1962,18 +2152,12 @@ canvas:hover {
 /* Era transition fanfare */
 .era-transition-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.7);
+  top: 12px;
+  left: 50%;
+  width: min(620px, calc(100vw - 24px));
+  transform: translateX(-50%);
   z-index: 1000;
   animation: era-fade-in 0.3s ease;
-  pointer-events: auto;
-  cursor: pointer;
 }
 
 .era-transition-overlay.fading {
@@ -1981,8 +2165,8 @@ canvas:hover {
 }
 
 @keyframes era-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 @keyframes era-fade-out {
@@ -1991,41 +2175,59 @@ canvas:hover {
 }
 
 .era-transition-content {
-  text-align: center;
-  animation: era-zoom-in 0.5s ease;
+  padding: 14px 16px;
+  background: #12191d;
+  border: 1px solid #d6b065;
+  border-radius: 6px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
 }
 
-@keyframes era-zoom-in {
-  from { transform: scale(0.5); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.era-transition-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.era-transition-title button {
+  width: 32px;
+  height: 32px;
+  color: #aeb8b9;
+  background: transparent;
+  border: 1px solid #3c494d;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2em;
 }
 
 .era-transition-label {
-  font-size: 1.2em;
+  font-size: 0.68em;
   color: #d4a840;
-  letter-spacing: 6px;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 
 .era-transition-name {
-  font-size: 2.5em;
+  font-size: 1.4em;
   font-weight: bold;
   color: #fff;
-  text-shadow: 0 0 20px rgba(212, 168, 64, 0.5), 0 0 40px rgba(212, 168, 64, 0.3);
-  animation: era-name-glow 1.5s ease-in-out infinite;
 }
 
-@keyframes era-name-glow {
-  0%, 100% { text-shadow: 0 0 20px rgba(212, 168, 64, 0.5), 0 0 40px rgba(212, 168, 64, 0.3); }
-  50% { text-shadow: 0 0 30px rgba(212, 168, 64, 0.8), 0 0 60px rgba(212, 168, 64, 0.5), 0 0 80px rgba(212, 168, 64, 0.2); }
+.era-transition-lore {
+  color: #c8b98f;
+  font-family: system-ui, sans-serif;
+  font-size: 0.78em;
+  line-height: 1.4;
+  margin-top: 8px;
 }
 
 .era-transition-unlocks {
-  margin-top: 14px;
-  font-size: 0.85em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 9px;
+  font-size: 0.72em;
   color: #aaddaa;
-  line-height: 1.6;
 }
 
 .era-unlock-line {
@@ -2354,14 +2556,31 @@ canvas:hover {
   }
 
   .header-controls {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 4px;
+    overflow-x: auto;
+    padding-bottom: 3px;
   }
 
   .header-controls button {
+    flex: 0 0 auto;
     font-size: 0.75em;
     padding: 3px 6px;
     min-height: 44px;
+  }
+
+  .control-ribbon {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .control-ribbon::-webkit-scrollbar {
+    display: none;
+  }
+
+  .control-chip {
+    flex: 0 0 auto;
   }
 
   /* Colony even split, dock button on mobile */
@@ -2375,12 +2594,13 @@ canvas:hover {
 
   .toast-container {
     right: 8px;
-    left: 8px;
-    max-width: none;
+    left: auto;
+    width: min(260px, calc(100vw - 16px));
   }
 
   .toast {
-    font-size: 0.8em;
+    font-size: 0.68em;
+    padding: 6px 8px;
   }
 
   /* Mini-game sub-tab buttons need adequate touch targets */
@@ -2395,6 +2615,94 @@ canvas:hover {
     min-height: 44px;
     padding: 10px 8px !important;
     font-size: 0.9em !important;
+  }
+
+  .era-transition-overlay {
+    top: auto;
+    bottom: 8px;
+  }
+
+  .era-transition-content {
+    padding: 11px 12px;
+  }
+
+  .era-transition-name {
+    font-size: 1.05em;
+  }
+
+  .era-transition-lore {
+    font-size: 0.7em;
+  }
+
+  .era-transition-unlocks {
+    font-size: 0.65em;
+  }
+
+  .early-game-layout .expedition-panel {
+    order: -1;
+  }
+
+  .era-panel {
+    padding: 9px;
+  }
+
+  .era-panel h2 {
+    font-size: 0.92em;
+    margin-bottom: 3px;
+  }
+
+  .era-panel > .text-lore {
+    display: none;
+  }
+
+  .era-panel > .era-hint {
+    font-size: 0.7em;
+    line-height: 1.3;
+  }
+
+  .era-panel .readiness-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+    margin: 5px 0;
+  }
+
+  .era-panel .readiness-card {
+    gap: 1px;
+    padding: 6px 4px;
+    border-radius: 6px;
+  }
+
+  .era-panel .readiness-card strong {
+    font-size: 0.95em;
+  }
+
+  .era-panel .readiness-card > span:last-child {
+    font-size: 0.58em;
+    line-height: 1.25;
+  }
+
+  .era-panel .era-director {
+    margin-top: 6px;
+    padding: 7px 8px;
+    border-radius: 6px;
+  }
+
+  .era-panel .director-heading {
+    margin: 0;
+  }
+
+  .era-panel .director-detail {
+    font-size: 0.7em;
+    line-height: 1.35;
+    margin: 4px 0 0;
+  }
+
+  .era-panel .director-chip-row {
+    display: none;
+  }
+
+  .era-panel .era-stats {
+    display: none;
   }
 }
 

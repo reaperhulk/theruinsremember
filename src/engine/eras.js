@@ -19,9 +19,9 @@ import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
 // Minimum upgrades purchased in the current era before transition is allowed.
 const ERA_MIN_UPGRADES = {
-  1: 30,   // ~55% of ~55
-  2: 35,   // ~63% of ~56
-  3: 20,   // ~38% of ~53 — reduced for faster flow
+  1: 14,
+  2: 16,
+  3: 16,
   4: 30,   // ~52% of ~58
   5: 30,   // ~52% of ~58 — reduced from 42 to avoid stalls
   6: 30,   // ~52% of ~58
@@ -39,8 +39,8 @@ export function getMinUpgradesForEra(era) {
 // This replaces fixed dwell timers with build-out/readiness checks.
 const ERA_MIN_TECHS = {
   1: 2,    // path tech + era gate
-  2: 4,    // path techs + multiple era commitments
-  3: 4,
+  2: 3,
+  3: 3,
   4: 4,
   5: 4,
   6: 3,
@@ -72,11 +72,19 @@ export function getEraReadiness(state, era = state.era) {
   const currentUpgrades = countEraUpgrades(state, era);
   const minTechs = getMinTechsForEra(era);
   const currentTechs = countEraTechs(state, era);
+  const discoveryCredits = era <= 3 && era === state.era
+    ? Math.min(8, (state.expedition?.eraFinds || 0) * 2)
+    : 0;
+  const minimumEconomicUpgrades = era <= 3 ? Math.ceil(minUpgrades * 0.4) : minUpgrades;
+  const foundationProgress = currentUpgrades + discoveryCredits;
 
   return {
     minUpgrades,
     currentUpgrades,
-    upgradesMet: currentUpgrades >= minUpgrades,
+    discoveryCredits,
+    minimumEconomicUpgrades,
+    foundationProgress,
+    upgradesMet: currentUpgrades >= minimumEconomicUpgrades && foundationProgress >= minUpgrades,
     minTechs,
     currentTechs,
     techsMet: currentTechs >= minTechs,
@@ -124,5 +132,9 @@ export function transitionEra(state, newEra) {
     bestEraTimes[newEra] = currentTime;
   }
 
-  return { ...state, era: newEra, resources: newResources, eraStartTime: state.totalTime, bestEraTimes };
+  const expedition = state.expedition
+    ? { ...state.expedition, eraFinds: 0, supplies: Math.max(1, state.expedition.supplies) }
+    : state.expedition;
+
+  return { ...state, era: newEra, resources: newResources, expedition, eraStartTime: state.totalTime, bestEraTimes };
 }

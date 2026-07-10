@@ -19,6 +19,7 @@ import { drawFragment, resolveWeave } from '../src/engine/weaving.js';
 import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
 import { assembleDysonSegment } from '../src/engine/dyson.js';
 import { applyTuning } from '../src/engine/tuning.js';
+import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
 import { allocateSenateInfluence, getMaxSenateInfluence } from '../src/engine/senate.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
 import { readFileSync } from 'fs';
@@ -85,9 +86,10 @@ const PROFILES = {
   optimal: {
     description: 'Engage everything, buy everything, perfect mini-game play. Baseline for pacing.',
     mine: true, gather: true, gatherInterval: 5,
+    expeditions: true, expeditionStrategy: 'deep',
     buyUpgrades: true, buyTech: true,
-    factory: true, factoryStrategy: 'balanced',
-    hacking: true, hackInterval: 35,
+    factory: false, factoryStrategy: 'balanced',
+    hacking: false, hackInterval: 35,
     docking: true, dockInterval: 3, dockAccuracy: 0,
     colonies: true, colonyStrategy: 'diversified',
     starChart: true,
@@ -112,6 +114,7 @@ const PROFILES = {
   noMinigames: {
     description: 'Buy upgrades/tech, gather, but skip all mini-games. Tests: are mini-games required?',
     mine: true, gather: true, gatherInterval: 5,
+    expeditions: false, expeditionStrategy: 'safe',
     buyUpgrades: true, buyTech: true,
     factory: false, factoryStrategy: 'balanced',
     hacking: false, hackInterval: 35,
@@ -135,6 +138,7 @@ const PROFILES = {
   passive: {
     description: 'Only auto-production + upgrade buying. No clicking or mini-games. Tests: minimum viable progression.',
     mine: false, gather: false, gatherInterval: 0,
+    expeditions: false, expeditionStrategy: 'safe',
     buyUpgrades: true, buyTech: true,
     factory: false, factoryStrategy: 'balanced',
     hacking: false, hackInterval: 0,
@@ -156,6 +160,7 @@ const PROFILES = {
   clickerOnly: {
     description: 'Mining + gathering every tick, no mini-games. Tests: how far can clicking carry you?',
     mine: true, gather: true, gatherInterval: 1,
+    expeditions: false, expeditionStrategy: 'safe',
     buyUpgrades: true, buyTech: true,
     factory: false, factoryStrategy: 'balanced',
     hacking: false, hackInterval: 0,
@@ -177,9 +182,10 @@ const PROFILES = {
   tradingHeavy: {
     description: 'All systems + aggressive trading of surplus into bottleneck resources. Tests: trading impact.',
     mine: true, gather: true, gatherInterval: 5,
+    expeditions: true, expeditionStrategy: 'deep',
     buyUpgrades: true, buyTech: true,
-    factory: true, factoryStrategy: 'balanced',
-    hacking: true, hackInterval: 35,
+    factory: false, factoryStrategy: 'balanced',
+    hacking: false, hackInterval: 35,
     docking: true, dockInterval: 3, dockAccuracy: 0,
     colonies: true, colonyStrategy: 'diversified',
     starChart: true,
@@ -203,9 +209,10 @@ const PROFILES = {
   casual: {
     description: 'Simulates a regular player: gathers infrequently, misses docks, skips some mini-games.',
     mine: true, gather: true, gatherInterval: 15,
+    expeditions: true, expeditionStrategy: 'measured',
     buyUpgrades: true, buyTech: true,
-    factory: true, factoryStrategy: 'balanced',
-    hacking: true, hackInterval: 60,
+    factory: false, factoryStrategy: 'balanced',
+    hacking: false, hackInterval: 60,
     docking: true, dockInterval: 5, dockAccuracy: 0.15,
     colonies: true, colonyStrategy: 'growth',
     starChart: true,
@@ -240,7 +247,17 @@ const SCENARIOS = {
 };
 
 const BALANCE_TARGETS = {
-  full: { minTime: 600, maxTime: 900, requiredEra: 10 },
+  full: {
+    minTime: 1800,
+    maxTime: 5400,
+    requiredEra: 10,
+    eraRanges: {
+      2: [90, 240],
+      3: [90, 300],
+      4: [60, 300],
+      5: [900, 2400],
+    },
+  },
   casual: { minTime: 1500, maxTime: 14400, requiredEra: 10 },
   noMinigames: { minTime: 5400, maxTime: 25200, requiredEra: 10 },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10 },
@@ -266,6 +283,15 @@ function botGather(state, profile, t, rng) {
     }
   }
   return state;
+}
+
+function botExpedition(state, profile, _t, rng) {
+  if (!profile.expeditions || state.era > 3 || (state.expedition?.supplies || 0) < 1) return state;
+  const routes = getExpeditionRoutes(state.era);
+  const routeIndex = profile.expeditionStrategy === 'deep'
+    ? 2
+    : profile.expeditionStrategy === 'measured' ? 1 : 0;
+  return runExpedition(state, routes[routeIndex].id, rng).state;
 }
 
 function botBuyUpgrades(state, profile, _t, _rng) {
@@ -762,6 +788,7 @@ function runScenario(opts) {
     // --- Bot actions ---
     state = botMine(state, profileDef, t, rng);
     state = botGather(state, profileDef, t, rng);
+    state = botExpedition(state, profileDef, t, rng);
     state = botBuyUpgrades(state, profileDef, t, rng);
     state = botBuyTech(state, profileDef, t, rng);
     state = botFactory(state, profileDef, t, rng);
@@ -1096,6 +1123,14 @@ function assertBalanceTargets(allResults) {
     if (status.finalEra < target.requiredEra) issues.push(`final era ${status.finalEra} < ${target.requiredEra}`);
     if (target.minTime != null && status.totalTime < target.minTime) issues.push(`too fast (${fmtTime(status.totalTime)} < ${fmtTime(target.minTime)})`);
     if (target.maxTime != null && status.totalTime > target.maxTime) issues.push(`too slow (${fmtTime(status.totalTime)} > ${fmtTime(target.maxTime)})`);
+    for (const [era, [minDuration, maxDuration]] of Object.entries(target.eraRanges || {})) {
+      const timing = collector.eraTimings[era];
+      if (!timing) {
+        issues.push(`era ${era} timing missing`);
+      } else if (timing.duration < minDuration || timing.duration > maxDuration) {
+        issues.push(`era ${Number(era) - 1} duration ${fmtTime(timing.duration)} outside ${fmtTime(minDuration)}-${fmtTime(maxDuration)}`);
+      }
+    }
 
     if (issues.length > 0) {
       failures++;

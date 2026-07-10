@@ -38,9 +38,15 @@ function startPump(page) {
       const p = phases[phase++ % phases.length];
       document.querySelector('#tab-' + p)?.click();
       setTimeout(() => {
-        if (p === 'upgrades') document.querySelectorAll('button').forEach(b => { if (b.textContent.includes('Buy All') && !b.disabled) b.click(); });
+        if (p === 'upgrades') {
+          const buyAll = [...document.querySelectorAll('button')].find(b => b.textContent.includes('Buy All') && !b.disabled);
+          if (buyAll) buyAll.click();
+          else document.querySelector('.upgrade-btn.affordable:not(:disabled)')?.click();
+        }
         else if (p === 'tech') { document.querySelectorAll('button').forEach(b => { if (b.textContent.includes('Research All') && !b.disabled) b.click(); }); document.querySelectorAll('.tech-btn.affordable').forEach(b => b.click()); document.querySelectorAll('.tech-btn.affordable.era-gate-tech').forEach(b => b.click()); }
         else if (p === 'prestige') document.querySelectorAll('.upgrade-btn.affordable').forEach(b => { if (!b.disabled) b.click(); });
+        const expeditionRoutes = [...document.querySelectorAll('.expedition-route:not(:disabled)')];
+        expeditionRoutes.at(-1)?.click();
         document.querySelectorAll('.gather-btn').forEach(b => b.click());
       }, 10);
     }, 80);

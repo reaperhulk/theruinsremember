@@ -2,6 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { createInitialState, migrateState } from '../state.js';
 
 describe('migrateState', () => {
+  it('adds the expedition model to older saves', () => {
+    const migrated = migrateState({ era: 1, resources: createInitialState().resources, saveVersion: 2 });
+    expect(migrated.expedition.supplies).toBe(2);
+    expect(migrated.expedition.eraFinds).toBe(0);
+    expect(migrated.saveVersion).toBe(3);
+  });
+
   it('fills missing fields from fresh state', () => {
     const oldSave = { era: 3, resources: { food: { unlocked: true, amount: 100 } } };
     const migrated = migrateState(oldSave);

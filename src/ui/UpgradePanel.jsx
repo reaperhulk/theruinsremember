@@ -10,6 +10,21 @@ import { playUpgrade } from './AudioManager.js';
 
 const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 
+function getFocusScore(state, upgrade) {
+  let score = upgrade.era === state.era ? 100 : 0;
+  if (canAfford(state, getUpgradeCost(state, upgrade.id))) score += 40;
+  if (upgrade.mechanic) score += 80;
+  if (LORE_UPGRADE_ID_SET.has(upgrade.id)) score += 20;
+  for (const effect of upgrade.effects) {
+    if (effect.type === 'unlock_resource') score += 70;
+    if (effect.type === 'production_mult_all') score += 60;
+    if (effect.type === 'production_mult') score += 35;
+    if (effect.type === 'cap_mult') score += 18;
+    if (effect.type === 'production_add') score += 8;
+  }
+  return score;
+}
+
 const mechanicDescriptions = {
   clickAll: 'Clicking any resource gives +1 to all others',
   surplusConvert: 'Capped resources trickle to your lowest resource',
@@ -100,6 +115,7 @@ function getAffordProgress(state, cost) {
 export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const [showPurchased, setShowPurchased] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
+  const [showCatalog, setShowCatalog] = useState(false);
   const [sortBy, setSortBy] = useState('default');
   const [filterType, setFilterType] = useState('all');
   const [filterEra, setFilterEra] = useState(null);
@@ -215,9 +231,17 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
     ? searchFiltered
     : searchFiltered.filter(u => !hiddenUpgrades[u.id]);
 
-  const affordableCount = filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
-  const mechanicCount = filteredAvailable.filter(u => u.mechanic).length;
-  const loreCount = filteredAvailable.filter(u => LORE_UPGRADE_ID_SET.has(u.id)).length;
+  const focusMode = state.era <= 3 && !showCatalog;
+  const visibleAvailable = focusMode
+    ? [...filteredAvailable]
+        .filter(upgrade => !upgrade.repeatable)
+        .sort((a, b) => getFocusScore(state, b) - getFocusScore(state, a))
+        .slice(0, 6)
+    : filteredAvailable;
+
+  const affordableCount = visibleAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
+  const mechanicCount = visibleAvailable.filter(u => u.mechanic).length;
+  const loreCount = visibleAvailable.filter(u => LORE_UPGRADE_ID_SET.has(u.id)).length;
 
   // Pre-compute enables counts for all upgrades (avoids O(N*M) per render)
   const enablesCountMap = useMemo(() => {
@@ -238,7 +262,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   return (
     <div className={`panel upgrade-panel${chainFlash ? ' chain-reaction-flash' : ''}`}>
       <h2>
-        Upgrades{filteredAvailable.length > 0 ? ` (${affordableCount}/${filteredAvailable.length})` : ''}
+        {focusMode ? 'Decisions' : 'Upgrade Catalog'}{visibleAvailable.length > 0 ? ` (${affordableCount}/${visibleAvailable.length})` : ''}
         {upcoming.length > 0 ? `, ${upcoming.length} soon` : ''}
         {purchased.length > 0 && (
           <span
@@ -260,10 +284,17 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
       </h2>
       <div className="upgrade-summary-strip">
         <span className="upgrade-summary-pill">{affordableCount} affordable now</span>
-        <span className="upgrade-summary-pill">{mechanicCount} mechanic shifts</span>
-        <span className="upgrade-summary-pill">{loreCount} lore fragments</span>
+        {focusMode && <span className="upgrade-summary-pill">showing {visibleAvailable.length} priorities</span>}
+        {mechanicCount > 0 && <span className="upgrade-summary-pill">{mechanicCount} mechanic shifts</span>}
+        {loreCount > 0 && <span className="upgrade-summary-pill">{loreCount} lore fragments</span>}
       </div>
-      {filteredAvailable.some(u => LORE_UPGRADE_ID_SET.has(u.id)) && (
+      {state.era <= 3 && (
+        <div className="catalog-mode" role="group" aria-label="Upgrade display mode">
+          <button className={!showCatalog ? 'active' : ''} onClick={() => setShowCatalog(false)}>Priority decisions</button>
+          <button className={showCatalog ? 'active' : ''} onClick={() => setShowCatalog(true)}>Full catalog ({available.length})</button>
+        </div>
+      )}
+      {visibleAvailable.some(u => LORE_UPGRADE_ID_SET.has(u.id)) && (
         <div className="text-hint" style={{ color: '#bb88ff', marginBottom: '4px' }}>
           Purple border = story upgrades — collected in Stats → Codex
         </div>
@@ -308,7 +339,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           }
           if (boughtThisPass === 0) break;
         }
-        return available.length > 0 && (
+        return !focusMode && available.length > 0 && (
           <button
             className="gather-btn"
             style={{ width: '100%', marginBottom: '4px', padding: '4px', fontSize: '0.8em' }}
@@ -344,7 +375,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           </button>
         );
       })()}
-      {available.length > 5 && (
+      {!focusMode && available.length > 5 && (
         <input
           type="text"
           placeholder="Search upgrades..."
@@ -354,7 +385,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           style={{ width: '100%', padding: '4px 8px', marginBottom: '4px', background: '#161820', border: '1px solid #2a2418', color: '#d8d0c8', fontFamily: 'inherit', fontSize: '0.8em', borderRadius: '3px', boxSizing: 'border-box' }}
         />
       )}
-      {available.length > 0 && (
+      {!focusMode && available.length > 0 && (
         <div className="upgrade-sort">
           <button className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>All</button>
           <button className={sortBy === 'affordable' ? 'active' : ''} onClick={() => setSortBy('affordable')}>Can Buy</button>
@@ -410,13 +441,13 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         </div>
       )}
       <div className="upgrade-list">
-        {filteredAvailable.length === 0 && upcoming.length === 0 && (
+        {visibleAvailable.length === 0 && upcoming.length === 0 && (
           <p className="empty-message">No upgrades available — explore the Tech Tree for new paths, or buy prerequisite upgrades to unlock more</p>
         )}
-        {filteredAvailable.length === 0 && upcoming.length > 0 && (
+        {visibleAvailable.length === 0 && upcoming.length > 0 && (
           <p className="empty-message">Buy prerequisites to unlock {upcoming.length} upcoming upgrade{upcoming.length > 1 ? 's' : ''}</p>
         )}
-        {(() => { const firstAffordableId = Object.keys(state.upgrades).length === 0 ? filteredAvailable.filter(u => !u.repeatable).find(u => canAfford(state, getUpgradeCost(state, u.id)))?.id : null; return filteredAvailable.filter(u => !u.repeatable).map(upgrade => {
+        {(() => { const firstAffordableId = Object.keys(state.upgrades).length === 0 ? visibleAvailable.filter(u => !u.repeatable).find(u => canAfford(state, getUpgradeCost(state, u.id)))?.id : null; return visibleAvailable.filter(u => !u.repeatable).map(upgrade => {
           const cost = getUpgradeCost(state, upgrade.id);
           const affordable = canAfford(state, cost);
           const count = typeof state.upgrades[upgrade.id] === 'number' ? state.upgrades[upgrade.id] : 0;
@@ -504,7 +535,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           );
         }); })()}
         {(() => {
-          const repeatables = filteredAvailable.filter(u => u.repeatable);
+          const repeatables = visibleAvailable.filter(u => u.repeatable);
           if (repeatables.length === 0) return null;
           return (
             <>

@@ -1,4 +1,5 @@
 import { resources } from '../data/resources.js';
+import { createExpeditionState } from './expeditions.js';
 
 // Migrate a saved state to the current schema by merging with fresh defaults
 export function migrateState(saved) {
@@ -17,6 +18,7 @@ export function migrateState(saved) {
   if (!migrated.dysonSegments) migrated.dysonSegments = 0;
   if (!migrated.tuningScore) migrated.tuningScore = 0;
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
+  migrated.expedition = { ...createExpeditionState(), ...(saved.expedition || {}) };
   // Guard against broken resource fields from corrupt saves
   for (const [id, r] of Object.entries(migrated.resources)) {
     if (!Number.isFinite(r.capMult) || r.capMult <= 0) migrated.resources[id] = { ...migrated.resources[id], capMult: 1 };
@@ -62,6 +64,8 @@ export function createInitialState() {
     miningStreak: 0,    // consecutive clicks without gem
     totalGems: 0,       // lifetime gems found
     lastMineTime: 0,    // cooldown tracking for manual mines
+    // Expeditions (Eras 1-3)
+    expedition: createExpeditionState(),
     // Events system (Era 3+)
     activeEffects: [],  // [{ id, endsAt, description }]
     eventLog: [],       // [{ message, time }] — last 10 events
@@ -102,6 +106,6 @@ export function createInitialState() {
     seenLoreEvents: {},
     // UI: hidden repeatable upgrades
     hiddenUpgrades: {},
-    saveVersion: 2,
+    saveVersion: 3,
   };
 }

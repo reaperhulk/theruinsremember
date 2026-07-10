@@ -143,12 +143,16 @@ function buildDirector(state, readiness) {
   const supplyAlerts = getSupplyChainAlert(state);
 
   if (!readiness.upgradesMet) {
+    const needsEconomicBase = readiness.currentUpgrades < readiness.minimumEconomicUpgrades;
     return {
-      title: 'Build Out The Era',
-      detail: `${readiness.minUpgrades - readiness.currentUpgrades} more upgrades needed before the next breakthrough counts.`,
+      title: needsEconomicBase ? 'Establish The Economy' : 'Stabilize The Era',
+      detail: needsEconomicBase
+        ? `${readiness.minimumEconomicUpgrades - readiness.currentUpgrades} more economic decisions are needed before discoveries can carry the rest.`
+        : `${readiness.minUpgrades - readiness.foundationProgress} more foundation progress needed. Buy an upgrade or recover discoveries on an expedition.`,
       chips: [
         `${affordableUpgrades.length} upgrades affordable now`,
-        `${readiness.currentUpgrades}/${readiness.minUpgrades} era upgrades`,
+        `${readiness.currentUpgrades} economic decisions`,
+        `${readiness.discoveryCredits} discovery credit`,
       ],
       tone: 'warning',
       supplyAlerts,
@@ -271,7 +275,7 @@ export function EraProgress({ state }) {
           return <p className="era-hint" style={{ color: '#88ff88' }}>Era transition imminent...</p>;
         }
         if (!upgradesMet) {
-          return <p className="era-hint">Buy {minUpgrades - eraUpgradeCount} more upgrades to stabilize this era, then finish the breakthrough research.</p>;
+          return <p className="era-hint">Build the economy or recover discoveries until the foundation is stable, then finish the breakthrough research.</p>;
         }
         if (!readiness.techsMet) {
           return <p className="era-hint" style={{ color: '#ddcc44' }}>Research {readiness.minTechs - readiness.currentTechs} more era tech{readiness.minTechs - readiness.currentTechs === 1 ? '' : 's'} to prove the economy is ready.</p>;
@@ -282,9 +286,9 @@ export function EraProgress({ state }) {
         <>
           <div className="readiness-grid">
             <div className={`readiness-card${upgradesMet ? ' ready' : ''}`}>
-              <span className="readiness-label">Era Upgrades</span>
-              <strong>{eraUpgradeCount}/{minUpgrades}</strong>
-              <span>{eraCompletion}% of this era's catalog</span>
+              <span className="readiness-label">Foundation</span>
+              <strong>{Math.min(readiness.foundationProgress, minUpgrades)}/{minUpgrades}</strong>
+              <span>{eraUpgradeCount} decisions + {readiness.discoveryCredits} discovery credit</span>
             </div>
             <div className={`readiness-card${readiness.techsMet ? ' ready' : ''}`}>
               <span className="readiness-label">Era Research</span>
@@ -293,8 +297,8 @@ export function EraProgress({ state }) {
             </div>
           </div>
           {!upgradesMet && (
-            <div className="upgrade-progress-bar" role="progressbar" aria-valuenow={eraUpgradeCount} aria-valuemin={0} aria-valuemax={minUpgrades} aria-label="Era upgrade progress" style={{ margin: '2px 0 4px' }}>
-              <div className={`upgrade-progress-fill ${eraUpgradeCount / minUpgrades > 0.8 ? 'almost' : ''}`} style={{ width: `${Math.floor(eraUpgradeCount / minUpgrades * 100)}%` }} />
+            <div className="upgrade-progress-bar" role="progressbar" aria-valuenow={readiness.foundationProgress} aria-valuemin={0} aria-valuemax={minUpgrades} aria-label="Era foundation progress" style={{ margin: '2px 0 4px' }}>
+              <div className={`upgrade-progress-fill ${readiness.foundationProgress / minUpgrades > 0.8 ? 'almost' : ''}`} style={{ width: `${Math.min(100, Math.floor(readiness.foundationProgress / minUpgrades * 100))}%` }} />
             </div>
           )}
         </>

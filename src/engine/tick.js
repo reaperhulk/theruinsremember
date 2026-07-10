@@ -11,6 +11,7 @@ import { purchaseUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { getSenatePctBonuses } from './senate.js';
 import { getTuningProductionBonus } from './tuning.js';
+import { advanceExpeditionSupplies } from './expeditions.js';
 
 // Resource consumption rates — moderate tension without breaking non-minigame paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
@@ -189,6 +190,8 @@ export function tick(state, dt, rng = Math.random) {
     totalTicks: state.totalTicks + 1,
     totalTime: state.totalTime + dt,
   };
+
+  newState = advanceExpeditionSupplies(newState, dt);
 
   const eventResult = checkForEvent(newState, dt, rng());
   newState = eventResult.state;

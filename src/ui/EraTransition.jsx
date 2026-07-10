@@ -17,9 +17,9 @@ const eraLore = {
 
 // What unlocks per era (resources + mini-games)
 const eraUnlocks = {
-  2: { resources: ['Steel', 'Electronics', 'Research'], features: ['Factory mini-game'] },
-  3: { resources: ['Software', 'Data'], features: ['Hacking mini-game'] },
-  4: { resources: ['Rocket Fuel', 'Orbital Infrastructure'], features: ['Docking mini-game', 'Trading'] },
+  2: { resources: ['Steel', 'Electronics', 'Research'], features: ['Industrial expedition routes'] },
+  3: { resources: ['Software', 'Data'], features: ['Signal expedition routes'] },
+  4: { resources: ['Rocket Fuel', 'Orbital Infrastructure'], features: ['Docking operations', 'Trading'] },
   5: { resources: ['Colonies', 'Exotic Materials'], features: ['Colony management'] },
   6: { resources: ['Star Systems', 'Dark Energy'], features: ['Star Chart'] },
   7: { resources: ['Megastructures', 'Stellar Forge Output'], features: ['Dyson Assembly'] },
@@ -52,7 +52,7 @@ export function EraTransition({ era }) {
       setFadingOut(false);
       playEraTransition();
 
-      const displayTime = 3000 + era * 500;
+      const displayTime = 4500;
       fadeTimerRef.current = setTimeout(() => setFadingOut(true), displayTime - 1000);
       hideTimerRef.current = setTimeout(() => {
         setVisible(false);
@@ -74,16 +74,18 @@ export function EraTransition({ era }) {
   return (
     <div
       className={`era-transition-overlay ${fadingOut ? 'fading' : ''}`}
-      onClick={dismiss}
-      style={{ cursor: 'pointer' }}
-      role="dialog"
-      aria-modal="true"
+      role="status"
       aria-label={`Era ${era}: ${eraNames[era]}`}
     >
       <div className="era-transition-content">
-        <div className="era-transition-label">ERA {era}</div>
-        <div className="era-transition-name">{eraNames[era]}</div>
-        <div style={{ fontSize: '0.85em', color: '#ccaa66', marginTop: '10px', fontStyle: 'italic', maxWidth: '400px', lineHeight: '1.4' }}>{eraLore[era]}</div>
+        <div className="era-transition-title">
+          <div>
+            <div className="era-transition-label">Era {era}</div>
+            <div className="era-transition-name">{eraNames[era]}</div>
+          </div>
+          <button onClick={dismiss} aria-label="Dismiss era notification" title="Dismiss">&times;</button>
+        </div>
+        <p className="era-transition-lore">{eraLore[era]}</p>
         {unlocks && (
           <div className="era-transition-unlocks">
             {unlocks.resources.length > 0 && (
@@ -98,7 +100,6 @@ export function EraTransition({ era }) {
             )}
           </div>
         )}
-        <div style={{ fontSize: '0.7em', color: '#666', marginTop: '12px' }}>Click anywhere to dismiss</div>
       </div>
     </div>
   );
