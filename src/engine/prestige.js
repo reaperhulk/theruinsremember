@@ -75,7 +75,7 @@ export function calculatePrestigePoints(state) {
   // Small bonus for operation mastery (deep engagement reward)
   points += Math.floor((state.expedition?.totalFinds || 0) / 10);
   points += Math.floor((state.dockingPerfects || 0) / 20);
-  points += Math.floor((state.totalWeaves || 0) / 15);
+  if (Object.keys(state.wovenLaws || {}).length >= 3) points += 1;
   return points;
 }
 

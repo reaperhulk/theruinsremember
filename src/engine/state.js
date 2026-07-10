@@ -24,6 +24,7 @@ export function migrateState(saved) {
     'miningStreak', 'lastMineTime', 'autoMineTimer',
     'factoryAllocation', 'factoryWorkers',
     'hackChallenge', 'hackDifficulty', 'hackSuccesses', 'hackMastery', 'lastHackTime',
+    'weavingGrid', 'weavingOffer', 'weaveCombo', 'lastWeaveTime',
   ]) {
     delete migrated[retiredField];
   }
@@ -74,6 +75,8 @@ export function createInitialState() {
     // Events system (Era 3+)
     activeEffects: [],  // [{ id, endsAt, description }]
     eventLog: [],       // [{ message, time }] — last 10 events
+    totalWeaves: 0,
+    wovenLaws: {},
     // Docking (Era 4+)
     dockingAttempts: 0,
     dockingSuccesses: 0,

@@ -23,7 +23,7 @@ Prestige isn't just a mechanic. It's the cycle itself.
 - **10 Eras** spanning primitive survival to multiverse exploration
 - **579 upgrades** forming deep prerequisite chains with meaningful branching choices
 - **115 tech nodes** including mutually exclusive paths that shape each run differently
-- **Era-focused operations** that evolve from ruin expeditions into orbital missions, colony mandates, star-network directives, Dyson assembly, reality weaving, galactic politics, cosmic tuning, and the Reality Forge
+- **Era-focused operations** that evolve from ruin expeditions into orbital missions, colony mandates, star-network directives, Dyson commissions, permanent cycle laws, galactic politics, cosmic tuning, and the Reality Forge
 - **Distinct cycle doctrines** that reshape early, middle, or late eras and award permanent cycle marks for doctrine-specific goals
 - **Reality keys with different identities**: faster expeditions, larger storage, stronger operation rewards, or seeded starting resources
 - **Recovered Relics** with guaranteed Echo Pressure offers and a two-slot, run-only loadout that dissolves at prestige

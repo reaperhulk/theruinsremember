@@ -109,7 +109,7 @@ describe('eras', () => {
       const state = createInitialState();
       state.cycleDoctrine = 'transcendence';
       state.era = 8;
-      state.totalWeaves = 2;
+      state.wovenLaws = { temporal: true, causal: true };
       expect(getEraMastery(state).completedDirectly).toBe(true);
 
       state.era = 9;

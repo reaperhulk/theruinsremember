@@ -45,7 +45,7 @@ export const RELICS = {
     id: 'loomNeedle',
     name: 'Loom Needle',
     domain: 'Weaving',
-    description: 'Thread surveys reveal four choices and weaving effects gain +20%.',
+    description: 'Reality Laws are 20% stronger.',
   },
 };
 

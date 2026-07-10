@@ -31,8 +31,8 @@ export const REALITY_KEY_RECIPES = [
     color: '#88dd88',
     description: 'Operation rewards increase 10% per key in every future cycle.',
     lore: 'Effect becomes cause. The causal loop feeds more echoes into the present.',
-    milestone: 'Complete 3 reality weaves',
-    unlocked: state => (state.totalWeaves || 0) >= 3,
+    milestone: 'Establish the Causal Certainty law',
+    unlocked: state => !!state.wovenLaws?.causal,
   },
   {
     id: 'quantum',

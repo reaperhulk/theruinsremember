@@ -1,217 +1,95 @@
-// Reality Weaving operation for Eras 8-10
+// Reality Weaving operation: establish three permanent laws for the current cycle.
 import { getOperationRewardMultiplier } from './cycles.js';
-import { getRelicOperationMultiplier, getRelicWeaveOfferCount } from './relics.js';
-// Combine reality fragments in patterns for multiplier bonuses.
-// Match 3 fragments of the same type for a production multiplier.
+import { getRelicOperationMultiplier } from './relics.js';
 
-const FRAGMENT_TYPES = ['temporal', 'spatial', 'causal', 'quantum'];
-const ALL_TYPES = ['temporal', 'spatial', 'causal', 'quantum', 'chaos'];
+export const REALITY_LAW_LIMIT = 3;
+export const REALITY_LAW_INTERVAL = 45;
 
-const TYPE_BONUSES = {
-  temporal: { resource: 'cosmicPower', mult: 2 },
-  spatial: { resource: 'exoticMatter', mult: 2 },
-  causal: { resource: 'universalConstants', mult: 2 },
-  quantum: { resource: 'realityFragments', mult: 2 },
+export const REALITY_LAWS = {
+  temporal: {
+    id: 'temporal',
+    name: 'Temporal Current',
+    resourceId: 'cosmicPower',
+    resourceName: 'Cosmic Power',
+    description: 'Time flows toward usable power.',
+  },
+  spatial: {
+    id: 'spatial',
+    name: 'Spatial Abundance',
+    resourceId: 'exoticMatter',
+    resourceName: 'Exotic Matter',
+    description: 'Every volume contains more than it should.',
+  },
+  causal: {
+    id: 'causal',
+    name: 'Causal Certainty',
+    resourceId: 'universalConstants',
+    resourceName: 'Universal Constants',
+    description: 'Useful causes become reliable effects.',
+  },
+  quantum: {
+    id: 'quantum',
+    name: 'Quantum Confluence',
+    resourceId: 'realityFragments',
+    resourceName: 'Reality Fragments',
+    description: 'Adjacent possibilities collapse in your favor.',
+  },
 };
 
-const WEAVE_COST = { realityFragments: 5 };
-const BONUS_DURATION = 60; // seconds
-const CHAOS_CHANCE = 0.15; // 15% chance for chaos (wild card) fragment
-const COMBO_RESET_TIME = 120; // seconds of no weaving before combo resets
-
-export function getWeaveDrawCost(state) {
-  return state.prestigeUpgrades?.masterWeaver ? Math.ceil(WEAVE_COST.realityFragments / 2) : WEAVE_COST.realityFragments;
+export function getWovenLaws(state) {
+  return { ...(state.wovenLaws || {}) };
 }
 
-// Generate a random fragment type.
-// roll is 0-1 for deterministic testing.
-// Chaos fragments act as wild cards.
-export function generateFragment(roll = Math.random()) {
-  if (roll < CHAOS_CHANCE) return 'chaos';
-  const adjusted = (roll - CHAOS_CHANCE) / (1 - CHAOS_CHANCE);
-  return FRAGMENT_TYPES[Math.floor(adjusted * FRAGMENT_TYPES.length)];
+export function getWeaveCost(state) {
+  const wovenCount = Object.keys(getWovenLaws(state)).length;
+  const baseCost = 20 * (wovenCount + 1);
+  return state.prestigeUpgrades?.masterWeaver ? Math.ceil(baseCost / 2) : baseCost;
 }
 
-// Get current fragments in the weaving grid
-export function getWeavingGrid(state) {
-  return state.weavingGrid || [];
-}
-
-// Get weaving stats
 export function getWeavingStats(state) {
+  const laws = getWovenLaws(state);
+  const wovenCount = Object.keys(laws).length;
+  const elapsed = state.totalTime - (state.lastLawWeaveTime ?? -REALITY_LAW_INTERVAL);
   return {
     totalWeaves: state.totalWeaves || 0,
-    grid: getWeavingGrid(state),
-    gridSize: 3,
+    laws,
+    wovenCount,
+    remaining: Math.max(0, REALITY_LAW_LIMIT - wovenCount),
+    cooldown: wovenCount >= REALITY_LAW_LIMIT ? 0 : Math.max(0, REALITY_LAW_INTERVAL - elapsed),
   };
 }
 
-// Draw a fragment and add to grid. Costs reality fragments.
-// Returns { state, fragment } or { state: null } if can't afford.
-export function drawFragment(state, roll = Math.random()) {
-  if (state.era < 8) return { state: null, fragment: null };
-
-  // Master Weaver prestige upgrade: halve fragment draw cost
-  const cost = { realityFragments: getWeaveDrawCost(state) };
-
-  // Check cost
-  for (const [resourceId, amount] of Object.entries(cost)) {
-    const r = state.resources[resourceId];
-    if (!r || r.amount < amount) return { state: null, fragment: null };
-  }
-
-  // Spend cost
-  const newResources = { ...state.resources };
-  for (const [resourceId, amount] of Object.entries(cost)) {
-    newResources[resourceId] = {
-      ...newResources[resourceId],
-      amount: newResources[resourceId].amount - amount,
-    };
-  }
-
-  const fragment = generateFragment(roll);
-  const grid = [...getWeavingGrid(state), fragment];
-
-  return {
-    state: {
-      ...state,
-      resources: newResources,
-      weavingGrid: grid,
-    },
-    fragment,
-  };
+export function getWeaveProductionMultiplier(state, resourceId) {
+  const law = Object.values(REALITY_LAWS).find(candidate => candidate.resourceId === resourceId);
+  if (!law || !state.wovenLaws?.[law.id]) return 1;
+  const savantMultiplier = state.prestigeUpgrades?.miniGameSavant ? 1.5 : 1;
+  const bonus = 0.5 * savantMultiplier * getOperationRewardMultiplier(state) * getRelicOperationMultiplier(state, 'weaving');
+  return 1 + bonus;
 }
 
-// Spend one draw cost to reveal three threads. The player chooses which one
-// enters the grid, turning fragment acquisition into a planning decision.
-export function surveyFragments(state, rolls = null, rng = Math.random) {
-  if (state.era < 8 || state.weavingOffer?.length) return null;
-  const cost = getWeaveDrawCost(state);
+export function weaveRealityLaw(state, lawId) {
+  const law = REALITY_LAWS[lawId];
+  if (state.era < 8 || !law) return null;
+
+  const stats = getWeavingStats(state);
+  if (stats.remaining <= 0 || stats.laws[lawId] || stats.cooldown > 0) return null;
+
   const fragments = state.resources.realityFragments;
+  const cost = getWeaveCost(state);
   if (!fragments?.unlocked || fragments.amount < cost) return null;
 
   return {
-    ...state,
-    resources: {
-      ...state.resources,
-      realityFragments: { ...fragments, amount: fragments.amount - cost },
-    },
-    weavingOffer: (rolls || Array.from({ length: getRelicWeaveOfferCount(state) }, () => rng()))
-      .slice(0, getRelicWeaveOfferCount(state))
-      .map(generateFragment),
-  };
-}
-
-export function chooseFragment(state, index) {
-  const offer = state.weavingOffer || [];
-  const fragment = offer[index];
-  if (!fragment) return null;
-  return {
-    ...state,
-    weavingGrid: [...getWeavingGrid(state), fragment],
-    weavingOffer: [],
-  };
-}
-
-export function discardFragment(state, index) {
-  const grid = getWeavingGrid(state);
-  if (!grid[index]) return state;
-  return {
-    ...state,
-    weavingGrid: grid.filter((_, fragmentIndex) => fragmentIndex !== index),
-  };
-}
-
-// Check if grid has a match (3 of the same type) and resolve it.
-// Chaos fragments count as wild cards for any type.
-// Consecutive weaves increase the multiplier (combo).
-// Returns { state, matched, matchType } or { matched: false }.
-export function resolveWeave(state) {
-  const grid = getWeavingGrid(state);
-  if (grid.length < 3) return { state, matched: false, matchType: null };
-
-  // Count fragments by type
-  const counts = {};
-  for (const f of grid) {
-    counts[f] = (counts[f] || 0) + 1;
-  }
-  const chaosCount = counts.chaos || 0;
-
-  // Find first type that has 3+ (counting chaos as wild)
-  let matchType = FRAGMENT_TYPES.find(t => (counts[t] || 0) >= 3);
-
-  // If no natural match, check if chaos can fill the gap
-  if (!matchType && chaosCount > 0) {
-    matchType = FRAGMENT_TYPES.find(t => ((counts[t] || 0) + chaosCount) >= 3);
-  }
-
-  if (!matchType) return { state, matched: false, matchType: null };
-
-  // Remove 3 fragments: prefer the matched type, then chaos
-  let needed = 3;
-  let removedType = 0;
-  let removedChaos = 0;
-  const typeAvailable = counts[matchType] || 0;
-  const fromType = Math.min(typeAvailable, needed);
-  needed -= fromType;
-  const fromChaos = Math.min(chaosCount, needed);
-
-  const newGrid = grid.filter(f => {
-    if (f === matchType && removedType < fromType) {
-      removedType++;
-      return false;
-    }
-    if (f === 'chaos' && removedChaos < fromChaos) {
-      removedChaos++;
-      return false;
-    }
-    return true;
-  });
-
-  // Combo: consecutive weaves boost multiplier
-  const weaveCombo = (state.weaveCombo || 0) + 1;
-  const comboMult = 1 + (weaveCombo - 1) * 0.5; // x1, x1.5, x2, x2.5...
-
-  // Apply bonus as timed effect (era-scaled)
-  const bonus = TYPE_BONUSES[matchType];
-  const eraScale = 1 + (state.era - 8) * 0.5; // x1 at era 8, x2 at era 10
-  const hasSavant = state.prestigeUpgrades && state.prestigeUpgrades.miniGameSavant;
-  const savantMult = hasSavant ? 1.5 : 1;
-  const effectMult = bonus.mult * comboMult * Math.max(1, eraScale) * savantMult * getOperationRewardMultiplier(state) * getRelicOperationMultiplier(state, 'weaving');
-  const effect = {
-    id: `weave_${matchType}_${state.totalTime}`,
-    startedAt: state.totalTime,
-    endsAt: state.totalTime + BONUS_DURATION,
-    description: `Reality Weave: x${effectMult.toFixed(1)} ${bonus.resource}`,
-    effect: { resourceId: bonus.resource, rateMultBonus: effectMult },
-  };
-
-  return {
     state: {
       ...state,
-      weavingGrid: newGrid,
+      resources: {
+        ...state.resources,
+        realityFragments: { ...fragments, amount: fragments.amount - cost },
+      },
+      wovenLaws: { ...stats.laws, [lawId]: true },
       totalWeaves: (state.totalWeaves || 0) + 1,
-      weaveCombo,
-      lastWeaveTime: state.totalTime,
-      activeEffects: [...(state.activeEffects || []), effect],
+      lastLawWeaveTime: state.totalTime,
     },
-    matched: true,
-    matchType,
+    law,
+    cost,
   };
-}
-
-// Check if combo should reset due to inactivity (120s).
-// Call this from the tick loop or before weaving.
-export function checkComboReset(state) {
-  if ((state.weaveCombo || 0) === 0) return state;
-  const lastWeaveTime = state.lastWeaveTime || 0;
-  if (state.totalTime - lastWeaveTime >= COMBO_RESET_TIME) {
-    return { ...state, weaveCombo: 0 };
-  }
-  return state;
-}
-
-// Clear the weaving grid (discard fragments)
-export function clearGrid(state) {
-  return { ...state, weavingGrid: [], weavingOffer: [] };
 }

@@ -12,7 +12,7 @@ import { canAfford, gather, getEffectiveRate, getNetRate } from '../src/engine/r
 import { attemptDock, getDockingInfo, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
 import { assignColonies, getAssignableColonies, getColonyBonus } from '../src/engine/colonies.js';
 import { createRoute, getUnlockedSystems, routeExists, getRoutes, getRouteBonus } from '../src/engine/starChart.js';
-import { drawFragment, resolveWeave } from '../src/engine/weaving.js';
+import { getWeaveProductionMultiplier, getWeavingStats, weaveRealityLaw } from '../src/engine/weaving.js';
 import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
 import { commissionDysonModule, getDysonStats } from '../src/engine/dyson.js';
 import { applyTuning, getTuningProductionBonus } from '../src/engine/tuning.js';
@@ -250,6 +250,7 @@ const BALANCE_TARGETS = {
     minRelics: 2,
     maxDockingAttempts: 30,
     maxDysonCommissions: 3,
+    maxRealityLaws: 3,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
@@ -262,7 +263,7 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3 },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3 },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true },
 };
@@ -398,20 +399,16 @@ function botStarChart(state, profile, t, _rng) {
   return state;
 }
 
-function botWeave(state, profile, t, rng) {
+function botWeave(state, profile, t, _rng) {
   if (!profile.weaving || state.era < 8) return state;
   const interval = profile.weaveInterval || 10;
   if (t % interval !== 0) return state;
 
-  // Draw 3 fragments then resolve
-  for (let i = 0; i < 3; i++) {
-    const { state: afterDraw } = drawFragment(state, rng());
-    if (afterDraw) state = afterDraw;
-    else break;
-  }
-  const { state: afterWeave } = resolveWeave(state);
-  if (afterWeave) state = afterWeave;
-  return state;
+  const stats = getWeavingStats(state);
+  if (stats.remaining <= 0) return state;
+  const lawOrder = ['temporal', 'causal', 'quantum', 'spatial'];
+  const lawId = lawOrder.find(id => !stats.laws[id]);
+  return weaveRealityLaw(state, lawId)?.state || state;
 }
 
 function botTrade(state, profile, t, _rng) {
@@ -769,9 +766,12 @@ function getPassiveOperationRates(state) {
     (sum, [resourceId, multiplier]) => sum + getEffectiveRate(state, resourceId) * Math.max(0, multiplier - 1),
     0,
   );
-  const weavingRate = (state.activeEffects || [])
-    .filter(effect => effect.id?.startsWith('weave_') && effect.effect?.resourceId)
-    .reduce((sum, effect) => sum + getEffectiveRate(state, effect.effect.resourceId) * Math.max(0, (effect.effect.rateMultBonus || 1) - 1), 0);
+  const weavingRate = Object.keys(state.wovenLaws || {}).reduce((sum, lawId) => {
+    const resourceIds = { temporal: 'cosmicPower', spatial: 'exoticMatter', causal: 'universalConstants', quantum: 'realityFragments' };
+    const resourceId = resourceIds[lawId];
+    const multiplier = getWeaveProductionMultiplier(state, resourceId);
+    return sum + getEffectiveRate(state, resourceId) * Math.max(0, 1 - 1 / multiplier);
+  }, 0);
   return {
     colonies: sumRates(getColonyBonus(state)),
     starChart: sumRates(getRouteBonus(state)),
@@ -1270,6 +1270,9 @@ function assertBalanceTargets(allResults) {
     if (target.maxDysonCommissions != null) {
       const commissions = Object.values(collector.engagement.actionsByEra).reduce((sum, actions) => sum + (actions.dyson || 0), 0);
       if (commissions > target.maxDysonCommissions) issues.push(`Dyson commissioned ${commissions} times`);
+    }
+    if (target.maxRealityLaws != null && collector.operationStats.weaving.weaves > target.maxRealityLaws) {
+      issues.push(`Reality Laws established ${collector.operationStats.weaving.weaves} times`);
     }
     if (target.maxFirstOperationLatency != null) {
       for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {

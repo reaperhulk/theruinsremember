@@ -109,7 +109,3 @@ export function getRelicSenateCostMultiplier(state) {
 export function getRelicSenateDirectiveMultiplier(state) {
   return hasRelic(state, 'brokenCrown') ? 1.5 : 1;
 }
-
-export function getRelicWeaveOfferCount(state) {
-  return hasRelic(state, 'loomNeedle') ? 4 : 3;
-}

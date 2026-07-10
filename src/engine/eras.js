@@ -110,7 +110,7 @@ export function getEraMastery(state, era = state.era) {
       ? 'Transcendence doctrine: allocate six Senate seats or complete two reality weaves.'
       : 'Allocate nine Senate seats or complete three reality weaves.';
     const senateSeats = Object.values(state.senate || {}).reduce((sum, count) => sum + count, 0);
-    current = Math.max(senateSeats, (state.totalWeaves || 0) * 3);
+    current = Math.max(senateSeats, Object.keys(state.wovenLaws || {}).length * 3);
     target = transcendent ? 6 : 9;
   } else if (era === 9) {
     title = 'Cosmic Alignment';

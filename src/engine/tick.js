@@ -4,7 +4,6 @@ import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.j
 import { getColonyBonus } from './colonies.js';
 import { getRouteBonus } from './starChart.js';
 import { checkAchievements } from './achievements.js';
-import { checkComboReset } from './weaving.js';
 import { purchaseUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { getSenatePctBonuses } from './senate.js';
@@ -235,7 +234,6 @@ export function tick(state, dt, rng = Math.random) {
   }
 
   // Check weave combo reset (120s inactivity)
-  newState = checkComboReset(newState);
 
   // Track total production for stats
   {

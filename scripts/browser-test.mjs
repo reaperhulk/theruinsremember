@@ -344,7 +344,7 @@ async function run() {
   const tuningFailed = !tuningAudit?.visible || tuningAudit.actionCount !== 2 || tuningAudit.readout.includes('NO READING');
   console.log(`  Cosmic tuning probes: ${tuningFailed ? 'FAILED' : 'limited probe and lock controls ready'}`);
 
-  const weavingChoices = await page.evaluate(() => {
+  const weavingMounted = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return 0;
     select.value = 'weaving';
@@ -352,11 +352,14 @@ async function run() {
     return 1;
   });
   await new Promise(resolve => setTimeout(resolve, 100));
-  if (weavingChoices) await page.evaluate(() => document.querySelector('.weave-controls button')?.click());
+  if (weavingMounted) await page.evaluate(() => document.querySelector('.reality-laws button:not(:disabled)')?.click());
   await new Promise(resolve => setTimeout(resolve, 100));
-  const weavingChoiceCount = weavingChoices && await page.evaluate(() => document.querySelectorAll('.weave-offer button').length);
-  const weavingFailed = weavingChoiceCount !== 3;
-  console.log(`  Reality weaving choices: ${weavingFailed ? 'FAILED' : `${weavingChoiceCount} threads offered`}`);
+  const weavingAudit = weavingMounted && await page.evaluate(() => ({
+    lawChoices: document.querySelectorAll('.reality-laws button').length,
+    established: document.querySelector('.weaving-heading strong')?.textContent || '',
+  }));
+  const weavingFailed = !weavingAudit || weavingAudit.lawChoices !== 4 || !weavingAudit.established.includes('1/3');
+  console.log(`  Reality laws: ${weavingFailed ? 'FAILED' : '4 choices, first law established'}`);
   const forgeReady = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return false;

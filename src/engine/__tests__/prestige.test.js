@@ -119,7 +119,7 @@ describe('prestige', () => {
       state.era = 10;
       state.expedition.totalFinds = 20;
       state.dockingPerfects = 20;
-      state.totalWeaves = 15;
+      state.wovenLaws = { temporal: true, spatial: true, causal: true };
 
       expect(calculatePrestigePoints(state)).toBe(34);
     });
@@ -237,6 +237,8 @@ describe('prestige', () => {
       state.starRoutes = [{ from: 'sol', to: 'alpha' }];
       state.dysonSegments = 30;
       state.tuningScore = 50;
+      state.totalWeaves = 3;
+      state.wovenLaws = { temporal: true, spatial: true, causal: true };
 
       const after = performPrestige(state);
       expect(after.dockingMissions).toEqual(state.dockingMissions);
@@ -244,6 +246,8 @@ describe('prestige', () => {
       expect(after.starRoutes).toEqual(state.starRoutes);
       expect(after.dysonSegments).toBe(30);
       expect(after.tuningScore).toBe(50);
+      expect(after.totalWeaves).toBe(3);
+      expect(after.wovenLaws).toEqual({});
     });
   });
 });

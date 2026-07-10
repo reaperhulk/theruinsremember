@@ -146,8 +146,8 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
           <span>{state.prestigePoints || 0}</span>
         </div>
         <div className="stat-row">
-          <span>Operation Combos</span>
-          <span>Dock: {state.dockingCombo || 0} | Weave: {state.weaveCombo || 0}</span>
+          <span>Cycle Commitments</span>
+          <span>Dock combo: {state.dockingCombo || 0} | Laws: {Object.keys(state.wovenLaws || {}).length}/3</span>
         </div>
         <div className="stat-row">
           <span>Production Mult</span>

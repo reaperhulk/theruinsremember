@@ -32,7 +32,7 @@ export const achievements = [
 
   // Operation achievements
   { id: 'perfectDock', name: 'Ace Pilot', description: 'Land 10 perfect docks', check: s => (s.dockingPerfects || 0) >= 10, reward: 2, category: 'operations' },
-  { id: 'weaver', name: 'Reality Weaver', description: 'Complete 10 weaves', check: s => (s.totalWeaves || 0) >= 10, reward: 2, category: 'operations' },
+  { id: 'weaver', name: 'Reality Weaver', description: 'Establish two Reality Laws in one cycle', check: s => Object.keys(s.wovenLaws || {}).length >= 2, reward: 2, category: 'operations' },
 
   // Prestige achievements
   { id: 'firstPrestige', name: 'New Beginning', description: 'Prestige for the first time', check: s => (s.prestigeCount || 0) >= 1, reward: 1, category: 'prestige' },
@@ -66,7 +66,6 @@ export const achievements = [
 
   // Combo achievements
   { id: 'dockCombo5', name: 'Docking Ace', description: 'Reach a 5x docking combo', check: s => (s.dockingCombo || 0) >= 5, reward: 3, category: 'operations' },
-  { id: 'weaveCombo3', name: 'Reality Artist', description: 'Reach a 3x weave combo', check: s => (s.weaveCombo || 0) >= 3, reward: 3, category: 'operations' },
 
   // Resource milestones
   { id: 'million', name: 'Millionaire', description: 'Have 1M of any resource', check: s => Object.values(s.resources || {}).some(r => r.unlocked && r.amount >= 1e6), reward: 2, category: 'milestones' },
@@ -121,7 +120,7 @@ export const achievements = [
 
   // Ultra endgame
   { id: 'upgrade200', name: 'Two Hundred', description: 'Purchase 200 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 200, reward: 25, category: 'upgrades' },
-  { id: 'weaveMaster', name: 'Weave Master', description: 'Complete 50 weaves', check: s => (s.totalWeaves || 0) >= 50, reward: 5, category: 'operations' },
+  { id: 'weaveMaster', name: 'Lawgiver', description: 'Establish three Reality Laws in one cycle', check: s => Object.keys(s.wovenLaws || {}).length >= 3, reward: 5, category: 'operations' },
   { id: 'gemOverlord', name: 'Gem Overlord', description: 'Find 500 gems', check: s => (s.totalGems || 0) >= 500, reward: 10, category: 'mining' },
   { id: 'allPrestige', name: 'Prestige Collector', description: 'Buy all prestige upgrades', check: s => Object.keys(s.prestigeUpgrades || {}).length >= 25, reward: 20, category: 'prestige' },
 
@@ -132,7 +131,6 @@ export const achievements = [
   { id: 'techScholar', name: 'Tech Scholar', description: 'Unlock 40 technologies', check: s => Object.keys(s.tech || {}).length >= 40, reward: 10, category: 'upgrades' },
   { id: 'eventSurvivor', name: 'Event Survivor', description: 'Play for 20 minutes with events active', check: s => s.era >= 2 && s.totalTime > 1200, reward: 5, category: 'milestones' },
   { id: 'dockCombo10', name: 'Docking Legend', description: 'Reach a 10x docking combo', check: s => (s.dockingCombo || 0) >= 10, reward: 5, category: 'operations' },
-  { id: 'weaveCombo5', name: 'Reality Sculptor', description: 'Reach a 5x weave combo', check: s => (s.weaveCombo || 0) >= 5, reward: 5, category: 'operations' },
   { id: 'prestigeGrandmaster', name: 'Prestige Grandmaster', description: 'Prestige 20 times', check: s => (s.prestigeCount || 0) >= 20, reward: 15, category: 'prestige' },
   { id: 'trade200', name: 'Trade Mogul', description: 'Complete 200 trades', check: s => (s.totalTrades || 0) >= 200, reward: 10, category: 'trading' },
   { id: 'gem1000', name: 'Gem Deity', description: 'Find 1000 gems', check: s => (s.totalGems || 0) >= 1000, reward: 15, category: 'mining' },
@@ -144,7 +142,6 @@ export const achievements = [
   { id: 'speedrunEra3fast', name: 'Lightning Start', description: 'Reach Era 3 in under 3 minutes', check: s => s.era >= 3 && (s.bestEraTimes?.[3] || Infinity) < 180, reward: 5, category: 'milestones' },
   { id: 'upgrade250', name: 'Upgrade Overlord', description: 'Purchase 250 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 250, reward: 30, category: 'upgrades' },
   { id: 'techSage', name: 'Tech Sage', description: 'Unlock 50 technologies', check: s => Object.keys(s.tech || {}).length >= 50, reward: 15, category: 'upgrades' },
-  { id: 'weave100', name: 'Weave Grandmaster', description: 'Complete 100 weaves', check: s => (s.totalWeaves || 0) >= 100, reward: 10, category: 'operations' },
   { id: 'docking100', name: 'Flight Commander', description: 'Land 100 perfect docks', check: s => (s.dockingPerfects || 0) >= 100, reward: 10, category: 'operations' },
   { id: 'trade500', name: 'Trade Titan', description: 'Complete 500 trades', check: s => (s.totalTrades || 0) >= 500, reward: 15, category: 'trading' },
   { id: 'gem5000', name: 'Gem Cosmos', description: 'Find 5000 gems', check: s => (s.totalGems || 0) >= 5000, reward: 20, category: 'mining' },
@@ -157,7 +154,6 @@ export const achievements = [
   { id: 'speedrunEra5fast', name: 'Hyperdrive', description: 'Reach Era 5 in under 7 minutes', check: s => s.era >= 5 && (s.bestEraTimes?.[5] || Infinity) < 420, reward: 7, category: 'milestones' },
   { id: 'upgrade300', name: 'Upgrade Deity', description: 'Purchase 300 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 300, reward: 40, category: 'upgrades' },
   { id: 'techOracle', name: 'Tech Oracle', description: 'Unlock 60 technologies', check: s => Object.keys(s.tech || {}).length >= 60, reward: 20, category: 'upgrades' },
-  { id: 'weave200', name: 'Weave Deity', description: 'Complete 200 weaves', check: s => (s.totalWeaves || 0) >= 200, reward: 15, category: 'operations' },
   { id: 'docking200', name: 'Admiral', description: 'Land 200 perfect docks', check: s => (s.dockingPerfects || 0) >= 200, reward: 15, category: 'operations' },
   { id: 'trade1000', name: 'Trade Overlord', description: 'Complete 1000 trades', check: s => (s.totalTrades || 0) >= 1000, reward: 20, category: 'trading' },
   { id: 'gem10000', name: 'Gem Eternal', description: 'Find 10000 gems', check: s => (s.totalGems || 0) >= 10000, reward: 25, category: 'mining' },
@@ -171,7 +167,6 @@ export const achievements = [
   { id: 'speedrunEra2', name: 'Quick Start', description: 'Reach Era 2 in under 2 minutes', check: s => s.era >= 2 && (s.bestEraTimes?.[2] || Infinity) < 120, reward: 3, category: 'milestones' },
   { id: 'upgrade350', name: 'Upgrade Ascendant', description: 'Purchase 350 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 350, reward: 50, category: 'upgrades' },
   { id: 'techOmniscient', name: 'Tech Omniscient', description: 'Unlock 65 technologies', check: s => Object.keys(s.tech || {}).length >= 65, reward: 25, category: 'upgrades' },
-  { id: 'weave300', name: 'Weave Overlord', description: 'Complete 300 weaves', check: s => (s.totalWeaves || 0) >= 300, reward: 20, category: 'operations' },
   { id: 'docking300', name: 'Fleet Admiral', description: 'Land 300 perfect docks', check: s => (s.dockingPerfects || 0) >= 300, reward: 20, category: 'operations' },
   { id: 'trade2000', name: 'Trade Emperor', description: 'Complete 2000 trades', check: s => (s.totalTrades || 0) >= 2000, reward: 25, category: 'trading' },
   { id: 'repeatAddict100', name: 'Industrial God', description: 'Buy any repeatable upgrade 100 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 100), reward: 15, category: 'upgrades' },
@@ -184,7 +179,6 @@ export const achievements = [
   { id: 'upgrade400', name: 'Upgrade Godhood', description: 'Purchase 400 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 400, reward: 60, category: 'upgrades' },
   { id: 'techArchitect', name: 'Tech Architect', description: 'Unlock 70 technologies', check: s => Object.keys(s.tech || {}).length >= 70, reward: 30, category: 'upgrades' },
   { id: 'speedrunEra8', name: 'Galactic Speedrun', description: 'Reach Era 8 in under 20 minutes', check: s => s.era >= 8 && (s.bestEraTimes?.[8] || Infinity) < 1200, reward: 8, category: 'milestones' },
-  { id: 'weave500', name: 'Weave Eternal', description: 'Complete 500 weaves', check: s => (s.totalWeaves || 0) >= 500, reward: 25, category: 'operations' },
   { id: 'docking500', name: 'Grand Admiral', description: 'Land 500 perfect docks', check: s => (s.dockingPerfects || 0) >= 500, reward: 25, category: 'operations' },
   { id: 'repeatAddict200', name: 'Infinite Factory', description: 'Buy any repeatable upgrade 200 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 200), reward: 20, category: 'upgrades' },
   { id: 'trade5000', name: 'Omniversal Trader', description: 'Complete 5000 trades', check: s => (s.totalTrades || 0) >= 5000, reward: 30, category: 'trading' },
@@ -195,7 +189,6 @@ export const achievements = [
   { id: 'speedrunEra6', name: 'Interstellar Speedrun', description: 'Reach Era 6 in under 12 minutes', check: s => s.era >= 6 && (s.bestEraTimes?.[6] || Infinity) < 720, reward: 6, category: 'milestones' },
   { id: 'upgrade500', name: 'Upgrade Transcendence', description: 'Purchase 500 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 500, reward: 75, category: 'upgrades' },
   { id: 'techVisionary', name: 'Tech Visionary', description: 'Unlock 75 technologies', check: s => Object.keys(s.tech || {}).length >= 75, reward: 35, category: 'upgrades' },
-  { id: 'weave1000', name: 'Weave Transcendent', description: 'Complete 1000 weaves', check: s => (s.totalWeaves || 0) >= 1000, reward: 30, category: 'operations' },
   { id: 'docking1000', name: 'Celestial Navigator', description: 'Land 1000 perfect docks', check: s => (s.dockingPerfects || 0) >= 1000, reward: 30, category: 'operations' },
   { id: 'trade10000', name: 'Universal Merchant', description: 'Complete 10000 trades', check: s => (s.totalTrades || 0) >= 10000, reward: 40, category: 'trading' },
   { id: 'gem25000', name: 'Gem Infinity', description: 'Find 25000 gems', check: s => (s.totalGems || 0) >= 25000, reward: 30, category: 'mining' },
@@ -210,7 +203,6 @@ export const achievements = [
   { id: 'upgrade450', name: 'Upgrade Singularity', description: 'Purchase 450 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 450, reward: 70, category: 'upgrades' },
   { id: 'techEnlightened', name: 'Tech Enlightened', description: 'Unlock 80 technologies', check: s => Object.keys(s.tech || {}).length >= 80, reward: 40, category: 'upgrades' },
   { id: 'docking750', name: 'Void Pilot', description: 'Land 750 perfect docks', check: s => (s.dockingPerfects || 0) >= 750, reward: 25, category: 'operations' },
-  { id: 'weave750', name: 'Fabric Weaver', description: 'Complete 750 weaves', check: s => (s.totalWeaves || 0) >= 750, reward: 25, category: 'operations' },
   { id: 'gem50000', name: 'Gem Singularity', description: 'Find 50000 gems', check: s => (s.totalGems || 0) >= 50000, reward: 30, category: 'mining' },
   { id: 'repeatAddict1000', name: 'Eternal Assembly', description: 'Buy any repeatable upgrade 1000 times', check: s => Object.values(s.upgrades || {}).some(v => typeof v === 'number' && v >= 1000), reward: 30, category: 'upgrades' },
 
@@ -219,7 +211,6 @@ export const achievements = [
   { id: 'speedrunEra10fast', name: 'Reality Bender', description: 'Reach Era 10 in under 20 minutes', check: s => s.era >= 10 && (s.bestEraTimes?.[10] || Infinity) < 1200, reward: 15, category: 'milestones' },
   { id: 'upgrade550', name: 'Upgrade Infinity', description: 'Purchase 550 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 550, reward: 80, category: 'upgrades' },
   { id: 'techTranscendent', name: 'Tech Transcendent', description: 'Unlock 85 technologies', check: s => Object.keys(s.tech || {}).length >= 85, reward: 45, category: 'upgrades' },
-  { id: 'weave1500', name: 'Weave Omniscient', description: 'Complete 1500 weaves', check: s => (s.totalWeaves || 0) >= 1500, reward: 35, category: 'operations' },
   { id: 'docking1500', name: 'Stellar Navigator', description: 'Land 1500 perfect docks', check: s => (s.dockingPerfects || 0) >= 1500, reward: 35, category: 'operations' },
   { id: 'trade15000', name: 'Omniversal Bazaar', description: 'Complete 15000 trades', check: s => (s.totalTrades || 0) >= 15000, reward: 45, category: 'trading' },
   { id: 'gem100000', name: 'Gem Omnipotence', description: 'Find 100000 gems', check: s => (s.totalGems || 0) >= 100000, reward: 40, category: 'mining' },
@@ -246,7 +237,6 @@ export const achievements = [
   { id: 'upgrade600', name: 'Upgrade Eternity', description: 'Purchase 600 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 600, reward: 90, category: 'upgrades' },
   { id: 'techInfinite', name: 'Tech Infinite', description: 'Unlock 90 technologies', check: s => Object.keys(s.tech || {}).length >= 90, reward: 50, category: 'upgrades' },
   { id: 'speedrunEra10ultra', name: 'Reality Breaker', description: 'Reach Era 10 in under 15 minutes', check: s => s.era >= 10 && (s.bestEraTimes?.[10] || Infinity) < 900, reward: 20, category: 'milestones' },
-  { id: 'weave2000', name: 'Weave Infinity', description: 'Complete 2000 weaves', check: s => (s.totalWeaves || 0) >= 2000, reward: 40, category: 'operations' },
   { id: 'docking2000', name: 'Cosmic Admiral', description: 'Land 2000 perfect docks', check: s => (s.dockingPerfects || 0) >= 2000, reward: 40, category: 'operations' },
   { id: 'trade25000', name: 'Omniversal Exchange', description: 'Complete 25000 trades', check: s => (s.totalTrades || 0) >= 25000, reward: 50, category: 'trading' },
   { id: 'gem30000', name: 'Gem Multiverse', description: 'Find 30000 gems', check: s => (s.totalGems || 0) >= 30000, reward: 35 },
@@ -264,7 +254,7 @@ export const achievements = [
   { id: 'relicPair', name: 'Curated Impossibilities', description: 'Fill both Recovered Relic slots', check: s => (s.activeRelics?.length || 0) >= 2, reward: 2, category: 'operations' },
   { id: 'relicReviser', name: 'A Better Memory', description: 'Recover three relics in one cycle', check: s => (s.relicsRecoveredThisRun || 0) >= 3, reward: 3, category: 'operations' },
   { id: 'firstRoute', name: 'First Route', description: 'Create your first star route', check: s => (s.starRoutes?.length || 0) >= 1, reward: 1, category: 'collection' },
-  { id: 'allOperations', name: 'Operations Director', description: 'Engage every operation in one cycle', check: s => (s.dockingAttempts || 0) > 0 && Object.values(s.colonyAssignments || {}).some(v => v > 0) && (s.starRoutes?.length || 0) > 0 && (s.dysonSegments || 0) > 0 && Object.values(s.senate || {}).some(v => v > 0) && (s.totalWeaves || 0) > 0 && (s.tuningScore || 0) > 0 && Object.values(s.realityKeys || {}).some(v => v > 0), reward: 10, category: 'operations' },
+  { id: 'allOperations', name: 'Operations Director', description: 'Engage every operation in one cycle', check: s => (s.dockingAttempts || 0) > 0 && Object.values(s.colonyAssignments || {}).some(v => v > 0) && (s.starRoutes?.length || 0) > 0 && (s.dysonSegments || 0) > 0 && Object.values(s.senate || {}).some(v => v > 0) && Object.keys(s.wovenLaws || {}).length > 0 && (s.tuningScore || 0) > 0 && Object.values(s.realityKeys || {}).some(v => v > 0), reward: 10, category: 'operations' },
   { id: 'tenPrestigeUpgrades', name: 'Prestige Veteran', description: 'Buy 10 prestige upgrades', check: s => Object.keys(s.prestigeUpgrades || {}).length >= 10, reward: 5, category: 'prestige' },
   { id: 'resourceDiversifier', name: 'Resource Diversifier', description: 'Have 15 unlocked resources simultaneously', check: s => Object.values(s.resources || {}).filter(r => r.unlocked).length >= 15, reward: 3, category: 'milestones' },
   { id: 'upgradeSavant', name: 'Upgrade Savant', description: 'Purchase 250 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 250, reward: 15, category: 'upgrades' },
@@ -355,11 +345,6 @@ export const achievements = [
   { id: 'dock35', name: 'Precision Pilot', description: 'Land 35 perfect docks', check: s => (s.dockingPerfects || 0) >= 35, reward: 3, category: 'operations' },
   { id: 'dock75', name: 'Top Gun', description: 'Land 75 perfect docks', check: s => (s.dockingPerfects || 0) >= 75, reward: 5, category: 'operations' },
 
-  // Weave milestones
-  { id: 'weave3', name: 'Thread Puller', description: 'Complete 3 weaves', check: s => (s.totalWeaves || 0) >= 3, reward: 1, category: 'operations' },
-  { id: 'weave15', name: 'Pattern Maker', description: 'Complete 15 weaves', check: s => (s.totalWeaves || 0) >= 15, reward: 1, category: 'operations' },
-  { id: 'weave30', name: 'Loom Operator', description: 'Complete 30 weaves', check: s => (s.totalWeaves || 0) >= 30, reward: 2, category: 'operations' },
-  { id: 'weave75', name: 'Tapestry Artisan', description: 'Complete 75 weaves', check: s => (s.totalWeaves || 0) >= 75, reward: 5, category: 'operations' },
 
   // Time played milestones
   { id: 'oneHour', name: 'Getting Started', description: 'Play for 45 minutes total', check: s => s.totalTime >= 2700, reward: 1, category: 'milestones' },
@@ -369,10 +354,9 @@ export const achievements = [
   // --- Operation mastery achievements ---
   { id: 'miningLegend', name: 'Mining Legend', description: 'Find 250 gems', check: s => (s.totalGems || 0) >= 250, reward: 7, category: 'mining' },
   { id: 'perfectRun75', name: 'Perfect Run', description: 'Land 75 perfect docks', check: s => (s.dockingPerfects || 0) >= 75, reward: 5, category: 'operations' },
-  { id: 'weaveArtist', name: 'Weave Artist', description: 'Complete 40 weaves', check: s => (s.totalWeaves || 0) >= 40, reward: 4, category: 'operations' },
   { id: 'starMapper', name: 'Star Mapper', description: 'Create 6 star routes', check: s => (s.starRoutes?.length || 0) >= 6, reward: 3, category: 'collection' },
   { id: 'colonyEmpire50', name: 'Colony Governor', description: 'Assign 50+ colonies', check: s => { const a = s.colonyAssignments || {}; return (a.growth || 0) + (a.science || 0) + (a.industry || 0) >= 50; }, reward: 5, category: 'collection' },
-  { id: 'comboKing', name: 'Combo King', description: 'Reach 3x dock combo AND 2x weave combo', check: s => (s.dockingCombo || 0) >= 3 && (s.weaveCombo || 0) >= 2, reward: 5, category: 'operations' },
+  { id: 'comboKing', name: 'Operations Tactician', description: 'Reach a 3x dock combo and establish all three Reality Laws', check: s => (s.dockingCombo || 0) >= 3 && Object.keys(s.wovenLaws || {}).length >= 3, reward: 5, category: 'operations' },
   { id: 'grandMiner', name: 'Grand Miner', description: 'Find 1500 gems', check: s => (s.totalGems || 0) >= 1500, reward: 10, category: 'mining' },
 
   // The ultimate endgame achievement
