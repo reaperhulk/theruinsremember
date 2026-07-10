@@ -159,6 +159,19 @@ function buildDirector(state, readiness) {
     };
   }
 
+  if (!readiness.mastery.met) {
+    return {
+      title: readiness.mastery.title,
+      detail: readiness.mastery.detail,
+      chips: [
+        `${readiness.mastery.current}/${readiness.mastery.target} mastery`,
+        `idle fallback ${formatTime(readiness.mastery.fallbackRemaining)}`,
+      ],
+      tone: 'warning',
+      supplyAlerts,
+    };
+  }
+
   if (!readiness.techsMet) {
     const eraTechs = affordableTech.filter(tech => tech.era === state.era);
     return {
@@ -277,6 +290,9 @@ export function EraProgress({ state }) {
         if (!upgradesMet) {
           return <p className="era-hint">Build the economy or {state.era <= 3 ? 'recover discoveries' : state.era === 4 ? 'complete orbital operations' : 'expand the foundation'} until the era is stable, then finish the breakthrough research.</p>;
         }
+        if (!readiness.mastery.met) {
+          return <p className="era-hint" style={{ color: '#ddcc44' }}>{readiness.mastery.detail} Idle progress unlocks the breakthrough in {formatTime(readiness.mastery.fallbackRemaining)}.</p>;
+        }
         if (!readiness.techsMet) {
           return <p className="era-hint" style={{ color: '#ddcc44' }}>Research {readiness.minTechs - readiness.currentTechs} more era tech{readiness.minTechs - readiness.currentTechs === 1 ? '' : 's'} to prove the economy is ready.</p>;
         }
@@ -295,6 +311,13 @@ export function EraProgress({ state }) {
               <strong>{readiness.currentTechs}/{readiness.minTechs}</strong>
               <span>breakthrough steps completed</span>
             </div>
+            {readiness.mastery.required && (
+              <div className={`readiness-card${readiness.mastery.met ? ' ready' : ''}`}>
+                <span className="readiness-label">{readiness.mastery.title}</span>
+                <strong>{Math.min(readiness.mastery.current, readiness.mastery.target)}/{readiness.mastery.target}</strong>
+                <span>{readiness.mastery.met ? 'operational mastery complete' : `idle fallback ${formatTime(readiness.mastery.fallbackRemaining)}`}</span>
+              </div>
+            )}
           </div>
           {!upgradesMet && (
             <div className="upgrade-progress-bar" role="progressbar" aria-valuenow={readiness.foundationProgress} aria-valuemin={0} aria-valuemax={minUpgrades} aria-label="Era foundation progress" style={{ margin: '2px 0 4px' }}>

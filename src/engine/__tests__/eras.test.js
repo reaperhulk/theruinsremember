@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkEraTransition, transitionEra, getEraReadiness, getMinUpgradesForEra, getMinTechsForEra, countEraUpgrades, countEraTechs } from '../eras.js';
+import { checkEraTransition, transitionEra, getEraMastery, getEraReadiness, getMinUpgradesForEra, getMinTechsForEra, countEraUpgrades, countEraTechs } from '../eras.js';
 import { createInitialState } from '../state.js';
 import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 
@@ -69,6 +69,28 @@ describe('eras', () => {
     expect(readiness.operationCredits).toBe(9);
     expect(readiness.foundationProgress).toBe(21);
     expect(readiness.upgradesMet).toBe(true);
+  });
+
+  describe('era mastery', () => {
+    it('recognizes direct system mastery in later eras', () => {
+      const state = createInitialState();
+      state.era = 7;
+      state.dysonSegments = 30;
+
+      expect(getEraMastery(state).completedDirectly).toBe(true);
+      expect(getEraMastery(state).met).toBe(true);
+    });
+
+    it('provides an idle fallback without pretending the system was mastered', () => {
+      const state = createInitialState();
+      state.era = 7;
+      state.eraStartTime = 100;
+      state.totalTime = 700;
+
+      expect(getEraMastery(state).completedDirectly).toBe(false);
+      expect(getEraMastery(state).met).toBe(true);
+      expect(getEraMastery(state).fallbackRemaining).toBe(0);
+    });
   });
 
   describe('checkEraTransition', () => {

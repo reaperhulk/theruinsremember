@@ -272,6 +272,17 @@ async function run() {
   await screenshot(page, 'orbital_operations');
   await stopPump(page);
   await promoteToEra10(page);
+  await page.evaluate(() => document.querySelector('#tab-mini')?.click());
+  await new Promise(resolve => setTimeout(resolve, 150));
+  const tuningMounted = await page.evaluate(() => {
+    const button = [...document.querySelectorAll('.mini-game-tabs button')].find(candidate => candidate.textContent.includes('Tuning'));
+    button?.click();
+    return !!button;
+  });
+  await new Promise(resolve => setTimeout(resolve, 150));
+  const tuningVisible = tuningMounted && await page.evaluate(() => !!document.querySelector('.tuning-panel'));
+  const tuningFailed = !tuningVisible;
+  console.log(`  Cosmic tuning panel: ${tuningVisible ? 'visible' : 'FAILED'}`);
 
   for (let cycle = 0; cycle < PRESTIGE_CYCLES; cycle++) {
     await page.evaluate(() => document.querySelector('.prestige-btn')?.click());
@@ -335,7 +346,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || tuningFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

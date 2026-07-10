@@ -249,7 +249,7 @@ const SCENARIOS = {
 
 const BALANCE_TARGETS = {
   full: {
-    minTime: 480,
+    minTime: 720,
     maxTime: 1800,
     requiredEra: 10,
     eraRanges: {
@@ -257,6 +257,11 @@ const BALANCE_TARGETS = {
       3: [90, 300],
       4: [5, 180],
       5: [30, 180],
+      6: [15, 120],
+      7: [15, 120],
+      8: [120, 240],
+      9: [60, 180],
+      10: [90, 180],
     },
   },
   casual: { minTime: 1500, maxTime: 14400, requiredEra: 10 },

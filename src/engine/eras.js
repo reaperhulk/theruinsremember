@@ -67,6 +67,58 @@ export function countEraTechs(state, era) {
   ).length;
 }
 
+const MASTERY_FALLBACK_SECONDS = 600;
+
+export function getEraMastery(state, era = state.era) {
+  const elapsed = era === state.era ? Math.max(0, state.totalTime - (state.eraStartTime || 0)) : 0;
+  const fallbackMet = elapsed >= MASTERY_FALLBACK_SECONDS;
+  let title = '';
+  let detail = '';
+  let current = 0;
+  let target = 0;
+
+  if (era === 5) {
+    title = 'Colony Doctrine';
+    detail = 'Assign at least one colony to growth, science, and industry.';
+    current = Object.values(state.colonyAssignments || {}).filter(count => count > 0).length;
+    target = 3;
+  } else if (era === 6) {
+    title = 'Route Network';
+    detail = 'Establish ten routes on the star chart.';
+    current = state.starRoutes?.length || 0;
+    target = 10;
+  } else if (era === 7) {
+    title = 'Sphere Assembly';
+    detail = 'Assemble thirty Dyson segments.';
+    current = state.dysonSegments || 0;
+    target = 30;
+  } else if (era === 8) {
+    title = 'Galactic Mandate';
+    detail = 'Allocate nine Senate seats or complete three reality weaves.';
+    const senateSeats = Object.values(state.senate || {}).reduce((sum, count) => sum + count, 0);
+    current = Math.max(senateSeats, (state.totalWeaves || 0) * 3);
+    target = 9;
+  } else if (era === 9) {
+    title = 'Cosmic Alignment';
+    detail = 'Reach tuning score 50.';
+    current = state.tuningScore || 0;
+    target = 50;
+  }
+
+  const required = target > 0;
+  return {
+    required,
+    title,
+    detail,
+    current,
+    target,
+    fallbackSeconds: MASTERY_FALLBACK_SECONDS,
+    fallbackRemaining: Math.max(0, MASTERY_FALLBACK_SECONDS - elapsed),
+    completedDirectly: required && current >= target,
+    met: !required || current >= target || fallbackMet,
+  };
+}
+
 export function getEraReadiness(state, era = state.era) {
   const minUpgrades = getMinUpgradesForEra(era);
   const currentUpgrades = countEraUpgrades(state, era);
@@ -83,6 +135,7 @@ export function getEraReadiness(state, era = state.era) {
     ? Math.ceil(minUpgrades * 0.4)
     : era === 4 ? 12 : minUpgrades;
   const foundationProgress = currentUpgrades + activityCredits;
+  const mastery = getEraMastery(state, era);
 
   return {
     minUpgrades,
@@ -97,6 +150,7 @@ export function getEraReadiness(state, era = state.era) {
     minTechs,
     currentTechs,
     techsMet: currentTechs >= minTechs,
+    mastery,
   };
 }
 
@@ -113,7 +167,7 @@ export function checkEraTransition(state) {
   if (!gatingTech) return null;
 
   const readiness = getEraReadiness(state, state.era);
-  if (!readiness.upgradesMet || !readiness.techsMet) return null;
+  if (!readiness.upgradesMet || !readiness.techsMet || !readiness.mastery.met) return null;
 
   return nextEra;
 }

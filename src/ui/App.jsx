@@ -11,6 +11,7 @@ import { DockingPanel } from './DockingPanel.jsx';
 import { ColonyPanel } from './ColonyPanel.jsx';
 import { StarChartPanel } from './StarChartPanel.jsx';
 import { WeavingPanel } from './WeavingPanel.jsx';
+import { TuningPanel } from './TuningPanel.jsx';
 import { DysonPanel } from './DysonPanel.jsx';
 import { TradingPanel } from './TradingPanel.jsx';
 import { SenatePanel } from './SenatePanel.jsx';
@@ -54,6 +55,7 @@ const MINI_GAME_DEFS = [
   { id: 'dyson', label: 'Dyson', era: 7, desc: 'Build sphere segments for forge output' },
   { id: 'senate', label: 'Senate', era: 8, desc: 'Allocate influence to factions' },
   { id: 'weaving', label: 'Weaving', era: 8, desc: 'Match reality fragments for boosts' },
+  { id: 'tuning', label: 'Tuning', era: 9, desc: 'Align cosmic frequencies to stabilize local reality' },
   { id: 'realityForge', label: 'Forge', era: 10, desc: 'Craft keys for permanent bonuses' },
 ];
 
@@ -207,6 +209,7 @@ export function App() {
       dyson: <DysonPanel key="dyson" state={state} onUpdate={updateState} />,
       senate: <SenatePanel key="senate" state={state} onUpdate={updateState} />,
       weaving: <WeavingPanel key="weaving" state={state} onUpdate={updateState} />,
+      tuning: <TuningPanel key="tuning" state={state} onUpdate={updateState} />,
       realityForge: <RealityForgePanel key="realityForge" state={state} onUpdate={updateState} />,
     };
 
@@ -340,6 +343,7 @@ export function App() {
                 (g.id === 'dyson' && (state.dysonSegments || 0) > 0) ||
                 (g.id === 'senate' && Object.values(state.senate || {}).some(v => v > 0)) ||
                 (g.id === 'weaving' && (state.totalWeaves || 0) > 0) ||
+                (g.id === 'tuning' && (state.tuningScore || 0) > 0) ||
                 (g.id === 'realityForge' && Object.values(state.realityKeys || {}).some(v => v > 0))
               );
               return (
