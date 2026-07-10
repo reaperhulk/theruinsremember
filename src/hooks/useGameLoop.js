@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { tick } from '../engine/tick.js';
+import { advanceTime } from '../engine/advanceTime.js';
 import { migrateState } from '../engine/state.js';
 
 const SAVE_KEY = 'incremental-game-save';
@@ -30,13 +31,7 @@ export function useGameLoop(initialState) {
           const maxChunks = (parsed.prestigeUpgrades?.infinitePatience) ? 10080 :
                             (parsed.prestigeCount > 0) ? 1440 : 240; // 7 days, 24 hours, or 4 hours of chunks
           const chunks = Math.min(Math.floor(offlineDt / chunkSize), maxChunks);
-          let tickState = migrated;
-          for (let i = 0; i < chunks; i++) {
-            tickState = tick(tickState, chunkSize);
-          }
-          const remainder = offlineDt - chunks * chunkSize;
-          if (remainder > 0) tickState = tick(tickState, remainder);
-          const after = tickState;
+          const after = advanceTime(migrated, offlineDt, Math.random, chunkSize);
 
           // Calculate resource gains for offline report
           const gains = {};
@@ -69,20 +64,29 @@ export function useGameLoop(initialState) {
   });
 
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  const lastTimeRef = useRef(0);
+  const lastStateUpdateRef = useRef(0);
+  const accumulatedDtRef = useRef(0);
+  const rafRef = useRef(null);
+  const saveTimerRef = useRef(null);
+  const speedRef = useRef(1);
 
   // Expose debug helpers on window for play-testing
   useEffect(() => {
     window.__game = {
       getState: () => stateRef.current,
       setState: (fn) => setState(prev => fn(prev) || prev),
-      fastForward: (seconds) => setState(prev => tick(prev, seconds)),
+      fastForward: (seconds) => setState(prev => advanceTime(prev, seconds)),
       setSpeed: (mult) => { speedRef.current = Math.max(0, mult); },
       getSpeed: () => speedRef.current,
       giveAll: (amount = 1000) => setState(prev => {
         const res = { ...prev.resources };
         for (const [id, r] of Object.entries(res)) {
-          if (r.unlocked) res[id] = { ...r, amount: amount };
+          if (r.unlocked) res[id] = { ...r, amount };
         }
         return { ...prev, resources: res };
       }),
@@ -90,35 +94,25 @@ export function useGameLoop(initialState) {
     return () => { delete window.__game; };
   }, []);
 
-  const lastTimeRef = useRef(performance.now());
-  const lastStateUpdateRef = useRef(performance.now());
-  const accumulatedDtRef = useRef(0);
-  const rafRef = useRef(null);
-  const saveTimerRef = useRef(null);
-  const speedRef = useRef(1);
-
-  const gameLoop = useCallback((now) => {
-    const dt = (now - lastTimeRef.current) / 1000;
-    lastTimeRef.current = now;
-
-    // Cap dt to avoid spiral of death (e.g., tab was hidden)
-    const cappedDt = Math.max(0, Math.min(dt, 1)) * speedRef.current;
-    accumulatedDtRef.current += cappedDt;
-
-    // Throttle React state updates to ~10fps (100ms) while canvas animates at 60fps
-    if (now - lastStateUpdateRef.current > 100) {
-      const accDt = accumulatedDtRef.current;
-      accumulatedDtRef.current = 0;
-      lastStateUpdateRef.current = now;
-      setState(prev => tick(prev, accDt));
-    }
-
-    rafRef.current = requestAnimationFrame(gameLoop);
-  }, []);
-
   // Start/stop the loop
   useEffect(() => {
-    lastTimeRef.current = performance.now();
+    const gameLoop = (now) => {
+      const dt = (now - lastTimeRef.current) / 1000;
+      lastTimeRef.current = now;
+      accumulatedDtRef.current += Math.max(0, Math.min(dt, 1)) * speedRef.current;
+
+      if (now - lastStateUpdateRef.current > 100) {
+        const accDt = accumulatedDtRef.current;
+        accumulatedDtRef.current = 0;
+        lastStateUpdateRef.current = now;
+        setState(prev => tick(prev, accDt));
+      }
+      rafRef.current = requestAnimationFrame(gameLoop);
+    };
+
+    const startedAt = performance.now();
+    lastTimeRef.current = startedAt;
+    lastStateUpdateRef.current = startedAt;
     rafRef.current = requestAnimationFrame(gameLoop);
 
     // Auto-save with error handling for quota/disabled localStorage
@@ -142,7 +136,7 @@ export function useGameLoop(initialState) {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       safeSave();
     };
-  }, [gameLoop]);
+  }, []);
 
   const updateState = useCallback((fn) => {
     setState(prev => {

@@ -10,12 +10,13 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
   const [comboFlash, setComboFlash] = useState(false);
   const prevComboRef = useRef(state.dockingCombo || 0);
   const animRef = useRef(null);
-  const startTimeRef = useRef(performance.now());
+  const startTimeRef = useRef(0);
   const eraRef = useRef(state.era);
 
   useEffect(() => { eraRef.current = state.era; }, [state.era]);
 
   useEffect(() => {
+    startTimeRef.current = performance.now();
     const animate = (now) => {
       const elapsed = (now - startTimeRef.current) / 1000;
       setPosition(getIndicatorPosition(elapsed, eraRef.current));

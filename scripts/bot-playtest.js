@@ -241,9 +241,9 @@ const SCENARIOS = {
 
 const BALANCE_TARGETS = {
   full: { minTime: 600, maxTime: 900, requiredEra: 10 },
-  casual: { maxTime: 14400, requiredEra: 10 },
-  noMinigames: { maxTime: 25200, requiredEra: 10 },
-  passive: { maxTime: 25200, requiredEra: 10 },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10 },
+  noMinigames: { minTime: 5400, maxTime: 25200, requiredEra: 10 },
+  passive: { minTime: 5400, maxTime: 25200, requiredEra: 10 },
 };
 
 // ─── Bot Action Functions ───────────────────────────────────────────────────
@@ -257,12 +257,12 @@ function botMine(state, profile, t, rng) {
   return afterMine;
 }
 
-function botGather(state, profile, t, _rng) {
+function botGather(state, profile, t, rng) {
   if (!profile.gather || !profile.gatherInterval) return state;
   if (t % profile.gatherInterval !== 0) return state;
   for (const [id, r] of Object.entries(state.resources)) {
     if (r.unlocked) {
-      state = gather(state, id, 1);
+      state = gather(state, id, 1, rng);
     }
   }
   return state;
@@ -346,7 +346,7 @@ function botHack(state, profile, t, rng) {
   for (let i = 0; i < 8; i++) rolls.push(rng());
   state = startHack(state, rolls);
   if (state.hackChallenge) {
-    const { state: afterHack } = submitHack(state, state.hackChallenge.sequence);
+    const { state: afterHack } = submitHack(state, state.hackChallenge.sequence, rng);
     state = afterHack;
   }
   return state;

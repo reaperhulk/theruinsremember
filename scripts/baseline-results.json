@@ -1,46 +1,54 @@
 {
-  "timestamp": "2026-04-05",
-  "description": "Regression baseline after iterations 30-49 (second improvement plan)",
+  "timestamp": "2026-07-10",
+  "description": "Regression baseline after deterministic time and event integration fixes",
   "profiles": {
     "optimal": {
       "finalEra": 10,
       "completed": true,
-      "timeMinutes": 10.95,
+      "timeMinutes": 10.87,
       "upgradeCount": 579,
       "techCount": 101,
       "prestiges": 0,
-      "gems": 129,
-      "tuningScore": 60,
+      "gems": 106,
+      "tuningScore": 65,
       "senateInfluence": 14,
       "realityKeys": 4
     },
     "casual": {
       "finalEra": 10,
       "completed": true,
-      "timeMinutes": 37.48,
+      "timeMinutes": 28.97,
       "upgradeCount": 520,
       "techCount": 101,
       "prestiges": 0,
-      "gems": 340,
+      "gems": 274,
       "tuningScore": 60,
-      "senateInfluence": 70,
+      "senateInfluence": 54,
       "realityKeys": 4
     },
     "noMinigames": {
       "finalEra": 10,
       "completed": true,
-      "timeMinutes": 126.02,
-      "upgradeCount": 466,
+      "timeMinutes": 217.73,
+      "upgradeCount": 467,
       "techCount": 101,
       "prestiges": 0,
-      "gems": 1263
+      "gems": 2235
+    },
+    "passive": {
+      "finalEra": 10,
+      "completed": true,
+      "timeMinutes": 148.17,
+      "upgradeCount": 467,
+      "techCount": 97,
+      "prestiges": 0,
+      "gems": 0
     }
   },
   "notes": [
-    "Optimal: 10m57s (stable vs previous 9m53s — marginal drift from new features)",
-    "Casual: 37m29s — meets >=30 minute first-run requirement",
-    "noMinigames: 2h06m — stable completion of era 10",
-    "All 248 tests pass, clean production build (901KB JS, 37KB CSS)",
-    "New features: bulk purchase, era splits, resource forecast, mobile swipe, event log, auto-connect, clipboard save, factory balance, etc."
+    "Optimal: 10m52s; casual: 28m58s",
+    "No-minigames: 3h37m44s; passive: 2h28m10s",
+    "All 257 tests pass with clean lint and production build",
+    "Timed events and mini-game effects now share one runtime path; periodic systems use elapsed time"
   ]
 }

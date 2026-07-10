@@ -83,7 +83,7 @@ export function spend(state, cost) {
 
 // Manually gather a resource (clicking). Returns new state.
 // Gather amount scales with rateMult, prestige, and era so clicking stays relevant.
-export function gather(state, resourceId, amount = 1) {
+export function gather(state, resourceId, amount = 1, rng = Math.random) {
   const r = state.resources[resourceId];
   if (!r || !r.unlocked) return state;
   const eraScale = 1 + (state.era - 1) * 1.0;
@@ -103,7 +103,7 @@ export function gather(state, resourceId, amount = 1) {
   // Mechanic: canvasDataCache — 20% chance on any click to get 30s of data production
   let dataMiningProc = false;
   if (state.upgrades?.dataMining && newResources.data?.unlocked) {
-    if (Math.random() < 0.2) {
+    if (rng() < 0.2) {
       const dataR = newResources.data;
       const dataRate = (dataR.baseRate + dataR.rateAdd) * dataR.rateMult * getEffectivePrestige(state.prestigeMultiplier || 1);
       if (dataRate > 0) {

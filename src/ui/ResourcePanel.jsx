@@ -79,7 +79,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
         });
       }, 600);
     }
-  }, [state.upgrades]);
+  }, [unlockedResources]);
 
   // Group by era
   const byEra = {};

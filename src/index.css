@@ -210,6 +210,14 @@ g[role="button"]:focus-visible {
   gap: 12px;
 }
 
+.game-layout > *,
+.tab-content,
+.upgrade-list,
+.tech-list,
+.upgrade-row {
+  min-width: 0;
+}
+
 .panel {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
@@ -618,6 +626,8 @@ g[role="button"]:focus-visible {
   font-family: inherit;
   font-size: 0.8em;
   transition: background 0.2s ease, border-color 0.2s ease;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .upgrade-btn:hover:not(:disabled),
@@ -711,12 +721,13 @@ g[role="button"]:focus-visible {
 
 .upgrade-sort {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   margin-bottom: 6px;
 }
 
 .upgrade-sort button {
-  flex: 1;
+  flex: 1 1 auto;
   padding: 3px;
   background: transparent;
   color: #666;
@@ -1511,6 +1522,7 @@ canvas:hover {
   align-items: center;
   gap: 8px;
   font-size: 0.85em;
+  min-width: 0;
 }
 
 .trade-row label {
@@ -1521,6 +1533,8 @@ canvas:hover {
 .trade-row select,
 .trade-row input {
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
   padding: 4px;
   background: #1a1a2e;
   color: #e0e0e0;

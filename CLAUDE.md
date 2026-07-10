@@ -26,9 +26,9 @@ node scripts/browser-test.mjs --mobile           # Mobile viewport (375x812)
 node scripts/browser-test.mjs --screenshots      # Save screenshots to /tmp/game-screenshots/
 ```
 
-The Puppeteer test drives a real headless Chrome, uses `fastForward()` to pump the engine,
-clicks DOM buttons to buy upgrades/tech, and validates layout at Era 10. Exit code 1 if
-layout issues found.
+The Puppeteer test drives a real headless Chrome through the early game, then hydrates
+a deterministic Era 10 state to validate every tab. It exits nonzero for progression
+misses, console errors, or layout/viewport overflow.
 
 ### Manual Browser Testing (inject harness)
 1. Start the dev server: `npm run dev`
@@ -46,7 +46,7 @@ layout issues found.
 The speed multiplier is applied inside `useGameLoop.js` before dt accumulation. The 1-second dt cap is applied *before* the multiplier, so at 100x speed each frame contributes up to 100s of game time.
 
 ### Instant Time Skip
-For even faster testing, `__harness.fastForward(seconds)` or `__game.fastForward(seconds)` advances the engine by an arbitrary amount in a single tick. This is instantaneous but skips intermediate event checks.
+For even faster testing, `__harness.fastForward(seconds)` or `__game.fastForward(seconds)` advances the engine in bounded one-second simulation steps. This preserves periodic automation, event, and achievement checks.
 
 ### Key Harness Functions
 ```js

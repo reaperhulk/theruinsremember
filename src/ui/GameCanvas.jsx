@@ -2937,37 +2937,45 @@ function updateAndDrawParticles(ctx, particles, now) {
   particles.push(...alive);
 }
 
+const ERA1_BUILDINGS = [
+  { x: 37, y: 103, w: 22, h: 32, label: 'Shelter — first structure raised from wreckage materials' },
+  { x: 87, y: 105, w: 18, h: 24, label: 'Workshop — unlocked by early industrial upgrades' },
+  { x: 197, y: 99, w: 24, h: 34, label: 'Foundry — built by manufacturing technology' },
+  { x: 237, y: 109, w: 16, h: 22, label: 'Storage — expanded by capacity upgrades' },
+];
+
 // --- Main Component ---
 export function GameCanvas({ state, onUpdate }) {
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
   const eraRef = useRef(state.era);
-  eraRef.current = state.era;
   const stateRef = useRef(state);
-  stateRef.current = state;
   const onUpdateRef = useRef(onUpdate);
-  onUpdateRef.current = onUpdate;
+  useEffect(() => {
+    eraRef.current = state.era;
+    stateRef.current = state;
+    onUpdateRef.current = onUpdate;
+  }, [state, onUpdate]);
   const floatingTextsRef = useRef([]);
   const particlesRef = useRef([]);
   const prevGemsRef = useRef(state.totalGems || 0);
   const prevEraRef = useRef(state.era);
   const prevUpgradeCountRef = useRef(Object.keys(state.upgrades || {}).length);
   const bonusOrbRef = useRef(null); // { x, y, spawnTime, type, resource }
-  const lastOrbTimeRef = useRef(performance.now() / 1000);
-  const nextOrbDelayRef = useRef(20 + Math.random() * 40); // 30-90s
+  const lastOrbTimeRef = useRef(0);
+  const nextOrbDelayRef = useRef(40);
   const prevHackRef = useRef(state.hackSuccesses || 0);
   const prevDockRef = useRef(state.dockingPerfects || 0);
   const hackFlashRef = useRef(0); // timestamp of last hack flash
   const dockFlashRef = useRef(0); // timestamp of last dock flash
   const mouseRef = useRef({ x: 0, y: 0 }); // for parallax
-  const buildingHitZonesRef = useRef([]); // [{x, y, w, h, label}] in canvas coords
   const [canvasTooltip, setCanvasTooltip] = useState(null); // {x, y, text} in CSS px
   const ruinsRef = useRef([]); // Array of { x, y, era, discovered, spawnTime }
   const lastRuinsCheckRef = useRef(0);
-  const nextRuinDelayRef = useRef(45 + Math.random() * 75); // 45-120s
+  const nextRuinDelayRef = useRef(80);
   const depositsRef = useRef([]); // Array of { x, y, resourceId, amount, spawnTime, duration, color }
   const lastDepositCheckRef = useRef(0);
-  const nextDepositDelayRef = useRef(20 + Math.random() * 20); // 20-40s
+  const nextDepositDelayRef = useRef(30);
 
   const handleCanvasClick = useCallback((e) => {
     const canvas = canvasRef.current;
@@ -3643,14 +3651,6 @@ export function GameCanvas({ state, onUpdate }) {
     rafRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafRef.current);
   }, []);
-
-  // Approximate building hit zones for era 1 (canvas is 280x180)
-  const ERA1_BUILDINGS = [
-    { x: 37, y: 103, w: 22, h: 32, label: 'Shelter — first structure raised from wreckage materials' },
-    { x: 87, y: 105, w: 18, h: 24, label: 'Workshop — unlocked by early industrial upgrades' },
-    { x: 197, y: 99, w: 24, h: 34, label: 'Foundry — built by manufacturing technology' },
-    { x: 237, y: 109, w: 16, h: 22, label: 'Storage — expanded by capacity upgrades' },
-  ];
 
   const handleMouseMove = useCallback((e) => {
     const canvas = canvasRef.current;

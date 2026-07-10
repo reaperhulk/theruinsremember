@@ -50,6 +50,19 @@ const ERA_OMENS = {
   10: 'Every universe you touch feels less discovered than revisited.',
 };
 
+const MINI_GAME_DEFS = [
+  { id: 'mining', label: 'Mining', era: 1, desc: 'Click to mine materials and find gems' },
+  { id: 'factory', label: 'Factory', era: 2, desc: 'Assign workers to production lines' },
+  { id: 'hacking', label: 'Hacking', era: 3, desc: 'Memory puzzle for data/software boost' },
+  { id: 'docking', label: 'Docking', era: 4, desc: 'Timing game for fuel and infra' },
+  { id: 'colony', label: 'Colonies', era: 5, desc: 'Manage colony focus for bonuses' },
+  { id: 'starChart', label: 'Star Chart', era: 6, desc: 'Connect systems for passive bonuses' },
+  { id: 'dyson', label: 'Dyson', era: 7, desc: 'Build sphere segments for forge output' },
+  { id: 'senate', label: 'Senate', era: 8, desc: 'Allocate influence to factions' },
+  { id: 'weaving', label: 'Weaving', era: 8, desc: 'Match reality fragments for boosts' },
+  { id: 'realityForge', label: 'Forge', era: 10, desc: 'Craft keys for permanent bonuses' },
+];
+
 // Tab definitions — which tabs are available at which era
 function getAvailableTabs(era) {
   const tabs = [
@@ -68,8 +81,11 @@ export function App() {
   const [activeTab, setActiveTab] = useState('upgrades');
   const [activeMiniGame, setActiveMiniGame] = useState('mining');
   const prevEraRef = useRef(state.era);
+  const keyboardStateRef = useRef(state);
+  useEffect(() => {
+    keyboardStateRef.current = state;
+  }, [state]);
   const [shakeClass, setShakeClass] = useState('');
-  const [flashClass, setFlashClass] = useState('');
   const prevLoreCountRef = useRef((state.eventLog || []).filter(e => e.isLore).length);
   const [unseenLoreCount, setUnseenLoreCount] = useState(0);
   const [hintsDismissed, setHintsDismissed] = useState(false);
@@ -145,11 +161,12 @@ export function App() {
   // Keyboard shortcuts
   const handleKeyDown = useCallback((e) => {
     if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA' || document.activeElement?.tagName === 'SELECT') return;
-    const tabs = getAvailableTabs(state.era);
+    const currentState = keyboardStateRef.current;
+    const tabs = getAvailableTabs(currentState.era);
     const tabByKey = tabs.find(t => t.key === e.key);
     if (tabByKey) {
       // Don't switch tabs on 0-3 keys during hack challenge
-      if (state.hackChallenge && ['0','1','2','3'].includes(e.key)) return;
+      if (currentState.hackChallenge && ['0','1','2','3'].includes(e.key)) return;
       setActiveTab(tabByKey.id);
       return;
     }
@@ -160,7 +177,7 @@ export function App() {
     if (e.code === 'Space') {
       e.preventDefault();
       // Check cooldown client-side to avoid unnecessary state updates
-      if ((state.totalTime || 0) - (state.lastMineTime || 0) < 0.5) return;
+      if ((currentState.totalTime || 0) - (currentState.lastMineTime || 0) < 0.5) return;
       updateState(s => {
         const result = mine(s);
         const newState = {
@@ -176,7 +193,7 @@ export function App() {
         return newState;
       });
     }
-  }, [state.era, state.hackChallenge, updateState]);
+  }, [updateState]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -189,28 +206,15 @@ export function App() {
   // Badge counts for tabs
   const affordableUpgrades = getAvailableUpgrades(state).filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
   const affordableTech = getAvailableTech(state).filter(t => canAfford(state, t.cost)).length;
-  const activeEffectCount = 0; // Events removed
+  const activeEffectCount = state.activeEffects?.length || 0;
 
   // Mini-game definitions with era requirements
-  const miniGameDefs = [
-    { id: 'mining', label: 'Mining', era: 1, desc: 'Click to mine materials and find gems' },
-    { id: 'factory', label: 'Factory', era: 2, desc: 'Assign workers to production lines' },
-    { id: 'hacking', label: 'Hacking', era: 3, desc: 'Memory puzzle for data/software boost' },
-    { id: 'docking', label: 'Docking', era: 4, desc: 'Timing game for fuel and infra' },
-    { id: 'colony', label: 'Colonies', era: 5, desc: 'Manage colony focus for bonuses' },
-    { id: 'starChart', label: 'Star Chart', era: 6, desc: 'Connect systems for passive bonuses' },
-    { id: 'dyson', label: 'Dyson', era: 7, desc: 'Build sphere segments for forge output' },
-    { id: 'senate', label: 'Senate', era: 8, desc: 'Allocate influence to factions' },
-    { id: 'weaving', label: 'Weaving', era: 8, desc: 'Match reality fragments for boosts' },
-    { id: 'realityForge', label: 'Forge', era: 10, desc: 'Craft keys for permanent bonuses' },
-  ];
-
-  const availableMiniGames = miniGameDefs.filter(g => state.era >= g.era);
+  const availableMiniGames = MINI_GAME_DEFS.filter(g => state.era >= g.era);
 
   // Auto-select newest mini-game only when the era actually changes
   useEffect(() => {
     if (state.era !== prevEraRef.current) {
-      const available = miniGameDefs.filter(g => state.era >= g.era);
+      const available = MINI_GAME_DEFS.filter(g => state.era >= g.era);
       const newGames = available.filter(g => g.era === state.era);
       if (newGames.length > 0) {
         setActiveMiniGame(newGames[newGames.length - 1].id);
@@ -265,7 +269,7 @@ export function App() {
   };
 
   return (
-    <div className={`game-container era-${state.era} ${shakeClass} ${flashClass}`}>
+    <div className={`game-container era-${state.era} ${shakeClass}`}>
       <header className="game-header">
         <div className="title-block">
           <h1>The Ruins Remember{state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888', marginLeft: '8px' }}>Era {state.era}: {eraNames[state.era]}</span>}</h1>
@@ -312,7 +316,7 @@ export function App() {
                   if (data.era && data.resources) {
                     const migrated = migrateState(data);
                     updateState(() => ({ ...migrated, lastSaved: Date.now() }));
-                    try { localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() })); } catch {}
+                    try { localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() })); } catch { /* storage unavailable */ }
                   }
                 } catch { alert('Invalid save file. Please select a valid .json save.'); }
               };
@@ -329,7 +333,7 @@ export function App() {
               if (data.era && data.resources) {
                 const migrated = migrateState(data);
                 updateState(() => ({ ...migrated, lastSaved: Date.now() }));
-                try { localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() })); } catch {}
+                try { localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() })); } catch { /* storage unavailable */ }
               }
             } catch { /* clipboard unavailable or invalid data */ }
           }} title="Import save from clipboard">

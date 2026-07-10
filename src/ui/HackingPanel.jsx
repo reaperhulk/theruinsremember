@@ -43,7 +43,7 @@ export const HackingPanel = memo(function HackingPanel({ state, onUpdate }) {
         clearInterval(countdownRef.current);
       };
     }
-  }, [challenge?.sequence?.join(',')]);
+  }, [challenge, difficulty]);
 
   const handleStart = () => {
     setPlayerInput([]);

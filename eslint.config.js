@@ -24,6 +24,8 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
+      // UI effects intentionally trigger transient animation/toast state from game-state changes.
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
 ])

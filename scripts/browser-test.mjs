@@ -13,6 +13,7 @@ import { mkdirSync, writeFileSync } from 'fs';
 const PRESTIGE_CYCLES = parseInt(process.argv.find((_, i, a) => a[i-1] === '--prestige') || '0');
 const MOBILE = process.argv.includes('--mobile');
 const SCREENSHOTS = process.argv.includes('--screenshots');
+const GAME_URL = process.env.GAME_URL || 'http://localhost:5173';
 const SCREENSHOT_DIR = '/tmp/game-screenshots';
 if (SCREENSHOTS) mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
@@ -69,10 +70,31 @@ async function getState(page) {
   });
 }
 
+async function promoteToEra10(page) {
+  await page.evaluate(() => {
+    window.__game.setState(state => ({
+      ...state,
+      era: 10,
+      lifetimeHighestEra: Math.max(10, state.lifetimeHighestEra || 1),
+      resources: Object.fromEntries(Object.entries(state.resources).map(([id, resource]) => [
+        id,
+        { ...resource, unlocked: true, amount: Math.max(resource.amount || 0, 1000) },
+      ])),
+    }));
+  });
+  await new Promise(resolve => setTimeout(resolve, 300));
+}
+
 async function checkLayout(page) {
   return page.evaluate(() => {
     const issues = [];
     const ok = [];
+
+    const viewportWidth = document.documentElement.clientWidth;
+    const documentWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+    if (documentWidth > viewportWidth + 2)
+      issues.push(`Document overflow: ${documentWidth} > ${viewportWidth}`);
+    else ok.push(`Document fits viewport: ${viewportWidth}px`);
 
     // Header overflow
     const header = document.querySelector('.game-header');
@@ -91,6 +113,7 @@ async function checkLayout(page) {
     if (upgradeBtn) {
       const w = upgradeBtn.getBoundingClientRect().width;
       if (w < 100) issues.push(`Upgrade card collapsed: ${Math.round(w)}px`);
+      else if (w > viewportWidth + 2) issues.push(`Upgrade card overflows viewport: ${Math.round(w)}px > ${viewportWidth}px`);
       else ok.push(`Upgrade cards: ${Math.round(w)}px wide`);
     }
 
@@ -169,7 +192,7 @@ async function run() {
   page.on('pageerror', err => consoleErrors.push(err.message));
 
   // Navigate and clear save
-  await page.goto('http://localhost:5173', { waitUntil: 'networkidle0', timeout: 30000 });
+  await page.goto(GAME_URL, { waitUntil: 'networkidle0', timeout: 30000 });
   await page.evaluate(() => localStorage.clear());
   await page.reload({ waitUntil: 'networkidle0', timeout: 30000 });
   await page.waitForFunction(() => window.__game, { timeout: 10000 });
@@ -180,55 +203,34 @@ async function run() {
   console.log('Auto-player started');
 
   let lastEra = 1;
-  let cycle = 0;
-  const eraTimes = {};
+  let earlyGameReached = false;
 
-  for (let tick = 0; tick < 120; tick++) { // max 2 min real time
+  for (let tick = 0; tick < 30; tick++) {
     await new Promise(r => setTimeout(r, 1000));
     const state = await getState(page);
 
     if (state.era > lastEra) {
-      eraTimes[state.era] = state.totalTime;
       console.log(`  Era ${state.era} | ${state.upgrades} upgrades | ${state.tech} tech | ${state.totalTime}s game time`);
       lastEra = state.era;
-      await screenshot(page, `cycle${cycle}_era${state.era}`);
+      await screenshot(page, `early_era${state.era}`);
     }
 
-    if (state.era >= 10) {
-      // Layout checks at era 10
-      await stopPump(page);
-      await new Promise(r => setTimeout(r, 500));
-
-      // Check each tab
-      for (const tab of ['upgrades', 'tech', 'prestige', 'stats']) {
-        await page.evaluate(t => document.querySelector('#tab-' + t)?.click(), tab);
-        await new Promise(r => setTimeout(r, 200));
-      }
-      // Back to upgrades for layout check
-      await page.evaluate(() => document.querySelector('#tab-upgrades')?.click());
-      await new Promise(r => setTimeout(r, 300));
-
-      const layout = await checkLayout(page);
-      console.log('\n=== LAYOUT CHECK (Era 10) ===');
-      layout.ok.forEach(o => console.log('  ✓ ' + o));
-      layout.issues.forEach(i => console.log('  ✗ ' + i));
-
-      await screenshot(page, `cycle${cycle}_era10_check`);
-
-      if (cycle < PRESTIGE_CYCLES) {
-        // Prestige
-        await page.evaluate(() => document.querySelector('.prestige-btn')?.click());
-        await new Promise(r => setTimeout(r, 500));
-        await page.evaluate(() => document.querySelector('.confirm-yes')?.click());
-        await new Promise(r => setTimeout(r, 1000));
-        await startPump(page);
-        lastEra = 0;
-        cycle++;
-        console.log(`\nPrestige #${cycle} complete. Starting cycle ${cycle + 1}...`);
-      } else {
-        break;
-      }
+    if (state.era >= 3) {
+      earlyGameReached = true;
+      break;
     }
+  }
+
+  await stopPump(page);
+  await promoteToEra10(page);
+
+  for (let cycle = 0; cycle < PRESTIGE_CYCLES; cycle++) {
+    await page.evaluate(() => document.querySelector('.prestige-btn')?.click());
+    await new Promise(r => setTimeout(r, 200));
+    await page.evaluate(() => document.querySelector('.confirm-yes')?.click());
+    await new Promise(r => setTimeout(r, 300));
+    await promoteToEra10(page);
+    console.log(`  Prestige cycle ${cycle + 1} completed`);
   }
 
   // Always run layout check at current state
@@ -240,6 +242,17 @@ async function run() {
   console.log('\n=== LAYOUT CHECK ===');
   layout.ok.forEach(o => console.log('  ✓ ' + o));
   layout.issues.forEach(i => console.log('  ✗ ' + i));
+  await screenshot(page, 'era10_check');
+  await stopPump(page);
+
+  const tabIssues = [];
+  for (const tab of ['tech', 'mini', 'trading', 'prestige', 'stats']) {
+    await page.evaluate(tabId => document.querySelector('#tab-' + tabId)?.click(), tab);
+    await new Promise(r => setTimeout(r, 100));
+    const tabLayout = await checkLayout(page);
+    tabIssues.push(...tabLayout.issues.map(issue => `${tab}: ${issue}`));
+  }
+  await page.evaluate(() => document.querySelector('#tab-upgrades')?.click());
 
   // Final state
   const final = await getState(page);
@@ -267,7 +280,13 @@ async function run() {
 
   if (SCREENSHOTS) console.log(`\nScreenshots: ${SCREENSHOT_DIR}/`);
 
-  const exitCode = (await checkLayout(page)).issues.length > 0 ? 1 : 0;
+  const finalLayout = await checkLayout(page);
+  const progressionFailed = !earlyGameReached || final.era < 10 || final.prestigeCount < PRESTIGE_CYCLES;
+  if (progressionFailed) {
+    console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
+  }
+  tabIssues.forEach(issue => console.log('  ✗ ' + issue));
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

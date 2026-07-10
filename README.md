@@ -22,10 +22,10 @@ Prestige isn't just a mechanic. It's the cycle itself.
 
 - **10 Eras** spanning primitive survival to multiverse exploration
 - **579 upgrades** forming deep prerequisite chains with meaningful branching choices
-- **109 tech nodes** including mutually exclusive paths that shape each run differently
+- **115 tech nodes** including mutually exclusive paths that shape each run differently
 - **11 mini-games** (mining, factory management, hacking, orbital docking, colony management, star charting, trading, Dyson assembly, reality weaving, galactic senate, reality forge)
 - **30 prestige upgrades** including 5 "Ascension" tier endgame upgrades
-- **289 achievements** tracking everything from speed milestones to narrative discovery
+- **290 achievements** tracking everything from speed milestones to narrative discovery
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players
 - **Progression-gated era advancement** — new eras require sufficient upgrade depth, era-local research depth, and the starred breakthrough technology instead of passive waiting
 - **Resource caps that matter** — storage is a real constraint requiring strategic cap upgrades
@@ -65,6 +65,12 @@ Pure logic:
 npm test -- --run
 ```
 
+Complete non-browser quality gate:
+
+```bash
+npm run test:quality
+```
+
 Balance regression harness:
 
 ```bash
@@ -78,6 +84,10 @@ npm run dev
 node scripts/browser-test.mjs
 node scripts/browser-test.mjs --mobile
 ```
+
+The browser smoke test drives a real early-game flow, hydrates a deterministic
+Era 10 state to exercise every tab, and fails on progression misses, console
+errors, or viewport overflow. Use `--prestige 1` to include a prestige cycle.
 
 The balance harness currently validates four seeded scenarios:
 

@@ -10,15 +10,6 @@ import { playUpgrade } from './AudioManager.js';
 
 const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 
-function countEffects(upgrades) {
-  let count = 0;
-  for (const u of upgrades) {
-    count += u.effects.length;
-    if (u.mechanic) count++;
-  }
-  return count;
-}
-
 const mechanicDescriptions = {
   clickAll: 'Clicking any resource gives +1 to all others',
   surplusConvert: 'Capped resources trickle to your lowest resource',
@@ -172,7 +163,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [available.length]);
+  }, [available]);
 
   // Sort upgrades
   const sortedAvailable = [...available].sort((a, b) => {
@@ -224,12 +215,9 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
     ? searchFiltered
     : searchFiltered.filter(u => !hiddenUpgrades[u.id]);
 
-  const affordableCount = useMemo(() =>
-    filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length,
-    [filteredAvailable, state.resources]
-  );
-  const mechanicCount = useMemo(() => filteredAvailable.filter(u => u.mechanic).length, [filteredAvailable]);
-  const loreCount = useMemo(() => filteredAvailable.filter(u => LORE_UPGRADE_ID_SET.has(u.id)).length, [filteredAvailable]);
+  const affordableCount = filteredAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
+  const mechanicCount = filteredAvailable.filter(u => u.mechanic).length;
+  const loreCount = filteredAvailable.filter(u => LORE_UPGRADE_ID_SET.has(u.id)).length;
 
   // Pre-compute enables counts for all upgrades (avoids O(N*M) per render)
   const enablesCountMap = useMemo(() => {

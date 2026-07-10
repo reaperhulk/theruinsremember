@@ -5,7 +5,7 @@ import { assembleDysonSegment, getDysonStats } from '../engine/dyson.js';
 
 export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
   const [lastGain, setLastGain] = useState(null);
-  const { segments: totalSegments, completion, milestone, nextMilestone, autoRate, bonusMult } = getDysonStats(state);
+  const { segments: totalSegments, milestone, nextMilestone, autoRate, bonusMult } = getDysonStats(state);
 
   const handleAssemble = () => {
     playClick();

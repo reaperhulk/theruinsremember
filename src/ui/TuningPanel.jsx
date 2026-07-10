@@ -15,8 +15,6 @@ export const TuningPanel = memo(function TuningPanel({ state, onUpdate }) {
 
   // Change target every 30 seconds
   useEffect(() => {
-    const newTarget = 10 + Math.floor(Math.random() * 80);
-    setTarget(newTarget);
     targetTimerRef.current = setInterval(() => {
       setTarget(10 + Math.floor(Math.random() * 80));
       setResult(null);

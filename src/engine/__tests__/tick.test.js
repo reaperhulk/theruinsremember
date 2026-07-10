@@ -235,14 +235,14 @@ describe('tick', () => {
   it('auto-purchase only buys non-repeatable upgrades from earlier eras', () => {
     const state = createInitialState();
     state.era = 5;
-    state.totalTicks = 59; // Will be 60 on next tick (auto-purchase fires at %60===0)
+    state.totalTime = 29;
     // Give the player tons of resources
     for (const id of Object.keys(state.resources)) {
       state.resources[id] = { ...state.resources[id], unlocked: true, amount: 999999 };
     }
     // Pre-own some era 1 upgrades so chain works
     state.upgrades = { tools: true, irrigation: true, basicPower: true };
-    const after = tick(state, 0.1);
+    const after = tick(state, 1, () => 0.99);
     // Should have auto-purchased non-repeatable upgrades from era <= 4 (era-1)
     const newUpgrades = Object.keys(after.upgrades).filter(id => !state.upgrades[id]);
     expect(newUpgrades.length).toBeGreaterThan(0);
@@ -308,8 +308,8 @@ describe('tick', () => {
     const state = createInitialState();
     state.era = 7;
     state.dysonSegments = 100;
-    state.totalTicks = 59; // Will be 60 on next tick (auto-assembly fires at %60===0)
-    const after = tick(state, 1);
+    state.totalTime = 59;
+    const after = tick(state, 1, () => 0.99);
     // autoRate = Math.min(20, Math.floor(100/10)) = 10
     expect(after.dysonSegments).toBe(110);
   });
@@ -318,9 +318,31 @@ describe('tick', () => {
     const state = createInitialState();
     state.era = 7;
     state.dysonSegments = 500;
-    state.totalTicks = 59;
-    const after = tick(state, 1);
+    state.totalTime = 59;
+    const after = tick(state, 1, () => 0.99);
     // autoRate = Math.min(20, Math.floor(500/10)) = 20
     expect(after.dysonSegments).toBe(520);
+  });
+
+  it('applies activeEffects created by events and mini-games', () => {
+    const base = createInitialState();
+    const boosted = createInitialState();
+    boosted.activeEffects = [{
+      id: 'test-boost',
+      startedAt: 0,
+      endsAt: 30,
+      effect: { resourceId: 'materials', rateMultBonus: 2 },
+    }];
+
+    const baseAfter = tick(base, 1, () => 0.99);
+    const boostedAfter = tick(boosted, 1, () => 0.99);
+    expect(boostedAfter.resources.materials.amount).toBeCloseTo(baseAfter.resources.materials.amount * 2, 5);
+    expect(boostedAfter.activeEffects).toHaveLength(1);
+  });
+
+  it('executes events through the game loop and records them', () => {
+    const state = createInitialState();
+    const after = tick(state, 1, () => 0);
+    expect(after.eventLog.some(entry => entry.message.startsWith('Event:'))).toBe(true);
   });
 });

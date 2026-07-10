@@ -123,7 +123,7 @@ export function Toast({ state }) {
         setToasts(prev => prev.filter(t => !ids.includes(t.id)));
       }, 4000);
     }
-  }, [state.era, state.totalGems, state.eventLog?.length, Math.floor(state.totalTime || 0)]);
+  }, [state]);
 
   if (toasts.length === 0) return null;
 

@@ -37,7 +37,7 @@ export function startHack(state, rolls = null) {
 }
 
 // Submit a solution. Returns { state, success }.
-export function submitHack(state, playerSequence) {
+export function submitHack(state, playerSequence, rng = Math.random) {
   const challenge = state.hackChallenge;
   if (!challenge) return { state, success: false };
 
@@ -78,7 +78,7 @@ export function submitHack(state, playerSequence) {
         .filter(([, r]) => r.unlocked && (r.baseRate + r.rateAdd) > 0)
         .map(([id]) => id);
       if (unlockedIds.length > 0) {
-        const targetId = unlockedIds[Math.floor(Math.random() * unlockedIds.length)];
+        const targetId = unlockedIds[Math.floor(rng() * unlockedIds.length)];
         const r = newState.resources[targetId];
         newState.resources = { ...newState.resources, [targetId]: { ...r, rateMult: r.rateMult * 1.01 } };
       }
@@ -114,4 +114,3 @@ export function submitHack(state, playerSequence) {
     success: false,
   };
 }
-

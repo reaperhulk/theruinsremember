@@ -4,7 +4,10 @@
 import { getEligibleEvents } from '../data/events.js';
 import { getEffectivePrestige } from './resources.js';
 
-const BASE_EVENT_CHANCE = 0.02; // 2% per second of gameplay
+function getBaseEventChance(era) {
+  const averageInterval = era <= 3 ? 180 : era <= 6 ? 120 : 90;
+  return 1 / averageInterval;
+}
 
 // Check whether a random event fires this tick.
 // `roll` is optional 0-1 number for deterministic testing.
@@ -17,7 +20,7 @@ export function checkForEvent(state, dt, roll = Math.random()) {
   // Temporal Echo prestige upgrade: scales with prestige count (1.25x per prestige, capped at 3x)
   const hasTemporalEcho = state.prestigeUpgrades && state.prestigeUpgrades.temporalEcho;
   const echoBonus = hasTemporalEcho ? Math.min(2, 1 + 0.15 * (state.prestigeCount || 1)) : 1;
-  let eventChance = BASE_EVENT_CHANCE;
+  let eventChance = getBaseEventChance(state.era);
   if (hasEventMagnet) eventChance *= 1.5;
   eventChance *= echoBonus;
 

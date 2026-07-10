@@ -1,6 +1,5 @@
 import { techTree } from '../data/tech-tree.js';
 import { spend } from './resources.js';
-import { applyEraCostScaling } from './upgrades.js';
 
 // Unlock a tech node. Returns new state or null.
 export function unlockTech(state, techId) {

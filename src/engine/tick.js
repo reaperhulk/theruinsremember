@@ -1,6 +1,6 @@
 import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
-import { events as eventDefs } from '../data/events.js';
+import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
 import { getFactoryBonus } from './factory.js';
 import { getColonyBonus } from './colonies.js';
 import { getRouteBonus } from './starChart.js';
@@ -16,6 +16,10 @@ import { getTuningProductionBonus } from './tuning.js';
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
 const ENERGY_PER_ELECTRONICS = 0.4; // Energy consumed per electronics/s
 const FUEL_PER_ORBITAL = 0.5;     // Fuel consumed per orbitalInfra/s
+
+function intervalCrossings(startTime, endTime, interval) {
+  return Math.max(0, Math.floor(endTime / interval) - Math.floor(startTime / interval));
+}
 
 // Apply a fractional production bonus to all producing resources, respecting caps
 function applyProductionBonus(state, fraction, dt) {
@@ -37,6 +41,7 @@ function applyProductionBonus(state, fraction, dt) {
 // Optional rng parameter for deterministic bot/testing runs.
 export function tick(state, dt, rng = Math.random) {
   if (dt <= 0) return state; // Guard against negative or zero dt
+  state = expireEffects(state);
   const rates = calculateProduction(state);
 
   // Add mini-game bonuses to production rates
@@ -47,6 +52,10 @@ export function tick(state, dt, rng = Math.random) {
     for (const [id, amount] of Object.entries(bonus)) {
       rates[id] = (rates[id] || 0) + amount;
     }
+  }
+
+  for (const id of Object.keys(rates)) {
+    rates[id] *= getTimedRateMultiplier(state, id);
   }
 
   // Consumption throttling: when the consumed resource runs low,
@@ -102,13 +111,6 @@ export function tick(state, dt, rng = Math.random) {
     if (id === 'orbitalInfra') effectiveRate = rate * orbitalScale;
     if (id === 'colonies') effectiveRate = rate * colonyScale;
     if (id === 'megastructures') effectiveRate = rate * megaScale;
-
-    // Apply timed event bonuses (relative: +50% per matching active event)
-    const activeEvents = state.activeEvents || [];
-    const eventBonus = activeEvents
-      .filter(e => e.endTime > state.totalTime && (e.target === id || e.target === null))
-      .reduce((sum, e) => sum + e.multBonus, 0);
-    if (eventBonus > 0) effectiveRate *= (1 + eventBonus);
 
     // Apply senate directive production bonuses (era 8+)
     if (state.era >= 8) {
@@ -188,49 +190,18 @@ export function tick(state, dt, rng = Math.random) {
     totalTime: state.totalTime + dt,
   };
 
-  // Events system: fire one event per interval, using relative bonuses to avoid pacing disruption
-  {
-    const eventInterval = state.era <= 3 ? 180 : state.era <= 6 ? 120 : 90;
-    const timeSinceEvent = newState.totalTime - (state.lastEventTime || 0);
-    const activeEvents = (state.activeEvents || []).filter(e => e.endTime > newState.totalTime);
-
-    if (timeSinceEvent >= eventInterval) {
-      const eligible = Object.values(eventDefs).filter(e => e.minEra <= state.era);
-      if (eligible.length > 0) {
-        const ev = eligible[Math.floor(rng() * eligible.length)];
-        let newActiveEvents = activeEvents;
-
-        if (ev.type === 'timed') {
-          // Timed: +50% production for 30s on the targeted resource (relative, not absolute)
-          const target = ev.effect?.resourceId || null;
-          newActiveEvents = [...activeEvents, { id: ev.id, target, multBonus: 0.5, endTime: newState.totalTime + 30 }];
-        } else {
-          // Instant: grant 60 seconds of current production for targeted resource(s)
-          const grantResources = { ...newState.resources };
-          const targets = ev.effects
-            ? ev.effects.filter(e => e.type === 'resource').map(e => ({ resourceId: e.target }))
-            : ev.effect ? [ev.effect] : [];
-          for (const t of targets) {
-            const r = grantResources[t.resourceId];
-            if (!r || !r.unlocked) continue;
-            const rate = rates[t.resourceId] || 0;
-            const grant = rate > 0 ? rate * 60 : (t.amount || 0);
-            const cap = getEffectiveCap(newState, t.resourceId);
-            grantResources[t.resourceId] = { ...r, amount: cap > 0 ? Math.min(r.amount + grant, cap) : r.amount + grant };
-          }
-          newState = { ...newState, resources: grantResources };
-        }
-
-        newState = {
-          ...newState,
-          lastEventTime: newState.totalTime,
-          activeEvents: newActiveEvents,
-          eventLog: [...(newState.eventLog || []), { message: `Event: ${ev.name} — ${ev.description}`, time: newState.totalTime, isLore: !!ev.isLore }].slice(-20),
-        };
-      }
-    } else {
-      newState = { ...newState, activeEvents };
-    }
+  const eventResult = checkForEvent(newState, dt, rng());
+  newState = eventResult.state;
+  if (eventResult.event) {
+    const ev = eventResult.event;
+    newState = {
+      ...newState,
+      eventLog: [...(newState.eventLog || []), {
+        message: `Event: ${ev.name} — ${ev.description}`,
+        time: newState.totalTime,
+        isLore: !!ev.isLore,
+      }].slice(-20),
+    };
   }
 
   // Milestone lore events — fire once at narrative turning points
@@ -285,7 +256,7 @@ export function tick(state, dt, rng = Math.random) {
     }, 0);
     totalProduced += totalRate * dt;
     // Track peak production rate (every 30 ticks to reduce overhead)
-    const peakRate = newState.totalTicks % 30 === 0
+    const peakRate = intervalCrossings(state.totalTime, newState.totalTime, 30) > 0
       ? Math.max(newState.peakProductionRate || 0, totalRate)
       : (newState.peakProductionRate || 0);
     newState = { ...newState, totalResourcesProduced: totalProduced, peakProductionRate: peakRate };
@@ -311,28 +282,33 @@ export function tick(state, dt, rng = Math.random) {
   // so upgrades MUST be bought while costs are still affordable.
   // Buys ALL affordable upgrades from prior eras (not just one) to
   // prevent deep prerequisite chains from stalling progression.
-  if (newState.era >= 3 && newState.totalTicks % 30 === 0) {
+  const autoPurchaseRuns = intervalCrossings(state.totalTime, newState.totalTime, 30);
+  if (newState.era >= 3 && autoPurchaseRuns > 0) {
     const autoPurchaseEra = Math.max(1, newState.era - 1);
-    for (let pass = 0; pass < 5; pass++) { // multiple passes for chains
-      let boughtAny = false;
-      for (const def of Object.values(upgradeDefs)) {
-        if (def.era > autoPurchaseEra) continue;
-        if (def.repeatable) continue;
-        if (newState.upgrades[def.id]) continue;
-        if (def.prerequisites.some(p => !newState.upgrades[p])) continue;
-        const result = purchaseUpgrade(newState, def.id);
-        if (result) { newState = result; boughtAny = true; }
+    for (let run = 0; run < autoPurchaseRuns; run++) {
+      for (let pass = 0; pass < 5; pass++) { // multiple passes for chains
+        let boughtAny = false;
+        for (const def of Object.values(upgradeDefs)) {
+          if (def.era > autoPurchaseEra) continue;
+          if (def.repeatable) continue;
+          if (newState.upgrades[def.id]) continue;
+          if (def.prerequisites.some(p => !newState.upgrades[p])) continue;
+          const result = purchaseUpgrade(newState, def.id);
+          if (result) { newState = result; boughtAny = true; }
+        }
+        if (!boughtAny) break;
       }
-      if (!boughtAny) break;
     }
   }
 
   // Auto-gather (prestige milestone: 3+ prestiges)
-  if (newState.autoGather && newState.totalTicks % 20 === 0) {
-    // Gather each unlocked resource once
-    for (const [id, r] of Object.entries(newState.resources)) {
-      if (r.unlocked) {
-        newState = gather(newState, id, 1);
+  const autoGatherRuns = intervalCrossings(state.totalTime, newState.totalTime, 20);
+  if (newState.autoGather && autoGatherRuns > 0) {
+    for (let run = 0; run < autoGatherRuns; run++) {
+      for (const [id, r] of Object.entries(newState.resources)) {
+        if (r.unlocked) {
+          newState = gather(newState, id, 1, rng);
+        }
       }
     }
   }
@@ -460,15 +436,16 @@ export function tick(state, dt, rng = Math.random) {
 
   // Dyson auto-assembly: every 60 ticks, auto-add segments based on existing count
   // Auto-rate scales with segments (1 per 10 segments, up to 20/tick)
-  if (newState.era >= 7 && (newState.dysonSegments || 0) > 0 && newState.totalTicks % 60 === 0) {
-    const autoRate = Math.max(1, Math.min(20, Math.floor((newState.dysonSegments || 0) / 10)));
-    if (autoRate > 0) {
+  const dysonRuns = intervalCrossings(state.totalTime, newState.totalTime, 60);
+  if (newState.era >= 7 && (newState.dysonSegments || 0) > 0 && dysonRuns > 0) {
+    for (let run = 0; run < dysonRuns; run++) {
+      const autoRate = Math.max(1, Math.min(20, Math.floor((newState.dysonSegments || 0) / 10)));
       newState = { ...newState, dysonSegments: (newState.dysonSegments || 0) + autoRate };
     }
   }
 
   // Check achievements (every 60 ticks to reduce overhead)
-  if (newState.totalTicks % 60 === 0) {
+  if (intervalCrossings(state.totalTime, newState.totalTime, 60) > 0) {
     const { state: afterAchievements, newAchievements } = checkAchievements(newState);
     if (newAchievements.length > 0) {
       newState = {

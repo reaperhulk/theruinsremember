@@ -57,8 +57,7 @@ describe('events', () => {
 
     it('triggers an event when roll is low enough', () => {
       const state = makeState();
-      // With dt=1, chance = 1 - (1-0.02)^1 = 0.02
-      // roll=0.001 < 0.02, so event triggers
+      // Early eras average one event per 180 seconds, so this low roll triggers.
       const { event } = checkForEvent(state, 1, 0.001);
       expect(event).not.toBeNull();
       expect(event.minEra).toBeLessThanOrEqual(4);

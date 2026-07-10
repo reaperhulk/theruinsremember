@@ -79,7 +79,7 @@ function getPrereqChain(techId, unlockedSet, visited = new Set()) {
 }
 
 // BFS forward to find steps to nearest era-breakthrough tech
-function stepsToBreakthrough(startId, unlockedSet) {
+function stepsToBreakthrough(startId) {
   const queue = [[startId, 0]];
   const visited = new Set([startId]);
   while (queue.length > 0) {
@@ -122,7 +122,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
 
   const unlockedSet = new Set(Object.keys(state.tech || {}));
   const hoveredPrereqChain = hoveredTechId ? new Set(getPrereqChain(hoveredTechId, unlockedSet)) : new Set();
-  const hoveredSteps = hoveredTechId ? stepsToBreakthrough(hoveredTechId, unlockedSet) : null;
+  const hoveredSteps = hoveredTechId ? stepsToBreakthrough(hoveredTechId) : null;
 
   if (available.length === 0) {
     return (
