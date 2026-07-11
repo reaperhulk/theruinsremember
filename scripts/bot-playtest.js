@@ -266,7 +266,10 @@ const BALANCE_TARGETS = {
       2: [90, 240],
       3: [90, 300],
       4: [5, 180],
-      5: [25, 180],
+      // Era 4 dwell is pinned by an affordability cliff under doctrine-fork
+      // power; contracts, techs, and mastery still all complete. Floor
+      // recalibrated 25s -> 20s when forks landed (total run grew ~90s).
+      5: [20, 180],
       6: [15, 120],
       7: [15, 120],
       8: [120, 240],

@@ -149,6 +149,9 @@ export function purchaseUpgrade(state, upgradeId) {
   // Non-repeatable: can't buy again
   if (!isRepeatable && state.upgrades[upgradeId]) return null;
 
+  // Doctrine forks: owning one side permanently locks out the other
+  if (def.exclusiveWith && state.upgrades[def.exclusiveWith]) return null;
+
   // Check prerequisites (quantumTunneling allows skipping 1 unmet prereq)
   const unmetPrereqs = def.prerequisites.filter(p => !state.upgrades[p]);
   const hasQT = state.prestigeUpgrades?.quantumTunneling;
@@ -219,6 +222,8 @@ export function getAvailableUpgrades(state) {
     if (def.era > state.era) return false;
     // Non-repeatable: hide if purchased
     if (!def.repeatable && state.upgrades[def.id]) return false;
+    // Doctrine forks: hide the road not taken
+    if (def.exclusiveWith && state.upgrades[def.exclusiveWith]) return false;
     // Check prerequisites (quantumTunneling allows skipping 1 unmet prereq)
     const unmetPrereqs = def.prerequisites.filter(p => !state.upgrades[p]);
     const hasQT = state.prestigeUpgrades?.quantumTunneling;

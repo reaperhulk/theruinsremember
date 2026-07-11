@@ -1277,6 +1277,17 @@ g[role="button"]:focus-visible {
   vertical-align: middle;
 }
 
+.fork-badge {
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px solid #b06ad0;
+  border-radius: 3px;
+  color: #d8a8f0;
+  font-size: 0.62em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .upgrade-name,
 .tech-name {
   font-weight: bold;

@@ -2601,7 +2601,7 @@ export const upgrades = {
   // Era 4: deeper upgrade chains and cross-era connections
   orbitalFoundry: { id: 'orbitalFoundry', name: 'Orbital Foundry', era: 4, cost: { rocketFuel: 30, steel: 50, electronics: 40 }, effects: [{ type: 'production_mult', target: 'steel', value: 2 }, { type: 'production_add', target: 'orbitalInfra', value: 1.5 }], description: 'Zero-gravity smelting produces impossibly pure alloys — the old foundries pale in comparison.', prerequisites: ['spaceStation', 'advancedMaterials'] },
   missionArchive: { id: 'missionArchive', name: 'Mission Archive', era: 4, cost: { data: 60, research: 80, rocketFuel: 20 }, effects: [{ type: 'production_mult', target: 'data', value: 3 }, { type: 'production_add', target: 'research', value: 2.0 }], description: 'Decades of mission data reveal patterns — the orbital debris is arranged with mathematical precision.', prerequisites: ['deepSpaceProbe', 'orbitalTelescope'] },
-  fuelNexus: { id: 'fuelNexus', name: 'Fuel Nexus', era: 4, cost: { rocketFuel: 40, energy: 80, steel: 60 }, effects: [{ type: 'production_mult', target: 'rocketFuel', value: 2 }, { type: 'cap_mult', target: 'rocketFuel', value: 3 }], description: 'A network of fuel depots ensures steady supply — the ancient fuel lines mirror our own design.', prerequisites: ['reusableRockets', 'nuclearReactor'] },
+  fuelNexus: { id: 'fuelNexus', name: 'Fuel Nexus', era: 4, cost: { rocketFuel: 40, energy: 80, steel: 60 }, effects: [{ type: 'production_mult', target: 'rocketFuel', value: 1.75 }, { type: 'cap_mult', target: 'rocketFuel', value: 3 }], description: 'A network of fuel depots ensures steady supply — the ancient fuel lines mirror our own design.', prerequisites: ['reusableRockets', 'nuclearReactor'] },
   spaceAgeCapstone: { id: 'spaceAgeCapstone', name: 'Space Age Capstone', era: 4, cost: { orbitalInfra: 50, rocketFuel: 60, research: 100 }, effects: [{ type: 'production_mult_all', value: 1.3 }, { type: 'cap_mult', target: 'orbitalInfra', value: 3 }], description: 'Integrating all orbital systems reveals a chilling truth — the previous civilization had this exact configuration.', prerequisites: ['orbitalFoundry', 'missionArchive', 'fuelNexus'] },
 
   // Era 5: cross-link colony and exotic material chains
@@ -2611,7 +2611,7 @@ export const upgrades = {
   // Era 5: deeper upgrade chains and cross-era connections
   xenobotany: { id: 'xenobotany', name: 'Xenobotany', era: 5, cost: { colonies: 15, exoticMaterials: 30, food: 100 }, effects: [{ type: 'production_mult', target: 'colonies', value: 2 }, { type: 'production_add', target: 'food', value: 3.0 }], description: 'Alien plant life responds to our agriculture — as if it was designed for human cultivation.', prerequisites: ['terraforming', 'geneticEngineering'] },
   exoticSynthesizer: { id: 'exoticSynthesizer', name: 'Exotic Synthesizer', era: 5, cost: { exoticMaterials: 40, energy: 100, steel: 80 }, effects: [{ type: 'production_mult', target: 'exoticMaterials', value: 3 }, { type: 'production_add', target: 'materials', value: 5.0 }], description: 'Processing exotic materials with conventional methods works perfectly — too perfectly.', prerequisites: ['asteroidMining', 'colonyRefinery'] },
-  solarSurvey: { id: 'solarSurvey', name: 'Stellar Cartography', era: 5, cost: { research: 120, data: 60, exoticMaterials: 20 }, effects: [{ type: 'production_mult', target: 'research', value: 2 }, { type: 'cap_mult', target: 'exoticMaterials', value: 3 }], description: 'Mapping the solar system reveals ancient navigation beacons at every Lagrange point.', prerequisites: ['nanofabricator', 'outerColony'] },
+  solarSurvey: { id: 'solarSurvey', name: 'Stellar Cartography', era: 5, cost: { research: 120, data: 60, exoticMaterials: 20 }, effects: [{ type: 'production_mult', target: 'research', value: 1.75 }, { type: 'cap_mult', target: 'exoticMaterials', value: 3 }], description: 'Mapping the solar system reveals ancient navigation beacons at every Lagrange point.', prerequisites: ['nanofabricator', 'outerColony'] },
   solarAgeCapstone: { id: 'solarAgeCapstone', name: 'Solar Age Capstone', era: 5, cost: { colonies: 30, exoticMaterials: 60, research: 150 }, effects: [{ type: 'production_mult_all', value: 1.5 }, { type: 'cap_mult', target: 'colonies', value: 5 }], description: 'The solar system was seeded — engineered to support exactly this sequence of development.', prerequisites: ['xenobotany', 'exoticSynthesizer', 'solarSurvey'] },
 
   // Era 6: cross-link star system and dark energy chains
@@ -3265,6 +3265,148 @@ export const upgrades = {
     description: 'The cycle completes. The cycle begins. Production loops back on itself — each tick compounds the last, an ouroboros of creation.',
     prerequisites: ['echoMultiplier', 'omniscienceEngine'],
     mechanic: 'compoundingTick',
+  },
+
+  // ─── Doctrine forks: one choice per era, the other is lost for the run ───
+  forkHearth: {
+    id: 'forkHearth', name: 'Hearth Doctrine', era: 1,
+    cost: { labor: 30, materials: 40 },
+    effects: [{ type: 'production_mult', target: 'food', value: 2 }, { type: 'production_mult', target: 'materials', value: 0.85 }],
+    description: 'Feed everyone first. The quarries can wait — the hearth-fires remember every winter that was survived',
+    prerequisites: ['tools'], exclusiveWith: 'forkQuarry',
+  },
+  forkQuarry: {
+    id: 'forkQuarry', name: 'Quarry Doctrine', era: 1,
+    cost: { labor: 30, food: 40 },
+    effects: [{ type: 'production_mult', target: 'materials', value: 2 }, { type: 'production_mult', target: 'food', value: 0.85 }],
+    description: 'Build first. Hunger sharpens the mind — the quarry walls bear tool-marks older than your species',
+    prerequisites: ['tools'], exclusiveWith: 'forkHearth',
+  },
+  forkElectrify: {
+    id: 'forkElectrify', name: 'Electrification Doctrine', era: 2,
+    cost: { steel: 40, materials: 45 },
+    effects: [{ type: 'production_mult', target: 'energy', value: 2 }, { type: 'production_mult', target: 'labor', value: 0.85 }],
+    description: 'Wire every street. The grid you lay follows conduits already buried in the ruin-strata',
+    prerequisites: ['assemblyLines'], exclusiveWith: 'forkWorkforce',
+  },
+  forkWorkforce: {
+    id: 'forkWorkforce', name: 'Workforce Doctrine', era: 2,
+    cost: { steel: 40, energy: 45 },
+    effects: [{ type: 'production_mult', target: 'labor', value: 2 }, { type: 'production_mult', target: 'energy', value: 0.85 }],
+    description: 'People before machines. The factory floors are sized for ten thousand hands — they were always sized for yours',
+    prerequisites: ['assemblyLines'], exclusiveWith: 'forkElectrify',
+  },
+  forkOpenNet: {
+    id: 'forkOpenNet', name: 'Open Network Doctrine', era: 3,
+    cost: { research: 70, electronics: 55 },
+    effects: [{ type: 'production_mult', target: 'data', value: 1.75 }, { type: 'production_mult', target: 'research', value: 0.85 }],
+    description: 'Every node open, every packet free. The protocols negotiate themselves, as if they had met before',
+    prerequisites: ['internet'], exclusiveWith: 'forkArchive',
+  },
+  forkArchive: {
+    id: 'forkArchive', name: 'Deep Archive Doctrine', era: 3,
+    cost: { research: 70, data: 40 },
+    effects: [{ type: 'production_mult', target: 'research', value: 2 }, { type: 'production_mult', target: 'data', value: 0.85 }],
+    description: 'Curate. Verify. Preserve. The archive indexes itself around gaps shaped exactly like what you will discover next',
+    prerequisites: ['internet'], exclusiveWith: 'forkOpenNet',
+  },
+  forkFuelworks: {
+    id: 'forkFuelworks', name: 'Fuelworks Doctrine', era: 4,
+    cost: { research: 65, steel: 70 },
+    effects: [{ type: 'production_mult', target: 'rocketFuel', value: 2 }, { type: 'production_mult', target: 'orbitalInfra', value: 0.85 }],
+    description: 'Burn hard, burn often. The fuel formulae decrypt from ruin-glyphs on the first attempt',
+    prerequisites: ['rocketScience'], exclusiveWith: 'forkOrbitalYards',
+  },
+  forkOrbitalYards: {
+    id: 'forkOrbitalYards', name: 'Orbital Yards Doctrine', era: 4,
+    cost: { research: 65, software: 60 },
+    effects: [{ type: 'production_mult', target: 'orbitalInfra', value: 1.75 }, { type: 'production_mult', target: 'rocketFuel', value: 0.85 }],
+    description: 'Build the harbor before the fleet. The docking cradles fit ships you have not designed yet',
+    prerequisites: ['rocketScience'], exclusiveWith: 'forkFuelworks',
+  },
+  forkExtraction: {
+    id: 'forkExtraction', name: 'Extraction Doctrine', era: 5,
+    cost: { orbitalInfra: 50, rocketFuel: 90 },
+    effects: [{ type: 'production_mult', target: 'exoticMaterials', value: 2 }, { type: 'production_mult', target: 'colonies', value: 0.85 }],
+    description: 'Strip the belt bare. The richest veins sit precisely where the old survey beacons still blink',
+    prerequisites: ['asteroidMining'], exclusiveWith: 'forkSettlement',
+  },
+  forkSettlement: {
+    id: 'forkSettlement', name: 'Settlement Doctrine', era: 5,
+    cost: { orbitalInfra: 50, exoticMaterials: 50 },
+    effects: [{ type: 'production_mult', target: 'colonies', value: 2 }, { type: 'production_mult', target: 'exoticMaterials', value: 0.85 }],
+    description: 'Plant flags, not drills. Every habitable rock already has foundations poured beneath its dust',
+    prerequisites: ['asteroidMining'], exclusiveWith: 'forkExtraction',
+  },
+  forkDarkTaps: {
+    id: 'forkDarkTaps', name: 'Dark Tap Doctrine', era: 6,
+    cost: { galacticInfluence: 40, research: 200 },
+    effects: [{ type: 'production_mult', target: 'darkEnergy', value: 2 }, { type: 'production_mult', target: 'starSystems', value: 0.85 }],
+    description: 'Siphon the void between stars. The taps thread into currents that flow toward somewhere specific',
+    prerequisites: ['warpDrive'], exclusiveWith: 'forkStellarClaims',
+  },
+  forkStellarClaims: {
+    id: 'forkStellarClaims', name: 'Stellar Claim Doctrine', era: 6,
+    cost: { galacticInfluence: 40, darkEnergy: 60 },
+    effects: [{ type: 'production_mult', target: 'starSystems', value: 2 }, { type: 'production_mult', target: 'darkEnergy', value: 0.85 }],
+    description: 'Claim every sun you can see. Some of them already answer to your name',
+    prerequisites: ['warpDrive'], exclusiveWith: 'forkDarkTaps',
+  },
+  forkForgePrimacy: {
+    id: 'forkForgePrimacy', name: 'Forge Primacy Doctrine', era: 7,
+    cost: { starSystems: 35, exoticMaterials: 120 },
+    effects: [{ type: 'production_mult', target: 'stellarForge', value: 2 }, { type: 'production_mult', target: 'megastructures', value: 0.85 }],
+    description: 'The star is an anvil. Strike it. The hammer-rhythms match the pulse of the ruins exactly',
+    prerequisites: ['dysonSphere'], exclusiveWith: 'forkMegaGuilds',
+  },
+  forkMegaGuilds: {
+    id: 'forkMegaGuilds', name: 'Guild Doctrine', era: 7,
+    cost: { starSystems: 35, darkEnergy: 100 },
+    effects: [{ type: 'production_mult', target: 'megastructures', value: 2 }, { type: 'production_mult', target: 'stellarForge', value: 0.85 }],
+    description: 'A guild for every gigastructure. Their founding charters cite precedents from civilizations you never met',
+    prerequisites: ['dysonSphere'], exclusiveWith: 'forkForgePrimacy',
+  },
+  forkInfluenceWeb: {
+    id: 'forkInfluenceWeb', name: 'Influence Doctrine', era: 8,
+    cost: { megastructures: 30, darkEnergy: 170 },
+    effects: [{ type: 'production_mult', target: 'galacticInfluence', value: 2 }, { type: 'production_mult', target: 'exoticMatter', value: 0.85 }],
+    description: 'Own the conversation. Every debate in the senate chamber has been rehearsed there before',
+    prerequisites: ['galacticSenate'], exclusiveWith: 'forkMatterWorks',
+  },
+  forkMatterWorks: {
+    id: 'forkMatterWorks', name: 'Matter Doctrine', era: 8,
+    cost: { megastructures: 30, exoticMaterials: 500 },
+    effects: [{ type: 'production_mult', target: 'exoticMatter', value: 2 }, { type: 'production_mult', target: 'galacticInfluence', value: 0.85 }],
+    description: 'Refine what should not exist. The refineries hum in a key that predates matter itself',
+    prerequisites: ['galacticSenate'], exclusiveWith: 'forkInfluenceWeb',
+  },
+  forkAscendancy: {
+    id: 'forkAscendancy', name: 'Ascendancy Doctrine', era: 9,
+    cost: { cosmicPower: 360, exoticMatter: 150 },
+    effects: [{ type: 'production_mult', target: 'cosmicPower', value: 2 }, { type: 'production_mult', target: 'universalConstants', value: 0.85 }],
+    description: 'Take the power directly. The intake manifolds align with intergalactic currents on the first calibration',
+    prerequisites: ['galaxySeeding'], exclusiveWith: 'forkRefinement',
+  },
+  forkRefinement: {
+    id: 'forkRefinement', name: 'Refinement Doctrine', era: 9,
+    cost: { cosmicPower: 360, darkEnergy: 600 },
+    effects: [{ type: 'production_mult', target: 'universalConstants', value: 2 }, { type: 'production_mult', target: 'cosmicPower', value: 0.85 }],
+    description: 'Tune the constants finer. Each adjustment settles into a groove worn by previous adjusters',
+    prerequisites: ['galaxySeeding'], exclusiveWith: 'forkAscendancy',
+  },
+  forkCommunion: {
+    id: 'forkCommunion', name: 'Communion Doctrine', era: 10,
+    cost: { realityFragments: 270, cosmicPower: 800 },
+    effects: [{ type: 'production_mult', target: 'realityFragments', value: 2 }, { type: 'production_mult', target: 'quantumEchoes', value: 0.85 }],
+    description: 'Speak with the fragments. They answer in your voice, one cycle removed',
+    prerequisites: ['realityWeaving'], exclusiveWith: 'forkEchoHarvest',
+  },
+  forkEchoHarvest: {
+    id: 'forkEchoHarvest', name: 'Echo Harvest Doctrine', era: 10,
+    cost: { realityFragments: 270, universalConstants: 60 },
+    effects: [{ type: 'production_mult', target: 'quantumEchoes', value: 2 }, { type: 'production_mult', target: 'realityFragments', value: 0.85 }],
+    description: 'Harvest what the cycles left ringing. The echoes were seeded deliberately, like a crop',
+    prerequisites: ['realityWeaving'], exclusiveWith: 'forkCommunion',
   },
 };
 

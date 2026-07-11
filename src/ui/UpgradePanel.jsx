@@ -465,6 +465,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 {upgrade.name}
                 {upgrade.repeatable && count > 0 && ` (x${count})`}
                 {upgrade.repeatable && <span className="repeatable-badge">repeatable</span>}
+                {upgrade.exclusiveWith && <span className="fork-badge">doctrine fork</span>}
               </div>
               <div className="upgrade-cost"><CostDisplay cost={cost} state={state} /></div>
               <div className="upgrade-desc" style={LORE_UPGRADE_ID_SET.has(upgrade.id) ? { color: '#998866', fontStyle: 'italic' } : undefined}>{upgrade.description}</div>
@@ -491,6 +492,11 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 })}
                 {isMechanic && <span className="effect-tag effect-mechanic" title={mechanicDescriptions[upgrade.mechanic] || 'Special mechanic'}>MECHANIC</span>}
               </div>
+              {upgrade.exclusiveWith && (
+                <div className="text-hint" style={{ color: '#e0a0a0' }}>
+                  Choosing this permanently locks out {upgradeDefs[upgrade.exclusiveWith]?.name || upgrade.exclusiveWith} this cycle.
+                </div>
+              )}
               {enablesCountMap[upgrade.id] > 0 && (
                 <div className="text-hint" style={{ color: enablesCountMap[upgrade.id] >= 5 ? '#ddaa44' : enablesCountMap[upgrade.id] >= 3 ? '#88ccaa' : '#777' }} title={enablesCountMap._names[upgrade.id]?.join(', ') || ''}>Enables {enablesCountMap[upgrade.id]} upgrade{enablesCountMap[upgrade.id] > 1 ? 's' : ''}: {(enablesCountMap._names[upgrade.id] || []).slice(0, 3).join(', ')}{enablesCountMap[upgrade.id] > 3 ? '...' : ''}</div>
               )}

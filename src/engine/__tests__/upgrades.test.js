@@ -310,4 +310,22 @@ describe('upgrades', () => {
       expect(result).toBeNull();
     });
   });
+
+  it('doctrine forks are mutually exclusive for the run', () => {
+    let state = createInitialState();
+    state.resources.labor.amount = 500;
+    state.resources.materials.amount = 500;
+    state.resources.food.amount = 500;
+    state = purchaseUpgrade(state, 'tools'); // forks unlock mid-era
+
+    const available = getAvailableUpgrades(state).map(upgrade => upgrade.id);
+    expect(available).toContain('forkHearth');
+    expect(available).toContain('forkQuarry');
+
+    state = purchaseUpgrade(state, 'forkHearth');
+    expect(state.upgrades.forkHearth).toBe(true);
+    // The road not taken is gone: hidden and unpurchasable
+    expect(getAvailableUpgrades(state).map(upgrade => upgrade.id)).not.toContain('forkQuarry');
+    expect(purchaseUpgrade(state, 'forkQuarry')).toBeNull();
+  });
 });
