@@ -136,7 +136,8 @@ function rerouteTowardFrontier(state) {
 // Lay or re-lay one planned route per interval crossing, paying normal costs.
 export function advanceNetworkPlan(state, previousTime) {
   if (state.era < 6 || !state.networkPlan) return state;
-  const crossings = Math.floor(state.totalTime / ROUTE_LAY_INTERVAL) - Math.floor(previousTime / ROUTE_LAY_INTERVAL);
+  const interval = ROUTE_LAY_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1);
+  const crossings = Math.floor(state.totalTime / interval) - Math.floor(previousTime / interval);
   let updated = state;
   for (let run = 0; run < crossings; run++) {
     const next = getNextPlannedRoute(updated);

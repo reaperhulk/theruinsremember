@@ -271,17 +271,13 @@ export function performPrestige(state) {
   if (state.gameComplete) newState.gameComplete = true;
   if (state.trueEnding) newState.trueEnding = true;
 
-  // Perfect Memory: keep current operation progress.
+  // Perfect Memory: the hands remember. Operation history persists as
+  // stats and milestone credit, but every decision replays each cycle —
+  // at double speed (see perfectMemoryInterval in each operation).
   if (hasPrestigeUpgrade(state, 'perfectMemory')) {
     newState.dockingSuccesses = state.dockingSuccesses || 0;
     newState.dockingPerfects = state.dockingPerfects || 0;
-    newState.dockingMissions = state.dockingMissions || { cargo: 0, crew: 0, science: 0 };
-    newState.colonyAssignments = state.colonyAssignments || { growth: 0, science: 0, industry: 0 };
-    newState.starRoutes = state.starRoutes || [];
     newState.totalWeaves = state.totalWeaves || 0;
-    newState.dysonSegments = state.dysonSegments || 0;
-    newState.dysonModules = state.dysonModules || { frame: 0, collector: 0, forge: 0 };
-    newState.senateGov = state.senateGov || { leader: null, partner: null, ratified: false };
   }
 
   // Cosmic Insight: start at Era 2 (also buys era 2 tech)

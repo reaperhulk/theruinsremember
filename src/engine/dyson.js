@@ -5,6 +5,11 @@ import { getEffectivePrestige } from './resources.js';
 export const DYSON_MODULE_LIMIT = 3;
 export const DYSON_COMMISSION_INTERVAL = 60;
 
+// Perfect Memory: the hands remember — commissioning takes half the time.
+function commissionInterval(state) {
+  return DYSON_COMMISSION_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1);
+}
+
 export const DYSON_MODULES = {
   frame: {
     id: 'frame',
@@ -38,7 +43,7 @@ export function commissionDysonModule(state, moduleId) {
   const modules = getDysonModules(state);
   const totalModules = Object.values(modules).reduce((sum, count) => sum + count, 0);
   if (totalModules >= DYSON_MODULE_LIMIT) return null;
-  if (state.lastDysonCommissionTime !== undefined && state.totalTime - state.lastDysonCommissionTime < DYSON_COMMISSION_INTERVAL) return null;
+  if (state.lastDysonCommissionTime !== undefined && state.totalTime - state.lastDysonCommissionTime < commissionInterval(state)) return null;
 
   const module = DYSON_MODULES[moduleId];
   const resource = state.resources[module.resourceId];
@@ -74,12 +79,13 @@ export function getDysonStats(state) {
   const modules = getDysonModules(state);
   const totalModules = Object.values(modules).reduce((sum, count) => sum + count, 0);
   const elapsed = state.totalTime - (state.lastDysonCommissionTime ?? -DYSON_COMMISSION_INTERVAL);
+  const interval = commissionInterval(state);
   return {
     segments,
     modules,
     totalModules,
     remainingModules: Math.max(0, DYSON_MODULE_LIMIT - totalModules),
-    commissionCooldown: totalModules >= DYSON_MODULE_LIMIT ? 0 : Math.max(0, DYSON_COMMISSION_INTERVAL - elapsed),
+    commissionCooldown: totalModules >= DYSON_MODULE_LIMIT ? 0 : Math.max(0, interval - elapsed),
     completion: Math.floor(segments / 10) * 10,
     milestone: Math.floor(segments / 10),
     nextMilestone: (Math.floor(segments / 10) + 1) * 10,

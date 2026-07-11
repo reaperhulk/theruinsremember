@@ -280,6 +280,9 @@ const BALANCE_TARGETS = {
   },
   casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3, maxStarChartActions: 2, noCollapse: true },
   descent: { minRecursionDepth: 2, requireCollapse: true, minStatePrestiges: 1 },
+  // The compression floor: with three prestiges banked the final run must
+  // still take minutes, not seconds — decisions replay every cycle.
+  prestige3: { minTime: 150, requiredEra: 10, cycleReady: true },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
 };

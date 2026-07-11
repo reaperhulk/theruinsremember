@@ -44,12 +44,13 @@ export function getLockedSignals(state) {
 export function getTuningStats(state) {
   const locked = getLockedSignals(state);
   const lockedCount = Object.keys(locked).length;
-  const elapsed = state.totalTime - (state.lastSignalLockTime ?? -TUNING_LOCK_INTERVAL);
+  const interval = TUNING_LOCK_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1);
+  const elapsed = state.totalTime - (state.lastSignalLockTime ?? -interval);
   return {
     locked,
     lockedCount,
     remaining: Math.max(0, TUNING_LOCK_LIMIT - lockedCount),
-    cooldown: lockedCount >= TUNING_LOCK_LIMIT ? 0 : Math.max(0, TUNING_LOCK_INTERVAL - elapsed),
+    cooldown: lockedCount >= TUNING_LOCK_LIMIT ? 0 : Math.max(0, interval - elapsed),
   };
 }
 

@@ -152,7 +152,7 @@ export const prestigeUpgrades = {
     id: 'perfectMemory',
     name: 'Perfect Memory',
     cost: 7,
-    description: 'Keep operation progress across resets: docking, colonies, routes, Dyson assembly, and the senate government. Reality Laws and Signal Locks always dissolve.',
+    description: 'The hands remember: every operation recommissions at double speed each cycle — commissions, policy acts, laws, locks, and survey crews take half the time. Docking history persists.',
     effect: 'keep_operations',
   },
   universalOptimizer: {

@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:unit": "vitest --run",
-    "test:balance": "node scripts/bot-playtest.js --scenario full,casual,lowInteraction,passive,descent --seed 424242 --quiet --assert-balance",
+    "test:balance": "node scripts/bot-playtest.js --scenario full,casual,lowInteraction,passive,descent,prestige3 --seed 424242 --quiet --assert-balance",
     "test:browser": "node scripts/browser-test.mjs",
     "test:browser:mobile": "node scripts/browser-test.mjs --mobile",
     "test:quality": "npm run lint && npm run test:unit && npm run test:balance && npm run build"

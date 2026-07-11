@@ -46,13 +46,14 @@ export function getSenateStats(state) {
   const government = getSenateGovernment(state);
   const acts = countSenateActs(state);
   const nextAct = getNextSenateAct(state);
-  const elapsed = state.totalTime - (state.lastSenateActTime ?? -SENATE_ACT_INTERVAL);
+  const interval = SENATE_ACT_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1);
+  const elapsed = state.totalTime - (state.lastSenateActTime ?? -interval);
   return {
     government,
     acts,
     nextAct,
     nextActCost: getSenateActCost(state, nextAct),
-    cooldown: nextAct ? Math.max(0, SENATE_ACT_INTERVAL - elapsed) : 0,
+    cooldown: nextAct ? Math.max(0, interval - elapsed) : 0,
   };
 }
 

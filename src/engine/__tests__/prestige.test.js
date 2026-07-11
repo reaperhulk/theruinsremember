@@ -228,25 +228,32 @@ describe('prestige', () => {
       expect(after.resources.energy.amount).toBe(50);
     });
 
-    it('Perfect Memory preserves current operation progress', () => {
+    it('Perfect Memory keeps history but replays every decision', () => {
       const state = createInitialState();
       state.era = 10;
       state.prestigeUpgrades = { perfectMemory: true };
+      state.dockingSuccesses = 21;
+      state.dockingPerfects = 21;
       state.dockingMissions = { cargo: 3, crew: 2, science: 1 };
       state.colonyAssignments = { growth: 2, science: 1, industry: 1 };
       state.starRoutes = [{ from: 'sol', to: 'alpha' }];
       state.dysonSegments = 30;
+      state.senateGov = { leader: 'merchants', partner: 'scholars', ratified: true };
       state.lockedSignals = { power: true, stability: true, constants: true };
       state.totalWeaves = 3;
       state.wovenLaws = { temporal: true, spatial: true, causal: true };
 
       const after = performPrestige(state);
-      expect(after.dockingMissions).toEqual(state.dockingMissions);
-      expect(after.colonyAssignments).toEqual(state.colonyAssignments);
-      expect(after.starRoutes).toEqual(state.starRoutes);
-      expect(after.dysonSegments).toBe(30);
+      // History persists: counters and milestone credit
+      expect(after.dockingSuccesses).toBe(21);
+      expect(after.dockingPerfects).toBe(21);
       expect(after.totalWeaves).toBe(3);
-      // Run-build choices always dissolve, even with Perfect Memory
+      // Every decision replays: operations, laws, locks, government
+      expect(after.dockingMissions).toEqual({ cargo: 0, crew: 0, science: 0 });
+      expect(Object.values(after.colonyAssignments || {}).every(count => !count)).toBe(true);
+      expect(after.starRoutes || []).toEqual([]);
+      expect(after.dysonSegments).toBe(0);
+      expect(after.senateGov).toEqual({ leader: null, partner: null, ratified: false });
       expect(after.wovenLaws).toEqual({});
       expect(after.lockedSignals).toEqual({});
     });
