@@ -11,7 +11,7 @@ import { unlockTech, getAvailableTech } from '../src/engine/tech.js';
 import { canAfford, gather, getEffectiveRate, getNetRate } from '../src/engine/resources.js';
 import { attemptDock, getDockingInfo, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
 import { assignColonies, getAssignableColonies, getColonyBonus } from '../src/engine/colonies.js';
-import { createRoute, getUnlockedSystems, routeExists, getRoutes, getRouteBonus } from '../src/engine/starChart.js';
+import { getRouteBonus, selectNetworkPlan } from '../src/engine/starChart.js';
 import { getWeaveProductionMultiplier, getWeavingStats, weaveRealityLaw } from '../src/engine/weaving.js';
 import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
 import { commissionDysonModule, getDysonStats } from '../src/engine/dyson.js';
@@ -91,7 +91,7 @@ const PROFILES = {
     buyUpgrades: true, buyTech: true,
     docking: true, dockInterval: 3, dockAccuracy: 0,
     colonies: true, colonyStrategy: 'diversified',
-    starChart: true,
+    starChart: true, starChartPlan: 'longHaul',
     weaving: true, weaveInterval: 10,
     trading: true, tradeStrategy: 'bottleneck',
     dysonAssembly: true,
@@ -182,7 +182,7 @@ const PROFILES = {
     buyUpgrades: true, buyTech: true,
     docking: true, dockInterval: 3, dockAccuracy: 0,
     colonies: true, colonyStrategy: 'diversified',
-    starChart: true,
+    starChart: true, starChartPlan: 'surveyLattice',
     weaving: true, weaveInterval: 10,
     trading: true, tradeStrategy: 'aggressive',
     dysonAssembly: true,
@@ -207,7 +207,7 @@ const PROFILES = {
     buyUpgrades: true, buyTech: true,
     docking: true, dockInterval: 5, dockAccuracy: 0.15,
     colonies: true, colonyStrategy: 'growth',
-    starChart: true,
+    starChart: true, starChartPlan: 'coreWeb',
     weaving: false, weaveInterval: 0,
     trading: false, tradeStrategy: 'bottleneck',
     dysonAssembly: true,
@@ -253,6 +253,7 @@ const BALANCE_TARGETS = {
     maxRealityLaws: 3,
     maxTuningLocks: 3,
     maxSenateActs: 3,
+    maxStarChartActions: 2,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
@@ -265,7 +266,7 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3 },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3, maxStarChartActions: 2 },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true },
 };
@@ -378,27 +379,10 @@ function botColonies(state, profile, t, _rng) {
   return state;
 }
 
-function botStarChart(state, profile, t, _rng) {
-  if (!profile.starChart || state.era < 6) return state;
-  // Try to create routes every 60s
-  if (t % 60 !== 0) return state;
-
-  const systems = getUnlockedSystems(state);
-  const routes = getRoutes(state);
-  if (routes.length >= 10) return state;
-
-  // Connect all possible pairs, prioritizing longest distances
-  for (let i = 0; i < systems.length; i++) {
-    for (let j = i + 1; j < systems.length; j++) {
-      if (routeExists(state, systems[i].id, systems[j].id)) continue;
-      const result = createRoute(state, systems[i].id, systems[j].id);
-      if (result) {
-        state = result;
-        if (getRoutes(state).length >= 10) return state;
-      }
-    }
-  }
-  return state;
+function botStarChart(state, profile, _t, _rng) {
+  if (!profile.starChart || state.era < 6 || state.networkPlan) return state;
+  // One strategic commitment: survey crews lay the rest of the network.
+  return selectNetworkPlan(state, profile.starChartPlan || 'coreWeb');
 }
 
 function botWeave(state, profile, t, _rng) {
@@ -1283,6 +1267,10 @@ function assertBalanceTargets(allResults) {
     }
     if (target.maxSenateActs != null && collector.operationStats.senate.acts > target.maxSenateActs) {
       issues.push(`senate acts enacted ${collector.operationStats.senate.acts} times`);
+    }
+    if (target.maxStarChartActions != null) {
+      const chartActions = Object.values(collector.engagement.actionsByEra).reduce((sum, actions) => sum + (actions.starChart || 0), 0);
+      if (chartActions > target.maxStarChartActions) issues.push(`star chart acted ${chartActions} times`);
     }
     if (target.maxFirstOperationLatency != null) {
       for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {

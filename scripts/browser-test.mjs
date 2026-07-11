@@ -376,6 +376,22 @@ async function run() {
   }));
   const senateFailed = !senateAudit || senateAudit.factionChoices !== 3 || !senateAudit.acts.includes('1/3');
   console.log(`  Senate policy acts: ${senateFailed ? 'FAILED' : '3 factions, mandate granted'}`);
+  const chartMounted = await page.evaluate(() => {
+    const select = document.querySelector('.operation-archive select');
+    if (!select) return false;
+    select.value = 'starChart';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+  });
+  await new Promise(resolve => setTimeout(resolve, 100));
+  if (chartMounted) await page.evaluate(() => document.querySelector('.network-plans button:not([disabled])')?.click());
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const chartAudit = chartMounted && await page.evaluate(() => ({
+    planChoices: document.querySelectorAll('.network-plans button').length,
+    committed: !!document.querySelector('.network-plans button.active'),
+  }));
+  const chartFailed = !chartAudit || chartAudit.planChoices !== 3 || !chartAudit.committed;
+  console.log(`  Star chart plans: ${chartFailed ? 'FAILED' : '3 plans, one committed'}`);
   const forgeReady = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return false;
@@ -466,7 +482,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || chartFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

@@ -29,6 +29,130 @@ export function getStarDirectiveInfo(state) {
   return { directive, cooldown: Math.max(0, STAR_DIRECTIVE_DURATION - elapsed) };
 }
 
+// Network plans: one strategic commitment that lays the network for you.
+// Survey crews add one planned route every ROUTE_LAY_INTERVAL seconds
+// (paying normal route costs) until the chart is full. Manual routes on the
+// map remain available for hand-tuning.
+export const ROUTE_LAY_INTERVAL = 6;
+
+export const NETWORK_PLANS = {
+  coreWeb: {
+    id: 'coreWeb',
+    name: 'Core Web',
+    description: 'Dense central hubs. Every system feeds the web. Strongest with Throughput.',
+  },
+  longHaul: {
+    id: 'longHaul',
+    name: 'Long Haul',
+    description: 'The longest crossings first. Distance pays. Strongest with Frontier.',
+  },
+  surveyLattice: {
+    id: 'surveyLattice',
+    name: 'Survey Lattice',
+    description: 'Touch every system before doubling up. Strongest with Discovery.',
+  },
+};
+
+export function selectNetworkPlan(state, planId) {
+  if (state.era < 6 || !NETWORK_PLANS[planId]) return state;
+  const lastChange = state.lastNetworkPlanTime;
+  if (lastChange !== undefined && state.totalTime - lastChange < STAR_DIRECTIVE_DURATION) return state;
+  return { ...state, networkPlan: planId, lastNetworkPlanTime: state.totalTime };
+}
+
+export function getNetworkPlanInfo(state) {
+  const plan = NETWORK_PLANS[state.networkPlan] || null;
+  const elapsed = state.totalTime - (state.lastNetworkPlanTime ?? -STAR_DIRECTIVE_DURATION);
+  return { plan, cooldown: Math.max(0, STAR_DIRECTIVE_DURATION - elapsed) };
+}
+
+function countConnections(routes) {
+  const connections = {};
+  for (const route of routes) {
+    connections[route.from] = (connections[route.from] || 0) + 1;
+    connections[route.to] = (connections[route.to] || 0) + 1;
+  }
+  return connections;
+}
+
+function planScore(planId, fromSys, toSys, connections) {
+  const dist = getRouteDistance(fromSys, toSys);
+  const linked = (connections[fromSys.id] || 0) + (connections[toSys.id] || 0);
+  return planId === 'longHaul' ? dist
+    : planId === 'coreWeb' ? linked * 10 - dist
+      : -linked * 10 + dist; // surveyLattice: unconnected systems first, far reaches preferred
+}
+
+function bestCandidateRoute(state, systems, connections, requireFrontier) {
+  let best = null;
+  let bestScore = -Infinity;
+  for (let i = 0; i < systems.length; i++) {
+    for (let j = i + 1; j < systems.length; j++) {
+      const from = systems[i];
+      const to = systems[j];
+      if (routeExists(state, from.id, to.id)) continue;
+      if (requireFrontier && (connections[from.id] || 0) > 0 && (connections[to.id] || 0) > 0) continue;
+      const score = planScore(state.networkPlan, from, to, connections);
+      if (score > bestScore) {
+        bestScore = score;
+        best = { from: from.id, to: to.id };
+      }
+    }
+  }
+  return best;
+}
+
+// The next route the active plan would lay, or null when the chart is full,
+// no plan is set, or no candidate pair remains.
+export function getNextPlannedRoute(state) {
+  if (!NETWORK_PLANS[state.networkPlan] || getRoutes(state).length >= MAX_ROUTES) return null;
+  const systems = getUnlockedSystems(state);
+  return bestCandidateRoute(state, systems, countConnections(getRoutes(state)), false);
+}
+
+// When the chart is full but a newly charted system sits unconnected, crews
+// re-lay the least valuable interior route toward the frontier. Removals only
+// touch routes whose endpoints keep other connections, so connected systems
+// never drop off the network and the process terminates.
+function rerouteTowardFrontier(state) {
+  if (!NETWORK_PLANS[state.networkPlan]) return null;
+  const systems = getUnlockedSystems(state);
+  const routes = getRoutes(state);
+  const connections = countConnections(routes);
+  const frontier = bestCandidateRoute(state, systems, connections, true);
+  if (!frontier) return null;
+
+  const interior = routes.filter(route =>
+    (connections[route.from] || 0) >= 2 && (connections[route.to] || 0) >= 2);
+  if (interior.length === 0) return null;
+  const systemById = id => systems.find(system => system.id === id) || { id, x: 0.5, y: 0.5 };
+  const worst = interior.reduce((lowest, route) =>
+    planScore(state.networkPlan, systemById(route.from), systemById(route.to), connections)
+      < planScore(state.networkPlan, systemById(lowest.from), systemById(lowest.to), connections) ? route : lowest);
+
+  return createRoute(removeRoute(state, worst.from, worst.to), frontier.from, frontier.to);
+}
+
+// Lay or re-lay one planned route per interval crossing, paying normal costs.
+export function advanceNetworkPlan(state, previousTime) {
+  if (state.era < 6 || !state.networkPlan) return state;
+  const crossings = Math.floor(state.totalTime / ROUTE_LAY_INTERVAL) - Math.floor(previousTime / ROUTE_LAY_INTERVAL);
+  let updated = state;
+  for (let run = 0; run < crossings; run++) {
+    const next = getNextPlannedRoute(updated);
+    if (next) {
+      const result = createRoute(updated, next.from, next.to);
+      if (!result) break;
+      updated = result;
+      continue;
+    }
+    const rerouted = rerouteTowardFrontier(updated);
+    if (!rerouted) break;
+    updated = rerouted;
+  }
+  return updated;
+}
+
 // Available star system nodes (unlocked progressively)
 const STAR_SYSTEMS = [
   { id: 'sol', name: 'Sol', x: 0.5, y: 0.5, bonus: { energy: 10 } },

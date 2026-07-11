@@ -2,7 +2,7 @@ import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige } fr
 import { checkEraTransition, transitionEra } from './eras.js';
 import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
 import { getColonyBonus } from './colonies.js';
-import { getRouteBonus } from './starChart.js';
+import { advanceNetworkPlan, getRouteBonus } from './starChart.js';
 import { checkAchievements } from './achievements.js';
 import { purchaseUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
@@ -413,6 +413,9 @@ export function tick(state, dt, rng = Math.random) {
   if (newState.upgrades?.infiniteLoop) {
     newState = applyProductionBonus(newState, 0.001 * complexityTaxFactor, dt);
   }
+
+  // Network plan survey crews lay committed routes on their own schedule
+  newState = advanceNetworkPlan(newState, state.totalTime);
 
   // Dyson auto-assembly: every 60 ticks, auto-add segments based on existing count
   // Auto-rate scales with segments (1 per 10 segments, up to 20/tick)

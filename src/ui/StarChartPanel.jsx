@@ -1,5 +1,5 @@
 import { useState, memo } from 'react';
-import { createRoute, getRoutes, getRouteBonus, getRouteStats, getStarDirectiveInfo, getUnlockedSystems, removeRoute, routeExists, selectStarDirective, STAR_DIRECTIVES } from '../engine/starChart.js';
+import { createRoute, getNetworkPlanInfo, getRoutes, getRouteBonus, getRouteStats, getStarDirectiveInfo, getUnlockedSystems, NETWORK_PLANS, removeRoute, routeExists, selectNetworkPlan, selectStarDirective, STAR_DIRECTIVES } from '../engine/starChart.js';
 import { resources as resourceDefs } from '../data/resources.js';
 
 function resourceName(id) { return resourceDefs[id]?.name || id; }
@@ -12,6 +12,7 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
   const bonus = getRouteBonus(state);
   const stats = getRouteStats(state);
   const directiveInfo = getStarDirectiveInfo(state);
+  const planInfo = getNetworkPlanInfo(state);
 
   const handleSystemClick = (sysId) => {
     if (selected === null) {
@@ -158,29 +159,27 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
           The routes trace paths already worn into spacetime.
         </p>
       )}
-      {systems.length >= 2 && routes.length < 10 && (
-        <button
-          className="mine-btn"
-          style={{ marginTop: '4px', fontSize: '0.8em' }}
-          onClick={() => onUpdate(s => {
-            let st = s;
-            const sysList = getUnlockedSystems(st);
-            for (let i = 0; i < sysList.length && getRoutes(st).length < 10; i++) {
-              for (let j = i + 1; j < sysList.length && getRoutes(st).length < 10; j++) {
-                if (!routeExists(st, sysList[i].id, sysList[j].id)) {
-                  const result = createRoute(st, sysList[i].id, sysList[j].id);
-                  if (result) st = result;
-                }
-              }
-            }
-            return st;
-          })}
-        >
-          Auto-Connect ({Math.min(10 - routes.length, systems.length * (systems.length - 1) / 2 - routes.length)} slots)
-        </button>
+      <div className="star-directives network-plans" role="group" aria-label="Network plan">
+        {Object.values(NETWORK_PLANS).map(plan => (
+          <button
+            key={plan.id}
+            className={planInfo.plan?.id === plan.id ? 'active' : ''}
+            disabled={planInfo.cooldown > 0 && planInfo.plan?.id !== plan.id}
+            onClick={() => onUpdate(current => selectNetworkPlan(current, plan.id))}
+            title={plan.description}
+          >
+            <strong>{plan.name}</strong>
+            <span>{plan.description}</span>
+          </button>
+        ))}
+      </div>
+      {planInfo.plan && routes.length < 10 && (
+        <p className="operation-commitment">
+          Survey crews follow the {planInfo.plan.name} plan — next route lays automatically when 5 dark energy and 1 star system are on hand.
+        </p>
       )}
       <p className="operation-hint">
-        {selected ? 'Click another system to create a route, or same system to deselect.' : 'Click/tap two systems to create or remove routes (5 dark energy + 1 star system).'}
+        {selected ? 'Click another system to create a route, or same system to deselect.' : 'Choose a network plan and crews lay routes for you, or click two systems to hand-tune (5 dark energy + 1 star system).'}
         {stats.hubSystems > 0 && ' Hub systems (2+ routes) get +50% bonus.'}
         {' '}Longer routes give more resources.
       </p>

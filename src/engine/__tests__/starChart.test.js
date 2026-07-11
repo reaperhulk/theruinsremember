@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getUnlockedSystems, createRoute, removeRoute, getRoutes, getRouteBonus, routeExists, selectStarDirective } from '../starChart.js';
+import { advanceNetworkPlan, getUnlockedSystems, createRoute, removeRoute, getRoutes, getRouteBonus, ROUTE_LAY_INTERVAL, routeExists, selectNetworkPlan, selectStarDirective } from '../starChart.js';
 import { createInitialState } from '../state.js';
 
 describe('starChart', () => {
@@ -83,6 +83,39 @@ describe('starChart', () => {
     const state = makeEra6State();
     state.resources.darkEnergy.amount = 0;
     expect(createRoute(state, 'sol', 'alpha')).toBeNull();
+  });
+
+  it('lays committed network plans over time and follows the frontier', () => {
+    let state = selectNetworkPlan(makeEra6State(), 'longHaul');
+    expect(state.networkPlan).toBe('longHaul');
+
+    // Crews lay one route per interval, paying normal costs
+    state.totalTime += ROUTE_LAY_INTERVAL;
+    state = advanceNetworkPlan(state, state.totalTime - ROUTE_LAY_INTERVAL);
+    expect(getRoutes(state)).toHaveLength(1);
+    expect(state.resources.darkEnergy.amount).toBe(95);
+
+    // Fill the chart among the 5 unlocked systems (10 pairs = full chart).
+    // Production keeps star systems stocked in a live run; mirror that here.
+    for (let step = 0; step < 12; step++) {
+      state.resources.starSystems.amount = Math.max(state.resources.starSystems.amount, 10);
+      state.totalTime += ROUTE_LAY_INTERVAL;
+      state = advanceNetworkPlan(state, state.totalTime - ROUTE_LAY_INTERVAL);
+    }
+    expect(getRoutes(state)).toHaveLength(10);
+
+    // A newly charted system pulls crews toward the frontier via re-routing
+    state.resources.starSystems.amount = 30; // unlocks all 12 systems
+    state.resources.darkEnergy.amount = 100;
+    state.totalTime += ROUTE_LAY_INTERVAL;
+    const rerouted = advanceNetworkPlan(state, state.totalTime - ROUTE_LAY_INTERVAL);
+    expect(getRoutes(rerouted)).toHaveLength(10);
+    const connected = new Set(getRoutes(rerouted).flatMap(route => [route.from, route.to]));
+    const previouslyConnected = new Set(getRoutes(state).flatMap(route => [route.from, route.to]));
+    expect(connected.size).toBeGreaterThan(previouslyConnected.size);
+
+    // Plans are commitments: switching immediately after is refused
+    expect(selectNetworkPlan(rerouted, 'coreWeb').networkPlan).toBe('longHaul');
   });
 
   it('changes network output with a committed directive', () => {
