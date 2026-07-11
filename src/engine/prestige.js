@@ -265,6 +265,9 @@ export function performPrestige(state) {
       };
     }
   }
+  // A prestiged timeline starts spent: one expedition supply, so the early
+  // eras are paced by rediscovery rather than skipped by banked wealth.
+  newState.expedition = { ...newState.expedition, supplies: 1 };
   newState.echoMode = state.echoMode || false;
   newState.echoResource = state.echoResource || 0;
   newState.echoUpgrades = state.echoUpgrades || {};

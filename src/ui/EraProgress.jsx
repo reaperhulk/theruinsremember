@@ -161,6 +161,18 @@ function buildDirector(state, readiness) {
     };
   }
 
+  if (!readiness.activityMet && readiness.echoProof) {
+    return {
+      title: 'The Ruins Test What You Remember',
+      detail: `${readiness.echoProof.label}: banked power cannot skip this era's work.`,
+      chips: [
+        `${readiness.echoProof.current}/${readiness.echoProof.target} completed`,
+      ],
+      tone: 'warning',
+      supplyAlerts,
+    };
+  }
+
   if (!readiness.mastery.met) {
     return {
       title: readiness.mastery.title,
