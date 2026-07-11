@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable } from '../upgrades.js';
+import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable, getRepeatableMilestone, getRepeatableMilestoneMultiplier } from '../upgrades.js';
 import { createInitialState } from '../state.js';
 
 describe('upgrades', () => {
@@ -327,5 +327,20 @@ describe('upgrades', () => {
     // The road not taken is gone: hidden and unpurchasable
     expect(getAvailableUpgrades(state).map(upgrade => upgrade.id)).not.toContain('forkQuarry');
     expect(purchaseUpgrade(state, 'forkQuarry')).toBeNull();
+  });
+
+  it('repeatable milestones multiply the target resource every 25 levels', () => {
+    const state = createInitialState();
+    state.upgrades.expandWorkforce = 24;
+    expect(getRepeatableMilestone(state, 'expandWorkforce').milestones).toBe(0);
+    expect(getRepeatableMilestoneMultiplier(state, 'labor')).toBe(1);
+
+    state.upgrades.expandWorkforce = 50;
+    const milestone = getRepeatableMilestone(state, 'expandWorkforce');
+    expect(milestone.milestones).toBe(2);
+    expect(milestone.nextAt).toBe(75);
+    expect(getRepeatableMilestoneMultiplier(state, 'labor')).toBeCloseTo(1.2544);
+    // Other resources are untouched
+    expect(getRepeatableMilestoneMultiplier(state, 'food')).toBe(1);
   });
 });

@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useMemo, useEffect, memo } from 'react';
-import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades, buyAllAffordable } from '../engine/upgrades.js';
+import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable } from '../engine/upgrades.js';
 import { getEraMasteryTier } from '../engine/eras.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -503,6 +503,15 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 })}
                 {isMechanic && <span className="effect-tag effect-mechanic" title={mechanicDescriptions[upgrade.mechanic] || 'Special mechanic'}>MECHANIC</span>}
               </div>
+              {upgrade.repeatable && (() => {
+                const milestone = getRepeatableMilestone(state, upgrade.id);
+                return (
+                  <div className="text-hint" style={{ color: '#c7a85e' }}>
+                    {milestone.milestones > 0 && `Milestone ${milestone.milestones} — output x${milestone.multiplier.toFixed(2)}. `}
+                    {milestone.nextAt - milestone.level} levels to the next milestone.
+                  </div>
+                );
+              })()}
               {upgrade.exclusiveWith && (
                 <div className="text-hint" style={{ color: '#e0a0a0' }}>
                   Choosing this permanently locks out {upgradeDefs[upgrade.exclusiveWith]?.name || upgrade.exclusiveWith} this cycle.

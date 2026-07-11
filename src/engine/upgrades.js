@@ -3,6 +3,39 @@ import { resources as resourceDefs } from '../data/resources.js';
 import { spend, getEffectivePrestige } from './resources.js';
 import { getEraMasteryTier } from './eras.js';
 
+// Repeatable milestones: every 25 levels of a repeatable upgrade crosses a
+// named breakpoint that multiplies its target resource. Levels stop being
+// noise — each one climbs toward the next milestone.
+export const REPEATABLE_MILESTONE_STEP = 25;
+export const REPEATABLE_MILESTONE_BONUS = 1.12;
+const REPEATABLE_DEFS = Object.values(upgradeDefs).filter(def => def.repeatable);
+
+export function getRepeatableLevel(state, upgradeId) {
+  const value = state.upgrades?.[upgradeId];
+  return typeof value === 'number' ? value : value ? 1 : 0;
+}
+
+export function getRepeatableMilestone(state, upgradeId) {
+  const level = getRepeatableLevel(state, upgradeId);
+  const milestones = Math.floor(level / REPEATABLE_MILESTONE_STEP);
+  return {
+    level,
+    milestones,
+    multiplier: Math.pow(REPEATABLE_MILESTONE_BONUS, milestones),
+    nextAt: (milestones + 1) * REPEATABLE_MILESTONE_STEP,
+  };
+}
+
+export function getRepeatableMilestoneMultiplier(state, resourceId) {
+  let multiplier = 1;
+  for (const def of REPEATABLE_DEFS) {
+    if (def.effects?.[0]?.target !== resourceId) continue;
+    const milestones = Math.floor(getRepeatableLevel(state, def.id) / REPEATABLE_MILESTONE_STEP);
+    if (milestones > 0) multiplier *= Math.pow(REPEATABLE_MILESTONE_BONUS, milestones);
+  }
+  return multiplier;
+}
+
 // Era-based cost multiplier to keep pace with exponential production growth.
 // Smooth exponential curve: each era ~15-30x more expensive than previous.
 // Also scales resource caps so earlier resources can store enough.
@@ -176,6 +209,18 @@ export function purchaseUpgrade(state, upgradeId) {
     upgrades: { ...afterEffects.upgrades, [upgradeId]: newValue },
     lastUpgradeTime: afterEffects.totalTime || 0,
   };
+
+  // Repeatable milestones: announce each crossing
+  if (isRepeatable && typeof newValue === 'number' && newValue % REPEATABLE_MILESTONE_STEP === 0) {
+    const milestone = getRepeatableMilestone(finalState, upgradeId);
+    finalState = {
+      ...finalState,
+      eventLog: [...(finalState.eventLog || []), {
+        message: `MILESTONE: ${def.name} level ${newValue} — ${def.effects[0].target} output x${milestone.multiplier.toFixed(2)}.`,
+        time: finalState.totalTime || 0,
+      }].slice(-20),
+    };
+  }
 
   // Era Mastery Tiers: announce the felt breakpoint every purchase counts toward
   const tierInfo = getEraMasteryTier(finalState);

@@ -1,5 +1,5 @@
 import { resources as resourceDefs } from '../data/resources.js';
-import { ERA_COST_MULTIPLIERS } from './upgrades.js';
+import { ERA_COST_MULTIPLIERS, getRepeatableMilestoneMultiplier } from './upgrades.js';
 import { getCycleProductionMultiplier } from './cycles.js';
 import { getRelicCapacityMultiplier, getRelicProductionMultiplier } from './relics.js';
 import { getWeaveProductionMultiplier } from './weaving.js';
@@ -24,7 +24,7 @@ export function getEffectiveRate(state, resourceId) {
   const def = resourceDefs[resourceId];
   if (!def) return 0;
   const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
-  return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * getCycleProductionMultiplier(state) * getRelicProductionMultiplier(state, resourceId) * getWeaveProductionMultiplier(state, resourceId) * getEraMasteryTier(state).multiplier;
+  return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * getCycleProductionMultiplier(state) * getRelicProductionMultiplier(state, resourceId) * getWeaveProductionMultiplier(state, resourceId) * getEraMasteryTier(state).multiplier * getRepeatableMilestoneMultiplier(state, resourceId);
 }
 
 // Calculate all production rates
