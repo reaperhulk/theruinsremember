@@ -7,7 +7,7 @@ import { buyMetaUpgrade, META_UPGRADES } from '../engine/meta.js';
 import { STRUCTURES } from '../engine/structures.js';
 
 const CANVAS = 420;
-const HIT_RADIUS = 34;
+const HIT_RADIUS = 40;
 
 const STRUCTURE_COLORS = {
   farm: '#8fc97a',
@@ -163,7 +163,13 @@ export function App() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
+    // Fixed 2x backing store: crisp on retina and on desktops where CSS
+    // scales the map above its logical 420px.
+    const dpr = 2;
+    canvas.width = CANVAS * dpr;
+    canvas.height = CANVAS * dpr;
     const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     let raf = null;
     const draw = () => {
       if (stateRef.current.round) drawTown(ctx, stateRef.current, selectedRef.current, performance.now() / 1000);
@@ -285,7 +291,7 @@ export function App() {
           </button>
         </div>
       ) : (
-        <>
+        <div className="playfield">
           <canvas
             ref={canvasRef}
             width={CANVAS}
@@ -294,7 +300,7 @@ export function App() {
             role="img"
             aria-label={isDay ? 'Town map — pick a card, then tap an empty slot' : 'Night — tap a slot to send the Warden'}
           />
-
+          <div className="side">
           {isDay ? (
             <div className="day-controls">
               <div className="draft">
@@ -338,7 +344,8 @@ export function App() {
               <div key={index}>{entry.message}</div>
             ))}
           </div>
-        </>
+          </div>
+        </div>
       )}
     </div>
   );
