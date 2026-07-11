@@ -3047,6 +3047,77 @@ canvas:hover {
   font-size: 0.7em;
 }
 
+/* The Forgetting siege panel */
+.forgetting-panel {
+  background: #0d0a14;
+  border-color: #4a2a5e;
+}
+
+.siege-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 8px 0;
+  border: 1px solid #2a1f38;
+  border-radius: 4px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.siege-meter {
+  position: relative;
+  height: 20px;
+  margin: 6px 0;
+  border: 1px solid #4a2a5e;
+  border-radius: 4px;
+  background: #120d1c;
+  overflow: hidden;
+}
+
+.siege-meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  transition: width 0.4s ease;
+}
+
+.siege-meter span {
+  position: relative;
+  display: block;
+  padding: 2px 8px;
+  color: #e8ddf2;
+  font-size: 0.72em;
+  text-align: center;
+}
+
+.siege-mirror {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.siege-warden-status {
+  padding: 4px 7px;
+  border: 1px solid #39414e;
+  border-radius: 3px;
+  color: #9fb2c8;
+  font-size: 0.68em;
+}
+
+.siege-threat-btn {
+  padding: 5px 9px;
+  border: 1px solid #b06ad0;
+  border-radius: 3px;
+  background: #1d1228;
+  color: #e6c8f5;
+  font-size: 0.72em;
+}
+
+.siege-threat-btn:hover {
+  background: #2a1a3a;
+}
+
 /* Cosmic Tuning panel */
 .tuning-panel {
   background: #101a1e;

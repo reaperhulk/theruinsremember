@@ -12,6 +12,7 @@ import { ColonyPanel } from './ColonyPanel.jsx';
 import { StarChartPanel } from './StarChartPanel.jsx';
 import { WeavingPanel } from './WeavingPanel.jsx';
 import { TuningPanel } from './TuningPanel.jsx';
+import { ForgettingPanel } from './ForgettingPanel.jsx';
 import { DysonPanel } from './DysonPanel.jsx';
 import { TradingPanel } from './TradingPanel.jsx';
 import { SenatePanel } from './SenatePanel.jsx';
@@ -200,6 +201,7 @@ export function App() {
       senate: <SenatePanel key="senate" state={state} onUpdate={updateState} />,
       weaving: <WeavingPanel key="weaving" state={state} onUpdate={updateState} />,
       tuning: <TuningPanel key="tuning" state={state} onUpdate={updateState} />,
+      forgetting: <ForgettingPanel key="forgetting" state={state} onUpdate={updateState} />,
       realityForge: <RealityForgePanel key="realityForge" state={state} onUpdate={updateState} />,
     };
     return operationComponents[operationId] || null;

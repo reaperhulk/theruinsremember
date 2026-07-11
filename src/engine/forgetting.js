@@ -294,6 +294,21 @@ export function placeWarden(state, wardenId, nodeId) {
   };
 }
 
+// Station the best available warden at a node: an unplaced warden first,
+// otherwise an off-cooldown warden that is not currently holding a tendril.
+// Returns the placeWarden result or null.
+export function autoStationWarden(state, nodeId) {
+  const forgetting = state.forgetting;
+  if (!forgetting) return null;
+  const busy = new Set(forgetting.tendrils.map(tendril => tendril.targetId));
+  const ready = forgetting.wardens.filter(warden =>
+    state.totalTime - warden.movedAt >= WARDEN_MOVE_COOLDOWN && warden.nodeId !== nodeId);
+  const candidate = ready.find(warden => !warden.nodeId)
+    || ready.find(warden => !busy.has(warden.nodeId));
+  if (!candidate) return null;
+  return placeWarden(state, candidate.id, nodeId);
+}
+
 // Snapshot for UI, bots, and tests.
 export function getForgettingStats(state) {
   const forgetting = state.forgetting;

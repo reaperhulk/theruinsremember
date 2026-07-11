@@ -6,6 +6,7 @@ export const OPERATIONS = [
   { id: 'senate', label: 'Galactic Senate', era: 8, description: 'Set the political mandate that shapes the galactic economy.' },
   { id: 'weaving', label: 'Reality Weaving', era: 8, description: 'Combine fragments into temporary laws of reality.' },
   { id: 'tuning', label: 'Cosmic Tuning', era: 9, description: 'Lock three of four cosmic bands to shape the cycle.' },
+  { id: 'forgetting', label: 'The Forgetting', era: 10, description: 'Station wardens on the memories of this cycle. Hold the line.' },
   { id: 'realityForge', label: 'Reality Forge', era: 10, description: 'Craft distinct keys and decide how the next cycle begins.' },
 ];
 

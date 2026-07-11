@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   advanceForgetting,
+  autoStationWarden,
   FIRST_SURGE_DELAY,
   FORGETTING_BASE_RATE,
   FORGETTING_COLLAPSE,
@@ -154,6 +155,27 @@ describe('the Forgetting', () => {
     const a = runOnce();
     const b = runOnce();
     expect(JSON.stringify(a.forgetting)).toBe(JSON.stringify(b.forgetting));
+  });
+
+  it('auto-stations the best available warden', () => {
+    const rng = makeRng();
+    let state = run(makeSiegeState(), 2, rng);
+
+    // Idle warden goes first
+    let result = autoStationWarden(state, 'law:temporal');
+    expect(result.warden.id).toBe(1);
+    state = result.state;
+
+    // Second idle warden next; both now on cooldown
+    result = autoStationWarden(state, 'law:causal');
+    expect(result.warden.id).toBe(2);
+    state = result.state;
+    expect(autoStationWarden(state, 'lock:power')).toBeNull();
+
+    // Off cooldown, a non-holding warden repositions
+    state = { ...state, totalTime: state.totalTime + WARDEN_MOVE_COOLDOWN };
+    result = autoStationWarden(state, 'lock:power');
+    expect(result).toBeTruthy();
   });
 
   it('reports stats for bots and UI', () => {

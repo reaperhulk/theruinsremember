@@ -392,6 +392,49 @@ async function run() {
   }));
   const chartFailed = !chartAudit || chartAudit.planChoices !== 3 || !chartAudit.committed;
   console.log(`  Star chart plans: ${chartFailed ? 'FAILED' : '3 plans, one committed'}`);
+  // The Forgetting: seed a deterministic siege, drive it from the DOM mirror
+  await page.evaluate(() => {
+    window.__game.setState(state => ({
+      ...state,
+      forgetting: {
+        meter: 12,
+        startedAt: state.totalTime - 60,
+        nextSurgeAt: state.totalTime + 3600,
+        tendrils: [{ id: 1, targetId: 'lock:stability', spawnedAt: state.totalTime - 5, spawnAngle: 1.2, arrivesAt: state.totalTime + 300, phase: 'approach', heldSince: null, consumesAt: null }],
+        scars: {},
+        wardens: [
+          { id: 1, nodeId: null, movedAt: -100 },
+          { id: 2, nodeId: null, movedAt: -100 },
+        ],
+        sealed: 0, consumed: 0, collapsed: false, nextTendrilId: 2,
+      },
+    }));
+  });
+  const siegeMounted = await page.evaluate(() => {
+    const select = document.querySelector('.operation-archive select');
+    if (select) {
+      select.value = '';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    return true;
+  }) && await new Promise(resolve => setTimeout(() => resolve(true), 150)) && await page.evaluate(() => {
+    const tab = [...document.querySelectorAll('.operation-modes button')].find(button => /Forgetting/.test(button.textContent));
+    if (!tab) return false;
+    tab.click();
+    return true;
+  });
+  await new Promise(resolve => setTimeout(resolve, 200));
+  if (siegeMounted) await page.evaluate(() => document.querySelector('.siege-threat-btn')?.click());
+  await new Promise(resolve => setTimeout(resolve, 200));
+  const siegeAudit = siegeMounted && await page.evaluate(() => ({
+    canvas: !!document.querySelector('.siege-canvas'),
+    meter: !!document.querySelector('.siege-meter'),
+    stationed: document.querySelector('.forgetting-panel .tuning-header strong')?.textContent || '',
+    wardenRows: document.querySelectorAll('.siege-warden-status').length,
+  }));
+  const siegeFailed = !siegeAudit || !siegeAudit.canvas || !siegeAudit.meter || siegeAudit.wardenRows < 2 || !siegeAudit.stationed.includes('1/2');
+  if (siegeFailed) console.log('    siege debug:', JSON.stringify(siegeAudit));
+  console.log(`  Forgetting siege: ${siegeFailed ? 'FAILED' : 'canvas + mirror, warden stationed via mirror'}`);
   const forgeReady = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return false;
@@ -482,7 +525,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || chartFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }
