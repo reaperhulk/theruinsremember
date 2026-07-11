@@ -21,7 +21,7 @@ import { getEraReadiness } from '../src/engine/eras.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
 import { countSenateActs, enactSenatePolicy, getSenateGovernmentMultiplier, getSenatePctBonuses, getSenateStats } from '../src/engine/senate.js';
 import { selectNextCycleDoctrine } from '../src/engine/cycles.js';
-import { getForgettingStats, placeWarden } from '../src/engine/forgetting.js';
+import { descendRecursion, getForgettingStats, placeWarden } from '../src/engine/forgetting.js';
 import { claimRelic, declineRelicOffer } from '../src/engine/relics.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
 import { readFileSync } from 'fs';
@@ -240,6 +240,7 @@ const SCENARIOS = {
   earlyGame:    { profile: 'optimal',      prestige: 0,  targetEra: 3,  maxTime: 900,   purpose: 'Era 1-3 pacing detail' },
   lateGame:     { profile: 'optimal',      prestige: 2,  targetEra: 10, maxTime: 14400, prestigeAtEra: 7, purpose: 'Late-game with prestige' },
   casual:       { profile: 'casual',       prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Standard casual player experience' },
+  descent:      { profile: 'optimal',      prestige: 0,  targetEra: 10, maxTime: 21600, profileOverrides: { maxRecursionDepth: 12 }, stopOnCollapse: true, purpose: 'The wall: descend until the Forgetting wins' },
 };
 
 const BALANCE_TARGETS = {
@@ -274,6 +275,7 @@ const BALANCE_TARGETS = {
     },
   },
   casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3, maxStarChartActions: 2, noCollapse: true },
+  descent: { minRecursionDepth: 2, requireCollapse: true, minStatePrestiges: 1 },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
 };
@@ -539,6 +541,13 @@ function botForgetting(state, profile, t, _rng) {
   return result ? result.state : state;
 }
 
+function botDescend(state, profile, _t, _rng) {
+  if (!profile.maxRecursionDepth || state.era < 10) return state;
+  if ((state.recursionDepth || 0) >= profile.maxRecursionDepth) return state;
+  const result = descendRecursion(state);
+  return result ? result.state : state;
+}
+
 function botRealityForge(state, profile, t, _rng) {
   if (state.era < 10) return state;
   if (!state.nextCycleDoctrine) {
@@ -621,7 +630,7 @@ function createCollector() {
       tuning: { locks: 0 },
       senate: { acts: 0 },
       realityForge: { keys: 0 },
-      forgetting: { sealed: 0, consumed: 0, meterMax: 0 },
+      forgetting: { sealed: 0, consumed: 0, meterMax: 0, depthMax: 0, collapsed: false },
     },
     prestigeLog: [],
     bottlenecks: [],
@@ -707,10 +716,12 @@ function updateOperationStats(prevState, state, collector) {
   s.starChart.routes = (state.starRoutes || []).length;
   s.realityForge.keys = Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0);
   if (state.forgetting) {
-    s.forgetting.sealed = state.forgetting.sealed || 0;
-    s.forgetting.consumed = state.forgetting.consumed || 0;
+    s.forgetting.sealed = Math.max(s.forgetting.sealed, state.forgetting.sealed || 0);
+    s.forgetting.consumed = Math.max(s.forgetting.consumed, state.forgetting.consumed || 0);
     s.forgetting.meterMax = Math.max(s.forgetting.meterMax, state.forgetting.meter || 0);
+    if (state.forgetting.collapsed) s.forgetting.collapsed = true;
   }
+  s.forgetting.depthMax = Math.max(s.forgetting.depthMax, state.recursionDepth || 0);
   s.senate.acts = countSenateActs(state);
 }
 
@@ -867,9 +878,10 @@ function logWrite(msg) {
 }
 
 function runScenario(opts) {
-  const { profile, maxTime, targetEra, prestige, prestigeAtEra, seed, snapshotInterval, verbose, quiet } = opts;
-  const profileDef = PROFILES[profile];
-  if (!profileDef) throw new Error(`Unknown profile: ${profile}`);
+  const { profile, maxTime, targetEra, prestige, prestigeAtEra, seed, snapshotInterval, verbose, quiet, profileOverrides, stopOnCollapse } = opts;
+  const baseProfile = PROFILES[profile];
+  if (!baseProfile) throw new Error(`Unknown profile: ${profile}`);
+  const profileDef = profileOverrides ? { ...baseProfile, ...profileOverrides } : baseProfile;
 
   const rng = mulberry32(seed);
   const DT = 1;
@@ -908,12 +920,17 @@ function runScenario(opts) {
     applyAction('tuning', current => botCosmicTuning(current, profileDef, t, rng));
     applyAction('senate', current => botSenate(current, profileDef, t, rng));
     applyAction('forgetting', current => botForgetting(current, profileDef, t, rng));
+    applyAction('descend', current => botDescend(current, profileDef, t, rng));
     applyAction('realityForge', current => botRealityForge(current, profileDef, t, rng));
     applyAction('prestigeUpgrade', current => botPrestigeUpgrades(current, profileDef, t, rng));
 
     // Tick the engine
     state = tick(state, DT, rng);
     recordEngagementTick(state, collector);
+
+    if (stopOnCollapse && collector.operationStats.forgetting.collapsed && (state.prestigeCount || 0) > 0) {
+      break;
+    }
 
     // Track era transitions
     if (state.era !== lastEra) {
@@ -930,7 +947,8 @@ function runScenario(opts) {
     }
 
     // Prestige check
-    if (prestigesDone < prestige && state.era >= prestigeAtEra && getCycleReadiness(state).ready) {
+    if (prestigesDone < prestige && state.era >= prestigeAtEra && getCycleReadiness(state).ready &&
+        (profileDef.maxRecursionDepth || 0) <= (state.recursionDepth || 0)) {
       const bonus = calculatePrestigeBonus(state);
       const points = calculatePrestigePoints(state);
       collector.prestigeLog.push({
@@ -1025,7 +1043,7 @@ function runScenario(opts) {
           log(`  Reached era ${targetEra} at ${fmtTime(state.totalTime)}`);
         }
       }
-      if (targetEra >= 10 ? getCycleReadiness(state).ready : t - reachedTargetAt >= 120) break;
+      if (stopOnCollapse) { /* run until the wall wins */ } else if (targetEra >= 10 ? getCycleReadiness(state).ready : t - reachedTargetAt >= 120) break;
     }
   }
 
@@ -1046,7 +1064,8 @@ function runScenario(opts) {
     prestigeMultiplier: state.prestigeMultiplier || 1,
     activeRelics: state.activeRelics || [],
     relicsRecoveredThisRun: state.relicsRecoveredThisRun || 0,
-    forgettingCollapsed: !!state.forgetting?.collapsed,
+    forgettingCollapsed: collector.operationStats.forgetting.collapsed || !!state.forgetting?.collapsed,
+    statePrestigeCount: state.prestigeCount || 0,
   };
 
   const operationActivity = {
@@ -1113,7 +1132,7 @@ function printHumanReport(scenarioName, opts, collector) {
     if (mg.tuning.locks > 0) console.log(`  Tuning: ${mg.tuning.locks} signal locks`);
     if (mg.senate.acts > 0) console.log(`  Senate: ${mg.senate.acts} policy acts`);
     if (mg.realityForge.keys > 0) console.log(`  Reality Forge: ${mg.realityForge.keys} keys forged`);
-    if (mg.forgetting.meterMax > 0) console.log(`  Forgetting: peak ${mg.forgetting.meterMax.toFixed(1)}, ${mg.forgetting.sealed} sealed, ${mg.forgetting.consumed} memories lost`);
+    if (mg.forgetting.meterMax > 0) console.log(`  Forgetting: peak ${mg.forgetting.meterMax.toFixed(1)}, ${mg.forgetting.sealed} sealed, ${mg.forgetting.consumed} memories lost${mg.forgetting.depthMax > 0 ? `, depth ${mg.forgetting.depthMax}` : ''}${mg.forgetting.collapsed ? ' — COLLAPSED' : ''}`);
   }
 
   const engagement = collector.engagement;
@@ -1321,6 +1340,15 @@ function assertBalanceTargets(allResults) {
     if (target.noCollapse && status.forgettingCollapsed) {
       issues.push('the Forgetting collapsed the run');
     }
+    if (target.minRecursionDepth != null && collector.operationStats.forgetting.depthMax < target.minRecursionDepth) {
+      issues.push(`only reached recursion depth ${collector.operationStats.forgetting.depthMax}`);
+    }
+    if (target.requireCollapse && !status.forgettingCollapsed) {
+      issues.push('the wall never won — no collapse');
+    }
+    if (target.minStatePrestiges != null && (status.statePrestigeCount || 0) < target.minStatePrestiges) {
+      issues.push('collapse did not force the cycle to end');
+    }
     if (target.maxFirstOperationLatency != null) {
       for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {
         if (latency > target.maxFirstOperationLatency) issues.push(`era ${era} first operation took ${fmtTime(latency)}`);
@@ -1476,6 +1504,8 @@ for (const scenarioName of scenarioNames) {
     targetEra: scenarioDef ? scenarioDef.targetEra : args.targetEra,
     prestige: scenarioDef ? scenarioDef.prestige : args.prestige,
     prestigeAtEra: scenarioDef?.prestigeAtEra || args.prestigeAtEra,
+    profileOverrides: scenarioDef?.profileOverrides,
+    stopOnCollapse: scenarioDef?.stopOnCollapse || false,
     seed: globalSeed,
     snapshotInterval: args.snapshotInterval,
     verbose: args.verbose,

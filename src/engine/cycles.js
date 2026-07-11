@@ -26,6 +26,7 @@ export function selectNextCycleDoctrine(state, doctrineId) {
 
 export function getCycleProductionMultiplier(state) {
   let multiplier = 1 + (state.cycleMarks || 0) * 0.01;
+  multiplier *= Math.pow(1.5, state.recursionDepth || 0); // deeper recursion resonates
   if (state.cycleDoctrine === 'reconstruction' && state.era <= 3) multiplier *= 1.35;
   if (state.cycleDoctrine === 'expansion' && state.era >= 4 && state.era <= 7) multiplier *= 1.3;
   if (state.cycleDoctrine === 'transcendence' && state.era >= 8) multiplier *= 1.3;

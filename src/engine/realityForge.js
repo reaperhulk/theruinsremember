@@ -7,7 +7,7 @@ export const REALITY_KEY_RECIPES = [
     fragments: 50,
     echoes: 20,
     color: '#ff8866',
-    description: 'Next cycles recover expedition supplies 5 seconds faster per key.',
+    description: 'Expedition supplies recover 5s faster per key in future cycles, and Forgetting tendrils approach 10% slower per key.',
     lore: 'Frozen moments compressed into a key. Time bends around whoever holds it.',
     milestone: 'Lock the Deep Time signal band',
     unlocked: state => !!state.lockedSignals?.stability,

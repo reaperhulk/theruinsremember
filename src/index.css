@@ -3118,6 +3118,37 @@ canvas:hover {
   background: #2a1a3a;
 }
 
+.siege-descend {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.siege-descend span {
+  color: #8793a2;
+  font-size: 0.68em;
+}
+
+.descend-btn {
+  padding: 6px 12px;
+  border: 1px solid #e05a5a;
+  border-radius: 3px;
+  background: #241016;
+  color: #f2c4c4;
+  font-size: 0.78em;
+  white-space: nowrap;
+}
+
+.descend-btn:disabled {
+  border-color: #4a3138;
+  color: #7a5f66;
+}
+
+.descend-btn:not(:disabled):hover {
+  background: #3a1820;
+}
+
 /* Cosmic Tuning panel */
 .tuning-panel {
   background: #101a1e;

@@ -9,6 +9,7 @@ import { COSMIC_BANDS } from './tuning.js';
 import { REALITY_LAWS } from './weaving.js';
 import { SENATE_FACTIONS } from './senate.js';
 import { RELICS } from '../data/relics.js';
+import { getCycleReadiness } from './realityForge.js';
 
 export const FORGETTING_COLLAPSE = 100;
 export const FORGETTING_BASE_RATE = 100 / 7200; // unstalled: two hours to collapse, before scars
@@ -23,7 +24,9 @@ export const FIRST_SURGE_DELAY = 15;
 export const SURGE_INTERVAL = 75;
 export const MAX_TENDRILS = 5;
 export const WARDEN_MOVE_COOLDOWN = 20;
-export const DEPTH_ESCALATION = 1.6;            // per recursion depth (the ladder arrives later)
+export const DEPTH_ESCALATION = 1.6;            // siege speed multiplier per recursion depth
+export const DEPTH_MIN_DWELL = 90;              // seconds to weather a depth before descending
+export const DEPTH_DESCEND_METER_LIMIT = 50;    // the line must be holding to go deeper
 
 // Ring layout for non-system memories, arranged around the Archive (0.5, 0.5).
 const KIND_RINGS = {
@@ -102,6 +105,7 @@ function createForgetting(state) {
   return {
     meter: 0,
     startedAt: state.totalTime,
+    depthStartedAt: state.totalTime,
     nextSurgeAt: state.totalTime + FIRST_SURGE_DELAY,
     tendrils: [],
     scars: {},
@@ -136,7 +140,11 @@ function guardedNodeIds(forgetting) {
   return new Set(forgetting.wardens.filter(warden => warden.nodeId).map(warden => warden.nodeId));
 }
 
-function spawnSurge(forgetting, nodes, now, factor, rng) {
+function getTendrilSlowMultiplier(state) {
+  return 1 + (state.realityKeys?.temporal || 0) * 0.1;
+}
+
+function spawnSurge(forgetting, nodes, now, factor, slow, rng) {
   const targeted = new Set(forgetting.tendrils.map(tendril => tendril.targetId));
   const open = nodes.filter(node => !forgetting.scars[node.id] && !targeted.has(node.id));
   const budget = Math.min(
@@ -171,7 +179,7 @@ function spawnSurge(forgetting, nodes, now, factor, rng) {
         targetId: target.id,
         spawnedAt: now,
         spawnAngle: rng() * Math.PI * 2,
-        arrivesAt: now + (TENDRIL_APPROACH_TIME * jitter) / factor,
+        arrivesAt: now + ((TENDRIL_APPROACH_TIME * jitter) / factor) * slow,
         phase: 'approach',
         heldSince: null,
         consumesAt: null,
@@ -181,11 +189,11 @@ function spawnSurge(forgetting, nodes, now, factor, rng) {
   return updated;
 }
 
-function advanceSlice(forgetting, nodes, now, sliceDt, factor, rng) {
+function advanceSlice(forgetting, nodes, now, sliceDt, factor, slow, rng) {
   // Surges open new breaches on a fixed cadence.
   while (forgetting.nextSurgeAt <= now) {
     const surgeAt = forgetting.nextSurgeAt;
-    forgetting = spawnSurge(forgetting, nodes, surgeAt, factor, rng);
+    forgetting = spawnSurge(forgetting, nodes, surgeAt, factor, slow, rng);
     forgetting = { ...forgetting, nextSurgeAt: surgeAt + SURGE_INTERVAL / factor };
   }
 
@@ -251,14 +259,15 @@ export function advanceForgetting(state, dt, rng = Math.random) {
 
   const nodes = getMemoryConstellation(state);
   const factor = depthFactor(state);
+  const slow = getTendrilSlowMultiplier(state);
   const startTime = state.totalTime - dt;
   let elapsed = 0;
   while (elapsed < dt) {
     const sliceDt = Math.min(1, dt - elapsed);
     elapsed += sliceDt;
-    forgetting = advanceSlice(forgetting, nodes, startTime + elapsed, sliceDt, factor, rng);
+    forgetting = advanceSlice(forgetting, nodes, startTime + elapsed, sliceDt, factor, slow, rng);
     if (forgetting.meter >= FORGETTING_COLLAPSE) {
-      forgetting = { ...forgetting, meter: FORGETTING_COLLAPSE, collapsed: true, tendrils: [] };
+      forgetting = { ...forgetting, meter: FORGETTING_COLLAPSE, collapsed: true, collapsedAt: startTime + elapsed, tendrils: [] };
       break;
     }
   }
@@ -291,6 +300,55 @@ export function placeWarden(state, wardenId, nodeId) {
     },
     warden,
     node,
+  };
+}
+
+// Descend one recursion depth: the run's real scoreboard. Requires the full
+// cycle checklist (you descend INSTEAD of prestiging), a weathered dwell at
+// the current depth, and a held line. The siege re-forms harder; scars
+// persist — the run carries its wounds deeper. Each depth multiplies
+// production x1.5 and banks 8 prestige points at cycle end.
+export function canDescend(state) {
+  const forgetting = state.forgetting;
+  if (state.era < 10 || !forgetting || forgetting.collapsed) {
+    return { allowed: false, reason: 'The siege is not active.' };
+  }
+  if (!getCycleReadiness(state).directlyReady) {
+    return { allowed: false, reason: 'Complete the cycle checklist first.' };
+  }
+  const dwell = state.totalTime - (forgetting.depthStartedAt ?? forgetting.startedAt ?? 0);
+  if (dwell < DEPTH_MIN_DWELL) {
+    return { allowed: false, reason: `Weather this depth ${Math.ceil(DEPTH_MIN_DWELL - dwell)}s longer.` };
+  }
+  if (forgetting.meter >= DEPTH_DESCEND_METER_LIMIT) {
+    return { allowed: false, reason: 'The line is not holding — push the Forgetting below 50% first.' };
+  }
+  return { allowed: true, reason: null };
+}
+
+export function descendRecursion(state) {
+  if (!canDescend(state).allowed) return null;
+  const forgetting = state.forgetting;
+
+  const depth = (state.recursionDepth || 0) + 1;
+  return {
+    state: {
+      ...state,
+      recursionDepth: depth,
+      forgetting: {
+        ...forgetting,
+        meter: 0,
+        tendrils: [],
+        nextSurgeAt: state.totalTime + FIRST_SURGE_DELAY,
+        depthStartedAt: state.totalTime,
+      },
+      eventLog: [...(state.eventLog || []), {
+        message: `RECURSION DEPTH ${depth}: The Multiverse folds inward. The Forgetting follows, faster.`,
+        time: state.totalTime,
+        isLore: true,
+      }].slice(-20),
+    },
+    depth,
   };
 }
 

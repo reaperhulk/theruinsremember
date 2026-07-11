@@ -1,6 +1,8 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   autoStationWarden,
+  canDescend,
+  descendRecursion,
   getForgettingStats,
   placeWarden,
   TENDRIL_CONSUME_TIME,
@@ -171,6 +173,14 @@ export const ForgettingPanel = memo(function ForgettingPanel({ state, onUpdate }
 
   const stats = getForgettingStats(state);
   const stationed = stats.wardens.filter(warden => warden.nodeId).length;
+  const depth = state.recursionDepth || 0;
+  const descendInfo = canDescend(state);
+
+  const handleDescend = () => {
+    playClick();
+    const result = descendRecursion(state);
+    if (result) onUpdate(() => result.state);
+  };
 
   // Render loop — pauses when the tab is hidden.
   useEffect(() => {
@@ -256,7 +266,7 @@ export const ForgettingPanel = memo(function ForgettingPanel({ state, onUpdate }
     <div className="panel forgetting-panel">
       <div className="tuning-header">
         <div>
-          <span className="panel-kicker">The cycle turns</span>
+          <span className="panel-kicker">{depth > 0 ? `Recursion depth ${depth}` : 'The cycle turns'}</span>
           <h2>The Forgetting</h2>
         </div>
         <strong>{stationed}/{stats.wardens.length} wardens stationed</strong>
@@ -271,7 +281,9 @@ export const ForgettingPanel = memo(function ForgettingPanel({ state, onUpdate }
       </div>
 
       {stats.collapsed ? (
-        <p className="operation-commitment">Every memory dims. Prestige to begin the next cycle — the ruins will remember.</p>
+        <p className="operation-commitment">
+          Every memory dims. The cycle ends{depth > 0 ? ` at recursion depth ${depth} — +${depth * 8} prestige points banked` : ''}. The ruins will remember.
+        </p>
       ) : (
         <>
           <canvas
@@ -299,6 +311,16 @@ export const ForgettingPanel = memo(function ForgettingPanel({ state, onUpdate }
             ))}
           </div>
 
+          <div className="siege-descend">
+            <button className="descend-btn" disabled={!descendInfo.allowed} onClick={handleDescend}>
+              Descend to Depth {depth + 1}
+            </button>
+            <span>
+              {descendInfo.allowed
+                ? `x1.5 production, +8 prestige points per depth — the siege quickens`
+                : descendInfo.reason}
+            </span>
+          </div>
           <p className="operation-hint">
             Tap a memory to station a warden | Held tendrils stall the meter, sealed ones push it back | Lost memories stay lost this cycle
           </p>

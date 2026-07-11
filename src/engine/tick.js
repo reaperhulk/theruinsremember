@@ -13,6 +13,7 @@ import { getActiveSystems } from './operations.js';
 import { awardCycleGoal } from './cycles.js';
 import { advanceEchoPressure } from './relics.js';
 import { advanceForgetting } from './forgetting.js';
+import { performPrestige } from './prestige.js';
 
 // Resource consumption rates — moderate tension without breaking low-interaction paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
@@ -202,6 +203,11 @@ export function tick(state, dt, rng = Math.random) {
           isLore: true,
         }].slice(-20),
       };
+    }
+    // The cycle ends whether or not you are ready — rewards are banked.
+    if (newState.forgetting?.collapsed &&
+        newState.totalTime - (newState.forgetting.collapsedAt ?? newState.totalTime) >= 10) {
+      return performPrestige(newState);
     }
   }
   if (newState.era <= 3 && newState.prestigeUpgrades?.autoClicker && newState.expedition?.supplies >= EXPEDITION_MAX_SUPPLIES) {

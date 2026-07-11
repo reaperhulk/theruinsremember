@@ -77,6 +77,8 @@ export function calculatePrestigePoints(state) {
   points += Math.floor((state.dockingPerfects || 0) / 20);
   if (Object.keys(state.wovenLaws || {}).length >= 3) points += 1;
   if (Object.keys(state.lockedSignals || {}).length >= 3) points += 1;
+  // The depth ladder: every recursion survived is the run's real score
+  points += (state.recursionDepth || 0) * 8;
   return points;
 }
 

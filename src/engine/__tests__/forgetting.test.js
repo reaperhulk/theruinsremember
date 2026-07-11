@@ -18,6 +18,11 @@ import {
 import { getWeaveProductionMultiplier } from '../weaving.js';
 import { hasRelic } from '../relics.js';
 import { createInitialState } from '../state.js';
+import { canDescend, DEPTH_ESCALATION, DEPTH_MIN_DWELL, descendRecursion, getForgettingRate } from '../forgetting.js';
+import { calculatePrestigePoints } from '../prestige.js';
+import { getCycleProductionMultiplier } from '../cycles.js';
+import { tick } from '../tick.js';
+import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 
 // Deterministic rng: cycles through a fixed sequence.
 function makeRng(sequence = [0.5]) {
@@ -176,6 +181,59 @@ describe('the Forgetting', () => {
     state = { ...state, totalTime: state.totalTime + WARDEN_MOVE_COOLDOWN };
     result = autoStationWarden(state, 'lock:power');
     expect(result).toBeTruthy();
+  });
+
+  it('gates descending on readiness, dwell, and a held line', () => {
+    const rng = makeRng();
+    let state = run(makeSiegeState(), 2, rng);
+
+    // Cycle checklist incomplete
+    expect(canDescend(state).allowed).toBe(false);
+    for (const upgrade of Object.values(upgradeDefs).filter(u => u.era === 10).slice(0, 20)) {
+      state.upgrades[upgrade.id] = true;
+    }
+    state.realityKeys = { temporal: 1, spatial: 1, quantum: 2 };
+    state.nextCycleDoctrine = 'reconstruction';
+
+    // Ready, but the depth has not been weathered long enough
+    expect(canDescend(state).allowed).toBe(false);
+    expect(canDescend(state).reason).toMatch(/Weather/);
+    state = run(state, DEPTH_MIN_DWELL, rng);
+    expect(canDescend(state).allowed).toBe(true);
+
+    // A failing line blocks the way down
+    const failing = { ...state, forgetting: { ...state.forgetting, meter: 60 } };
+    expect(canDescend(failing).allowed).toBe(false);
+
+    const result = descendRecursion(state);
+    expect(result.depth).toBe(1);
+    const deeper = result.state;
+    expect(deeper.recursionDepth).toBe(1);
+    expect(deeper.forgetting.meter).toBe(0);
+    expect(deeper.forgetting.tendrils).toHaveLength(0);
+    // Depth escalates the siege and pays out
+    expect(getForgettingRate(deeper)).toBeCloseTo(getForgettingRate(state) * DEPTH_ESCALATION, 6);
+    expect(calculatePrestigePoints(deeper) - calculatePrestigePoints({ ...deeper, recursionDepth: 0 })).toBe(8);
+    expect(getCycleProductionMultiplier(deeper) / getCycleProductionMultiplier({ ...deeper, recursionDepth: 0 })).toBeCloseTo(1.5, 6);
+    // Fresh dwell requirement at the new depth
+    expect(canDescend(deeper).allowed).toBe(false);
+  });
+
+  it('forces the cycle to end after collapse', () => {
+    const rng = makeRng();
+    let state = run(makeSiegeState(), 1, rng);
+    state = {
+      ...state,
+      forgetting: { ...state.forgetting, meter: 100, collapsed: true, collapsedAt: state.totalTime - 11, tendrils: [] },
+      recursionDepth: 2,
+    };
+    const after = tick(state, 1, rng);
+    expect(after.era).toBe(1);
+    expect(after.prestigeCount).toBe(1);
+    expect(after.forgetting).toBeNull();
+    expect(after.recursionDepth).toBe(0);
+    // Depth points were banked
+    expect(after.prestigePoints).toBeGreaterThanOrEqual(16);
   });
 
   it('reports stats for bots and UI', () => {

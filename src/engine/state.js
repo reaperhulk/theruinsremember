@@ -111,6 +111,7 @@ export function createInitialState() {
     senatePct: { merchants: 34, scholars: 33, warriors: 33 },
     // The Forgetting (Era 10+) — run-ending siege state
     forgetting: null,
+    recursionDepth: 0,
     // Reality Forge (Era 10+)
     realityKeys: {},
     echoPressure: 0,
