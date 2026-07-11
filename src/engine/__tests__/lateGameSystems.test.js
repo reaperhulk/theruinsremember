@@ -8,10 +8,12 @@ import {
   setSenateDirective,
 } from '../senate.js';
 import {
-  applyTuning,
-  getNextTuningTier,
-  getTuningProductionBonus,
-  getTuningQuality,
+  COSMIC_BANDS,
+  getTuningProductionMultiplier,
+  getTuningStats,
+  lockCosmicSignal,
+  TUNING_LOCK_INTERVAL,
+  TUNING_LOCK_LIMIT,
 } from '../tuning.js';
 import { createInitialState } from '../state.js';
 
@@ -61,16 +63,34 @@ describe('late-game systems', () => {
     expect(getSenatePctBonuses(directed).exoticMatter).toBeCloseTo(1.07);
   });
 
-  it('scores tuning and advances production tiers', () => {
-    const state = createInitialState();
+  it('locks signal bands with calibration gaps and a hard limit', () => {
+    let state = createInitialState();
     state.era = 9;
-    state.resources.cosmicPower = { ...state.resources.cosmicPower, unlocked: true };
-    state.resources.universalConstants = { ...state.resources.universalConstants, unlocked: true };
-    expect(getTuningQuality(2)).toBe('perfect');
-    const result = applyTuning(state, 'perfect');
-    expect(result.state.tuningScore).toBe(5);
-    expect(getNextTuningTier(result.state.tuningScore).threshold).toBe(10);
-    expect(getTuningProductionBonus(100)).toBe(1.5);
+
+    const first = lockCosmicSignal(state, 'power');
+    expect(first.band.id).toBe('power');
+    state = first.state;
+    expect(getTuningStats(state).lockedCount).toBe(1);
+
+    // Calibration interval blocks an immediate second lock
+    expect(getTuningStats(state).cooldown).toBeGreaterThan(0);
+    expect(lockCosmicSignal(state, 'constants')).toBeNull();
+
+    // After the interval passes, further locks work up to the limit
+    state = { ...state, totalTime: state.totalTime + TUNING_LOCK_INTERVAL };
+    state = lockCosmicSignal(state, 'stability').state;
+    state = { ...state, totalTime: state.totalTime + TUNING_LOCK_INTERVAL };
+    state = lockCosmicSignal(state, 'constants').state;
+    expect(getTuningStats(state).lockedCount).toBe(TUNING_LOCK_LIMIT);
+    state = { ...state, totalTime: state.totalTime + TUNING_LOCK_INTERVAL };
+    expect(lockCosmicSignal(state, 'fragments')).toBeNull();
+
+    // Locked bands apply visible boosts and drags
+    expect(Object.keys(COSMIC_BANDS)).toHaveLength(4);
+    const powerOnly = { ...createInitialState(), era: 9, lockedSignals: { power: true } };
+    expect(getTuningProductionMultiplier(powerOnly, 'cosmicPower')).toBeCloseTo(1.6);
+    expect(getTuningProductionMultiplier(powerOnly, 'universalConstants')).toBeCloseTo(0.9);
+    expect(getTuningProductionMultiplier(powerOnly, 'realityFragments')).toBe(1);
   });
 
   it('detects advisor archetypes and returns available suggestions', () => {

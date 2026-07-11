@@ -15,7 +15,7 @@ import { createRoute, getUnlockedSystems, routeExists, getRoutes, getRouteBonus 
 import { getWeaveProductionMultiplier, getWeavingStats, weaveRealityLaw } from '../src/engine/weaving.js';
 import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
 import { commissionDysonModule, getDysonStats } from '../src/engine/dyson.js';
-import { applyTuning, getTuningProductionBonus } from '../src/engine/tuning.js';
+import { getTuningProductionMultiplier, getTuningStats, lockCosmicSignal } from '../src/engine/tuning.js';
 import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
 import { getEraReadiness } from '../src/engine/eras.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
@@ -251,6 +251,7 @@ const BALANCE_TARGETS = {
     maxDockingAttempts: 30,
     maxDysonCommissions: 3,
     maxRealityLaws: 3,
+    maxTuningLocks: 3,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
@@ -263,7 +264,7 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3 },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3 },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true },
 };
@@ -490,12 +491,16 @@ function botDyson(state, profile, t, _rng) {
   return result ? result.state : state;
 }
 
-function botCosmicTuning(state, profile, t, _rng) {
+function botCosmicTuning(state, profile, _t, _rng) {
   if (!profile.cosmicTuning || state.era < 9) return state;
-  // Tune every 10s with perfect accuracy
-  if (t % 10 !== 0) return state;
-
-  const result = applyTuning(state, 'perfect');
+  // Lock Deep Time first (Temporal Key milestone), then the two big output
+  // bands, leaving the Fracture Band unlocked. Calibration gaps pace this.
+  const lockOrder = ['stability', 'power', 'constants'];
+  const stats = getTuningStats(state);
+  if (stats.remaining <= 0 || stats.cooldown > 0) return state;
+  const nextBand = lockOrder.find(bandId => !stats.locked[bandId]);
+  if (!nextBand) return state;
+  const result = lockCosmicSignal(state, nextBand);
   return result ? result.state : state;
 }
 
@@ -605,7 +610,7 @@ function createCollector() {
       starChart: { routes: 0 },
       weaving: { draws: 0, weaves: 0 },
       dyson: { segments: 0 },
-      tuning: { tunes: 0, score: 0 },
+      tuning: { locks: 0 },
       senate: { allocations: 0 },
       realityForge: { keys: 0 },
     },
@@ -689,7 +694,7 @@ function updateOperationStats(prevState, state, collector) {
   s.docking.perfects = state.dockingPerfects || 0;
   s.weaving.weaves = state.totalWeaves || 0;
   s.dyson.segments = state.dysonSegments || 0;
-  s.tuning.score = state.tuningScore || 0;
+  s.tuning.locks = Object.keys(state.lockedSignals || {}).length;
   s.starChart.routes = (state.starRoutes || []).length;
   s.realityForge.keys = Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0);
   s.senate.allocations = (state.senate?.merchants || 0) + (state.senate?.scholars || 0) + (state.senate?.warriors || 0);
@@ -743,7 +748,7 @@ function hasEraOperationProgress(state) {
   if (state.era === 6) return (state.starRoutes?.length || 0) > 0;
   if (state.era === 7) return (state.dysonSegments || 0) > 0;
   if (state.era === 8) return Object.values(state.senate || {}).some(count => count > 0) || (state.totalWeaves || 0) > 0;
-  if (state.era === 9) return (state.tuningScore || 0) > 0;
+  if (state.era === 9) return Object.keys(state.lockedSignals || {}).length > 0;
   return Object.values(state.realityKeys || {}).some(count => count > 0);
 }
 
@@ -761,7 +766,10 @@ function recordEngagementTick(state, collector) {
 
 function getPassiveOperationRates(state) {
   const sumRates = rates => Object.values(rates).reduce((sum, rate) => sum + Math.max(0, rate), 0);
-  const tuningRate = getEffectiveRate(state, 'cosmicPower') * Math.max(0, getTuningProductionBonus(state.tuningScore) - 1);
+  const tuningRate = ['cosmicPower', 'universalConstants', 'realityFragments'].reduce(
+    (sum, resourceId) => sum + getEffectiveRate(state, resourceId) * (getTuningProductionMultiplier(state, resourceId) - 1),
+    0,
+  );
   const senateRate = Object.entries(getSenatePctBonuses(state)).reduce(
     (sum, [resourceId, multiplier]) => sum + getEffectiveRate(state, resourceId) * Math.max(0, multiplier - 1),
     0,
@@ -1030,7 +1038,7 @@ function runScenario(opts) {
     dyson: collector.operationStats.dyson.segments,
     senate: collector.operationStats.senate.allocations,
     weaving: collector.operationStats.weaving.weaves,
-    tuning: collector.operationStats.tuning.score,
+    tuning: collector.operationStats.tuning.locks,
     realityForge: collector.operationStats.realityForge.keys,
   };
   const configuredOperations = {
@@ -1074,7 +1082,7 @@ function printHumanReport(scenarioName, opts, collector) {
   const mg = collector.operationStats;
   const hasAnyOperation = mg.expeditions.finds > 0 || mg.docking.attempts > 0 ||
     mg.starChart.routes > 0 || mg.weaving.weaves > 0 || mg.dyson.segments > 0 ||
-    mg.tuning.score > 0 || mg.senate.allocations > 0 || mg.realityForge.keys > 0;
+    mg.tuning.locks > 0 || mg.senate.allocations > 0 || mg.realityForge.keys > 0;
 
   if (hasAnyOperation) {
     console.log('\n── Operation Stats ──');
@@ -1083,7 +1091,7 @@ function printHumanReport(scenarioName, opts, collector) {
     if (mg.starChart.routes > 0) console.log(`  Star Chart: ${mg.starChart.routes} routes`);
     if (mg.weaving.weaves > 0) console.log(`  Weaving: ${mg.weaving.weaves} weaves`);
     if (mg.dyson.segments > 0) console.log(`  Dyson: ${mg.dyson.segments} segments`);
-    if (mg.tuning.score > 0) console.log(`  Tuning: score ${mg.tuning.score}`);
+    if (mg.tuning.locks > 0) console.log(`  Tuning: ${mg.tuning.locks} signal locks`);
     if (mg.senate.allocations > 0) console.log(`  Senate: ${mg.senate.allocations} influence allocated`);
     if (mg.realityForge.keys > 0) console.log(`  Reality Forge: ${mg.realityForge.keys} keys forged`);
   }
@@ -1273,6 +1281,9 @@ function assertBalanceTargets(allResults) {
     }
     if (target.maxRealityLaws != null && collector.operationStats.weaving.weaves > target.maxRealityLaws) {
       issues.push(`Reality Laws established ${collector.operationStats.weaving.weaves} times`);
+    }
+    if (target.maxTuningLocks != null && collector.operationStats.tuning.locks > target.maxTuningLocks) {
+      issues.push(`signal bands locked ${collector.operationStats.tuning.locks} times`);
     }
     if (target.maxFirstOperationLatency != null) {
       for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {

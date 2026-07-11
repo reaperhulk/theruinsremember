@@ -16,7 +16,7 @@ export function migrateState(saved) {
   }
   // Ensure new state fields exist
   if (!migrated.dysonSegments) migrated.dysonSegments = 0;
-  if (!migrated.tuningScore) migrated.tuningScore = 0;
+  if (!migrated.lockedSignals) migrated.lockedSignals = {};
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
   migrated.expedition = { ...createExpeditionState(), ...(saved.expedition || {}) };
   migrated.dockingMissions = { cargo: 0, crew: 0, science: 0, ...(saved.dockingMissions || {}) };
@@ -25,6 +25,7 @@ export function migrateState(saved) {
     'factoryAllocation', 'factoryWorkers',
     'hackChallenge', 'hackDifficulty', 'hackSuccesses', 'hackMastery', 'lastHackTime',
     'weavingGrid', 'weavingOffer', 'weaveCombo', 'lastWeaveTime',
+    'tuningScore',
   ]) {
     delete migrated[retiredField];
   }
@@ -101,8 +102,8 @@ export function createInitialState() {
     // Dyson Assembly (Era 7+)
     dysonSegments: 0,
     dysonModules: { frame: 0, collector: 0, forge: 0 },
-    // Cosmic Tuning (Era 9+)
-    tuningScore: 0,
+    // Cosmic Tuning (Era 9+) — locked signal bands for this cycle
+    lockedSignals: {},
     // Galactic Senate (Era 8+)
     senate: { merchants: 0, scholars: 0, warriors: 0 },
     // Senate directive sliders — percentage focus per faction (sum = 100)

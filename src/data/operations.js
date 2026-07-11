@@ -5,7 +5,7 @@ export const OPERATIONS = [
   { id: 'dyson', label: 'Dyson Assembly', era: 7, description: 'Direct megastructure capacity into a functioning stellar engine.' },
   { id: 'senate', label: 'Galactic Senate', era: 8, description: 'Set the political mandate that shapes the galactic economy.' },
   { id: 'weaving', label: 'Reality Weaving', era: 8, description: 'Combine fragments into temporary laws of reality.' },
-  { id: 'tuning', label: 'Cosmic Tuning', era: 9, description: 'Stabilize an uncertain signal for lasting cosmic output.' },
+  { id: 'tuning', label: 'Cosmic Tuning', era: 9, description: 'Lock three of four cosmic bands to shape the cycle.' },
   { id: 'realityForge', label: 'Reality Forge', era: 10, description: 'Craft distinct keys and decide how the next cycle begins.' },
 ];
 

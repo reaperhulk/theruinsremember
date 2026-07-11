@@ -9,8 +9,8 @@ export const REALITY_KEY_RECIPES = [
     color: '#ff8866',
     description: 'Next cycles recover expedition supplies 5 seconds faster per key.',
     lore: 'Frozen moments compressed into a key. Time bends around whoever holds it.',
-    milestone: 'Reach Cosmic Tuning score 50',
-    unlocked: state => (state.tuningScore || 0) >= 50,
+    milestone: 'Lock the Deep Time signal band',
+    unlocked: state => !!state.lockedSignals?.stability,
   },
   {
     id: 'spatial',

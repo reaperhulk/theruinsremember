@@ -236,7 +236,7 @@ describe('prestige', () => {
       state.colonyAssignments = { growth: 2, science: 1, industry: 1 };
       state.starRoutes = [{ from: 'sol', to: 'alpha' }];
       state.dysonSegments = 30;
-      state.tuningScore = 50;
+      state.lockedSignals = { power: true, stability: true, constants: true };
       state.totalWeaves = 3;
       state.wovenLaws = { temporal: true, spatial: true, causal: true };
 
@@ -245,9 +245,10 @@ describe('prestige', () => {
       expect(after.colonyAssignments).toEqual(state.colonyAssignments);
       expect(after.starRoutes).toEqual(state.starRoutes);
       expect(after.dysonSegments).toBe(30);
-      expect(after.tuningScore).toBe(50);
       expect(after.totalWeaves).toBe(3);
+      // Run-build choices always dissolve, even with Perfect Memory
       expect(after.wovenLaws).toEqual({});
+      expect(after.lockedSignals).toEqual({});
     });
   });
 });

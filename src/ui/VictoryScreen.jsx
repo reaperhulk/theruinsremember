@@ -35,7 +35,7 @@ export function VictoryScreen({ state, onDismiss }) {
             <div>Achievements: {Object.keys(state.achievements || {}).length}/{achievements.length}</div>
             {state.totalGems > 0 && <div>Gems: {state.totalGems} | Trades: {state.totalTrades || 0}</div>}
             <div>Discoveries: {state.expedition?.totalFinds || 0} | Docks: {state.dockingPerfects || 0} | Weaves: {state.totalWeaves || 0}</div>
-            {state.dysonSegments > 0 && <div>Dyson: {state.dysonSegments} segments | Tuning: {state.tuningScore || 0} score</div>}
+            {state.dysonSegments > 0 && <div>Dyson: {state.dysonSegments} segments | Signal locks: {Object.keys(state.lockedSignals || {}).length}</div>}
           </div>
           <div className="victory-card victory-card-wide">
             <strong>Final Signal</strong>

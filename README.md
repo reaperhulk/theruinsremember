@@ -91,7 +91,7 @@ node scripts/browser-test.mjs --mobile
 ```
 
 The browser smoke test drives a real early-game flow, exercises orbital mission
-choices, fragment selection, limited tuning probes, the operation archive, all
+choices, fragment selection, cosmic signal locks, the operation archive, all
 three cycle doctrines, and an Era 10 prestige. It fails on progression misses,
 console errors, or viewport overflow. Use `--prestige 1` to include a reset.
 

@@ -93,7 +93,7 @@ async function promoteToEra10(page) {
     window.__game.setState(state => ({
       ...state,
       era: 10,
-      tuningScore: 50,
+      lockedSignals: { stability: true },
       dockingSuccesses: 9,
       realityKeys: { temporal: 1, spatial: 1, quantum: 2 },
       nextCycleDoctrine: 'reconstruction',
@@ -334,15 +334,15 @@ async function run() {
     return true;
   });
   await new Promise(resolve => setTimeout(resolve, 150));
-  if (tuningMounted) await page.evaluate(() => document.querySelector('.tuning-actions button')?.click());
+  if (tuningMounted) await page.evaluate(() => document.querySelector('.signal-bands button:not([disabled])')?.click());
   await new Promise(resolve => setTimeout(resolve, 100));
   const tuningAudit = tuningMounted && await page.evaluate(() => ({
       visible: !!document.querySelector('.tuning-panel'),
-      actionCount: document.querySelectorAll('.tuning-actions button').length,
-      readout: document.querySelector('.signal-readout')?.textContent || '',
+      bandChoices: document.querySelectorAll('.signal-bands button').length,
+      lockedHeading: document.querySelector('.tuning-header strong')?.textContent || '',
     }));
-  const tuningFailed = !tuningAudit?.visible || tuningAudit.actionCount !== 2 || tuningAudit.readout.includes('NO READING');
-  console.log(`  Cosmic tuning probes: ${tuningFailed ? 'FAILED' : 'limited probe and lock controls ready'}`);
+  const tuningFailed = !tuningAudit?.visible || tuningAudit.bandChoices !== 4 || !tuningAudit.lockedHeading.includes('2/3');
+  console.log(`  Cosmic tuning locks: ${tuningFailed ? 'FAILED' : '4 bands, second signal locked'}`);
 
   const weavingMounted = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');

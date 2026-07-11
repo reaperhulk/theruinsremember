@@ -113,7 +113,7 @@ describe('eras', () => {
       expect(getEraMastery(state).completedDirectly).toBe(true);
 
       state.era = 9;
-      state.tuningScore = 30;
+      state.lockedSignals = { stability: true, power: true };
       expect(getEraMastery(state).completedDirectly).toBe(true);
     });
   });

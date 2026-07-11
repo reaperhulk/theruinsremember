@@ -21,7 +21,7 @@ describe('reality forge', () => {
 
   it('forges an unlocked key and consumes its resources', () => {
     const state = makeForgeState();
-    state.tuningScore = 50;
+    state.lockedSignals = { stability: true };
     const after = forgeRealityKey(state, 'temporal');
 
     expect(after.realityKeys.temporal).toBe(1);

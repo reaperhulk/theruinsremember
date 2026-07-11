@@ -76,6 +76,7 @@ export function calculatePrestigePoints(state) {
   points += Math.floor((state.expedition?.totalFinds || 0) / 10);
   points += Math.floor((state.dockingPerfects || 0) / 20);
   if (Object.keys(state.wovenLaws || {}).length >= 3) points += 1;
+  if (Object.keys(state.lockedSignals || {}).length >= 3) points += 1;
   return points;
 }
 
@@ -278,7 +279,6 @@ export function performPrestige(state) {
     newState.totalWeaves = state.totalWeaves || 0;
     newState.dysonSegments = state.dysonSegments || 0;
     newState.dysonModules = state.dysonModules || { frame: 0, collector: 0, forge: 0 };
-    newState.tuningScore = state.tuningScore || 0;
     newState.senate = state.senate || { merchants: 0, scholars: 0, warriors: 0 };
   }
 

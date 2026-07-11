@@ -288,7 +288,7 @@ describe('tick', () => {
   it('initial state includes late operation fields', () => {
     const state = createInitialState();
     expect(state.dysonSegments).toBe(0);
-    expect(state.tuningScore).toBe(0);
+    expect(state.lockedSignals).toEqual({});
     expect(state.senate).toBeDefined();
     expect(state.senate.merchants).toBe(0);
     expect(state.senate.scholars).toBe(0);

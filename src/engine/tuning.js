@@ -1,74 +1,93 @@
-// Cosmic Tuning operation — probe an unstable signal, then bank the best lock.
+// Cosmic Tuning operation — lock three of four visible signal bands for the cycle.
+import { getOperationRewardMultiplier } from './cycles.js';
 
-import { getEffectivePrestige } from './resources.js';
+export const TUNING_LOCK_LIMIT = 3;
+export const TUNING_LOCK_INTERVAL = 50;
 
-// Determine quality from the distance between player frequency and target.
-export function getTuningQuality(distance) {
-  if (distance <= 2) return 'perfect';
-  if (distance <= 8) return 'good';
-  if (distance <= 20) return 'ok';
-  return 'miss';
+// Each band is a fully visible tradeoff: a strong boost with a stated drag,
+// or the smaller penalty-free Deep Time band. Locks reset at prestige.
+export const COSMIC_BANDS = {
+  power: {
+    id: 'power',
+    name: 'Radiant Band',
+    description: 'Pour the signal into raw output. Precision suffers.',
+    boost: { cosmicPower: 0.6 },
+    drag: { universalConstants: 0.1 },
+  },
+  constants: {
+    id: 'constants',
+    name: 'Lattice Band',
+    description: 'Sharpen the constants. Raw power bleeds away.',
+    boost: { universalConstants: 0.6 },
+    drag: { cosmicPower: 0.1 },
+  },
+  fragments: {
+    id: 'fragments',
+    name: 'Fracture Band',
+    description: 'Split reality along useful seams. The lattice frays.',
+    boost: { realityFragments: 0.6 },
+    drag: { universalConstants: 0.1 },
+  },
+  stability: {
+    id: 'stability',
+    name: 'Deep Time Band',
+    description: 'A slow, even signal from before the first cycle. No drawbacks.',
+    boost: { cosmicPower: 0.25, universalConstants: 0.25 },
+    drag: {},
+  },
+};
+
+export function getLockedSignals(state) {
+  return { ...(state.lockedSignals || {}) };
 }
 
-// Get the reward multiplier for a quality level.
-export function getTuningMultiplier(quality) {
-  if (quality === 'perfect') return 5;
-  if (quality === 'good') return 2;
-  if (quality === 'ok') return 1;
-  return 0;
+export function getTuningStats(state) {
+  const locked = getLockedSignals(state);
+  const lockedCount = Object.keys(locked).length;
+  const elapsed = state.totalTime - (state.lastSignalLockTime ?? -TUNING_LOCK_INTERVAL);
+  return {
+    locked,
+    lockedCount,
+    remaining: Math.max(0, TUNING_LOCK_LIMIT - lockedCount),
+    cooldown: lockedCount >= TUNING_LOCK_LIMIT ? 0 : Math.max(0, TUNING_LOCK_INTERVAL - elapsed),
+  };
 }
 
-// Reward tiers: { threshold, bonus (multiplier on cosmicPower production), label }
-export const TUNING_TIERS = [
-  { threshold: 100, bonus: 1.50, label: 'Tier IV: +50% Cosmic Power' },
-  { threshold:  50, bonus: 1.20, label: 'Tier III: +20% Cosmic Power' },
-  { threshold:  25, bonus: 1.10, label: 'Tier II: +10% Cosmic Power' },
-  { threshold:  10, bonus: 1.05, label: 'Tier I: +5% Cosmic Power' },
-];
-
-// Get the current production bonus for cosmicPower based on tuning score.
-export function getTuningProductionBonus(tuningScore) {
-  const score = tuningScore || 0;
-  for (const tier of TUNING_TIERS) {
-    if (score >= tier.threshold) return tier.bonus;
+// Production multiplier from locked bands. Boosts scale with operation
+// rewards (doctrine and Causal Keys); drags stay fixed so synergies never
+// deepen a penalty.
+export function getTuningProductionMultiplier(state, resourceId) {
+  const locked = state.lockedSignals;
+  if (!locked) return 1;
+  let multiplier = 1;
+  let rewardMultiplier = null;
+  for (const band of Object.values(COSMIC_BANDS)) {
+    if (!locked[band.id]) continue;
+    const boost = band.boost[resourceId];
+    if (boost) {
+      rewardMultiplier ??= getOperationRewardMultiplier(state);
+      multiplier *= 1 + boost * rewardMultiplier;
+    }
+    const drag = band.drag[resourceId];
+    if (drag) multiplier *= 1 - drag;
   }
-  return 1;
+  return multiplier;
 }
 
-// Get the next tier not yet reached.
-export function getNextTuningTier(tuningScore) {
-  const score = tuningScore || 0;
-  return [...TUNING_TIERS].reverse().find(t => t.threshold > score) || null;
-}
+// Lock a signal band. Returns { state, band } or null if unavailable.
+export function lockCosmicSignal(state, bandId) {
+  const band = COSMIC_BANDS[bandId];
+  if (state.era < 9 || !band) return null;
 
-// Apply a tuning action. Returns { state, cpGain, ucGain } or null if miss/unavailable.
-export function applyTuning(state, quality) {
-  if (state.era < 9) return null;
-
-  const multiplier = getTuningMultiplier(quality);
-  if (multiplier === 0) return null;
-
-  const cp = state.resources.cosmicPower;
-  const uc = state.resources.universalConstants;
-  if (!cp?.unlocked || !uc?.unlocked) return null;
-
-  const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
-  const cpRate = (cp.baseRate + cp.rateAdd) * cp.rateMult * prestigeMult;
-  const ucRate = (uc.baseRate + uc.rateAdd) * uc.rateMult * prestigeMult;
-  const cpGain = Math.max(1, cpRate * multiplier);
-  const ucGain = Math.max(0.5, ucRate * multiplier * 0.5);
+  const stats = getTuningStats(state);
+  if (stats.remaining <= 0 || stats.locked[bandId] || stats.cooldown > 0) return null;
 
   return {
     state: {
       ...state,
-      tuningScore: (state.tuningScore || 0) + multiplier,
-      resources: {
-        ...state.resources,
-        cosmicPower: { ...cp, amount: cp.amount + cpGain },
-        universalConstants: { ...uc, amount: uc.amount + ucGain },
-      },
+      lockedSignals: { ...stats.locked, [bandId]: true },
+      lastSignalLockTime: state.totalTime,
     },
-    cpGain,
-    ucGain,
+    band,
   };
 }

@@ -28,7 +28,7 @@ node scripts/browser-test.mjs --screenshots      # Save screenshots to /tmp/game
 
 The Puppeteer test drives a real headless Chrome through the early game, then hydrates
 a deterministic Era 10 state to validate the operation archive, Weaving choices,
-Tuning probes, cycle doctrines, every main tab, and prestige. It exits nonzero for
+Signal Locks, cycle doctrines, every main tab, and prestige. It exits nonzero for
 progression misses, console errors, or layout/viewport overflow.
 
 ### Manual Browser Testing (inject harness)

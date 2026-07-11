@@ -219,7 +219,8 @@ export function PrestigePanel({ state, onUpdate }) {
                     <span>All resources{owned.quantumMemory ? ' (10% kept via Quantum Memory)' : ''}</span>
                     <span>Upgrades ({Object.keys(state.upgrades || {}).length} owned)</span>
                     <span>Tech research ({Object.keys(state.tech || {}).length} unlocked)</span>
-                    {!hasPerfectMemory && <span>Operation progress (docking, routes, weaving, assembly, tuning)</span>}
+                    {!hasPerfectMemory && <span>Operation progress (docking, colonies, routes, assembly, senate)</span>}
+                    <span>Reality Laws and Signal Locks</span>
                     <span>Recovered Relics and Echo Pressure</span>
                     <span>Current era (Era {state.era} {'\u2192'} Era {owned.temporalMastery ? 3 : owned.cosmicInsight ? 2 : 1})</span>
                   </div>

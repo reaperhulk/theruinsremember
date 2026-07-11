@@ -53,7 +53,7 @@ export function getCycleGoal(state) {
   }
   if (state.cycleDoctrine === 'transcendence') {
     const keys = Object.values(state.realityKeys || {}).reduce((sum, count) => sum + count, 0);
-    const current = Object.keys(state.wovenLaws || {}).length * 5 + (state.tuningScore || 0) + keys * 10;
+    const current = Object.keys(state.wovenLaws || {}).length * 5 + Object.keys(state.lockedSignals || {}).length * 10 + keys * 10;
     return { id: 'transcendence', label: 'Stabilize late-reality operations', current, target: 75, complete: current >= 75 };
   }
   return null;

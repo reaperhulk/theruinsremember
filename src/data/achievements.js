@@ -52,9 +52,8 @@ export const achievements = [
   { id: 'dysonBuilder100', name: 'Sphere Master', description: 'Assemble 100 Dyson segments', check: s => (s.dysonSegments || 0) >= 100, reward: 10, category: 'collection' },
 
   // Cosmic Tuning achievements
-  { id: 'cosmicTuner5', name: 'Frequency Finder', description: 'Score 5 perfect tunes', check: s => (s.tuningScore || 0) >= 5, reward: 3, category: 'collection' },
-  { id: 'cosmicTuner25', name: 'Harmonic Master', description: 'Score 25 perfect tunes', check: s => (s.tuningScore || 0) >= 25, reward: 10, category: 'collection' },
-  { id: 'cosmicTuner100', name: 'Universal Resonance', description: 'Score 100 perfect tunes — Tier IV reached', check: s => (s.tuningScore || 0) >= 100, reward: 20, category: 'collection' },
+  { id: 'firstSignalLock', name: 'First Lock', description: 'Lock a cosmic signal band', check: s => Object.keys(s.lockedSignals || {}).length >= 1, reward: 3, category: 'collection' },
+  { id: 'fullSpectrum', name: 'Full Spectrum', description: 'Lock three cosmic signal bands in one cycle', check: s => Object.keys(s.lockedSignals || {}).length >= 3, reward: 10, category: 'collection' },
 
   // Senate achievements
   { id: 'senator10', name: 'Junior Senator', description: 'Make 10 senate allocations', check: s => { const a = s.senate || {}; return (a.merchants || 0) + (a.scholars || 0) + (a.warriors || 0) >= 10; }, reward: 3, category: 'collection' },
@@ -254,7 +253,7 @@ export const achievements = [
   { id: 'relicPair', name: 'Curated Impossibilities', description: 'Fill both Recovered Relic slots', check: s => (s.activeRelics?.length || 0) >= 2, reward: 2, category: 'operations' },
   { id: 'relicReviser', name: 'A Better Memory', description: 'Recover three relics in one cycle', check: s => (s.relicsRecoveredThisRun || 0) >= 3, reward: 3, category: 'operations' },
   { id: 'firstRoute', name: 'First Route', description: 'Create your first star route', check: s => (s.starRoutes?.length || 0) >= 1, reward: 1, category: 'collection' },
-  { id: 'allOperations', name: 'Operations Director', description: 'Engage every operation in one cycle', check: s => (s.dockingAttempts || 0) > 0 && Object.values(s.colonyAssignments || {}).some(v => v > 0) && (s.starRoutes?.length || 0) > 0 && (s.dysonSegments || 0) > 0 && Object.values(s.senate || {}).some(v => v > 0) && Object.keys(s.wovenLaws || {}).length > 0 && (s.tuningScore || 0) > 0 && Object.values(s.realityKeys || {}).some(v => v > 0), reward: 10, category: 'operations' },
+  { id: 'allOperations', name: 'Operations Director', description: 'Engage every operation in one cycle', check: s => (s.dockingAttempts || 0) > 0 && Object.values(s.colonyAssignments || {}).some(v => v > 0) && (s.starRoutes?.length || 0) > 0 && (s.dysonSegments || 0) > 0 && Object.values(s.senate || {}).some(v => v > 0) && Object.keys(s.wovenLaws || {}).length > 0 && Object.keys(s.lockedSignals || {}).length > 0 && Object.values(s.realityKeys || {}).some(v => v > 0), reward: 10, category: 'operations' },
   { id: 'tenPrestigeUpgrades', name: 'Prestige Veteran', description: 'Buy 10 prestige upgrades', check: s => Object.keys(s.prestigeUpgrades || {}).length >= 10, reward: 5, category: 'prestige' },
   { id: 'resourceDiversifier', name: 'Resource Diversifier', description: 'Have 15 unlocked resources simultaneously', check: s => Object.values(s.resources || {}).filter(r => r.unlocked).length >= 15, reward: 3, category: 'milestones' },
   { id: 'upgradeSavant', name: 'Upgrade Savant', description: 'Purchase 250 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 250, reward: 15, category: 'upgrades' },

@@ -7,7 +7,7 @@ import { checkAchievements } from './achievements.js';
 import { purchaseUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { getSenatePctBonuses } from './senate.js';
-import { getTuningProductionBonus } from './tuning.js';
+import { getTuningProductionMultiplier } from './tuning.js';
 import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes, runExpedition } from './expeditions.js';
 import { getActiveSystems } from './operations.js';
 import { awardCycleGoal } from './cycles.js';
@@ -118,9 +118,9 @@ export function tick(state, dt, rng = Math.random) {
       if (senateBonuses[id] && senateBonuses[id] > 1) effectiveRate *= senateBonuses[id];
     }
 
-    // Apply cosmic tuning production bonus to cosmicPower (era 9+)
-    if (id === 'cosmicPower' && state.era >= 9) {
-      effectiveRate *= getTuningProductionBonus(state.tuningScore);
+    // Apply locked cosmic signal bands (era 9+)
+    if (state.era >= 9) {
+      effectiveRate *= getTuningProductionMultiplier(state, id);
     }
 
     if (id === 'stellarForge' && state.upgrades?.forgeMemory) {

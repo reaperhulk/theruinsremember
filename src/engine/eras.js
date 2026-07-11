@@ -115,10 +115,10 @@ export function getEraMastery(state, era = state.era) {
   } else if (era === 9) {
     title = 'Cosmic Alignment';
     detail = state.cycleDoctrine === 'transcendence'
-      ? 'Transcendence doctrine: reach tuning score 30.'
-      : 'Reach tuning score 50.';
-    current = state.tuningScore || 0;
-    target = state.cycleDoctrine === 'transcendence' ? 30 : 50;
+      ? 'Transcendence doctrine: lock two cosmic signal bands.'
+      : 'Lock three cosmic signal bands.';
+    current = Object.keys(state.lockedSignals || {}).length;
+    target = state.cycleDoctrine === 'transcendence' ? 2 : 3;
   }
 
   const required = target > 0;
