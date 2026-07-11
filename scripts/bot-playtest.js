@@ -21,6 +21,7 @@ import { getEraReadiness } from '../src/engine/eras.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
 import { countSenateActs, enactSenatePolicy, getSenateGovernmentMultiplier, getSenatePctBonuses, getSenateStats } from '../src/engine/senate.js';
 import { selectNextCycleDoctrine } from '../src/engine/cycles.js';
+import { getForgettingStats, placeWarden } from '../src/engine/forgetting.js';
 import { claimRelic, declineRelicOffer } from '../src/engine/relics.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
 import { readFileSync } from 'fs';
@@ -98,6 +99,7 @@ const PROFILES = {
     cosmicTuning: true,
     senateFocus: 'balanced',
     realityForge: true,
+    forgettingDefense: 2,
     buyPrestigeUpgrades: true,
     prestigeUpgradeOrder: [
       'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
@@ -189,6 +191,7 @@ const PROFILES = {
     cosmicTuning: true,
     senateFocus: 'balanced',
     realityForge: true,
+    forgettingDefense: 25,
     buyPrestigeUpgrades: true,
     prestigeUpgradeOrder: [
       'fastStart', 'luckyMiner', 'headStart', 'tradeRoutes',
@@ -214,6 +217,7 @@ const PROFILES = {
     cosmicTuning: true,
     senateFocus: 'merchants',
     realityForge: true,
+    forgettingDefense: 25,
     buyPrestigeUpgrades: true,
     prestigeUpgradeOrder: [
       'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
@@ -254,6 +258,9 @@ const BALANCE_TARGETS = {
     maxTuningLocks: 3,
     maxSenateActs: 3,
     maxStarChartActions: 2,
+    minTendrilsSealed: 1,
+    maxMemoriesConsumed: 0,
+    noCollapse: true,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
@@ -266,9 +273,9 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3, maxStarChartActions: 2 },
-  lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
-  passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3, maxStarChartActions: 2, noCollapse: true },
+  lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
+  passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
 };
 
 // ─── Bot Action Functions ───────────────────────────────────────────────────
@@ -510,6 +517,28 @@ function botSenate(state, profile, _t, _rng) {
   return result ? result.state : state;
 }
 
+function botForgetting(state, profile, t, _rng) {
+  if (!profile.forgettingDefense || state.era < 10 || !state.forgetting || state.forgetting.collapsed) return state;
+  if (t % profile.forgettingDefense !== 0) return state;
+
+  const stats = getForgettingStats(state);
+  const guarded = new Set(stats.wardens.map(warden => warden.nodeId).filter(Boolean));
+  // Most urgent live threat on an unguarded, unscarred memory
+  const threats = stats.tendrils
+    .filter(tendril => tendril.phase !== 'held' && !guarded.has(tendril.targetId))
+    .sort((a, b) => a.eta - b.eta);
+  if (threats.length === 0) return state;
+
+  // A warden is free if it is off-cooldown and not holding a live tendril
+  const busy = new Set(stats.tendrils.map(tendril => tendril.targetId));
+  const free = stats.wardens.find(warden =>
+    warden.cooldownRemaining <= 0 && (!warden.nodeId || !busy.has(warden.nodeId)));
+  if (!free) return state;
+
+  const result = placeWarden(state, free.id, threats[0].targetId);
+  return result ? result.state : state;
+}
+
 function botRealityForge(state, profile, t, _rng) {
   if (state.era < 10) return state;
   if (!state.nextCycleDoctrine) {
@@ -592,6 +621,7 @@ function createCollector() {
       tuning: { locks: 0 },
       senate: { acts: 0 },
       realityForge: { keys: 0 },
+      forgetting: { sealed: 0, consumed: 0, meterMax: 0 },
     },
     prestigeLog: [],
     bottlenecks: [],
@@ -676,6 +706,11 @@ function updateOperationStats(prevState, state, collector) {
   s.tuning.locks = Object.keys(state.lockedSignals || {}).length;
   s.starChart.routes = (state.starRoutes || []).length;
   s.realityForge.keys = Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0);
+  if (state.forgetting) {
+    s.forgetting.sealed = state.forgetting.sealed || 0;
+    s.forgetting.consumed = state.forgetting.consumed || 0;
+    s.forgetting.meterMax = Math.max(s.forgetting.meterMax, state.forgetting.meter || 0);
+  }
   s.senate.acts = countSenateActs(state);
 }
 
@@ -872,6 +907,7 @@ function runScenario(opts) {
     applyAction('dyson', current => botDyson(current, profileDef, t, rng));
     applyAction('tuning', current => botCosmicTuning(current, profileDef, t, rng));
     applyAction('senate', current => botSenate(current, profileDef, t, rng));
+    applyAction('forgetting', current => botForgetting(current, profileDef, t, rng));
     applyAction('realityForge', current => botRealityForge(current, profileDef, t, rng));
     applyAction('prestigeUpgrade', current => botPrestigeUpgrades(current, profileDef, t, rng));
 
@@ -1010,6 +1046,7 @@ function runScenario(opts) {
     prestigeMultiplier: state.prestigeMultiplier || 1,
     activeRelics: state.activeRelics || [],
     relicsRecoveredThisRun: state.relicsRecoveredThisRun || 0,
+    forgettingCollapsed: !!state.forgetting?.collapsed,
   };
 
   const operationActivity = {
@@ -1076,6 +1113,7 @@ function printHumanReport(scenarioName, opts, collector) {
     if (mg.tuning.locks > 0) console.log(`  Tuning: ${mg.tuning.locks} signal locks`);
     if (mg.senate.acts > 0) console.log(`  Senate: ${mg.senate.acts} policy acts`);
     if (mg.realityForge.keys > 0) console.log(`  Reality Forge: ${mg.realityForge.keys} keys forged`);
+    if (mg.forgetting.meterMax > 0) console.log(`  Forgetting: peak ${mg.forgetting.meterMax.toFixed(1)}, ${mg.forgetting.sealed} sealed, ${mg.forgetting.consumed} memories lost`);
   }
 
   const engagement = collector.engagement;
@@ -1273,6 +1311,15 @@ function assertBalanceTargets(allResults) {
     if (target.maxStarChartActions != null) {
       const chartActions = Object.values(collector.engagement.actionsByEra).reduce((sum, actions) => sum + (actions.starChart || 0), 0);
       if (chartActions > target.maxStarChartActions) issues.push(`star chart acted ${chartActions} times`);
+    }
+    if (target.minTendrilsSealed != null && collector.operationStats.forgetting.sealed < target.minTendrilsSealed) {
+      issues.push(`only ${collector.operationStats.forgetting.sealed} tendrils sealed`);
+    }
+    if (target.maxMemoriesConsumed != null && collector.operationStats.forgetting.consumed > target.maxMemoriesConsumed) {
+      issues.push(`${collector.operationStats.forgetting.consumed} memories consumed`);
+    }
+    if (target.noCollapse && status.forgettingCollapsed) {
+      issues.push('the Forgetting collapsed the run');
     }
     if (target.maxFirstOperationLatency != null) {
       for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {

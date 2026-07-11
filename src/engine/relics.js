@@ -5,6 +5,7 @@ export const ECHO_PRESSURE_TARGET = 100;
 export const ECHO_PRESSURE_PER_SECOND = 0.24;
 
 export function hasRelic(state, relicId) {
+  if (state.forgetting?.scars?.[`relic:${relicId}`]) return false; // consumed by the Forgetting
   return (state.activeRelics || []).includes(relicId);
 }
 

@@ -106,6 +106,7 @@ export function getColonyBonus(state) {
 
   const bonus = {};
   for (const focus of FOCUS_TYPES) {
+    if (state.forgetting?.scars?.[`colony:${focus}`]) continue; // consumed by the Forgetting
     const count = assignments[focus] || 0;
     if (count > 0) {
       const focusBonus = FOCUS_BONUSES[focus];

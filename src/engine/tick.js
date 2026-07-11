@@ -12,6 +12,7 @@ import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes
 import { getActiveSystems } from './operations.js';
 import { awardCycleGoal } from './cycles.js';
 import { advanceEchoPressure } from './relics.js';
+import { advanceForgetting } from './forgetting.js';
 
 // Resource consumption rates — moderate tension without breaking low-interaction paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
@@ -189,6 +190,20 @@ export function tick(state, dt, rng = Math.random) {
 
   newState = advanceExpeditionSupplies(newState, dt);
   newState = advanceEchoPressure(newState, dt, rng);
+  {
+    const wasCollapsed = newState.forgetting?.collapsed;
+    newState = advanceForgetting(newState, dt, rng);
+    if (!wasCollapsed && newState.forgetting?.collapsed) {
+      newState = {
+        ...newState,
+        eventLog: [...(newState.eventLog || []), {
+          message: 'THE FORGETTING: The last memory dims. The cycle claims this civilization.',
+          time: newState.totalTime,
+          isLore: true,
+        }].slice(-20),
+      };
+    }
+  }
   if (newState.era <= 3 && newState.prestigeUpgrades?.autoClicker && newState.expedition?.supplies >= EXPEDITION_MAX_SUPPLIES) {
     const safeRoute = getExpeditionRoutes(newState.era)[0];
     newState = runExpedition(newState, safeRoute.id, rng).state;
@@ -422,7 +437,8 @@ export function tick(state, dt, rng = Math.random) {
   // Dyson auto-assembly: every 60 ticks, auto-add segments based on existing count
   // Auto-rate scales with segments (1 per 10 segments, up to 20/tick)
   const dysonRuns = intervalCrossings(state.totalTime, newState.totalTime, 60);
-  if (newState.era >= 7 && (newState.dysonSegments || 0) > 0 && dysonRuns > 0) {
+  if (newState.era >= 7 && (newState.dysonSegments || 0) > 0 && dysonRuns > 0 &&
+      !newState.forgetting?.scars?.['dyson:assembly']) {
     for (let run = 0; run < dysonRuns; run++) {
       const autoRate = Math.max(1, Math.min(20, Math.floor((newState.dysonSegments || 0) / 10)));
       newState = { ...newState, dysonSegments: (newState.dysonSegments || 0) + autoRate };

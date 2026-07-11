@@ -62,6 +62,7 @@ export function getWeavingStats(state) {
 export function getWeaveProductionMultiplier(state, resourceId) {
   const law = Object.values(REALITY_LAWS).find(candidate => candidate.resourceId === resourceId);
   if (!law || !state.wovenLaws?.[law.id]) return 1;
+  if (state.forgetting?.scars?.[`law:${law.id}`]) return 1; // consumed by the Forgetting
   const savantMultiplier = state.prestigeUpgrades?.miniGameSavant ? 1.5 : 1;
   const bonus = 0.5 * savantMultiplier * getOperationRewardMultiplier(state) * getRelicOperationMultiplier(state, 'weaving');
   return 1 + bonus;

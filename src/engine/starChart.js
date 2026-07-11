@@ -154,7 +154,7 @@ export function advanceNetworkPlan(state, previousTime) {
 }
 
 // Available star system nodes (unlocked progressively)
-const STAR_SYSTEMS = [
+export const STAR_SYSTEMS = [
   { id: 'sol', name: 'Sol', x: 0.5, y: 0.5, bonus: { energy: 10 } },
   { id: 'alpha', name: 'Alpha Centauri', x: 0.3, y: 0.3, bonus: { research: 5 } },
   { id: 'sirius', name: 'Sirius', x: 0.7, y: 0.2, bonus: { materials: 20 } },
@@ -271,6 +271,7 @@ export function getRouteBonus(state) {
     const fromSys = STAR_SYSTEMS.find(s => s.id === route.from);
     const toSys = STAR_SYSTEMS.find(s => s.id === route.to);
     if (!fromSys || !toSys) continue;
+    if (state.forgetting?.scars?.[`system:${route.from}`] || state.forgetting?.scars?.[`system:${route.to}`]) continue; // consumed
 
     // Distance multiplier: longer routes = better (1x to 2x)
     const dist = getRouteDistance(fromSys, toSys);

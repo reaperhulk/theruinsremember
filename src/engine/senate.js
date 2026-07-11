@@ -103,6 +103,7 @@ export function enactSenatePolicy(state, actId, factionId = null) {
 export function getSenateGovernmentMultiplier(state, resourceId) {
   const government = state.senateGov;
   if (!government?.leader) return 1;
+  if (state.forgetting?.scars?.['senate:gov']) return 1; // consumed by the Forgetting
   let bonus = 0;
   const leaderResource = SENATE_FACTIONS[government.leader]?.resource;
   const partnerResource = government.partner ? SENATE_FACTIONS[government.partner]?.resource : null;

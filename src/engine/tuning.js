@@ -63,6 +63,7 @@ export function getTuningProductionMultiplier(state, resourceId) {
   let rewardMultiplier = null;
   for (const band of Object.values(COSMIC_BANDS)) {
     if (!locked[band.id]) continue;
+    if (state.forgetting?.scars?.[`lock:${band.id}`]) continue; // consumed by the Forgetting
     const boost = band.boost[resourceId];
     if (boost) {
       rewardMultiplier ??= getOperationRewardMultiplier(state);

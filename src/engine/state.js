@@ -109,6 +109,8 @@ export function createInitialState() {
     senateGov: { leader: null, partner: null, ratified: false },
     // Senate directive sliders — percentage focus per faction (sum = 100)
     senatePct: { merchants: 34, scholars: 33, warriors: 33 },
+    // The Forgetting (Era 10+) — run-ending siege state
+    forgetting: null,
     // Reality Forge (Era 10+)
     realityKeys: {},
     echoPressure: 0,
