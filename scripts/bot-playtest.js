@@ -275,6 +275,8 @@ const BALANCE_TARGETS = {
 
 function botGather(state, profile, t, rng) {
   if (!profile.gather || !profile.gatherInterval) return state;
+  // Era 4+ gathering is automated by the engine; a player stops clicking.
+  if (state.era >= 4) return state;
   if (t % profile.gatherInterval !== 0) return state;
   for (const [id, r] of Object.entries(state.resources)) {
     if (r.unlocked) {

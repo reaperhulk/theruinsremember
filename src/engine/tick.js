@@ -289,9 +289,11 @@ export function tick(state, dt, rng = Math.random) {
     }
   }
 
-  // Auto-gather (prestige milestone: 3+ prestiges)
+  // Auto-gather: manual gathering is a launch-phase activity. Orbital
+  // robotics take over from Era 4; the 3-prestige milestone extends the
+  // automation back to planetfall on later cycles.
   const autoGatherRuns = intervalCrossings(state.totalTime, newState.totalTime, 20);
-  if (newState.autoGather && autoGatherRuns > 0) {
+  if ((newState.autoGather || newState.era >= 4) && autoGatherRuns > 0) {
     for (let run = 0; run < autoGatherRuns; run++) {
       for (const [id, r] of Object.entries(newState.resources)) {
         if (r.unlocked) {

@@ -127,7 +127,7 @@ export function App() {
     if (state.prestigeUpgrades?.eternalReturn) return;
     const summary = getPrestigeSummary(state);
     const milestones = [];
-    if (summary.prestigeCount >= 3 && (state.prestigeCount || 0) < 3) milestones.push('NEW: Auto-gather unlocked');
+    if (summary.prestigeCount >= 3 && (state.prestigeCount || 0) < 3) milestones.push('NEW: Auto-gather from planetfall');
     if (summary.prestigeCount >= 5 && (state.prestigeCount || 0) < 5) milestones.push('NEW: Era 1 upgrades auto-purchased');
     if (summary.prestigeCount >= 10 && (state.prestigeCount || 0) < 10) milestones.push('NEW: Starting resources doubled');
     const msg = [
