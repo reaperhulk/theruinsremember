@@ -3,6 +3,7 @@ import { ERA_COST_MULTIPLIERS } from './upgrades.js';
 import { getCycleProductionMultiplier } from './cycles.js';
 import { getRelicCapacityMultiplier, getRelicProductionMultiplier } from './relics.js';
 import { getWeaveProductionMultiplier } from './weaving.js';
+import { getEraMasteryTier } from './eras.js';
 
 // Soft-scale prestige multiplier: first 10x is linear, beyond that sqrt.
 // Prevents early prestiges from trivializing the game while still rewarding
@@ -23,7 +24,7 @@ export function getEffectiveRate(state, resourceId) {
   const def = resourceDefs[resourceId];
   if (!def) return 0;
   const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
-  return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * getCycleProductionMultiplier(state) * getRelicProductionMultiplier(state, resourceId) * getWeaveProductionMultiplier(state, resourceId);
+  return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * getCycleProductionMultiplier(state) * getRelicProductionMultiplier(state, resourceId) * getWeaveProductionMultiplier(state, resourceId) * getEraMasteryTier(state).multiplier;
 }
 
 // Calculate all production rates

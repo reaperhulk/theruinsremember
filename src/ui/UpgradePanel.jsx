@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useMemo, useEffect, memo } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getUpcomingUpgrades, buyAllAffordable } from '../engine/upgrades.js';
+import { getEraMasteryTier } from '../engine/eras.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
@@ -283,6 +284,16 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         )}
       </h2>
       <div className="upgrade-summary-strip">
+        {(() => {
+          const mastery = getEraMasteryTier(state);
+          return (
+            <span className="upgrade-summary-pill mastery-pill" title="Every upgrade bought this era counts toward the next mastery tier">
+              Era Mastery {mastery.tier > 0 ? 'I'.repeat(mastery.tier) : '—'}
+              {mastery.tier > 0 && ` (x${mastery.multiplier.toFixed(2)} all production)`}
+              {mastery.nextThreshold != null && ` | ${mastery.remaining} to next tier`}
+            </span>
+          );
+        })()}
         <span className="upgrade-summary-pill">{affordableCount} affordable now</span>
         {focusMode && <span className="upgrade-summary-pill">showing {visibleAvailable.length} priorities</span>}
         {mechanicCount > 0 && <span className="upgrade-summary-pill">{mechanicCount} mechanic shifts</span>}

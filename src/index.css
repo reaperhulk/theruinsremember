@@ -1277,6 +1277,11 @@ g[role="button"]:focus-visible {
   vertical-align: middle;
 }
 
+.mastery-pill {
+  border-color: #c7a85e !important;
+  color: #edddb5 !important;
+}
+
 .fork-badge {
   margin-left: 6px;
   padding: 1px 5px;

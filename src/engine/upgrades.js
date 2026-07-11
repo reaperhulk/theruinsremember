@@ -1,6 +1,7 @@
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { spend, getEffectivePrestige } from './resources.js';
+import { getEraMasteryTier } from './eras.js';
 
 // Era-based cost multiplier to keep pace with exponential production growth.
 // Smooth exponential curve: each era ~15-30x more expensive than previous.
@@ -169,11 +170,24 @@ export function purchaseUpgrade(state, upgradeId) {
 
   const newValue = isRepeatable ? purchaseCount + 1 : true;
 
+  const tierBefore = getEraMasteryTier(state).tier;
   let finalState = {
     ...afterEffects,
     upgrades: { ...afterEffects.upgrades, [upgradeId]: newValue },
     lastUpgradeTime: afterEffects.totalTime || 0,
   };
+
+  // Era Mastery Tiers: announce the felt breakpoint every purchase counts toward
+  const tierInfo = getEraMasteryTier(finalState);
+  if (tierInfo.tier > tierBefore) {
+    finalState = {
+      ...finalState,
+      eventLog: [...(finalState.eventLog || []), {
+        message: `ERA MASTERY ${'I'.repeat(tierInfo.tier)}: this era's industries resonate — all production x${tierInfo.multiplier.toFixed(2)}.`,
+        time: finalState.totalTime || 0,
+      }].slice(-20),
+    };
+  }
 
   // Mechanic: purchaseBurst — every upgrade purchase triggers a burst of all resources
   if (finalState.upgrades?.chainReaction) {

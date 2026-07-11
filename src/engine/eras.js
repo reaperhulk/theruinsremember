@@ -69,6 +69,25 @@ export function countEraTechs(state, era) {
 
 const MASTERY_FALLBACK_SECONDS = 600;
 
+// Era Mastery Tiers: every upgrade bought in the current era advances a
+// visible tier bar. Tiers grant stacking all-production bonuses while the
+// era lasts, so each purchase counts toward a felt breakpoint.
+export const ERA_MASTERY_THRESHOLDS = [20, 35, 50];
+export const ERA_MASTERY_TIER_BONUS = 1.06;
+
+export function getEraMasteryTier(state) {
+  const count = countEraUpgrades(state, state.era);
+  const tier = ERA_MASTERY_THRESHOLDS.filter(threshold => count >= threshold).length;
+  const nextThreshold = ERA_MASTERY_THRESHOLDS.find(threshold => count < threshold) ?? null;
+  return {
+    tier,
+    count,
+    nextThreshold,
+    remaining: nextThreshold != null ? nextThreshold - count : 0,
+    multiplier: Math.pow(ERA_MASTERY_TIER_BONUS, tier),
+  };
+}
+
 export function getEraMastery(state, era = state.era) {
   const elapsed = era === state.era ? Math.max(0, state.totalTime - (state.eraStartTime || 0)) : 0;
   const fallbackMet = elapsed >= MASTERY_FALLBACK_SECONDS;

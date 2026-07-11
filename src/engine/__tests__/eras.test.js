@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkEraTransition, transitionEra, getEraMastery, getEraReadiness, getMinUpgradesForEra, getMinTechsForEra, countEraUpgrades, countEraTechs } from '../eras.js';
+import { checkEraTransition, transitionEra, getEraMastery, getEraMasteryTier, getEraReadiness, getMinUpgradesForEra, getMinTechsForEra, countEraUpgrades, countEraTechs } from '../eras.js';
 import { createInitialState } from '../state.js';
 import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 
@@ -232,5 +232,27 @@ describe('eras', () => {
       const after = transitionEra(state, 2);
       expect(after.era).toBe(3);
     });
+  });
+
+  it('era mastery tiers grant announced, stacking production bonuses', () => {
+    const state = createInitialState();
+    const era1Upgrades = Object.values(upgradeDefs).filter(upgrade => upgrade.era === 1);
+
+    expect(getEraMasteryTier(state).tier).toBe(0);
+    expect(getEraMasteryTier(state).multiplier).toBe(1);
+
+    for (const upgrade of era1Upgrades.slice(0, 20)) state.upgrades[upgrade.id] = true;
+    const tierOne = getEraMasteryTier(state);
+    expect(tierOne.tier).toBe(1);
+    expect(tierOne.multiplier).toBeCloseTo(1.06);
+    expect(tierOne.nextThreshold).toBe(35);
+
+    for (const upgrade of era1Upgrades.slice(20, 50)) state.upgrades[upgrade.id] = true;
+    expect(getEraMasteryTier(state).tier).toBe(3);
+    expect(getEraMasteryTier(state).multiplier).toBeCloseTo(1.19, 2);
+
+    // Tiers are era-scoped: a new era starts the ladder fresh
+    state.era = 2;
+    expect(getEraMasteryTier(state).tier).toBe(0);
   });
 });
