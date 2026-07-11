@@ -17,6 +17,7 @@ export function migrateState(saved) {
   // Ensure new state fields exist
   if (!migrated.dysonSegments) migrated.dysonSegments = 0;
   if (!migrated.lockedSignals) migrated.lockedSignals = {};
+  migrated.senateGov = { leader: null, partner: null, ratified: false, ...(saved.senateGov || {}) };
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
   migrated.expedition = { ...createExpeditionState(), ...(saved.expedition || {}) };
   migrated.dockingMissions = { cargo: 0, crew: 0, science: 0, ...(saved.dockingMissions || {}) };
@@ -25,7 +26,7 @@ export function migrateState(saved) {
     'factoryAllocation', 'factoryWorkers',
     'hackChallenge', 'hackDifficulty', 'hackSuccesses', 'hackMastery', 'lastHackTime',
     'weavingGrid', 'weavingOffer', 'weaveCombo', 'lastWeaveTime',
-    'tuningScore',
+    'tuningScore', 'senate',
   ]) {
     delete migrated[retiredField];
   }
@@ -104,8 +105,8 @@ export function createInitialState() {
     dysonModules: { frame: 0, collector: 0, forge: 0 },
     // Cosmic Tuning (Era 9+) — locked signal bands for this cycle
     lockedSignals: {},
-    // Galactic Senate (Era 8+)
-    senate: { merchants: 0, scholars: 0, warriors: 0 },
+    // Galactic Senate (Era 8+) — government formed by policy acts
+    senateGov: { leader: null, partner: null, ratified: false },
     // Senate directive sliders — percentage focus per faction (sum = 100)
     senatePct: { merchants: 34, scholars: 33, warriors: 33 },
     // Reality Forge (Era 10+)

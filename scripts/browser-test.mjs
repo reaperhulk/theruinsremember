@@ -360,6 +360,22 @@ async function run() {
   }));
   const weavingFailed = !weavingAudit || weavingAudit.lawChoices !== 4 || !weavingAudit.established.includes('1/3');
   console.log(`  Reality laws: ${weavingFailed ? 'FAILED' : '4 choices, first law established'}`);
+  const senateMounted = await page.evaluate(() => {
+    const select = document.querySelector('.operation-archive select');
+    if (!select) return false;
+    select.value = 'senate';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+  });
+  await new Promise(resolve => setTimeout(resolve, 100));
+  if (senateMounted) await page.evaluate(() => document.querySelector('.senate-acts button:not([disabled])')?.click());
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const senateAudit = senateMounted && await page.evaluate(() => ({
+    factionChoices: document.querySelectorAll('.senate-acts button').length,
+    acts: document.querySelector('.senate-panel .tuning-header strong')?.textContent || '',
+  }));
+  const senateFailed = !senateAudit || senateAudit.factionChoices !== 3 || !senateAudit.acts.includes('1/3');
+  console.log(`  Senate policy acts: ${senateFailed ? 'FAILED' : '3 factions, mandate granted'}`);
   const forgeReady = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return false;
@@ -450,7 +466,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

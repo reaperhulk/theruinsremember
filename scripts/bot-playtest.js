@@ -19,7 +19,7 @@ import { getTuningProductionMultiplier, getTuningStats, lockCosmicSignal } from 
 import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
 import { getEraReadiness } from '../src/engine/eras.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
-import { allocateSenateInfluence, getMaxSenateInfluence, getSenatePctBonuses } from '../src/engine/senate.js';
+import { countSenateActs, enactSenatePolicy, getSenateGovernmentMultiplier, getSenatePctBonuses, getSenateStats } from '../src/engine/senate.js';
 import { selectNextCycleDoctrine } from '../src/engine/cycles.js';
 import { claimRelic, declineRelicOffer } from '../src/engine/relics.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
@@ -252,6 +252,7 @@ const BALANCE_TARGETS = {
     maxDysonCommissions: 3,
     maxRealityLaws: 3,
     maxTuningLocks: 3,
+    maxSenateActs: 3,
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
@@ -264,7 +265,7 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3 },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3 },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true },
 };
@@ -504,31 +505,23 @@ function botCosmicTuning(state, profile, _t, _rng) {
   return result ? result.state : state;
 }
 
-function botSenate(state, profile, t, _rng) {
+function botSenate(state, profile, _t, _rng) {
   if (!profile.senateFocus || state.era < 8) return state;
-  // Allocate every 10s — senate slots open as GI accumulates
-  if (t % 10 !== 0) return state;
+  const stats = getSenateStats(state);
+  if (!stats.nextAct || stats.cooldown > 0) return state;
 
-  const senate = state.senate || { merchants: 0, scholars: 0, warriors: 0 };
-  const totalInfluence = senate.merchants + senate.scholars + senate.warriors;
-  const maxInfluence = getMaxSenateInfluence(state);
-  if (totalInfluence >= maxInfluence) return state;
-
-  // Choose faction based on strategy
-  const focus = profile.senateFocus;
-  let faction;
-  if (focus === 'balanced') {
-    // Add to the lowest faction
-    const min = Math.min(senate.merchants, senate.scholars, senate.warriors);
-    if (senate.merchants === min) faction = 'merchants';
-    else if (senate.scholars === min) faction = 'scholars';
-    else faction = 'warriors';
-  } else {
-    faction = focus; // 'merchants', 'scholars', or 'warriors'
-  }
-
-  const result = allocateSenateInfluence(state, faction, 1);
-  return result || state;
+  // Coalition choice follows the profile's focus: the focused faction leads
+  // and its natural partner joins; 'balanced' pairs merchants with scholars.
+  const coalitions = {
+    balanced: ['merchants', 'scholars'],
+    merchants: ['merchants', 'warriors'],
+    scholars: ['scholars', 'merchants'],
+    warriors: ['warriors', 'scholars'],
+  };
+  const [leader, partner] = coalitions[profile.senateFocus] || coalitions.balanced;
+  const faction = stats.nextAct === 'mandate' ? leader : stats.nextAct === 'coalition' ? partner : null;
+  const result = enactSenatePolicy(state, stats.nextAct, faction);
+  return result ? result.state : state;
 }
 
 function botRealityForge(state, profile, t, _rng) {
@@ -611,7 +604,7 @@ function createCollector() {
       weaving: { draws: 0, weaves: 0 },
       dyson: { segments: 0 },
       tuning: { locks: 0 },
-      senate: { allocations: 0 },
+      senate: { acts: 0 },
       realityForge: { keys: 0 },
     },
     prestigeLog: [],
@@ -697,7 +690,7 @@ function updateOperationStats(prevState, state, collector) {
   s.tuning.locks = Object.keys(state.lockedSignals || {}).length;
   s.starChart.routes = (state.starRoutes || []).length;
   s.realityForge.keys = Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0);
-  s.senate.allocations = (state.senate?.merchants || 0) + (state.senate?.scholars || 0) + (state.senate?.warriors || 0);
+  s.senate.acts = countSenateActs(state);
 }
 
 function totalResourceAmounts(state) {
@@ -747,7 +740,7 @@ function hasEraOperationProgress(state) {
   if (state.era === 5) return Object.values(state.colonyAssignments || {}).some(count => count > 0);
   if (state.era === 6) return (state.starRoutes?.length || 0) > 0;
   if (state.era === 7) return (state.dysonSegments || 0) > 0;
-  if (state.era === 8) return Object.values(state.senate || {}).some(count => count > 0) || (state.totalWeaves || 0) > 0;
+  if (state.era === 8) return !!state.senateGov?.leader || (state.totalWeaves || 0) > 0;
   if (state.era === 9) return Object.keys(state.lockedSignals || {}).length > 0;
   return Object.values(state.realityKeys || {}).some(count => count > 0);
 }
@@ -771,7 +764,10 @@ function getPassiveOperationRates(state) {
     0,
   );
   const senateRate = Object.entries(getSenatePctBonuses(state)).reduce(
-    (sum, [resourceId, multiplier]) => sum + getEffectiveRate(state, resourceId) * Math.max(0, multiplier - 1),
+    (sum, [resourceId, multiplier]) => {
+      const combined = multiplier * getSenateGovernmentMultiplier(state, resourceId);
+      return sum + getEffectiveRate(state, resourceId) * Math.max(0, combined - 1);
+    },
     0,
   );
   const weavingRate = Object.keys(state.wovenLaws || {}).reduce((sum, lawId) => {
@@ -1036,7 +1032,7 @@ function runScenario(opts) {
     colonies: Object.values(state.colonyAssignments || {}).reduce((sum, count) => sum + count, 0),
     starChart: collector.operationStats.starChart.routes,
     dyson: collector.operationStats.dyson.segments,
-    senate: collector.operationStats.senate.allocations,
+    senate: collector.operationStats.senate.acts,
     weaving: collector.operationStats.weaving.weaves,
     tuning: collector.operationStats.tuning.locks,
     realityForge: collector.operationStats.realityForge.keys,
@@ -1082,7 +1078,7 @@ function printHumanReport(scenarioName, opts, collector) {
   const mg = collector.operationStats;
   const hasAnyOperation = mg.expeditions.finds > 0 || mg.docking.attempts > 0 ||
     mg.starChart.routes > 0 || mg.weaving.weaves > 0 || mg.dyson.segments > 0 ||
-    mg.tuning.locks > 0 || mg.senate.allocations > 0 || mg.realityForge.keys > 0;
+    mg.tuning.locks > 0 || mg.senate.acts > 0 || mg.realityForge.keys > 0;
 
   if (hasAnyOperation) {
     console.log('\n── Operation Stats ──');
@@ -1092,7 +1088,7 @@ function printHumanReport(scenarioName, opts, collector) {
     if (mg.weaving.weaves > 0) console.log(`  Weaving: ${mg.weaving.weaves} weaves`);
     if (mg.dyson.segments > 0) console.log(`  Dyson: ${mg.dyson.segments} segments`);
     if (mg.tuning.locks > 0) console.log(`  Tuning: ${mg.tuning.locks} signal locks`);
-    if (mg.senate.allocations > 0) console.log(`  Senate: ${mg.senate.allocations} influence allocated`);
+    if (mg.senate.acts > 0) console.log(`  Senate: ${mg.senate.acts} policy acts`);
     if (mg.realityForge.keys > 0) console.log(`  Reality Forge: ${mg.realityForge.keys} keys forged`);
   }
 
@@ -1284,6 +1280,9 @@ function assertBalanceTargets(allResults) {
     }
     if (target.maxTuningLocks != null && collector.operationStats.tuning.locks > target.maxTuningLocks) {
       issues.push(`signal bands locked ${collector.operationStats.tuning.locks} times`);
+    }
+    if (target.maxSenateActs != null && collector.operationStats.senate.acts > target.maxSenateActs) {
+      issues.push(`senate acts enacted ${collector.operationStats.senate.acts} times`);
     }
     if (target.maxFirstOperationLatency != null) {
       for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {

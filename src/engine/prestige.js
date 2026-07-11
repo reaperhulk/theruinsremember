@@ -279,7 +279,7 @@ export function performPrestige(state) {
     newState.totalWeaves = state.totalWeaves || 0;
     newState.dysonSegments = state.dysonSegments || 0;
     newState.dysonModules = state.dysonModules || { frame: 0, collector: 0, forge: 0 };
-    newState.senate = state.senate || { merchants: 0, scholars: 0, warriors: 0 };
+    newState.senateGov = state.senateGov || { leader: null, partner: null, ratified: false };
   }
 
   // Cosmic Insight: start at Era 2 (also buys era 2 tech)

@@ -1743,17 +1743,15 @@ function drawEra6(ctx, w, h, t, state) {
     ctx.fill();
   }
 
-  // Senate faction-colored particles when a faction has majority
-  const senate = state?.senate || {};
-  const senateTotal = (senate.merchants || 0) + (senate.scholars || 0) + (senate.warriors || 0);
-  if (senateTotal > 0) {
+  // Senate faction-colored particles once a government has a leading faction
+  const government = state?.senateGov || {};
+  if (government.leader) {
     const factionColors = { merchants: [221, 170, 68], scholars: [136, 187, 238], warriors: [238, 102, 68] };
-    const maxCount = Math.max(senate.merchants || 0, senate.scholars || 0, senate.warriors || 0);
-    const majorityFaction = Object.entries(senate).find(([, v]) => v === maxCount && maxCount > 0);
-    if (majorityFaction) {
-      const [fid] = majorityFaction;
+    {
+      const fid = government.leader;
       const col = factionColors[fid] || [200, 200, 200];
-      const pCount = Math.min(12, maxCount * 2);
+      const acts = 1 + (government.partner ? 1 : 0) + (government.ratified ? 1 : 0);
+      const pCount = Math.min(12, acts * 4);
       for (let i = 0; i < pCount; i++) {
         const angle = t * 0.6 + (i / pCount) * Math.PI * 2;
         const dist = 60 + 20 * Math.sin(t * 0.8 + i);

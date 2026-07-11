@@ -56,8 +56,8 @@ export const achievements = [
   { id: 'fullSpectrum', name: 'Full Spectrum', description: 'Lock three cosmic signal bands in one cycle', check: s => Object.keys(s.lockedSignals || {}).length >= 3, reward: 10, category: 'collection' },
 
   // Senate achievements
-  { id: 'senator10', name: 'Junior Senator', description: 'Make 10 senate allocations', check: s => { const a = s.senate || {}; return (a.merchants || 0) + (a.scholars || 0) + (a.warriors || 0) >= 10; }, reward: 3, category: 'collection' },
-  { id: 'senator50', name: 'Grand Senator', description: 'Make 50 senate allocations', check: s => { const a = s.senate || {}; return (a.merchants || 0) + (a.scholars || 0) + (a.warriors || 0) >= 50; }, reward: 10, category: 'collection' },
+  { id: 'firstMandate', name: 'The Mandate', description: 'Grant a faction the senate mandate', check: s => !!s.senateGov?.leader, reward: 3, category: 'collection' },
+  { id: 'ratifiedGov', name: 'Ratified', description: 'Ratify a full galactic government in one cycle', check: s => !!s.senateGov?.ratified, reward: 10, category: 'collection' },
 
   // Reality Forge achievements
   { id: 'realityForger3', name: 'Key Smith', description: 'Forge 3 reality keys', check: s => { const k = s.realityKeys || {}; return Object.values(k).reduce((sum, v) => sum + v, 0) >= 3; }, reward: 5, category: 'collection' },
@@ -253,7 +253,7 @@ export const achievements = [
   { id: 'relicPair', name: 'Curated Impossibilities', description: 'Fill both Recovered Relic slots', check: s => (s.activeRelics?.length || 0) >= 2, reward: 2, category: 'operations' },
   { id: 'relicReviser', name: 'A Better Memory', description: 'Recover three relics in one cycle', check: s => (s.relicsRecoveredThisRun || 0) >= 3, reward: 3, category: 'operations' },
   { id: 'firstRoute', name: 'First Route', description: 'Create your first star route', check: s => (s.starRoutes?.length || 0) >= 1, reward: 1, category: 'collection' },
-  { id: 'allOperations', name: 'Operations Director', description: 'Engage every operation in one cycle', check: s => (s.dockingAttempts || 0) > 0 && Object.values(s.colonyAssignments || {}).some(v => v > 0) && (s.starRoutes?.length || 0) > 0 && (s.dysonSegments || 0) > 0 && Object.values(s.senate || {}).some(v => v > 0) && Object.keys(s.wovenLaws || {}).length > 0 && Object.keys(s.lockedSignals || {}).length > 0 && Object.values(s.realityKeys || {}).some(v => v > 0), reward: 10, category: 'operations' },
+  { id: 'allOperations', name: 'Operations Director', description: 'Engage every operation in one cycle', check: s => (s.dockingAttempts || 0) > 0 && Object.values(s.colonyAssignments || {}).some(v => v > 0) && (s.starRoutes?.length || 0) > 0 && (s.dysonSegments || 0) > 0 && !!s.senateGov?.leader && Object.keys(s.wovenLaws || {}).length > 0 && Object.keys(s.lockedSignals || {}).length > 0 && Object.values(s.realityKeys || {}).some(v => v > 0), reward: 10, category: 'operations' },
   { id: 'tenPrestigeUpgrades', name: 'Prestige Veteran', description: 'Buy 10 prestige upgrades', check: s => Object.keys(s.prestigeUpgrades || {}).length >= 10, reward: 5, category: 'prestige' },
   { id: 'resourceDiversifier', name: 'Resource Diversifier', description: 'Have 15 unlocked resources simultaneously', check: s => Object.values(s.resources || {}).filter(r => r.unlocked).length >= 15, reward: 3, category: 'milestones' },
   { id: 'upgradeSavant', name: 'Upgrade Savant', description: 'Purchase 250 upgrades', check: s => Object.keys(s.upgrades || {}).length >= 250, reward: 15, category: 'upgrades' },

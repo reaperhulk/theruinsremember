@@ -289,10 +289,10 @@ describe('tick', () => {
     const state = createInitialState();
     expect(state.dysonSegments).toBe(0);
     expect(state.lockedSignals).toEqual({});
-    expect(state.senate).toBeDefined();
-    expect(state.senate.merchants).toBe(0);
-    expect(state.senate.scholars).toBe(0);
-    expect(state.senate.warriors).toBe(0);
+    expect(state.senateGov).toBeDefined();
+    expect(state.senateGov.leader).toBeNull();
+    expect(state.senateGov.partner).toBeNull();
+    expect(state.senateGov.ratified).toBe(false);
     expect(state.realityKeys).toBeDefined();
     expect(Object.keys(state.realityKeys).length).toBe(0);
   });

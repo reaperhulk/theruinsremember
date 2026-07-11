@@ -1,66 +1,118 @@
 // Galactic Senate operation — Era 8
-// Allocate influence to factions for resource bonuses.
+// Form a government in three policy acts, then steer it with directives.
+import { getOperationRewardMultiplier } from './cycles.js';
 import { getRelicSenateCostMultiplier, getRelicSenateDirectiveMultiplier } from './relics.js';
 
-const FACTIONS = [
-  { id: 'merchants', rate: 1.0, resource: 'exoticMatter' },
-  { id: 'scholars', rate: 0.6, resource: 'galacticInfluence' },
-  { id: 'warriors', rate: 0.4, resource: 'starSystems' },
-];
+export const SENATE_ACT_INTERVAL = 45;
 
-// Get the cost to allocate the next influence point.
-export function getSenateAllocateCost(totalInfluence, state = null) {
-  return Math.ceil(5 * Math.pow(1.5, totalInfluence / 10) * (state ? getRelicSenateCostMultiplier(state) : 1));
+export const SENATE_FACTIONS = {
+  merchants: { id: 'merchants', name: 'Merchant Guild', resource: 'exoticMatter', resourceName: 'Exotic Matter' },
+  scholars: { id: 'scholars', name: 'Scholar Enclave', resource: 'galacticInfluence', resourceName: 'Galactic Influence' },
+  warriors: { id: 'warriors', name: 'Warrior Caste', resource: 'stellarForge', resourceName: 'Stellar Forge' },
+};
+
+// Production bonus fractions per government role.
+export const SENATE_LEADER_BONUS = 0.3;
+export const SENATE_PARTNER_BONUS = 0.15;
+export const SENATE_RATIFY_BONUS = 0.1;
+
+const ACT_BASE_COSTS = { mandate: 20, coalition: 40, ratify: 80 };
+
+export function getSenateGovernment(state) {
+  return { leader: null, partner: null, ratified: false, ...(state.senateGov || {}) };
 }
 
-// Get the maximum influence slots available.
-export function getMaxSenateInfluence(state) {
-  return Math.max(3, Math.floor((state.resources.galacticInfluence?.amount || 0) / 50) + 3);
+export function countSenateActs(state) {
+  const government = getSenateGovernment(state);
+  return (government.leader ? 1 : 0) + (government.partner ? 1 : 0) + (government.ratified ? 1 : 0);
 }
 
-// Allocate or remove influence for a faction.
-// delta: +1 to add, -1 to remove.
-// Returns new state or null if invalid.
-export function allocateSenateInfluence(state, factionId, delta) {
+// The next act in the fixed mandate → coalition → ratify sequence, or null.
+export function getNextSenateAct(state) {
+  const government = getSenateGovernment(state);
+  if (!government.leader) return 'mandate';
+  if (!government.partner) return 'coalition';
+  if (!government.ratified) return 'ratify';
+  return null;
+}
+
+export function getSenateActCost(state, actId = getNextSenateAct(state)) {
+  const base = ACT_BASE_COSTS[actId];
+  if (!base) return 0;
+  return Math.ceil(base * getRelicSenateCostMultiplier(state));
+}
+
+export function getSenateStats(state) {
+  const government = getSenateGovernment(state);
+  const acts = countSenateActs(state);
+  const nextAct = getNextSenateAct(state);
+  const elapsed = state.totalTime - (state.lastSenateActTime ?? -SENATE_ACT_INTERVAL);
+  return {
+    government,
+    acts,
+    nextAct,
+    nextActCost: getSenateActCost(state, nextAct),
+    cooldown: nextAct ? Math.max(0, SENATE_ACT_INTERVAL - elapsed) : 0,
+  };
+}
+
+// Enact the next policy act. Mandate and coalition take a faction id; ratify
+// takes none. Returns { state, act, faction } or null if unavailable.
+export function enactSenatePolicy(state, actId, factionId = null) {
   if (state.era < 8) return null;
 
-  const faction = FACTIONS.find(f => f.id === factionId);
-  if (!faction) return null;
+  const stats = getSenateStats(state);
+  if (stats.nextAct !== actId || stats.cooldown > 0) return null;
 
-  const sen = state.senate || { merchants: 0, scholars: 0, warriors: 0 };
-  const current = sen[factionId] || 0;
-  const newVal = Math.max(0, current + delta);
-  const newSenate = { ...sen, [factionId]: newVal };
-  const newTotal = newSenate.merchants + newSenate.scholars + newSenate.warriors;
-  const max = getMaxSenateInfluence(state);
-  if (newTotal > max) return null;
-
-  const resources = { ...state.resources };
-
-  // Adding costs galacticInfluence; removing is free
-  if (delta > 0) {
-    const currentTotal = (sen.merchants || 0) + (sen.scholars || 0) + (sen.warriors || 0);
-    const cost = getSenateAllocateCost(currentTotal, state);
-    const gi = resources.galacticInfluence;
-    if (!gi || gi.amount < cost) return null;
-    resources.galacticInfluence = { ...gi, amount: gi.amount - cost };
+  const government = stats.government;
+  let newGovernment;
+  let faction = null;
+  if (actId === 'mandate' || actId === 'coalition') {
+    faction = SENATE_FACTIONS[factionId];
+    if (!faction || factionId === government.leader) return null;
+    newGovernment = actId === 'mandate'
+      ? { ...government, leader: factionId }
+      : { ...government, partner: factionId };
+  } else if (actId === 'ratify') {
+    newGovernment = { ...government, ratified: true };
+  } else {
+    return null;
   }
 
-  // Apply instant resource bonuses based on new allocation
-  for (const f of FACTIONS) {
-    const count = newSenate[f.id] || 0;
-    if (count > 0 && resources[f.resource]?.unlocked) {
-      const r = resources[f.resource];
-      const maxAlloc = Math.max(newSenate.merchants, newSenate.scholars, newSenate.warriors);
-      const isMajority = FACTIONS.filter(ff => (newSenate[ff.id] || 0) === maxAlloc).length === 1
-        && (newSenate[f.id] || 0) === maxAlloc;
-      const mult = isMajority ? 2 : 1;
-      const gain = count * f.rate * mult;
-      resources[f.resource] = { ...r, amount: r.amount + gain };
-    }
-  }
+  const cost = getSenateActCost(state, actId);
+  const influence = state.resources.galacticInfluence;
+  if (!influence?.unlocked || influence.amount < cost) return null;
 
-  return { ...state, senate: newSenate, resources };
+  return {
+    state: {
+      ...state,
+      resources: {
+        ...state.resources,
+        galacticInfluence: { ...influence, amount: influence.amount - cost },
+      },
+      senateGov: newGovernment,
+      lastSenateActTime: state.totalTime,
+    },
+    act: actId,
+    faction,
+  };
+}
+
+// Government production multiplier for a resource. Bonuses scale with
+// operation rewards (doctrine and Causal Keys).
+export function getSenateGovernmentMultiplier(state, resourceId) {
+  const government = state.senateGov;
+  if (!government?.leader) return 1;
+  let bonus = 0;
+  const leaderResource = SENATE_FACTIONS[government.leader]?.resource;
+  const partnerResource = government.partner ? SENATE_FACTIONS[government.partner]?.resource : null;
+  if (resourceId === leaderResource) bonus += SENATE_LEADER_BONUS;
+  if (resourceId === partnerResource) bonus += SENATE_PARTNER_BONUS;
+  if (government.ratified && Object.values(SENATE_FACTIONS).some(faction => faction.resource === resourceId)) {
+    bonus += SENATE_RATIFY_BONUS;
+  }
+  if (bonus === 0) return 1;
+  return 1 + bonus * getOperationRewardMultiplier(state);
 }
 
 // Set senate directive percentages — adjusting one slider rebalances others proportionally.
@@ -87,34 +139,13 @@ export function setSenateDirective(state, factionId, pct) {
 }
 
 // Get senate directive production multipliers from slider percentages.
-// Returns { galacticInfluence: mult, exoticMatter: mult, stellarForge: mult }
+// Each faction's directive boosts that faction's resource.
 export function getSenatePctBonuses(state) {
   const pct = state.senatePct || { merchants: 34, scholars: 33, warriors: 33 };
   const relicMult = getRelicSenateDirectiveMultiplier(state);
   return {
-    galacticInfluence: 1 + (pct.merchants || 0) * 0.001 * relicMult,
-    exoticMatter:      1 + (pct.scholars || 0) * 0.001 * relicMult,
+    exoticMatter:      1 + (pct.merchants || 0) * 0.001 * relicMult,
+    galacticInfluence: 1 + (pct.scholars || 0) * 0.001 * relicMult,
     stellarForge:      1 + (pct.warriors || 0) * 0.001 * relicMult,
-  };
-}
-
-// Get senate display info.
-export function getSenateInfo(state) {
-  const senate = state.senate || { merchants: 0, scholars: 0, warriors: 0 };
-  const totalInfluence = senate.merchants + senate.scholars + senate.warriors;
-  const maxInfluence = getMaxSenateInfluence(state);
-  const maxCount = Math.max(senate.merchants, senate.scholars, senate.warriors);
-  const majorityFaction = maxCount > 0
-    ? FACTIONS.find(f => senate[f.id] === maxCount && FACTIONS.filter(ff => senate[ff.id] === maxCount).length === 1)
-    : null;
-
-  return {
-    senate,
-    totalInfluence,
-    maxInfluence,
-    available: maxInfluence - totalInfluence,
-    allocateCost: getSenateAllocateCost(totalInfluence, state),
-    majorityFaction: majorityFaction?.id || null,
-    factions: FACTIONS,
   };
 }

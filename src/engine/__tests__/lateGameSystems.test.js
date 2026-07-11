@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { detectArchetype, getArchetypeSuggestions } from '../advisor.js';
 import { commissionDysonModule, getDysonStats } from '../dyson.js';
 import {
-  allocateSenateInfluence,
-  getSenateInfo,
+  enactSenatePolicy,
+  getSenateGovernmentMultiplier,
   getSenatePctBonuses,
+  getSenateStats,
+  SENATE_ACT_INTERVAL,
   setSenateDirective,
 } from '../senate.js';
 import {
@@ -46,21 +48,37 @@ describe('late-game systems', () => {
     expect(commissionDysonModule(state, 'forge')).toBeNull();
   });
 
-  it('allocates senate influence and keeps directives normalized', () => {
-    const state = createInitialState();
+  it('forms a government in three deliberate policy acts', () => {
+    let state = createInitialState();
     state.era = 8;
     state.resources.galacticInfluence = {
       ...state.resources.galacticInfluence,
       unlocked: true,
       amount: 500,
     };
-    const allocated = allocateSenateInfluence(state, 'merchants', 1);
-    expect(allocated.senate.merchants).toBe(1);
-    expect(getSenateInfo(allocated).majorityFaction).toBe('merchants');
 
-    const directed = setSenateDirective(allocated, 'scholars', 70);
+    // Acts follow the mandate → coalition → ratify sequence
+    expect(enactSenatePolicy(state, 'coalition', 'scholars')).toBeNull();
+    state = enactSenatePolicy(state, 'mandate', 'merchants').state;
+    expect(state.senateGov.leader).toBe('merchants');
+
+    // Deliberation blocks the next act; the leader cannot also be partner
+    expect(enactSenatePolicy(state, 'coalition', 'scholars')).toBeNull();
+    state = { ...state, totalTime: state.totalTime + SENATE_ACT_INTERVAL };
+    expect(enactSenatePolicy(state, 'coalition', 'merchants')).toBeNull();
+    state = enactSenatePolicy(state, 'coalition', 'scholars').state;
+    state = { ...state, totalTime: state.totalTime + SENATE_ACT_INTERVAL };
+    state = enactSenatePolicy(state, 'ratify').state;
+    expect(getSenateStats(state).nextAct).toBeNull();
+
+    // Government bonuses: leader 1.3, partner 1.15, ratify +0.1 each
+    expect(getSenateGovernmentMultiplier(state, 'exoticMatter')).toBeCloseTo(1.4);
+    expect(getSenateGovernmentMultiplier(state, 'galacticInfluence')).toBeCloseTo(1.25);
+    expect(getSenateGovernmentMultiplier(state, 'stellarForge')).toBeCloseTo(1.1);
+
+    const directed = setSenateDirective(state, 'scholars', 70);
     expect(Object.values(directed.senatePct).reduce((sum, value) => sum + value, 0)).toBe(100);
-    expect(getSenatePctBonuses(directed).exoticMatter).toBeCloseTo(1.07);
+    expect(getSenatePctBonuses(directed).galacticInfluence).toBeCloseTo(1.07);
   });
 
   it('locks signal bands with calibration gaps and a hard limit', () => {

@@ -6,7 +6,7 @@ import { getRouteBonus } from './starChart.js';
 import { checkAchievements } from './achievements.js';
 import { purchaseUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
-import { getSenatePctBonuses } from './senate.js';
+import { getSenateGovernmentMultiplier, getSenatePctBonuses } from './senate.js';
 import { getTuningProductionMultiplier } from './tuning.js';
 import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes, runExpedition } from './expeditions.js';
 import { getActiveSystems } from './operations.js';
@@ -112,10 +112,11 @@ export function tick(state, dt, rng = Math.random) {
     if (id === 'colonies') effectiveRate = rate * colonyScale;
     if (id === 'megastructures') effectiveRate = rate * megaScale;
 
-    // Apply senate directive production bonuses (era 8+)
+    // Apply senate directive and government bonuses (era 8+)
     if (state.era >= 8) {
       const senateBonuses = getSenatePctBonuses(state);
       if (senateBonuses[id] && senateBonuses[id] > 1) effectiveRate *= senateBonuses[id];
+      effectiveRate *= getSenateGovernmentMultiplier(state, id);
     }
 
     // Apply locked cosmic signal bands (era 9+)

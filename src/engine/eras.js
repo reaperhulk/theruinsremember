@@ -107,11 +107,12 @@ export function getEraMastery(state, era = state.era) {
     title = 'Galactic Mandate';
     const transcendent = state.cycleDoctrine === 'transcendence';
     detail = transcendent
-      ? 'Transcendence doctrine: allocate six Senate seats or complete two reality weaves.'
-      : 'Allocate nine Senate seats or complete three reality weaves.';
-    const senateSeats = Object.values(state.senate || {}).reduce((sum, count) => sum + count, 0);
-    current = Math.max(senateSeats, Object.keys(state.wovenLaws || {}).length * 3);
-    target = transcendent ? 6 : 9;
+      ? 'Transcendence doctrine: enact two Senate policy acts or establish two reality laws.'
+      : 'Enact three Senate policy acts or establish three reality laws.';
+    const government = state.senateGov || {};
+    const senateActs = (government.leader ? 1 : 0) + (government.partner ? 1 : 0) + (government.ratified ? 1 : 0);
+    current = Math.max(senateActs, Object.keys(state.wovenLaws || {}).length);
+    target = transcendent ? 2 : 3;
   } else if (era === 9) {
     title = 'Cosmic Alignment';
     detail = state.cycleDoctrine === 'transcendence'

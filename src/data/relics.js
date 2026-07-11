@@ -39,7 +39,7 @@ export const RELICS = {
     id: 'brokenCrown',
     name: 'Broken Crown',
     domain: 'Senate',
-    description: 'Senate allocations cost 30% less and directives are 50% stronger.',
+    description: 'Senate policy acts cost 30% less and directives are 50% stronger.',
   },
   loomNeedle: {
     id: 'loomNeedle',

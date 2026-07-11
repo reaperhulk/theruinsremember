@@ -138,7 +138,7 @@ export const prestigeUpgrades = {
     id: 'perfectMemory',
     name: 'Perfect Memory',
     cost: 7,
-    description: 'Keep operation progress across resets: docking, colonies, routes, Dyson assembly, and senate influence. Reality Laws and Signal Locks always dissolve.',
+    description: 'Keep operation progress across resets: docking, colonies, routes, Dyson assembly, and the senate government. Reality Laws and Signal Locks always dissolve.',
     effect: 'keep_operations',
   },
   universalOptimizer: {

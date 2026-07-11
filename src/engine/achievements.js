@@ -51,8 +51,8 @@ const ACHIEVEMENT_PROGRESS = {
   firstRelic:      s => ({ current: s.relicsRecoveredThisRun || 0, target: 1 }),
   relicPair:       s => ({ current: s.activeRelics?.length || 0, target: 2 }),
   realityForger10: s => ({ current: Object.values(s.realityKeys || {}).reduce((sum, v) => sum + v, 0), target: 10 }),
-  senator10:       s => ({ current: (s.senate?.merchants||0)+(s.senate?.scholars||0)+(s.senate?.warriors||0), target: 10 }),
-  senator50:       s => ({ current: (s.senate?.merchants||0)+(s.senate?.scholars||0)+(s.senate?.warriors||0), target: 50 }),
+  firstMandate:    s => ({ current: s.senateGov?.leader ? 1 : 0, target: 1 }),
+  ratifiedGov:     s => ({ current: (s.senateGov?.leader ? 1 : 0) + (s.senateGov?.partner ? 1 : 0) + (s.senateGov?.ratified ? 1 : 0), target: 3 }),
 };
 
 // Check all achievements and award any newly completed ones.
