@@ -71,10 +71,30 @@ describe('the Forgetting', () => {
     expect(state.forgetting.tendrils).toHaveLength(0);
   });
 
-  it('grants a third warden to a ratified government', () => {
+  it('grants extra wardens for a ratified government and Warden Eternal', () => {
     const state = makeSiegeState();
     state.senateGov = { ...state.senateGov, ratified: true };
     expect(getWardenCapacity(state)).toBe(3);
+    state.prestigeUpgrades = { wardenEternal: true };
+    expect(getWardenCapacity(state)).toBe(4);
+  });
+
+  it('Seal Mastery doubles the pushback from sealed tendrils', () => {
+    const sealRun = prestigeUpgrades => {
+      const rng = makeRng([0.01, 0.5, 0.5]);
+      let state = makeSiegeState();
+      state.prestigeUpgrades = prestigeUpgrades;
+      state.forgetting = null;
+      state = run(state, 1, rng);
+      state = { ...state, forgetting: { ...state.forgetting, meter: 40 } };
+      state = run(state, FIRST_SURGE_DELAY, rng);
+      const target = state.forgetting.tendrils[0].targetId;
+      state = placeWarden(state, 1, target).state;
+      return run(state, 80, rng).forgetting.meter;
+    };
+    const plain = sealRun({});
+    const mastered = sealRun({ sealMastery: true });
+    expect(mastered).toBeLessThan(plain);
   });
 
   it('consumes an unguarded memory and scars its bonus', () => {

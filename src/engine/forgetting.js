@@ -98,7 +98,7 @@ export function isMemoryScarred(state, nodeId) {
 }
 
 export function getWardenCapacity(state) {
-  return 2 + (state.senateGov?.ratified ? 1 : 0);
+  return 2 + (state.senateGov?.ratified ? 1 : 0) + (state.prestigeUpgrades?.wardenEternal ? 1 : 0);
 }
 
 function createForgetting(state) {
@@ -189,7 +189,7 @@ function spawnSurge(forgetting, nodes, now, factor, slow, rng) {
   return updated;
 }
 
-function advanceSlice(forgetting, nodes, now, sliceDt, factor, slow, rng) {
+function advanceSlice(forgetting, nodes, now, sliceDt, factor, slow, sealPower, rng) {
   // Surges open new breaches on a fixed cadence.
   while (forgetting.nextSurgeAt <= now) {
     const surgeAt = forgetting.nextSurgeAt;
@@ -221,7 +221,7 @@ function advanceSlice(forgetting, nodes, now, sliceDt, factor, slow, rng) {
         current = { ...current, phase: 'consuming', heldSince: null, consumesAt: now + TENDRIL_CONSUME_TIME / factor };
       } else if (now - current.heldSince >= TENDRIL_SEAL_HOLD) {
         sealed += 1;
-        meter = Math.max(0, meter - SEAL_METER_REWARD);
+        meter = Math.max(0, meter - SEAL_METER_REWARD * sealPower);
         continue;
       }
     }
@@ -260,12 +260,13 @@ export function advanceForgetting(state, dt, rng = Math.random) {
   const nodes = getMemoryConstellation(state);
   const factor = depthFactor(state);
   const slow = getTendrilSlowMultiplier(state);
+  const sealPower = state.prestigeUpgrades?.sealMastery ? 2 : 1;
   const startTime = state.totalTime - dt;
   let elapsed = 0;
   while (elapsed < dt) {
     const sliceDt = Math.min(1, dt - elapsed);
     elapsed += sliceDt;
-    forgetting = advanceSlice(forgetting, nodes, startTime + elapsed, sliceDt, factor, slow, rng);
+    forgetting = advanceSlice(forgetting, nodes, startTime + elapsed, sliceDt, factor, slow, sealPower, rng);
     if (forgetting.meter >= FORGETTING_COLLAPSE) {
       forgetting = { ...forgetting, meter: FORGETTING_COLLAPSE, collapsed: true, collapsedAt: startTime + elapsed, tendrils: [] };
       break;

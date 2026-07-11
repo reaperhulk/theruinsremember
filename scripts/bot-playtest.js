@@ -103,6 +103,7 @@ const PROFILES = {
     buyPrestigeUpgrades: true,
     prestigeUpgradeOrder: [
       'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
+      'sealMastery', 'wardenEternal',
       'hackMaster', 'dockingPro', 'factoryExpert', 'miniGameSavant',
       'tradeRoutes', 'eventMagnet', 'wisdomOfAges', 'quantumMemory',
       'cosmicInsight', 'perfectMemory', 'universalOptimizer', 'chainMaster',

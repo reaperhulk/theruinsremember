@@ -134,6 +134,20 @@ export const prestigeUpgrades = {
     effect: 'start_era2',
     requires: 'fastStart',
   },
+  wardenEternal: {
+    id: 'wardenEternal',
+    name: 'Warden Eternal',
+    cost: 12,
+    description: 'A fourth presence holds the line: +1 Warden against the Forgetting in every cycle.',
+    effect: 'extra_warden',
+  },
+  sealMastery: {
+    id: 'sealMastery',
+    name: 'Seal Mastery',
+    cost: 10,
+    description: 'Sealed tendrils push the Forgetting back twice as far. Descend deeper; the ruins will remember further.',
+    effect: 'seal_mastery',
+  },
   perfectMemory: {
     id: 'perfectMemory',
     name: 'Perfect Memory',
