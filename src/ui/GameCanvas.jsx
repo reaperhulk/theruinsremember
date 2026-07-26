@@ -3,6 +3,14 @@ import { gather, getEffectiveCap, getEffectiveRate } from '../engine/resources.j
 import { countEraUpgrades, getMinUpgradesForEra } from '../engine/eras.js';
 import { playClick } from './AudioManager.js';
 
+// Every scene below draws in a fixed logical space. The backing store is sized
+// to the element's real pixel dimensions and the context is scaled to match, so
+// the art stays crisp at any width and on any display density without a single
+// drawing coordinate changing.
+const LOGICAL_W = 280;
+const LOGICAL_H = 180;
+const CANVAS_ASPECT = LOGICAL_W / LOGICAL_H;
+
 // --- Shared Helpers ---
 
 // Module-level parallax offset (set per frame by the canvas component)
@@ -2855,37 +2863,6 @@ function drawFloatingTexts(ctx, floatingTexts) {
   }
 }
 
-// --- Era progress bar overlay ---
-function drawEraProgress(ctx, w, h, state) {
-  if (!state) return;
-  const era = state.era || 1;
-  const eraUpgrades = countEraUpgrades(state, era);
-  const minNeeded = getMinUpgradesForEra(era);
-  const barW = w * 0.6;
-  const barH = 6;
-  const barX = (w - barW) / 2;
-  const barY = h - 12;
-
-  ctx.save();
-
-  // Background
-  ctx.fillStyle = 'rgba(255,255,255,0.1)';
-  ctx.fillRect(barX, barY, barW, barH);
-
-  // Fill — use era-specific upgrade count vs minimum needed
-  const progress = Math.min(eraUpgrades / minNeeded, 1);
-  ctx.fillStyle = progress >= 1 ? '#44aa44' : '#aaaa44';
-  ctx.fillRect(barX, barY, barW * progress, barH);
-
-  // Text
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.font = '8px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText(`${eraUpgrades}/${minNeeded} era upgrades`, w / 2, barY - 2);
-
-  ctx.restore();
-}
-
 // --- Particle system ---
 function spawnParticles(particles, x, y, count, color, speed = 50) {
   for (let i = 0; i < count; i++) {
@@ -2944,6 +2921,7 @@ const ERA1_BUILDINGS = [
 // --- Main Component ---
 export function GameCanvas({ state, onUpdate }) {
   const canvasRef = useRef(null);
+  const wrapRef = useRef(null);
   const rafRef = useRef(null);
   const eraRef = useRef(state.era);
   const stateRef = useRef(state);
@@ -2976,14 +2954,13 @@ export function GameCanvas({ state, onUpdate }) {
     const canvas = canvasRef.current;
     if (!canvas || !onUpdateRef.current) return;
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const cx = (e.clientX - rect.left) * scaleX;
-    const cy = (e.clientY - rect.top) * scaleY;
+    // Hit-test in logical space so clicks line up regardless of rendered size.
+    const cx = (e.clientX - rect.left) * (LOGICAL_W / rect.width);
+    const cy = (e.clientY - rect.top) * (LOGICAL_H / rect.height);
 
     const t = performance.now() / 1000;
-    const w = canvas.width;
-    const h = canvas.height;
+    const w = LOGICAL_W;
+    const h = LOGICAL_H;
     const era = eraRef.current;
     // Check bonus orb click first
     if (bonusOrbRef.current) {
@@ -3156,10 +3133,13 @@ export function GameCanvas({ state, onUpdate }) {
 
     function draw(now) {
       const t = now / 1000;
-      const w = canvas.width;
-      const h = canvas.height;
+      const w = LOGICAL_W;
+      const h = LOGICAL_H;
       const era = eraRef.current;
 
+      // Map the logical drawing space onto the real backing store. Everything
+      // below keeps working in 280x180 units while rendering at full density.
+      ctx.setTransform(canvas.width / LOGICAL_W, 0, 0, canvas.height / LOGICAL_H, 0, 0);
       ctx.clearRect(0, 0, w, h);
 
       // Update parallax offset from mouse position
@@ -3230,9 +3210,7 @@ export function GameCanvas({ state, onUpdate }) {
         ctx.fillRect(0, 0, w, h);
       }
 
-      // Draw era progress bar
       const upgradeCount = Object.keys(stateRef.current.upgrades || {}).length;
-      drawEraProgress(ctx, w, h, state);
 
       // Draw era name watermark in top-left
       ctx.save();
@@ -3242,17 +3220,6 @@ export function GameCanvas({ state, onUpdate }) {
       const eraLabels = ['', 'Planetfall', 'Industrial', 'Digital', 'Space', 'Solar', 'Interstellar', 'Dyson', 'Galactic', 'Intergalactic', 'Multiverse'];
       ctx.fillText(eraLabels[era] || '', 4, 12);
       ctx.restore();
-
-      // Whisper line — small atmospheric text so the canvas carries story, not just scenery
-      const whisper = eraWhispers[era];
-      if (whisper) {
-        ctx.save();
-        ctx.font = '8px serif';
-        ctx.fillStyle = 'rgba(255, 240, 210, 0.28)';
-        ctx.textAlign = 'right';
-        ctx.fillText(whisper, w - 6, h - 8);
-        ctx.restore();
-      }
 
       // Prosperity glow — subtle light at top-right based on total upgrades
       if (upgradeCount > 0) {
@@ -3610,6 +3577,46 @@ export function GameCanvas({ state, onUpdate }) {
     return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
+  // Size the backing store to the element's real pixels. Without this the
+  // canvas renders at a fixed 280x180 and gets stretched — soft on every
+  // display, and badly so on high-density ones.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const wrap = wrapRef.current;
+    if (!canvas || !wrap) return;
+
+    function resize() {
+      const available = wrap.clientWidth;
+      if (!available) return;
+      const maxHeight = window.innerWidth <= 640 ? 240 : 380;
+      let cssW = available;
+      let cssH = cssW / CANVAS_ASPECT;
+      if (cssH > maxHeight) {
+        cssH = maxHeight;
+        cssW = cssH * CANVAS_ASPECT;
+      }
+      const dpr = Math.min(window.devicePixelRatio || 1, 3);
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
+      const nextW = Math.round(cssW * dpr);
+      const nextH = Math.round(cssH * dpr);
+      // Assigning width/height clears the canvas, so only do it on real change.
+      if (canvas.width !== nextW || canvas.height !== nextH) {
+        canvas.width = nextW;
+        canvas.height = nextH;
+      }
+    }
+
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(wrap);
+    window.addEventListener('resize', resize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
+
   const handleMouseMove = useCallback((e) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -3622,8 +3629,8 @@ export function GameCanvas({ state, onUpdate }) {
     // Hit-test era 1 buildings for tooltip
     const era = eraRef.current;
     if (era === 1) {
-      const cx = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const cy = (e.clientY - rect.top) * (canvas.height / rect.height);
+      const cx = (e.clientX - rect.left) * (LOGICAL_W / rect.width);
+      const cy = (e.clientY - rect.top) * (LOGICAL_H / rect.height);
       const upgradeTotal = Object.keys(stateRef.current?.upgrades || {}).length;
       const visibleCount = Math.min(Math.floor(upgradeTotal / 3), 4);
       let hit = null;
@@ -3640,19 +3647,40 @@ export function GameCanvas({ state, onUpdate }) {
     }
   }, []);
 
+  const era = state.era || 1;
+  const eraUpgrades = countEraUpgrades(state, era);
+  const minNeeded = getMinUpgradesForEra(era);
+  const eraProgress = Math.min(eraUpgrades / minNeeded, 1);
+
   return (
-    <div className="panel canvas-panel" style={{ position: 'relative' }}>
+    <div className="panel canvas-panel" ref={wrapRef}>
       <canvas
         ref={canvasRef}
-        width={280}
-        height={180}
         onClick={handleCanvasClick}
         onMouseMove={handleMouseMove}
         onMouseLeave={() => setCanvasTooltip(null)}
-        style={{ cursor: 'pointer' }}
         role="img"
         aria-label="Game world visualization — click to interact"
       />
+      <div className="canvas-caption">
+        <div
+          className="canvas-era-bar"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={minNeeded}
+          aria-valuenow={Math.min(eraUpgrades, minNeeded)}
+          aria-label="Era upgrade progress"
+        >
+          <div
+            className={`canvas-era-bar-fill ${eraProgress >= 1 ? 'complete' : ''}`}
+            style={{ width: `${eraProgress * 100}%` }}
+          />
+        </div>
+        <div className="canvas-caption-row">
+          <span className="canvas-era-count">{eraUpgrades}/{minNeeded} era upgrades</span>
+          <span className="canvas-whisper">{eraWhispers[era]}</span>
+        </div>
+      </div>
       {canvasTooltip && (
         <div style={{
           position: 'absolute',
