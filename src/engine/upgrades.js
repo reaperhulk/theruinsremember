@@ -1,7 +1,10 @@
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { resources as resourceDefs } from '../data/resources.js';
+import { LORE_UPGRADE_IDS } from '../data/lore.js';
 import { spend, getEffectivePrestige } from './resources.js';
 import { getEraMasteryTier } from './eras.js';
+
+const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 
 // Repeatable milestones: every 25 levels of a repeatable upgrade crosses a
 // named breakpoint that multiplies its target resource. Levels stop being
@@ -319,6 +322,48 @@ export function getUpcomingUpgrades(state) {
     const missingName = missingPrereq ? (upgradeDefs[missingPrereq]?.name || missingPrereq) : null;
     return { ...def, missingPrereq: missingName };
   }).slice(0, 5); // Show max 5 upcoming
+}
+
+// A decision is an upgrade where the choice itself matters: a doctrine fork
+// that locks out its opposite, an upgrade that changes a rule, one that opens
+// a new resource, or a lore fragment the player should actually read. Anything
+// else is build-out — a confirmation, not a choice. There are 599 upgrades and
+// only about 40 of them are decisions by this definition, which is why buying
+// upgrades felt like flushing a queue.
+export function isDecisionUpgrade(def) {
+  if (!def) return false;
+  if (def.exclusiveWith) return true;
+  if (def.mechanic) return true;
+  if (LORE_UPGRADE_ID_SET.has(def.id)) return true;
+  return (def.effects || []).some(effect => effect.type === 'unlock_resource');
+}
+
+// Build-out the player has already committed to by enabling automation: the
+// routine current-era upgrades. Decisions are deliberately left alone, so the
+// choices stay in the player's hands while the confirmations stop needing a
+// click each. Prior eras are already automated separately in tick().
+export function buyRoutineBuildOut(state) {
+  let current = state;
+  let total = 0;
+  const hidden = state.hiddenUpgrades || {};
+  for (let pass = 0; pass < 5; pass++) {
+    let boughtAny = false;
+    for (const def of Object.values(upgradeDefs)) {
+      if (def.era !== current.era) continue;
+      if (def.repeatable) continue;
+      if (current.upgrades[def.id]) continue;
+      if (hidden[def.id]) continue;
+      if (isDecisionUpgrade(def)) continue;
+      const result = purchaseUpgrade(current, def.id);
+      if (result) {
+        current = result;
+        total++;
+        boughtAny = true;
+      }
+    }
+    if (!boughtAny) break;
+  }
+  return { state: current, count: total };
 }
 
 // Buy all affordable non-repeatable upgrades (multi-pass for chains).

@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useMemo, useEffect, memo } from 'react';
-import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable } from '../engine/upgrades.js';
+import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable, isDecisionUpgrade } from '../engine/upgrades.js';
 import { getEraMasteryTier } from '../engine/eras.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -14,6 +14,9 @@ const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 function getFocusScore(state, upgrade) {
   let score = upgrade.era === state.era ? 100 : 0;
   if (canAfford(state, getUpgradeCost(state, upgrade.id))) score += 40;
+  // Forks are the only upgrades with a real opportunity cost — taking one
+  // locks its opposite out for the rest of the run. They lead the list.
+  if (upgrade.exclusiveWith) score += 200;
   if (upgrade.mechanic) score += 80;
   if (LORE_UPGRADE_ID_SET.has(upgrade.id)) score += 20;
   for (const effect of upgrade.effects) {
@@ -233,11 +236,18 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
     : searchFiltered.filter(u => !hiddenUpgrades[u.id]);
 
   const focusMode = !showCatalog;
+  const autoBuildOut = state.autoBuildOut !== false;
+
+  // With build-out automated, the priority list should be the decisions —
+  // forks, rule changes, resource unlocks, lore. Routine upgrades still show
+  // if there are not enough decisions to fill the list, so it is never empty.
+  const focusCandidates = [...filteredAvailable].filter(upgrade => !upgrade.repeatable);
+  const decisions = focusCandidates.filter(isDecisionUpgrade);
+  const routine = focusCandidates.filter(upgrade => !isDecisionUpgrade(upgrade));
+  const routineWaiting = autoBuildOut ? routine.filter(u => u.era === state.era).length : 0;
+  const byFocus = (a, b) => getFocusScore(state, b) - getFocusScore(state, a);
   const visibleAvailable = focusMode
-    ? [...filteredAvailable]
-        .filter(upgrade => !upgrade.repeatable)
-        .sort((a, b) => getFocusScore(state, b) - getFocusScore(state, a))
-        .slice(0, 6)
+    ? [...decisions.sort(byFocus), ...routine.sort(byFocus)].slice(0, 6)
     : filteredAvailable;
 
   const affordableCount = visibleAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
@@ -298,7 +308,24 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         {focusMode && <span className="upgrade-summary-pill">showing {visibleAvailable.length} priorities</span>}
         {mechanicCount > 0 && <span className="upgrade-summary-pill">{mechanicCount} mechanic shifts</span>}
         {loreCount > 0 && <span className="upgrade-summary-pill">{loreCount} lore fragments</span>}
+        <button
+          className={`upgrade-summary-pill buildout-toggle${autoBuildOut ? ' active' : ''}`}
+          onClick={() => onUpdate(s => ({ ...s, autoBuildOut: !autoBuildOut }))}
+          aria-pressed={autoBuildOut}
+          title={
+            autoBuildOut
+              ? 'Routine upgrades for this era buy themselves. Forks, rule changes, resource unlocks and lore fragments are always left to you.'
+              : 'Every upgrade must be bought by hand, including routine build-out.'
+          }
+        >
+          Auto build-out {autoBuildOut ? 'ON' : 'OFF'}
+        </button>
       </div>
+      {focusMode && autoBuildOut && routineWaiting > 0 && (
+        <div className="text-hint" style={{ marginBottom: '4px' }}>
+          {routineWaiting} routine upgrade{routineWaiting === 1 ? '' : 's'} queued for build-out — the choices below are yours
+        </div>
+      )}
       <div className="catalog-mode" role="group" aria-label="Upgrade display mode">
         <button className={!showCatalog ? 'active' : ''} onClick={() => setShowCatalog(false)}>Priority decisions</button>
         <button className={showCatalog ? 'active' : ''} onClick={() => setShowCatalog(true)}>Full catalog ({available.length})</button>

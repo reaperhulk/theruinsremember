@@ -1365,6 +1365,20 @@ g[role="button"]:focus-visible {
   transition: width 0.5s ease-out;
 }
 
+/* Auto build-out toggle — a pill in the upgrade summary strip */
+.buildout-toggle {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  color: inherit;
+}
+
+.buildout-toggle.active {
+  border-color: rgba(136, 204, 136, 0.5);
+  color: #8c8;
+}
+
 /* Save data menu — Export/Copy/Import/Paste/Reset used to sit in the header at
    the same visual weight as the game itself. */
 .save-menu-wrap {

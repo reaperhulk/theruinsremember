@@ -4,7 +4,7 @@ import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.j
 import { getColonyBonus } from './colonies.js';
 import { advanceNetworkPlan, getRouteBonus } from './starChart.js';
 import { checkAchievements } from './achievements.js';
-import { purchaseUpgrade } from './upgrades.js';
+import { purchaseUpgrade, buyRoutineBuildOut } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { getSenateGovernmentMultiplier, getSenatePctBonuses } from './senate.js';
 import { getTuningProductionMultiplier } from './tuning.js';
@@ -307,6 +307,18 @@ export function tick(state, dt, rng = Math.random) {
         }
         if (!boughtAny) break;
       }
+    }
+  }
+
+  // Routine build-out: the current era's non-decision upgrades buy themselves
+  // so the Decisions tab holds decisions rather than a queue to flush. Forks,
+  // rule changes, resource unlocks and lore fragments are never auto-bought.
+  const buildOutRuns = intervalCrossings(state.totalTime, newState.totalTime, 5);
+  if (newState.autoBuildOut !== false && buildOutRuns > 0) {
+    for (let run = 0; run < buildOutRuns; run++) {
+      const result = buyRoutineBuildOut(newState);
+      if (result.count === 0) break;
+      newState = result.state;
     }
   }
 

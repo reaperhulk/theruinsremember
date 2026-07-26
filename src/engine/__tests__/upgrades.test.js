@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable, getRepeatableMilestone, getRepeatableMilestoneMultiplier } from '../upgrades.js';
+import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable, getRepeatableMilestone, getRepeatableMilestoneMultiplier, isDecisionUpgrade, buyRoutineBuildOut } from '../upgrades.js';
 import { createInitialState } from '../state.js';
 import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 import { resources as resourceDefs } from '../../data/resources.js';
@@ -19,6 +19,48 @@ describe('upgrades', () => {
       }
     }
     expect(offenders).toEqual([]);
+  });
+
+  describe('routine build-out', () => {
+    it('classifies forks, rule changes, unlocks and lore as decisions', () => {
+      expect(isDecisionUpgrade(upgradeDefs.forkHearth)).toBe(true);      // fork
+      expect(isDecisionUpgrade(upgradeDefs.deadStarAtlas)).toBe(true);   // lore
+      expect(isDecisionUpgrade(upgradeDefs.foundry)).toBe(true);         // unlocks steel
+      expect(isDecisionUpgrade(upgradeDefs.tools)).toBe(false);          // routine multiplier
+    });
+
+    it('leaves decisions to the player while buying routine build-out', () => {
+      const state = createInitialState();
+      state.resources.labor.amount = 1e6;
+      state.resources.materials.amount = 1e6;
+      state.resources.food.amount = 1e6;
+      state.resources.energy.amount = 1e6;
+
+      const { state: after, count } = buyRoutineBuildOut(state);
+      expect(count).toBeGreaterThan(0);
+
+      // Nothing classified as a decision may have been bought.
+      const boughtDecisions = Object.keys(after.upgrades)
+        .filter(id => !state.upgrades[id])
+        .filter(id => isDecisionUpgrade(upgradeDefs[id]));
+      expect(boughtDecisions).toEqual([]);
+
+      // Both sides of every fork must still be open.
+      expect(after.upgrades.forkHearth).toBeUndefined();
+      expect(after.upgrades.forkQuarry).toBeUndefined();
+    });
+
+    it('respects hidden upgrades and never touches repeatables', () => {
+      const state = createInitialState();
+      state.resources.labor.amount = 1e6;
+      state.resources.materials.amount = 1e6;
+      state.hiddenUpgrades = { tools: true };
+
+      const { state: after } = buyRoutineBuildOut(state);
+      expect(after.upgrades.tools).toBeUndefined();
+      const boughtRepeatables = Object.keys(after.upgrades).filter(id => upgradeDefs[id]?.repeatable);
+      expect(boughtRepeatables).toEqual([]);
+    });
   });
 
   it('never routes the prerequisite tree through a repeatable upgrade', () => {

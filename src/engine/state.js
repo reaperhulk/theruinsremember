@@ -19,6 +19,7 @@ export function migrateState(saved) {
   if (!migrated.lockedSignals) migrated.lockedSignals = {};
   migrated.senateGov = { leader: null, partner: null, ratified: false, ...(saved.senateGov || {}) };
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
+  if (migrated.autoBuildOut === undefined) migrated.autoBuildOut = true;
   migrated.expedition = { ...createExpeditionState(), ...(saved.expedition || {}) };
   migrated.dockingMissions = { cargo: 0, crew: 0, science: 0, ...(saved.dockingMissions || {}) };
   for (const retiredField of [
@@ -130,6 +131,8 @@ export function createInitialState() {
     seenLoreEvents: {},
     // UI: hidden repeatable upgrades
     hiddenUpgrades: {},
+    // Routine current-era upgrades buy themselves; decisions never do.
+    autoBuildOut: true,
     saveVersion: 6,
   };
 }
