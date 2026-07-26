@@ -89,6 +89,9 @@ describe('starChart', () => {
     let state = selectNetworkPlan(makeEra6State(), 'longHaul');
     expect(state.networkPlan).toBe('longHaul');
 
+    // Plans are commitments: switching while the network is being laid is refused
+    expect(selectNetworkPlan(state, 'coreWeb').networkPlan).toBe('longHaul');
+
     // Crews lay one route per interval, paying normal costs
     state.totalTime += ROUTE_LAY_INTERVAL;
     state = advanceNetworkPlan(state, state.totalTime - ROUTE_LAY_INTERVAL);
@@ -114,8 +117,9 @@ describe('starChart', () => {
     const previouslyConnected = new Set(getRoutes(state).flatMap(route => [route.from, route.to]));
     expect(connected.size).toBeGreaterThan(previouslyConnected.size);
 
-    // Plans are commitments: switching immediately after is refused
-    expect(selectNetworkPlan(rerouted, 'coreWeb').networkPlan).toBe('longHaul');
+    // Once the network is laid the commitment has run its course and a new
+    // plan can be chosen.
+    expect(selectNetworkPlan(rerouted, 'coreWeb').networkPlan).toBe('coreWeb');
   });
 
   it('changes network output with a committed directive', () => {

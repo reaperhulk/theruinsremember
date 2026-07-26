@@ -3,7 +3,10 @@
 import { getEffectivePrestige } from './resources.js';
 
 export const DYSON_MODULE_LIMIT = 3;
-export const DYSON_COMMISSION_INTERVAL = 60;
+// Era 7 ends at thirty segments, which is exactly three commissions, so this
+// interval sets the Dyson era's length. At 60s the sphere went from first
+// girder to complete in about two minutes.
+export const DYSON_COMMISSION_INTERVAL = 105;
 
 // Perfect Memory: the hands remember — commissioning takes half the time.
 function commissionInterval(state) {

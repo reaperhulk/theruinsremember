@@ -23,9 +23,13 @@ const ERA_MIN_UPGRADES = {
   2: 16,
   3: 16,
   4: 20,
-  5: 30,   // ~52% of ~58 — reduced from 42 to avoid stalls
-  6: 30,   // ~52% of ~58
-  7: 30,   // ~49% of ~61
+  // Eras 5-8 are not gated by these quotas in practice — a strong economy
+  // clears 60+ era upgrades in about 25 seconds, so the operation objective
+  // below is what actually sets era length. Raising these has no effect on
+  // pacing; the operation cadences are the lever.
+  5: 30,   // ~50% of 60
+  6: 30,   // ~50% of 60
+  7: 30,   // ~48% of 63
   8: 30,   // ~50% of ~60
   9: 5,    // 5 CP-only entry upgrades form a viable path; later upgrades need operation resources
   10: 30,  // ~51% of ~59
@@ -120,9 +124,14 @@ export function getEraMastery(state, era = state.era) {
       current = assignments.reduce((sum, count) => sum + count, 0);
       target = 5;
     } else {
-      detail = 'Assign at least one colony to growth, science, and industry.';
-      current = assignments.filter(count => count > 0).length;
-      target = 3;
+      // Counting distinct focuses made this a three-click objective and the
+      // Solar System era was over in 26 seconds. Requiring depth in every
+      // focus keeps the breadth the era is about while asking for a real
+      // colony base to back it.
+      detail = 'Staff growth, science, and industry with four colonies each.';
+      const staffed = { growth: 0, science: 0, industry: 0, ...(state.colonyAssignments || {}) };
+      current = Math.min(staffed.growth, staffed.science, staffed.industry);
+      target = 4;
     }
   } else if (era === 6) {
     title = 'Route Network';

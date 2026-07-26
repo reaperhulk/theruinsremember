@@ -33,7 +33,11 @@ export function getStarDirectiveInfo(state) {
 // Survey crews add one planned route every ROUTE_LAY_INTERVAL seconds
 // (paying normal route costs) until the chart is full. Manual routes on the
 // map remain available for hand-tuning.
-export const ROUTE_LAY_INTERVAL = 6;
+//
+// Era 6 ends when the ten-route network is complete, so this interval is
+// literally the era's length: at 6s the whole Interstellar era was over in
+// about a minute, less time than it takes to read the star chart.
+export const ROUTE_LAY_INTERVAL = 13;
 
 export const NETWORK_PLANS = {
   coreWeb: {
@@ -53,17 +57,21 @@ export const NETWORK_PLANS = {
   },
 };
 
+// A plan is a commitment for as long as the network it commits to takes to
+// lay, so it is derived from the build rather than from the directive cooldown.
+export const NETWORK_PLAN_DURATION = ROUTE_LAY_INTERVAL * MAX_ROUTES;
+
 export function selectNetworkPlan(state, planId) {
   if (state.era < 6 || !NETWORK_PLANS[planId]) return state;
   const lastChange = state.lastNetworkPlanTime;
-  if (lastChange !== undefined && state.totalTime - lastChange < STAR_DIRECTIVE_DURATION) return state;
+  if (lastChange !== undefined && state.totalTime - lastChange < NETWORK_PLAN_DURATION) return state;
   return { ...state, networkPlan: planId, lastNetworkPlanTime: state.totalTime };
 }
 
 export function getNetworkPlanInfo(state) {
   const plan = NETWORK_PLANS[state.networkPlan] || null;
-  const elapsed = state.totalTime - (state.lastNetworkPlanTime ?? -STAR_DIRECTIVE_DURATION);
-  return { plan, cooldown: Math.max(0, STAR_DIRECTIVE_DURATION - elapsed) };
+  const elapsed = state.totalTime - (state.lastNetworkPlanTime ?? -NETWORK_PLAN_DURATION);
+  return { plan, cooldown: Math.max(0, NETWORK_PLAN_DURATION - elapsed) };
 }
 
 function countConnections(routes) {
@@ -130,7 +138,7 @@ function rerouteTowardFrontier(state) {
     planScore(state.networkPlan, systemById(route.from), systemById(route.to), connections)
       < planScore(state.networkPlan, systemById(lowest.from), systemById(lowest.to), connections) ? route : lowest);
 
-  return createRoute(removeRoute(state, worst.from, worst.to), frontier.from, frontier.to);
+  return layRoute(removeRoute(state, worst.from, worst.to), frontier.from, frontier.to);
 }
 
 // Lay or re-lay one planned route per interval crossing, paying normal costs.
@@ -142,7 +150,7 @@ export function advanceNetworkPlan(state, previousTime) {
   for (let run = 0; run < crossings; run++) {
     const next = getNextPlannedRoute(updated);
     if (next) {
-      const result = createRoute(updated, next.from, next.to);
+      const result = layRoute(updated, next.from, next.to);
       if (!result) break;
       updated = result;
       continue;
@@ -191,9 +199,28 @@ export function routeExists(state, fromId, toId) {
   );
 }
 
-// Create a route between two star systems.
-// Costs darkEnergy and starSystems. Returns new state or null.
+// Surveying a route by hand takes time. Without this, a strong economy could
+// pay for the whole ten-route chart in a few frames and finish Era 6 in about
+// half a minute — the star chart was over before it was read. Crews laying a
+// committed plan are paced by ROUTE_LAY_INTERVAL instead and skip this.
+export const ROUTE_SURVEY_COOLDOWN = 12;
+
+export function getRouteSurveyCooldown(state) {
+  const last = state.lastRouteTime;
+  if (last === undefined) return 0;
+  return Math.max(0, ROUTE_SURVEY_COOLDOWN - (state.totalTime - last));
+}
+
+// Create a route between two star systems by hand. Subject to the survey
+// cooldown; returns new state or null.
 export function createRoute(state, fromId, toId) {
+  if (getRouteSurveyCooldown(state) > 0) return null;
+  return layRoute(state, fromId, toId);
+}
+
+// Lay a route with no survey cooldown — used by committed network plans, which
+// carry their own cadence.
+function layRoute(state, fromId, toId) {
   if (state.era < 6) return null;
   if (fromId === toId) return null;
 
@@ -228,6 +255,7 @@ export function createRoute(state, fromId, toId) {
     ...state,
     resources: newResources,
     starRoutes: [...getRoutes(state), newRoute],
+    lastRouteTime: state.totalTime,
   };
 }
 

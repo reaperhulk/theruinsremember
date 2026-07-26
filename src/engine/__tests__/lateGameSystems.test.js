@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { detectArchetype, getArchetypeSuggestions } from '../advisor.js';
-import { commissionDysonModule, getDysonStats } from '../dyson.js';
+import { commissionDysonModule, getDysonStats, DYSON_COMMISSION_INTERVAL } from '../dyson.js';
 import {
   enactSenatePolicy,
   getSenateGovernmentMultiplier,
@@ -40,7 +40,7 @@ describe('late-game systems', () => {
     }
     for (const moduleId of ['frame', 'collector', 'forge']) {
       state = commissionDysonModule(state, moduleId).state;
-      state.totalTime += 61;
+      state.totalTime += DYSON_COMMISSION_INTERVAL + 1;
     }
 
     expect(state.dysonSegments).toBe(30);

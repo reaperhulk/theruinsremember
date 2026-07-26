@@ -263,6 +263,7 @@ const BALANCE_TARGETS = {
     minTendrilsSealed: 1,
     maxMemoriesConsumed: 0,
     noCollapse: true,
+    // Key N bounds the duration of era N-1.
     eraRanges: {
       2: [90, 240],
       3: [90, 300],
@@ -271,9 +272,12 @@ const BALANCE_TARGETS = {
       // power; contracts, techs, and mastery still all complete. Floor
       // recalibrated 25s -> 20s when forks landed (total run grew ~90s).
       5: [20, 180],
-      6: [15, 120],
-      7: [15, 120],
-      8: [120, 240],
+      6: [15, 180],
+      // Eras 6 and 7 introduce the star chart and the Dyson sphere and used to
+      // be over in 59s and 124s. Route surveying and Dyson commissioning are
+      // now paced so the operations can be seen; the ceilings move with them.
+      7: [75, 240],
+      8: [120, 260],
       9: [60, 180],
       10: [90, 180],
     },

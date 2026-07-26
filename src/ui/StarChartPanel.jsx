@@ -1,5 +1,5 @@
 import { useState, memo } from 'react';
-import { createRoute, getNetworkPlanInfo, getRoutes, getRouteBonus, getRouteStats, getStarDirectiveInfo, getUnlockedSystems, NETWORK_PLANS, removeRoute, routeExists, selectNetworkPlan, selectStarDirective, STAR_DIRECTIVES } from '../engine/starChart.js';
+import { createRoute, getNetworkPlanInfo, getRoutes, getRouteBonus, getRouteStats, getRouteSurveyCooldown, getStarDirectiveInfo, getUnlockedSystems, NETWORK_PLANS, removeRoute, routeExists, selectNetworkPlan, selectStarDirective, STAR_DIRECTIVES } from '../engine/starChart.js';
 import { resources as resourceDefs } from '../data/resources.js';
 
 function resourceName(id) { return resourceDefs[id]?.name || id; }
@@ -13,6 +13,7 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
   const stats = getRouteStats(state);
   const directiveInfo = getStarDirectiveInfo(state);
   const planInfo = getNetworkPlanInfo(state);
+  const surveyCooldown = getRouteSurveyCooldown(state);
 
   const handleSystemClick = (sysId) => {
     if (selected === null) {
@@ -26,7 +27,9 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
       if (routeExists(state, selected, sysId)) {
         onUpdate(s => removeRoute(s, selected, sysId));
       } else {
-        onUpdate(s => createRoute(s, selected, sysId));
+        // createRoute returns null when the survey is on cooldown, the chart is
+        // full, or the cost cannot be paid — keep the state rather than clear it.
+        onUpdate(s => createRoute(s, selected, sysId) ?? s);
       }
       setSelected(null);
     }
@@ -40,6 +43,11 @@ export const StarChartPanel = memo(function StarChartPanel({ state, onUpdate }) 
         <span>Systems: {systems.length}</span>
         {stats.hubSystems > 0 && <span style={{ color: '#88ccff' }}>Hubs: {stats.hubSystems}</span>}
         {stats.allConnected && <span style={{ color: '#ffdd44' }}>All Connected!</span>}
+        {surveyCooldown > 0 && (
+          <span style={{ color: '#ddaa44' }} title="Surveying a route by hand takes time">
+            Survey crew: {Math.ceil(surveyCooldown)}s
+          </span>
+        )}
       </div>
       <div className="star-directives" role="group" aria-label="Star network directive">
         {Object.values(STAR_DIRECTIVES).map(directive => (
