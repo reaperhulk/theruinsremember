@@ -658,6 +658,11 @@ function createCollector() {
       ignoredOperations: [],
       finalPassiveRatesByOperation: {},
     },
+    // High-water mark. A scenario can end BELOW its peak by design — the
+    // descent scenario runs until the Forgetting collapses, and collapse
+    // forces a prestige that resets era to 1 and totalTime to 0. Judging
+    // completion by the final state labelled a healthy run STUCK / 0m00s.
+    peak: { era: 1, time: 0 },
     completionStatus: { reachedTargetEra: false, totalTime: 0, finalEra: 1, gameComplete: false },
   };
 }
@@ -790,6 +795,8 @@ function hasEraOperationProgress(state) {
 
 function recordEngagementTick(state, collector) {
   const era = state.era || 1;
+  collector.peak.era = Math.max(collector.peak.era, era);
+  collector.peak.time = Math.max(collector.peak.time, state.totalTime || 0);
   const affordableUpgrade = getAvailableUpgrades(state).some(upgrade => canAfford(state, getUpgradeCost(state, upgrade.id)));
   const affordableTech = getAvailableTech(state).some(tech => canAfford(state, tech.cost));
   if (!affordableUpgrade && !affordableTech) {
@@ -1063,10 +1070,21 @@ function runScenario(opts) {
   recordUpgradeTimeline(state, Math.floor(state.totalTime), collector);
 
   // Completion status
+  const peakEra = Math.max(collector.peak.era, state.era);
+  const peakTime = Math.max(collector.peak.time, state.totalTime);
   collector.completionStatus = {
-    reachedTargetEra: state.era >= targetEra,
+    // Did the run EVER reach the target? A by-design reset at the end is
+    // not a failure to progress. finalEra and wasReset keep the end state
+    // visible, so a reset is reported rather than hidden.
+    reachedTargetEra: peakEra >= targetEra,
+    // totalTime stays the FINAL-state clock: minTime/maxTime assertions
+    // compare against it, and prestige scenarios legitimately reset it.
+    // peakTime is display-only — never assert on it.
     totalTime: state.totalTime,
+    peakTime,
+    peakEra,
     finalEra: state.era,
+    wasReset: state.era < peakEra,
     gameComplete: state.gameComplete || false,
     cycleReady: getCycleReadiness(state).ready,
     upgradeCount: Object.keys(state.upgrades || {}).length,
@@ -1199,7 +1217,10 @@ function printHumanReport(scenarioName, opts, collector) {
   // Summary
   const cs = collector.completionStatus;
   console.log('\n── Summary ──');
-  console.log(`  Final era: ${cs.finalEra} | Time: ${fmtTime(cs.totalTime)} | ${cs.reachedTargetEra ? 'COMPLETED' : 'DID NOT COMPLETE'}`);
+  const eraLine = cs.wasReset
+    ? `${cs.peakEra} (reset to ${cs.finalEra})`
+    : `${cs.finalEra}`;
+  console.log(`  Final era: ${eraLine} | Time: ${fmtTime(displayTime(cs))} | ${cs.reachedTargetEra ? 'COMPLETED' : 'DID NOT COMPLETE'}`);
   console.log(`  Upgrades: ${cs.upgradeCount} | Tech: ${cs.techCount} | Prestiges: ${cs.prestigeCount} (${cs.prestigeMultiplier?.toFixed(1)}x)`);
   if (cs.gameComplete) console.log('  Game marked COMPLETE');
   console.log();
@@ -1224,6 +1245,13 @@ function buildJsonResult(scenarioName, opts, collector, seed) {
   };
 }
 
+// What a human should read as "how long this run lasted". For a run that
+// ended by a by-design reset (descent), the final clock is 0 and the peak
+// is the honest number. Display only — assertions use totalTime.
+function displayTime(cs) {
+  return cs.wasReset ? (cs.peakTime ?? cs.totalTime) : cs.totalTime;
+}
+
 function printSummaryTable(allResults) {
   console.log(`\n${'═'.repeat(70)}`);
   console.log('  SCENARIO COMPARISON TABLE');
@@ -1236,7 +1264,9 @@ function printSummaryTable(allResults) {
   for (const { scenarioName, collector } of allResults) {
     const cs = collector.completionStatus;
     const status = cs.reachedTargetEra ? 'OK' : 'STUCK';
-    console.log(`  ${scenarioName.padEnd(15)} ${(cs.profile || '').padEnd(14)} ${String(cs.finalEra).padEnd(10)} ${fmtTime(cs.totalTime).padEnd(12)} ${status}`);
+    // '10>1' reads: peaked at era 10, ended at 1 (a by-design reset).
+    const era = cs.wasReset ? `${cs.peakEra}>${cs.finalEra}` : String(cs.finalEra);
+    console.log(`  ${scenarioName.padEnd(15)} ${(cs.profile || '').padEnd(14)} ${era.padEnd(10)} ${fmtTime(displayTime(cs)).padEnd(12)} ${status}`);
   }
   console.log();
 }
@@ -1380,7 +1410,7 @@ function assertBalanceTargets(allResults) {
       failures++;
       console.log(`  ✗ ${scenarioName}: ${issues.join(', ')}`);
     } else {
-      console.log(`  ✓ ${scenarioName}: ${fmtTime(status.totalTime)}`);
+      console.log(`  ✓ ${scenarioName}: ${fmtTime(displayTime(status))}`);
     }
   }
 
