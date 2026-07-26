@@ -1,8 +1,64 @@
 import { describe, it, expect } from 'vitest';
 import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable, getRepeatableMilestone, getRepeatableMilestoneMultiplier } from '../upgrades.js';
 import { createInitialState } from '../state.js';
+import { upgrades as upgradeDefs } from '../../data/upgrades.js';
+import { resources as resourceDefs } from '../../data/resources.js';
 
 describe('upgrades', () => {
+  it('never prices an upgrade in a resource from a later era', () => {
+    // Era advancement needs a quota of upgrades bought during that era, so an
+    // upgrade costing a resource that does not exist yet is dead weight in its
+    // own era's pool — and can strand a run when the pool runs short.
+    const offenders = [];
+    for (const upgrade of Object.values(upgradeDefs)) {
+      for (const resourceId of Object.keys(upgrade.cost || {})) {
+        const resourceEra = resourceDefs[resourceId]?.era;
+        if (resourceEra && resourceEra > upgrade.era) {
+          offenders.push(`${upgrade.id} (era ${upgrade.era}) costs ${resourceId} (era ${resourceEra})`);
+        }
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it('never routes the prerequisite tree through a repeatable upgrade', () => {
+    // Repeatables read as optional grind, but a single one sitting on the
+    // critical path can strand a run: darkEnergyCollector alone used to gate
+    // fusionReactor -> ... -> dysonSphere and 57 downstream era 7 upgrades.
+    const repeatable = new Set(Object.values(upgradeDefs).filter(u => u.repeatable).map(u => u.id));
+    const offenders = [];
+    for (const upgrade of Object.values(upgradeDefs)) {
+      for (const prereq of upgrade.prerequisites || []) {
+        if (repeatable.has(prereq)) offenders.push(`${upgrade.id} requires repeatable ${prereq}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it('keeps every era reachable from the previous era alone', () => {
+    // Owning everything from earlier eras must open the whole of the next era,
+    // otherwise an era's upgrade quota can become unmeetable.
+    const all = Object.values(upgradeDefs);
+    for (let era = 2; era <= 10; era++) {
+      const owned = new Set(all.filter(u => u.era < era).map(u => u.id));
+      const pool = all.filter(u => u.era === era);
+      const reached = new Set();
+      let grew = true;
+      while (grew) {
+        grew = false;
+        for (const u of pool) {
+          if (reached.has(u.id)) continue;
+          if ((u.prerequisites || []).every(p => owned.has(p) || reached.has(p))) {
+            reached.add(u.id);
+            grew = true;
+          }
+        }
+      }
+      expect({ era, unreachable: pool.filter(u => !reached.has(u.id)).map(u => u.id) })
+        .toEqual({ era, unreachable: [] });
+    }
+  });
+
   describe('purchaseUpgrade', () => {
     it('deducts cost and marks upgrade as purchased', () => {
       const state = createInitialState();

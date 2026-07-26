@@ -174,12 +174,14 @@ function buildDirector(state, readiness) {
   }
 
   if (!readiness.mastery.met) {
+    const mastery = readiness.mastery;
     return {
-      title: readiness.mastery.title,
-      detail: readiness.mastery.detail,
+      title: mastery.title,
+      detail: mastery.detail,
       chips: [
-        `${readiness.mastery.current}/${readiness.mastery.target} mastery`,
-        `idle fallback ${formatTime(readiness.mastery.fallbackRemaining)}`,
+        `${Math.min(mastery.current, mastery.target)}/${mastery.target} mastery`,
+        ...(mastery.decisionsRemaining > 0 ? [`${mastery.decisionsRemaining} decisions shorten the wait`] : []),
+        `backstop ${formatTime(mastery.fallbackRemaining)}`,
       ],
       tone: 'warning',
       supplyAlerts,
@@ -304,7 +306,12 @@ export function EraProgress({ state }) {
       return { text: `Build the economy or ${activity} until the era is stable, then finish the breakthrough research.`, color: undefined };
     }
     if (!readiness.mastery.met) {
-      return { text: readiness.mastery.detail, color: '#ddcc44' };
+      const mastery = readiness.mastery;
+      const n = mastery.decisionsRemaining;
+      const alternative = n > 0
+        ? ` Building the economy shortens the wait — ${n} more era decision${n === 1 ? '' : 's'}.`
+        : '';
+      return { text: `${mastery.detail}${alternative}`, color: '#ddcc44' };
     }
     if (!readiness.techsMet) {
       const remaining = readiness.minTechs - readiness.currentTechs;
@@ -379,13 +386,22 @@ export function EraProgress({ state }) {
               <strong>{readiness.currentTechs}/{readiness.minTechs}</strong>
               <span>breakthrough steps completed</span>
             </div>
-            {readiness.mastery.required && (
-              <div className={`readiness-card${readiness.mastery.met ? ' ready' : ''}`}>
-                <span className="readiness-label">{readiness.mastery.title}</span>
-                <strong>{Math.min(readiness.mastery.current, readiness.mastery.target)}/{readiness.mastery.target}</strong>
-                <span>{readiness.mastery.met ? 'operational mastery complete' : `idle fallback ${formatTime(readiness.mastery.fallbackRemaining)}`}</span>
-              </div>
-            )}
+            {readiness.mastery.required && (() => {
+              const mastery = readiness.mastery;
+              const n = mastery.decisionsRemaining;
+              let note;
+              if (mastery.completedDirectly) note = 'operational mastery complete';
+              else if (mastery.met) note = 'resolved';
+              else if (mastery.shortenedByDecisions) note = `${n} more decision${n === 1 ? '' : 's'} shortens the wait further`;
+              else note = `${formatTime(mastery.fallbackRemaining)} left, or finish the operation`;
+              return (
+                <div className={`readiness-card${mastery.met ? ' ready' : ''}`}>
+                  <span className="readiness-label">{mastery.title}</span>
+                  <strong>{Math.min(mastery.current, mastery.target)}/{mastery.target}</strong>
+                  <span>{note}</span>
+                </div>
+              );
+            })()}
           </div>
           {!upgradesMet && (
             <div className="upgrade-progress-bar" role="progressbar" aria-valuenow={readiness.foundationProgress} aria-valuemin={0} aria-valuemax={minUpgrades} aria-label="Era foundation progress" style={{ margin: '2px 0 4px' }}>

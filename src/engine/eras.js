@@ -67,7 +67,23 @@ export function countEraTechs(state, era) {
   ).length;
 }
 
-const MASTERY_FALLBACK_SECONDS = 600;
+// A flat ten-minute wait used to be the only thing standing between an idle
+// player and the next era, which turned whole eras into a wall clock. It is
+// halved, and it now shrinks with everything the player actually does:
+// progress on the era's operation, and era decisions bought beyond the
+// foundation minimum. Doing nothing at all is the only way to pay it in full.
+//
+// The operation stays the fast route — completing it clears mastery outright.
+// The economic route only buys the backstop down to MASTERY_FALLBACK_FLOOR of
+// its base, so building wide is a real alternative for players who skip the
+// operation without ever being quicker than engaging with it.
+const MASTERY_FALLBACK_SECONDS = 300;
+const MASTERY_FALLBACK_FLOOR = 0.5;
+
+// Surplus era decisions that buy the backstop all the way down to its floor.
+// Era catalogues run ~60-63 deep against a 30-upgrade foundation, so this is
+// most of what remains after the foundation is paid for.
+const MASTERY_DECISION_SUBSTITUTE = 20;
 
 // Era Mastery Tiers: every upgrade bought in the current era advances a
 // visible tier bar. Tiers grant stacking all-production bonuses while the
@@ -88,9 +104,9 @@ export function getEraMasteryTier(state) {
   };
 }
 
+
 export function getEraMastery(state, era = state.era) {
   const elapsed = era === state.era ? Math.max(0, state.totalTime - (state.eraStartTime || 0)) : 0;
-  const fallbackMet = elapsed >= MASTERY_FALLBACK_SECONDS;
   let title = '';
   let detail = '';
   let current = 0;
@@ -142,16 +158,37 @@ export function getEraMastery(state, era = state.era) {
   }
 
   const required = target > 0;
+
+  const completedDirectly = required && current >= target;
+
+  // Either kind of engagement buys the backstop down: partial progress on the
+  // operation, or era decisions bought past the foundation minimum.
+  const surplusDecisions = Math.max(0, countEraUpgrades(state, era) - getMinUpgradesForEra(era));
+  const decisionsRemaining = Math.max(0, MASTERY_DECISION_SUBSTITUTE - surplusDecisions);
+  const operationProgress = required ? Math.min(1, current / target) : 0;
+  const decisionProgress = Math.min(1, surplusDecisions / MASTERY_DECISION_SUBSTITUTE);
+  const progress = Math.max(operationProgress, decisionProgress);
+
+  const fallbackSeconds = required
+    ? MASTERY_FALLBACK_SECONDS * (1 - (1 - MASTERY_FALLBACK_FLOOR) * progress)
+    : 0;
+  const fallbackRemaining = completedDirectly ? 0 : Math.max(0, fallbackSeconds - elapsed);
+
   return {
     required,
     title,
     detail,
     current,
     target,
-    fallbackSeconds: MASTERY_FALLBACK_SECONDS,
-    fallbackRemaining: Math.max(0, MASTERY_FALLBACK_SECONDS - elapsed),
-    completedDirectly: required && current >= target,
-    met: !required || current >= target || fallbackMet,
+    surplusDecisions,
+    decisionsRemaining,
+    decisionSubstitute: MASTERY_DECISION_SUBSTITUTE,
+    progress,
+    fallbackSeconds,
+    fallbackRemaining,
+    completedDirectly,
+    shortenedByDecisions: required && !completedDirectly && decisionProgress > operationProgress,
+    met: !required || completedDirectly || fallbackRemaining === 0,
   };
 }
 

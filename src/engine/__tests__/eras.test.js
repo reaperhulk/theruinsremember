@@ -92,6 +92,59 @@ describe('eras', () => {
       expect(getEraMastery(state).fallbackRemaining).toBe(0);
     });
 
+    it('keeps the economic route reachable in every era that has an objective', () => {
+      for (const era of [5, 6, 7, 8, 9]) {
+        const catalogue = Object.values(upgradeDefs).filter(u => u.era === era).length;
+        const needed = getMinUpgradesForEra(era) + getEraMastery(createInitialState(), era).decisionSubstitute;
+        expect(catalogue).toBeGreaterThanOrEqual(needed);
+      }
+    });
+
+    it('shortens the backstop with operation progress but never below its floor', () => {
+      const base = createInitialState();
+      base.era = 7;
+      base.eraStartTime = 0;
+      base.totalTime = 0;
+
+      const idle = getEraMastery(base);
+      const halfway = getEraMastery({ ...base, dysonSegments: 15 });
+
+      expect(idle.fallbackSeconds).toBe(300);
+      expect(halfway.fallbackSeconds).toBe(225); // 300 * (1 - 0.5*0.5)
+      expect(halfway.met).toBe(false);
+    });
+
+    it('lets surplus era decisions buy the backstop down to its floor', () => {
+      const era7 = Object.values(upgradeDefs).filter(u => u.era === 7).map(u => u.id);
+      const state = createInitialState();
+      state.era = 7;
+      state.eraStartTime = 0;
+      state.totalTime = 0;
+      const substitute = getEraMastery(state).decisionSubstitute;
+      state.upgrades = Object.fromEntries(
+        era7.slice(0, getMinUpgradesForEra(7) + substitute).map(id => [id, true])
+      );
+
+      const mastery = getEraMastery(state);
+      expect(mastery.shortenedByDecisions).toBe(true);
+      expect(mastery.decisionsRemaining).toBe(0);
+      expect(mastery.fallbackSeconds).toBe(150); // floor: half of the base wait
+      expect(mastery.met).toBe(false);
+    });
+
+    it('clears mastery instantly when the operation itself is finished', () => {
+      const state = createInitialState();
+      state.era = 7;
+      state.eraStartTime = 0;
+      state.totalTime = 0;
+      state.dysonSegments = 30;
+
+      const mastery = getEraMastery(state);
+      expect(mastery.completedDirectly).toBe(true);
+      expect(mastery.fallbackRemaining).toBe(0);
+      expect(mastery.met).toBe(true);
+    });
+
     it('gives Expansion a different colony and route mastery path', () => {
       const state = createInitialState();
       state.cycleDoctrine = 'expansion';

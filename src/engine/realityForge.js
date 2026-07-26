@@ -47,6 +47,9 @@ export const REALITY_KEY_RECIPES = [
   },
 ];
 
+// Backstop for closing the cycle when the requirements below are ignored. It
+// scales down with how many of them are already met, so a player who is most
+// of the way there is not made to sit out the same hour as one who did nothing.
 export const CYCLE_FALLBACK_SECONDS = 3600;
 
 export function getRealityForgeRecipes(state) {
@@ -98,7 +101,8 @@ export function getCycleReadiness(state) {
   const era10Elapsed = state.era >= 10 ? Math.max(0, state.totalTime - (state.eraStartTime || 0)) : 0;
   const completed = requirements.filter(requirement => requirement.met).length;
   const directlyReady = requirements.every(requirement => requirement.met);
-  const fallbackRemaining = Math.max(0, CYCLE_FALLBACK_SECONDS - era10Elapsed);
+  const fallbackSeconds = CYCLE_FALLBACK_SECONDS * (1 - completed / requirements.length);
+  const fallbackRemaining = Math.max(0, fallbackSeconds - era10Elapsed);
   const fallbackReady = state.era >= 10 && fallbackRemaining === 0 && !!state.nextCycleDoctrine;
 
   return {
