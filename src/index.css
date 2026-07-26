@@ -82,7 +82,8 @@ g[role="button"]:focus-visible {
   padding: 14px 0 16px;
   border-bottom: 1px solid rgba(214, 176, 101, 0.18);
   margin-bottom: 16px;
-  overflow: hidden;
+  /* No overflow clipping here — it would cut off the save menu. The title
+     block and h1 below do their own ellipsis clipping. */
 }
 .game-header h1 {
   font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
@@ -96,6 +97,7 @@ g[role="button"]:focus-visible {
 
 .title-block {
   min-width: 0;
+  overflow: hidden;
 }
 
 .header-omen {
@@ -1363,6 +1365,117 @@ g[role="button"]:focus-visible {
   transition: width 0.5s ease-out;
 }
 
+/* Save data menu — Export/Copy/Import/Paste/Reset used to sit in the header at
+   the same visual weight as the game itself. */
+.save-menu-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.save-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: #12191d;
+  border: 1px solid rgba(214, 176, 101, 0.35);
+  border-radius: 6px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+  min-width: 132px;
+}
+
+.save-menu .reset-btn {
+  width: 100%;
+  text-align: left;
+}
+
+.save-menu .reset-btn.danger {
+  margin-top: 2px;
+  border-top: 1px solid rgba(214, 176, 101, 0.18);
+  padding-top: 6px;
+  color: #ff8877;
+}
+
+/* Era panel — compact strip */
+.era-panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.era-panel-compact {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.era-strip {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.era-strip-main {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.era-strip-title {
+  font-weight: bold;
+  color: #d6b065;
+  white-space: nowrap;
+}
+
+.era-strip-detail {
+  font-size: 0.75em;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.era-strip-side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.era-strip-metric {
+  font-size: 0.7em;
+  color: #8a8a7a;
+  white-space: nowrap;
+}
+
+.era-strip-toggle {
+  background: none;
+  border: 1px solid rgba(214, 176, 101, 0.25);
+  border-radius: 4px;
+  color: #b9a06a;
+  font-family: inherit;
+  font-size: 0.7em;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.era-strip-toggle:hover {
+  border-color: rgba(214, 176, 101, 0.6);
+  color: #d6b065;
+}
+
+.era-strip-bar {
+  margin-top: 6px;
+}
+
 /* Canvas */
 .canvas-panel {
   display: flex;
@@ -2226,13 +2339,16 @@ canvas:hover {
 }
 
 /* Toast notifications */
+/* Toasts sit bottom-right. They used to be top-right, directly on top of the
+   header controls and colliding with the top-centred era transition card —
+   and era transitions fire achievement toasts, so that collision was routine. */
 .toast-container {
   position: fixed;
-  top: 12px;
+  bottom: 12px;
   right: 12px;
   z-index: 999;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 4px;
   pointer-events: none;
   max-height: 50vh;
@@ -2794,10 +2910,24 @@ canvas:hover {
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
+    /* Fade the trailing edge so the strip reads as scrollable instead of
+       looking like the last chip was clipped off. */
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent 100%);
   }
 
   .control-ribbon::-webkit-scrollbar {
     display: none;
+  }
+
+  .toast-container {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    align-items: stretch;
+  }
+
+  .toast {
+    max-width: none;
   }
 
   .control-chip {

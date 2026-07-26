@@ -7,6 +7,12 @@ export const RelicPanel = memo(function RelicPanel({ state, onUpdate }) {
   const offer = state.relicOffer || [];
   const pressure = Math.min(ECHO_PRESSURE_TARGET, state.echoPressure || 0);
 
+  // Pressure ticks up from the first second, so an "0/2 active" panel with a
+  // near-empty bar sat above the fold for the whole onboarding window with
+  // nothing to act on. It appears once the signal is actually close.
+  const dormant = pressure < ECHO_PRESSURE_TARGET / 2 && offer.length === 0 && active.length === 0;
+  if (dormant) return null;
+
   return (
     <section className={`panel relic-panel ${offer.length > 0 ? 'offer-ready' : ''}`} aria-labelledby="relic-title">
       <div className="relic-heading">

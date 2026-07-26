@@ -87,6 +87,23 @@ export function App() {
   const [confirmDialog, setConfirmDialog] = useState(null);
   const touchStartRef = useRef(null);
   const prevPerfectsRef = useRef(state.dockingPerfects || 0);
+  const [saveMenuOpen, setSaveMenuOpen] = useState(false);
+  const saveMenuRef = useRef(null);
+
+  // Close the save menu on an outside click or Escape.
+  useEffect(() => {
+    if (!saveMenuOpen) return;
+    const onPointerDown = e => {
+      if (saveMenuRef.current && !saveMenuRef.current.contains(e.target)) setSaveMenuOpen(false);
+    };
+    const onKey = e => { if (e.key === 'Escape') setSaveMenuOpen(false); };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [saveMenuOpen]);
 
   // Sync audio muted state
   useEffect(() => {
@@ -224,7 +241,20 @@ export function App() {
           <button className="reset-btn" aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'} onClick={() => setAudioMuted(m => !m)} title={audioMuted ? 'Sound OFF' : 'Sound ON'}>
             {audioMuted ? 'Sound OFF' : 'Sound ON'}
           </button>
-          <button className="reset-btn" aria-label="Export save file" onClick={() => {
+          <div className="save-menu-wrap" ref={saveMenuRef}>
+            <button
+              className="reset-btn"
+              aria-label="Save data menu"
+              aria-expanded={saveMenuOpen}
+              aria-haspopup="menu"
+              onClick={() => setSaveMenuOpen(o => !o)}
+              title="Export, import, and reset your save"
+            >
+              Save ▾
+            </button>
+            {saveMenuOpen && (
+              <div className="save-menu" role="menu">
+          <button className="reset-btn" role="menuitem" aria-label="Export save file" onClick={() => {
             const save = localStorage.getItem('incremental-game-save');
             if (save) {
               const blob = new Blob([save], { type: 'application/json' });
@@ -236,13 +266,13 @@ export function App() {
           }}>
             Export
           </button>
-          <button className="reset-btn" aria-label="Copy save to clipboard" onClick={() => {
+          <button className="reset-btn" role="menuitem" aria-label="Copy save to clipboard" onClick={() => {
             const save = localStorage.getItem('incremental-game-save');
             if (save) { navigator.clipboard.writeText(save).catch(() => {}); }
           }} title="Copy save data to clipboard">
             Copy
           </button>
-          <button className="reset-btn" aria-label="Import save file" onClick={() => {
+          <button className="reset-btn" role="menuitem" aria-label="Import save file" onClick={() => {
             const input = document.createElement('input');
             input.type = 'file'; input.accept = '.json';
             input.onchange = (e) => {
@@ -265,7 +295,7 @@ export function App() {
           }}>
             Import
           </button>
-          <button className="reset-btn" aria-label="Paste save from clipboard" onClick={async () => {
+          <button className="reset-btn" role="menuitem" aria-label="Paste save from clipboard" onClick={async () => {
             try {
               const text = await navigator.clipboard.readText();
               const data = JSON.parse(text);
@@ -278,7 +308,7 @@ export function App() {
           }} title="Import save from clipboard">
             Paste
           </button>
-          <button className="reset-btn" aria-label="Hard reset all progress" onClick={() => {
+          <button className="reset-btn danger" role="menuitem" aria-label="Hard reset all progress" onClick={() => {
             setConfirmDialog({
               lines: ['Hard reset?', 'This erases ALL progress including prestige upgrades!'],
               onConfirm: () => { resetSave(); setConfirmDialog(null); },
@@ -287,6 +317,9 @@ export function App() {
           }}>
             Reset
           </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
       <div className="control-ribbon">
@@ -303,7 +336,7 @@ export function App() {
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
       {!hintsDismissed && state.totalTime < 60 && Object.keys(state.upgrades).length === 0 && (
         <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.9em', color: '#c8a850', padding: '6px 0', opacity: Math.max(0.3, 1 - state.totalTime / 60) }}>
-          Gather the resources you need, choose an expedition route, then make a decision on the right
+          Gather the resources you need, choose an expedition route, then make a decision in the Decisions tab
           <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
         </div>
       )}
@@ -319,12 +352,12 @@ export function App() {
 
       <main className={`game-layout ${state.era <= 4 ? 'early-game-layout' : ''}`}>
         <div className="left-column">
+          <ResourcePanel state={state} onUpdate={updateState} />
           {state.era <= 3 && <ExpeditionPanel state={state} onUpdate={updateState} />}
           {state.era === 4 && <DockingPanel state={state} onUpdate={updateState} />}
           {state.era > 4 && <GameCanvas state={state} onUpdate={updateState} />}
           <RelicPanel state={state} onUpdate={updateState} />
           {state.era <= 4 && <EraProgress state={state} />}
-          <ResourcePanel state={state} onUpdate={updateState} />
           {(state.eventLog?.length > 0 || state.activeEffects?.length > 0) && (
             <EventLog state={state} />
           )}

@@ -277,33 +277,95 @@ export function EraProgress({ state }) {
     prevTotalRateRef.current = totalRate;
   }, [totalRate]);
 
+  // The full readiness breakdown is genuinely useful, but it ran to roughly a
+  // third of the viewport above every interactive element. It collapses to a
+  // single status strip by default and remembers the choice.
+  const [expanded, setExpanded] = useState(() => localStorage.getItem('eraPanelExpanded') === 'true');
+  const toggleExpanded = () => {
+    setExpanded(prev => {
+      localStorage.setItem('eraPanelExpanded', String(!prev));
+      return !prev;
+    });
+  };
+
+  const foundationPct = Math.min(100, Math.floor(readiness.foundationProgress / minUpgrades * 100));
+
+  // The single "what is actually blocking the next era" line. Both the compact
+  // strip and the expanded panel render it, so guidance is never hidden behind
+  // a disclosure toggle.
+  const guidance = (() => {
+    if (isMaxEra) return { text: '', color: undefined };
+    const gatingTech = Object.values(techTree).find(t => t.grantsEra === state.era + 1 && state.tech[t.id]);
+    if (readiness.upgradesMet && readiness.techsMet && gatingTech) {
+      return { text: 'Era transition imminent...', color: '#88ff88' };
+    }
+    if (!upgradesMet) {
+      const activity = state.era <= 3 ? 'recover discoveries' : state.era === 4 ? 'complete orbital operations' : 'expand the foundation';
+      return { text: `Build the economy or ${activity} until the era is stable, then finish the breakthrough research.`, color: undefined };
+    }
+    if (!readiness.mastery.met) {
+      return { text: readiness.mastery.detail, color: '#ddcc44' };
+    }
+    if (!readiness.techsMet) {
+      const remaining = readiness.minTechs - readiness.currentTechs;
+      return { text: `Research ${remaining} more era tech${remaining === 1 ? '' : 's'} to prove the economy is ready.`, color: '#ddcc44' };
+    }
+    return { text: 'Research starred (★) technologies to advance to the next era', color: '#88ff88' };
+  })();
+
+  if (!expanded) {
+    return (
+      <div className="panel era-panel era-panel-compact">
+        <div className="era-strip">
+          <div className="era-strip-main">
+            <span className="era-strip-title">Era {state.era}: {currentEra}</span>
+            <span className="era-hint era-strip-detail" style={{ color: guidance.color }}>
+              {isMaxEra ? director.detail : guidance.text}
+            </span>
+          </div>
+          <div className="era-strip-side">
+            {!isMaxEra && (
+              <span className="era-strip-metric" title="Era foundation progress">
+                {Math.min(readiness.foundationProgress, minUpgrades)}/{minUpgrades} foundation
+              </span>
+            )}
+            <span className="era-strip-metric">{formatNumber(totalRate)}/s</span>
+            <button className="era-strip-toggle" onClick={toggleExpanded} aria-expanded={false}>
+              Details
+            </button>
+          </div>
+        </div>
+        {!isMaxEra && (
+          <div
+            className="upgrade-progress-bar era-strip-bar"
+            role="progressbar"
+            aria-valuenow={readiness.foundationProgress}
+            aria-valuemin={0}
+            aria-valuemax={minUpgrades}
+            aria-label="Era foundation progress"
+          >
+            <div className={`upgrade-progress-fill ${foundationPct > 80 ? 'almost' : ''}`} style={{ width: `${foundationPct}%` }} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="panel era-panel">
-      <h2>Era {state.era}: {currentEra} {eraCompletion >= 100 && '(complete)'}</h2>
+      <div className="era-panel-header">
+        <h2>Era {state.era}: {currentEra} {eraCompletion >= 100 && '(complete)'}</h2>
+        <button className="era-strip-toggle" onClick={toggleExpanded} aria-expanded={true}>
+          Hide details
+        </button>
+      </div>
       <p className="text-lore" style={{ margin: '0 0 4px' }}>{loreHint}</p>
       {eraUpgradeCount === 0 && state.totalTime < 120 && (
         <p style={{ fontSize: '0.75em', color: '#666', marginTop: '2px' }}>
-          Tip: Click the +1 buttons to gather resources, then buy upgrades on the right
+          Tip: Click the +1 buttons to gather resources, then buy upgrades in the Decisions tab
         </p>
       )}
-      {!isMaxEra && (() => {
-        const nextEra = state.era + 1;
-        const gatingTech = Object.values(techTree).find(t => t.grantsEra === nextEra && state.tech[t.id]);
-        const readyToTransition = readiness.upgradesMet && readiness.techsMet && gatingTech;
-        if (readyToTransition) {
-          return <p className="era-hint" style={{ color: '#88ff88' }}>Era transition imminent...</p>;
-        }
-        if (!upgradesMet) {
-          return <p className="era-hint">Build the economy or {state.era <= 3 ? 'recover discoveries' : state.era === 4 ? 'complete orbital operations' : 'expand the foundation'} until the era is stable, then finish the breakthrough research.</p>;
-        }
-        if (!readiness.mastery.met) {
-          return <p className="era-hint" style={{ color: '#ddcc44' }}>{readiness.mastery.detail} Idle progress unlocks the breakthrough in {formatTime(readiness.mastery.fallbackRemaining)}.</p>;
-        }
-        if (!readiness.techsMet) {
-          return <p className="era-hint" style={{ color: '#ddcc44' }}>Research {readiness.minTechs - readiness.currentTechs} more era tech{readiness.minTechs - readiness.currentTechs === 1 ? '' : 's'} to prove the economy is ready.</p>;
-        }
-        return <p className="era-hint" style={{ color: '#88ff88' }}>Research starred (★) technologies to advance to the next era</p>;
-      })()}
+      {!isMaxEra && <p className="era-hint" style={{ color: guidance.color }}>{guidance.text}</p>}
       {!isMaxEra && (
         <>
           <div className="readiness-grid">
