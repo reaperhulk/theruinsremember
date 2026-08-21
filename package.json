@@ -13,9 +13,10 @@
     "test:balance": "node scripts/balance-matrix.mjs",
     "test:balance:stress": "node scripts/balance-matrix.mjs --scenario prestige10 --seeds 424242,42",
     "test:personas": "node scripts/balance-matrix.mjs --scenario newcomer,engaged,optimizer,background,check_in,offline_returner,completionist,minimalist --seeds 424242,42",
+    "test:impact": "node scripts/persona-impact.mjs",
     "test:browser": "node scripts/browser-test.mjs",
     "test:browser:mobile": "node scripts/browser-test.mjs --mobile",
-    "test:quality": "npm run lint && npm run test:unit && npm run test:balance && npm run test:personas && npm run build"
+    "test:quality": "npm run lint && npm run test:unit && npm run test:balance && npm run test:impact && npm run build"
   },
   "dependencies": {
     "react": "^19.2.7",

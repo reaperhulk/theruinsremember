@@ -41,8 +41,8 @@ function mulberry32(seed) {
 // ─── CLI Argument Parsing ───────────────────────────────────────────────────
 function parseArgs(argv) {
   const args = {
-    scenario: 'full',
-    profile: 'optimal',
+    scenario: 'engaged',
+    profile: 'engaged',
     maxTime: 14400,
     targetEra: 10,
     prestige: 0,
@@ -84,167 +84,11 @@ function parseArgs(argv) {
   return args;
 }
 
-// ─── Profiles ───────────────────────────────────────────────────────────────
-const PROFILES = {
-  optimal: {
-    description: 'Engage every operation and buy every viable decision. Baseline for pacing.',
-    gather: true, gatherInterval: 5,
-    expeditions: true, expeditionStrategy: 'deep',
-    buyUpgrades: true, buyTech: true,
-    docking: true, dockInterval: 3, dockAccuracy: 0,
-    colonies: true, colonyStrategy: 'diversified',
-    starChart: true, starChartPlan: 'longHaul',
-    weaving: true, weaveInterval: 10,
-    trading: true, tradeStrategy: 'bottleneck',
-    dysonAssembly: true,
-    cosmicTuning: true,
-    senateFocus: 'balanced',
-    realityForge: true,
-    forgettingDefense: 2,
-    buyPrestigeUpgrades: true,
-    prestigeUpgradeOrder: [
-      'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
-      'sealMastery', 'wardenEternal',
-      'hackMaster', 'dockingPro', 'factoryExpert', 'miniGameSavant',
-      'tradeRoutes', 'eventMagnet', 'wisdomOfAges', 'quantumMemory',
-      'cosmicInsight', 'perfectMemory', 'universalOptimizer', 'chainMaster',
-      'eraMomentum', 'autoClicker', 'achievementHunter', 'temporalEcho',
-      'masterWeaver', 'quantumTunneling', 'infinitePatience', 'instantKnowledge',
-      'cycleMastery', 'temporalMastery', 'primordialMemory',
-      'acceleratedDecay', 'cosmicAwareness', 'eternalReturn',
-    ],
-  },
-  lowInteraction: {
-    description: 'Buy upgrades and tech, gather, but skip optional operations. Tests low-interaction viability.',
-    gather: true, gatherInterval: 5,
-    expeditions: false, expeditionStrategy: 'safe',
-    buyUpgrades: true, buyTech: true,
-    docking: false, dockInterval: 3, dockAccuracy: 0,
-    colonies: false, colonyStrategy: 'diversified',
-    starChart: false,
-    weaving: false, weaveInterval: 10,
-    trading: true, tradeStrategy: 'bottleneck',
-    dysonAssembly: false,
-    cosmicTuning: false,
-    senateFocus: null,
-    realityForge: false,
-    relics: false,
-    buyPrestigeUpgrades: true,
-    prestigeUpgradeOrder: [
-      'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
-      'wisdomOfAges', 'quantumMemory', 'tradeRoutes', 'eventMagnet',
-      'cosmicInsight', 'universalOptimizer', 'chainMaster', 'eraMomentum',
-      'autoClicker',
-    ],
-  },
-  passive: {
-    description: 'Only auto-production and upgrade buying. Tests minimum viable progression.',
-    gather: false, gatherInterval: 0,
-    expeditions: false, expeditionStrategy: 'safe',
-    buyUpgrades: true, buyTech: true,
-    docking: false, dockInterval: 0, dockAccuracy: 0,
-    colonies: false, colonyStrategy: 'diversified',
-    starChart: false,
-    weaving: false, weaveInterval: 0,
-    trading: false, tradeStrategy: 'bottleneck',
-    dysonAssembly: false,
-    cosmicTuning: false,
-    senateFocus: null,
-    realityForge: false,
-    relics: false,
-    buyPrestigeUpgrades: true,
-    prestigeUpgradeOrder: [
-      'fastStart', 'headStart', 'deepPockets', 'wisdomOfAges',
-      'quantumMemory', 'cosmicInsight', 'eraMomentum',
-    ],
-  },
-  clickerOnly: {
-    description: 'Gather every tick, but skip operations. Tests: how far can manual resource clicks carry you?',
-    gather: true, gatherInterval: 1,
-    expeditions: false, expeditionStrategy: 'safe',
-    buyUpgrades: true, buyTech: true,
-    docking: false, dockInterval: 0, dockAccuracy: 0,
-    colonies: false, colonyStrategy: 'diversified',
-    starChart: false,
-    weaving: false, weaveInterval: 0,
-    trading: false, tradeStrategy: 'bottleneck',
-    dysonAssembly: false,
-    cosmicTuning: false,
-    senateFocus: null,
-    realityForge: false,
-    relics: false,
-    buyPrestigeUpgrades: true,
-    prestigeUpgradeOrder: [
-      'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
-      'wisdomOfAges', 'quantumMemory', 'autoClicker',
-    ],
-  },
-  tradingHeavy: {
-    description: 'All systems + aggressive trading of surplus into bottleneck resources. Tests: trading impact.',
-    gather: true, gatherInterval: 5,
-    expeditions: true, expeditionStrategy: 'deep',
-    buyUpgrades: true, buyTech: true,
-    docking: true, dockInterval: 3, dockAccuracy: 0,
-    colonies: true, colonyStrategy: 'diversified',
-    starChart: true, starChartPlan: 'surveyLattice',
-    weaving: true, weaveInterval: 10,
-    trading: true, tradeStrategy: 'aggressive',
-    dysonAssembly: true,
-    cosmicTuning: true,
-    senateFocus: 'balanced',
-    realityForge: true,
-    forgettingDefense: 25,
-    buyPrestigeUpgrades: true,
-    prestigeUpgradeOrder: [
-      'fastStart', 'luckyMiner', 'headStart', 'tradeRoutes',
-      'deepPockets', 'hackMaster', 'dockingPro', 'factoryExpert',
-      'miniGameSavant', 'eventMagnet', 'wisdomOfAges', 'quantumMemory',
-      'cosmicInsight', 'perfectMemory', 'universalOptimizer', 'chainMaster',
-      'eraMomentum', 'autoClicker', 'achievementHunter', 'temporalEcho',
-      'masterWeaver', 'quantumTunneling', 'infinitePatience', 'instantKnowledge',
-      'cycleMastery',
-    ],
-  },
-  casual: {
-    description: 'Simulates a regular player: gathers infrequently, misses docks, and skips some operations.',
-    gather: true, gatherInterval: 15,
-    expeditions: true, expeditionStrategy: 'measured',
-    buyUpgrades: true, buyTech: true,
-    docking: true, dockInterval: 5, dockAccuracy: 0.15,
-    colonies: true, colonyStrategy: 'growth',
-    starChart: true, starChartPlan: 'coreWeb',
-    weaving: false, weaveInterval: 0,
-    trading: false, tradeStrategy: 'bottleneck',
-    dysonAssembly: true,
-    cosmicTuning: true,
-    senateFocus: 'merchants',
-    realityForge: true,
-    forgettingDefense: 25,
-    buyPrestigeUpgrades: true,
-    prestigeUpgradeOrder: [
-      'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
-      'autoClicker', 'factoryExpert', 'dockingPro', 'hackMaster',
-      'wisdomOfAges', 'quantumMemory', 'cosmicInsight',
-    ],
-  },
-};
-
-Object.assign(PROFILES, createPersonaProfiles(PROFILES));
+// ─── Attention-Aware Player Personas ────────────────────────────────────────
+const PROFILES = createPersonaProfiles();
 
 // ─── Built-in Scenarios ─────────────────────────────────────────────────────
 const SCENARIOS = {
-  full:         { profile: 'optimal',      prestige: 0,  targetEra: 10, maxTime: 14400, purpose: 'Standard pacing baseline' },
-  speedrun:     { profile: 'optimal',      prestige: 0,  targetEra: 10, maxTime: 7200,  purpose: 'Optimal time-to-completion' },
-  prestige3:    { profile: 'optimal',      prestige: 3,  targetEra: 10, maxTime: 28800, purpose: 'Prestige loop balance' },
-  prestige10:   { profile: 'optimal',      prestige: 10, targetEra: 10, maxTime: 86400, purpose: 'Prestige stress test' },
-  lowInteraction:  { profile: 'lowInteraction',  prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Optional operation viability' },
-  passive:      { profile: 'passive',      prestige: 0,  targetEra: 10, maxTime: 43200, purpose: 'Minimum viable progression' },
-  clickerOnly:  { profile: 'clickerOnly',  prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Click-only viability' },
-  regression:   { profile: 'optimal',      prestige: 0,  targetEra: 5,  maxTime: 1800,  purpose: 'Quick pacing sanity check' },
-  earlyGame:    { profile: 'optimal',      prestige: 0,  targetEra: 3,  maxTime: 900,   purpose: 'Era 1-3 pacing detail' },
-  lateGame:     { profile: 'optimal',      prestige: 2,  targetEra: 10, maxTime: 14400, prestigeAtEra: 7, purpose: 'Late-game with prestige' },
-  casual:       { profile: 'casual',       prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Standard casual player experience' },
-  descent:      { profile: 'optimal',      prestige: 0,  targetEra: 10, maxTime: 21600, profileOverrides: { maxRecursionDepth: 12 }, stopOnCollapse: true, purpose: 'The wall: descend until the Forgetting wins' },
   newcomer:     { profile: 'newcomer',     prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'First-time player comprehension and pacing' },
   engaged:      { profile: 'engaged',      prestige: 0,  targetEra: 10, maxTime: 21600, purpose: 'Attentive normal-player experience' },
   optimizer:    { profile: 'optimizer',    prestige: 0,  targetEra: 10, maxTime: 14400, purpose: 'Experienced attention-aware speed benchmark' },
@@ -253,10 +97,13 @@ const SCENARIOS = {
   offline_returner: { profile: 'offline_returner', prestige: 0, targetEra: 4, maxTime: 57600, purpose: 'Four-hour offline returns and honest unattended progress' },
   completionist: { profile: 'completionist', prestige: 0, targetEra: 10, maxTime: 21600, purpose: 'Deliberate exploration of every strategic operation' },
   minimalist:   { profile: 'minimalist',   prestige: 0,  targetEra: 10, maxTime: 43200, purpose: 'Economic-only progression with honest decision intervals' },
+  descent:      { profile: 'optimizer',    prestige: 0,  targetEra: 10, maxTime: 21600, profileOverrides: { maxRecursionDepth: 12 }, stopOnCollapse: true, purpose: 'Final-siege recursion and forced-collapse coverage' },
+  prestige3:    { profile: 'optimizer',    prestige: 3,  targetEra: 10, maxTime: 28800, purpose: 'Attention-aware prestige loop balance' },
+  prestige10:   { profile: 'optimizer',    prestige: 10, targetEra: 10, maxTime: 86400, purpose: 'Attention-aware prestige stress test' },
 };
 
 const BALANCE_TARGETS = {
-  full: {
+  optimizer: {
     minTime: 720,
     maxTime: 1800,
     requiredEra: 10,
@@ -269,7 +116,7 @@ const BALANCE_TARGETS = {
     maxDockingActions: 3,
     maxColonyActions: 1,
     maxTradingActions: 7,
-    maxGatherActions: 55,
+    maxGatherActions: 120,
     maxTechnologyActions: 30,
     maxUpgradeActions: 120,
     maxDysonCommissions: 3,
@@ -280,9 +127,11 @@ const BALANCE_TARGETS = {
     minTendrilsSealed: 1,
     maxMemoriesConsumed: 0,
     noCollapse: true,
+    maxDecisionWindowRatio: 0.51,
+    maxActionsWhileAway: 0,
     // Key N bounds the duration of era N-1.
     eraRanges: {
-      2: [70, 240],
+      2: [60, 240],
       3: [60, 300],
       4: [5, 180],
       // Era 4 dwell is pinned by an affordability cliff under doctrine-fork
@@ -299,17 +148,13 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDockingActions: 3, maxColonyActions: 1, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3, maxStarChartActions: 2, noCollapse: true },
   descent: { minRecursionDepth: 2, requireCollapse: true, minStatePrestiges: 1 },
   // The compression floor: with three prestiges banked the final run must
   // still take minutes, not seconds — decisions replay every cycle.
   prestige3: { minTime: 210, requiredEra: 10, cycleReady: true, minPrestiges: 3 },
   prestige10: { minTime: 120, maxTime: 1800, requiredEra: 10, cycleReady: true, minPrestiges: 10 },
-  lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
-  passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
   newcomer: { minTime: 900, maxTime: 7200, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.06, maxActionsWhileAway: 0 },
   engaged: { minTime: 600, maxTime: 5400, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.11, maxActionsWhileAway: 0 },
-  optimizer: { minTime: 600, maxTime: 2400, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.51, maxActionsWhileAway: 0 },
   background: { minTime: 1200, maxTime: 10800, requiredEra: 10, cycleReady: true, noCollapse: true, minSessions: 4, minAwaySeconds: 300, maxActiveRatio: 0.35, maxActionsWhileAway: 0 },
   check_in: { minTime: 1800, maxTime: 43200, requiredEra: 10, cycleReady: true, noCollapse: true, minSessions: 3, minOfflineSeconds: 600, maxActiveRatio: 0.2, maxActionsWhileAway: 0 },
   offline_returner: { minTime: 28800, maxTime: 57600, requiredEra: 4, noCollapse: true, minSessions: 3, minOfflineSeconds: 28000, maxActiveRatio: 0.05, maxActionsWhileAway: 0 },
@@ -1558,8 +1403,8 @@ Bot Playtest CLI — Configurable game balance testing tool.
 Usage: node scripts/bot-playtest.js [options]
 
 Options:
-  --scenario <name,...>     Comma-separated scenario names (default: full)
-  --profile <name>          Bot behavior profile (default: optimal)
+  --scenario <name,...>     Comma-separated scenario names (default: engaged)
+  --profile <name>          Attention-aware player persona (default: engaged)
   --max-time <seconds>      Max game-time before abort (default: 14400)
   --target-era <N>          Stop at this era (default: 10)
   --prestige <N>            Number of prestige resets (default: 0)
@@ -1576,14 +1421,14 @@ Options:
   -h, --help                Show this help
 
 Examples:
-  node scripts/bot-playtest.js --scenario full --json > baseline.json
-  node scripts/bot-playtest.js --scenario full --json --compare baseline.json
-  node scripts/bot-playtest.js --scenario full,lowInteraction,passive --quiet
+  node scripts/bot-playtest.js --scenario engaged --json > baseline.json
+  node scripts/bot-playtest.js --scenario engaged --json --compare baseline.json
+  node scripts/bot-playtest.js --scenario optimizer,background,minimalist --quiet
   node scripts/bot-playtest.js --scenario newcomer,engaged,optimizer,background,check_in --seed 424242 --quiet --assert-balance
   node scripts/bot-playtest.js --scenario offline_returner --seed 424242 --json
   node scripts/bot-playtest.js --scenario prestige3 --verbose
   node scripts/bot-playtest.js --seed 42 --verbose
-  node scripts/bot-playtest.js --scenario full,casual,lowInteraction,passive --seed 424242 --quiet --assert-balance
+  node scripts/bot-playtest.js --scenario newcomer,engaged,optimizer,background,check_in,offline_returner,completionist,minimalist --seed 424242 --quiet --assert-balance
 `);
 }
 

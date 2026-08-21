@@ -1,6 +1,6 @@
-// Attention-aware player personas. The older bot profiles remain useful as
-// stable economic baselines; these profiles additionally model when a real
-// person is actually present to make a decision.
+// The complete player-persona catalog. Every persona models when a real
+// person is actually present to make a decision; there are no legacy bots
+// with supernatural, every-second purchasing behavior.
 
 export const PERSONA_IDS = [
   'newcomer',
@@ -13,21 +13,56 @@ export const PERSONA_IDS = [
   'minimalist',
 ];
 
-export function createPersonaProfiles(legacyProfiles) {
-  const attentive = {
-    ...legacyProfiles.casual,
+const PRESTIGE_UPGRADE_ORDER = [
+  'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
+  'sealMastery', 'wardenEternal',
+  'hackMaster', 'dockingPro', 'factoryExpert', 'miniGameSavant',
+  'tradeRoutes', 'eventMagnet', 'wisdomOfAges', 'quantumMemory',
+  'cosmicInsight', 'perfectMemory', 'universalOptimizer', 'chainMaster',
+  'eraMomentum', 'autoClicker', 'achievementHunter', 'temporalEcho',
+  'masterWeaver', 'quantumTunneling', 'infinitePatience', 'instantKnowledge',
+  'cycleMastery', 'temporalMastery', 'primordialMemory',
+  'acceleratedDecay', 'cosmicAwareness', 'eternalReturn',
+];
+
+export function createPersonaProfiles() {
+  const efficient = {
+    gather: true,
+    gatherInterval: 5,
     expeditions: true,
+    expeditionStrategy: 'deep',
+    buyUpgrades: true,
+    buyTech: true,
     docking: true,
+    dockInterval: 3,
+    dockAccuracy: 0,
     colonies: true,
+    colonyStrategy: 'diversified',
     starChart: true,
+    starChartPlan: 'longHaul',
     weaving: true,
+    weaveInterval: 10,
     trading: true,
+    tradeStrategy: 'bottleneck',
     dysonAssembly: true,
     cosmicTuning: true,
     senateFocus: 'balanced',
     realityForge: true,
+    forgettingDefense: 2,
+    buyPrestigeUpgrades: true,
+    prestigeUpgradeOrder: PRESTIGE_UPGRADE_ORDER,
+  };
+
+  const attentive = {
+    ...efficient,
+    gatherInterval: 15,
+    expeditionStrategy: 'measured',
+    dockInterval: 5,
+    dockAccuracy: 0.15,
+    colonyStrategy: 'growth',
+    starChartPlan: 'coreWeb',
+    weaveInterval: 0,
     forgettingDefense: 5,
-    prestigeUpgradeOrder: legacyProfiles.optimal.prestigeUpgradeOrder,
   };
 
   return {
@@ -53,7 +88,7 @@ export function createPersonaProfiles(legacyProfiles) {
       attention: { decisionInterval: 10 },
     },
     optimizer: {
-      ...legacyProfiles.optimal,
+      ...efficient,
       description: 'Experienced optimizer: uses every system and makes efficient decisions every 2 seconds.',
       gatherInterval: 2,
       dockInterval: 2,
@@ -91,7 +126,7 @@ export function createPersonaProfiles(legacyProfiles) {
       },
     },
     completionist: {
-      ...legacyProfiles.optimal,
+      ...efficient,
       description: 'Completionist: explores every operation and optional choice with deliberate 5-second decisions.',
       gatherInterval: 5,
       dockInterval: 5,
@@ -99,9 +134,26 @@ export function createPersonaProfiles(legacyProfiles) {
       attention: { decisionInterval: 5 },
     },
     minimalist: {
-      ...legacyProfiles.lowInteraction,
+      ...efficient,
       description: 'Mechanics minimalist: checks economic decisions every 30 seconds and skips optional operations.',
       gatherInterval: 30,
+      expeditions: false,
+      expeditionStrategy: 'safe',
+      docking: false,
+      colonies: false,
+      starChart: false,
+      weaving: false,
+      dysonAssembly: false,
+      cosmicTuning: false,
+      senateFocus: null,
+      realityForge: false,
+      relics: false,
+      prestigeUpgradeOrder: [
+        'fastStart', 'luckyMiner', 'headStart', 'deepPockets',
+        'wisdomOfAges', 'quantumMemory', 'tradeRoutes', 'eventMagnet',
+        'cosmicInsight', 'universalOptimizer', 'chainMaster', 'eraMomentum',
+        'autoClicker',
+      ],
       attention: { decisionInterval: 30 },
     },
   };

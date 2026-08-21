@@ -3,12 +3,6 @@ import process from 'node:process';
 import { describe, expect, it } from 'vitest';
 import { createPersonaProfiles, getPlayerAttention, PERSONA_IDS } from '../../../scripts/playtest-personas.js';
 
-const legacyProfiles = {
-  casual: { gather: true, gatherInterval: 15, docking: true, prestigeUpgradeOrder: ['fastStart'] },
-  optimal: { gather: true, gatherInterval: 5, docking: true, prestigeUpgradeOrder: ['fastStart', 'deepPockets'] },
-  lowInteraction: { gather: true, gatherInterval: 5, docking: false, prestigeUpgradeOrder: ['fastStart'] },
-};
-
 function runPlaytest(...args) {
   const result = spawnSync(process.execPath, [
     'scripts/bot-playtest.js',
@@ -23,34 +17,29 @@ function runPlaytest(...args) {
 }
 
 describe('attention-aware player personas', () => {
-  it('adds every requested persona without mutating existing profile definitions', () => {
-    const personas = createPersonaProfiles(legacyProfiles);
+  it('defines exactly the requested standalone, attention-aware personas', () => {
+    const personas = createPersonaProfiles();
 
     expect(Object.keys(personas)).toEqual(PERSONA_IDS);
-    expect(legacyProfiles.casual.gatherInterval).toBe(15);
-    expect(legacyProfiles.optimal.gatherInterval).toBe(5);
-    expect(legacyProfiles.lowInteraction.gatherInterval).toBe(5);
+    expect(Object.values(personas).every(persona => persona.attention?.decisionInterval > 0)).toBe(true);
     expect(personas.minimalist.docking).toBe(false);
     expect(personas.newcomer.attention.firstDecisionAt).toBe(20);
   });
 
-  it('preserves the existing every-second behavior for legacy profiles', () => {
-    expect(getPlayerAttention(legacyProfiles.casual, 0)).toEqual({
-      present: true,
-      decisionWindow: true,
-      sessionStart: true,
-      offline: false,
-    });
-    expect(getPlayerAttention(legacyProfiles.casual, 37)).toEqual({
-      present: true,
-      decisionWindow: true,
-      sessionStart: false,
-      offline: false,
-    });
+  it('does not expose any superseded legacy bot profiles', () => {
+    const result = spawnSync(process.execPath, [
+      'scripts/bot-playtest.js', '--list-profiles',
+    ], { cwd: process.cwd(), encoding: 'utf8' });
+
+    expect(result.status, result.stderr).toBe(0);
+    for (const name of PERSONA_IDS) expect(result.stdout).toMatch(new RegExp(`^\\s*${name}\\s`, 'm'));
+    for (const name of ['optimal', 'casual', 'lowInteraction', 'passive', 'clickerOnly', 'tradingHeavy']) {
+      expect(result.stdout).not.toMatch(new RegExp(`^\\s*${name}\\s`, 'm'));
+    }
   });
 
   it('makes newcomers wait and limits engaged players to their decision cadence', () => {
-    const { newcomer, engaged, optimizer } = createPersonaProfiles(legacyProfiles);
+    const { newcomer, engaged, optimizer } = createPersonaProfiles();
 
     expect(getPlayerAttention(newcomer, 0).decisionWindow).toBe(false);
     expect(getPlayerAttention(newcomer, 19).decisionWindow).toBe(false);
@@ -63,7 +52,7 @@ describe('attention-aware player personas', () => {
   });
 
   it('keeps background sessions online while the player is away', () => {
-    const { background } = createPersonaProfiles(legacyProfiles);
+    const { background } = createPersonaProfiles();
 
     expect(getPlayerAttention(background, 0)).toMatchObject({ present: true, decisionWindow: true, sessionStart: true, offline: false });
     expect(getPlayerAttention(background, 29)).toMatchObject({ present: true, decisionWindow: false, offline: false });
@@ -73,7 +62,7 @@ describe('attention-aware player personas', () => {
   });
 
   it('models closed-game check-ins and four-hour offline returns independently', () => {
-    const { check_in: checkIn, offline_returner: offlineReturner } = createPersonaProfiles(legacyProfiles);
+    const { check_in: checkIn, offline_returner: offlineReturner } = createPersonaProfiles();
 
     expect(getPlayerAttention(checkIn, 59)).toMatchObject({ present: true, offline: false });
     expect(getPlayerAttention(checkIn, 60)).toMatchObject({ present: false, decisionWindow: false, offline: true });
@@ -118,7 +107,7 @@ describe('attention-aware player personas', () => {
     ], { cwd: process.cwd(), encoding: 'utf8' });
 
     expect(result.status, result.stderr).toBe(0);
-    expect(result.stdout).toContain('35m31s');
+    expect(result.stdout).toContain('38m49s');
     expect(result.stdout).not.toContain('5m20s');
   });
 });

@@ -1,29 +1,24 @@
 {
-  "timestamp": "2026-07-10",
-  "description": "Seeded pacing baseline after the operations and strategic-cycle redesign",
-  "seed": 424242,
-  "scenarios": {
-    "full": { "finalEra": 10, "cycleReady": true, "timeSeconds": 811, "dockingAttempts": 21, "activeRelics": 2 },
-    "casual": { "finalEra": 10, "cycleReady": true, "timeSeconds": 5401, "activeRelics": 2 },
-    "lowInteraction": { "finalEra": 10, "cycleReady": true, "timeSeconds": 9665 },
-    "passive": { "finalEra": 10, "cycleReady": true, "timeSeconds": 9977 }
-  },
-  "quality": {
-    "testFiles": 22,
-    "unitTests": 271,
-    "desktopPrestigeCycles": 2,
-    "mobileViewport": "375x812"
-  },
-  "engagementMetrics": [
-    "actionsByEra",
-    "directRewardsByOperation",
-    "finalPassiveRatesByOperation",
-    "economicWaitSecondsByEra",
-    "firstOperationLatencyByEra",
-    "upgradeSelections",
-    "doctrineSelections",
-    "ignoredOperations",
-    "firstRelicTime",
-    "relicSelections"
+  "schemaVersion": 1,
+  "description": "Attention-aware player persona impact baseline",
+  "seeds": [424242, 42],
+  "personas": ["newcomer", "engaged", "optimizer", "background", "check_in", "offline_returner", "completionist", "minimalist"],
+  "results": [
+    {"persona":"newcomer","seed":424242,"elapsedSeconds":1961,"activeSeconds":1961,"offlineSeconds":0,"manualActions":123,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"engaged","seed":424242,"elapsedSeconds":1881,"activeSeconds":1881,"offlineSeconds":0,"manualActions":157,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"optimizer","seed":424242,"elapsedSeconds":961,"activeSeconds":961,"offlineSeconds":0,"manualActions":217,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"background","seed":424242,"elapsedSeconds":2161,"activeSeconds":541,"offlineSeconds":0,"manualActions":109,"sessions":19,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"check_in","seed":424242,"elapsedSeconds":4201,"activeSeconds":421,"offlineSeconds":3780,"manualActions":112,"sessions":8,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"offline_returner","seed":424242,"elapsedSeconds":28801,"activeSeconds":241,"offlineSeconds":28560,"manualActions":69,"sessions":3,"finalEra":7,"targetEra":4,"completed":true,"cycleReady":false,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"completionist","seed":424242,"elapsedSeconds":1081,"activeSeconds":1081,"offlineSeconds":0,"manualActions":182,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"minimalist","seed":424242,"elapsedSeconds":6091,"activeSeconds":6091,"offlineSeconds":0,"manualActions":60,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"newcomer","seed":42,"elapsedSeconds":1961,"activeSeconds":1961,"offlineSeconds":0,"manualActions":119,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"engaged","seed":42,"elapsedSeconds":2161,"activeSeconds":2161,"offlineSeconds":0,"manualActions":161,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"optimizer","seed":42,"elapsedSeconds":871,"activeSeconds":871,"offlineSeconds":0,"manualActions":171,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"background","seed":42,"elapsedSeconds":2161,"activeSeconds":541,"offlineSeconds":0,"manualActions":108,"sessions":19,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"check_in","seed":42,"elapsedSeconds":4231,"activeSeconds":451,"offlineSeconds":3780,"manualActions":112,"sessions":8,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"offline_returner","seed":42,"elapsedSeconds":28801,"activeSeconds":241,"offlineSeconds":28560,"manualActions":68,"sessions":3,"finalEra":7,"targetEra":4,"completed":true,"cycleReady":false,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"completionist","seed":42,"elapsedSeconds":1081,"activeSeconds":1081,"offlineSeconds":0,"manualActions":172,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0},
+    {"persona":"minimalist","seed":42,"elapsedSeconds":6421,"activeSeconds":6421,"offlineSeconds":0,"manualActions":61,"sessions":1,"finalEra":10,"targetEra":10,"completed":true,"cycleReady":true,"collapsed":false,"actionsWhileAway":0}
   ]
 }

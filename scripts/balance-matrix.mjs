@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
+import { PERSONA_IDS } from './playtest-personas.js';
 
 const DEFAULT_SEEDS = [424242, 1, 42, 1337];
-const DEFAULT_SCENARIOS = 'full,casual,lowInteraction,passive,descent,prestige3';
+const DEFAULT_SCENARIOS = [...PERSONA_IDS, 'descent', 'prestige3'].join(',');
 
 const seedsArgumentIndex = process.argv.indexOf('--seeds');
 const scenarioArgumentIndex = process.argv.indexOf('--scenario');
@@ -14,7 +15,7 @@ const scenarios = scenarioArgumentIndex < 0
   : process.argv[scenarioArgumentIndex + 1];
 
 if (!seeds?.length || seeds.some(seed => !Number.isSafeInteger(seed)) || !scenarios) {
-  console.error('Usage: node scripts/balance-matrix.mjs [--seeds 424242,1,42,1337] [--scenario full,casual,...]');
+  console.error('Usage: node scripts/balance-matrix.mjs [--seeds 424242,1,42,1337] [--scenario newcomer,engaged,...]');
   process.exit(2);
 }
 
