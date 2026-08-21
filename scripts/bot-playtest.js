@@ -24,6 +24,7 @@ import { selectNextCycleDoctrine } from '../src/engine/cycles.js';
 import { descendRecursion, getForgettingStats, placeWarden } from '../src/engine/forgetting.js';
 import { claimRelic, declineRelicOffer } from '../src/engine/relics.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
+import { createPersonaProfiles, getPlayerAttention } from './playtest-personas.js';
 import { readFileSync } from 'fs';
 
 // ─── Mulberry32 PRNG ────────────────────────────────────────────────────────
@@ -228,6 +229,8 @@ const PROFILES = {
   },
 };
 
+Object.assign(PROFILES, createPersonaProfiles(PROFILES));
+
 // ─── Built-in Scenarios ─────────────────────────────────────────────────────
 const SCENARIOS = {
   full:         { profile: 'optimal',      prestige: 0,  targetEra: 10, maxTime: 14400, purpose: 'Standard pacing baseline' },
@@ -242,6 +245,14 @@ const SCENARIOS = {
   lateGame:     { profile: 'optimal',      prestige: 2,  targetEra: 10, maxTime: 14400, prestigeAtEra: 7, purpose: 'Late-game with prestige' },
   casual:       { profile: 'casual',       prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'Standard casual player experience' },
   descent:      { profile: 'optimal',      prestige: 0,  targetEra: 10, maxTime: 21600, profileOverrides: { maxRecursionDepth: 12 }, stopOnCollapse: true, purpose: 'The wall: descend until the Forgetting wins' },
+  newcomer:     { profile: 'newcomer',     prestige: 0,  targetEra: 10, maxTime: 28800, purpose: 'First-time player comprehension and pacing' },
+  engaged:      { profile: 'engaged',      prestige: 0,  targetEra: 10, maxTime: 21600, purpose: 'Attentive normal-player experience' },
+  optimizer:    { profile: 'optimizer',    prestige: 0,  targetEra: 10, maxTime: 14400, purpose: 'Experienced attention-aware speed benchmark' },
+  background:   { profile: 'background',   prestige: 0,  targetEra: 10, maxTime: 43200, purpose: 'Open background play with two-minute check-ins' },
+  check_in:     { profile: 'check_in',     prestige: 0,  targetEra: 10, maxTime: 86400, purpose: 'Closed-game visits every ten minutes' },
+  offline_returner: { profile: 'offline_returner', prestige: 0, targetEra: 4, maxTime: 57600, purpose: 'Four-hour offline returns and honest unattended progress' },
+  completionist: { profile: 'completionist', prestige: 0, targetEra: 10, maxTime: 21600, purpose: 'Deliberate exploration of every strategic operation' },
+  minimalist:   { profile: 'minimalist',   prestige: 0,  targetEra: 10, maxTime: 43200, purpose: 'Economic-only progression with honest decision intervals' },
 };
 
 const BALANCE_TARGETS = {
@@ -296,6 +307,14 @@ const BALANCE_TARGETS = {
   prestige10: { minTime: 120, maxTime: 1800, requiredEra: 10, cycleReady: true, minPrestiges: 10 },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
+  newcomer: { minTime: 900, maxTime: 7200, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.06, maxActionsWhileAway: 0 },
+  engaged: { minTime: 600, maxTime: 5400, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.11, maxActionsWhileAway: 0 },
+  optimizer: { minTime: 600, maxTime: 2400, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.51, maxActionsWhileAway: 0 },
+  background: { minTime: 1200, maxTime: 10800, requiredEra: 10, cycleReady: true, noCollapse: true, minSessions: 4, minAwaySeconds: 300, maxActiveRatio: 0.35, maxActionsWhileAway: 0 },
+  check_in: { minTime: 1800, maxTime: 43200, requiredEra: 10, cycleReady: true, noCollapse: true, minSessions: 3, minOfflineSeconds: 600, maxActiveRatio: 0.2, maxActionsWhileAway: 0 },
+  offline_returner: { minTime: 28800, maxTime: 57600, requiredEra: 4, noCollapse: true, minSessions: 3, minOfflineSeconds: 28000, maxActiveRatio: 0.05, maxActionsWhileAway: 0 },
+  completionist: { minTime: 600, maxTime: 5400, requiredEra: 10, cycleReady: true, noCollapse: true, maxIgnoredOperations: 0, maxDecisionWindowRatio: 0.21, maxActionsWhileAway: 0 },
+  minimalist: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.04, maxActionsWhileAway: 0 },
 };
 
 // ─── Bot Action Functions ───────────────────────────────────────────────────
@@ -636,6 +655,15 @@ function createCollector() {
       firstRelicTime: null,
       ignoredOperations: [],
       finalPassiveRatesByOperation: {},
+      attention: {
+        sessions: 0,
+        decisionWindows: 0,
+        activeSeconds: 0,
+        awaySeconds: 0,
+        offlineSeconds: 0,
+        manualActions: 0,
+        actionsWhileAway: 0,
+      },
     },
     // High-water mark. A scenario can end BELOW its peak by design — the
     // descent scenario runs until the Forgetting collapses, and collapse
@@ -915,33 +943,48 @@ function runScenario(opts) {
 
   for (let t = 0; t < maxTicks; t++) {
     const prevState = state;
+    const attention = getPlayerAttention(profileDef, t);
+    const attentionMetrics = collector.engagement.attention;
+    if (attention.sessionStart) attentionMetrics.sessions++;
+    if (attention.present) attentionMetrics.activeSeconds++;
+    else attentionMetrics.awaySeconds++;
+    if (attention.offline) attentionMetrics.offlineSeconds++;
+    if (attention.decisionWindow) attentionMetrics.decisionWindows++;
     const applyAction = (name, action) => {
       const before = state;
       state = action(state);
       recordBotAction(before, state, name, collector);
+      if (state !== before) {
+        attentionMetrics.manualActions++;
+        if (!attention.present) attentionMetrics.actionsWhileAway++;
+      }
     };
 
     // --- Bot actions ---
-    applyAction('relic', current => botRelics(current, profileDef));
-    applyAction('gather', current => botGather(current, profileDef, t, rng));
-    applyAction('expedition', current => botExpedition(current, profileDef, t, rng));
-    applyAction('upgrade', current => botBuyUpgrades(current, profileDef, t, rng));
-    applyAction('technology', current => botBuyTech(current, profileDef, t, rng));
-    applyAction('docking', current => botDock(current, profileDef, t, rng));
-    applyAction('colonies', current => botColonies(current, profileDef, t, rng));
-    applyAction('starChart', current => botStarChart(current, profileDef, t, rng));
-    applyAction('weaving', current => botWeave(current, profileDef, t, rng));
-    applyAction('trading', current => botTrade(current, profileDef, t, rng));
-    applyAction('dyson', current => botDyson(current, profileDef, t, rng));
-    applyAction('tuning', current => botCosmicTuning(current, profileDef, t, rng));
-    applyAction('senate', current => botSenate(current, profileDef, t, rng));
-    applyAction('forgetting', current => botForgetting(current, profileDef, t, rng));
-    applyAction('descend', current => botDescend(current, profileDef, t, rng));
-    applyAction('realityForge', current => botRealityForge(current, profileDef, t, rng));
-    applyAction('prestigeUpgrade', current => botPrestigeUpgrades(current, profileDef, t, rng));
+    if (attention.decisionWindow) {
+      applyAction('relic', current => botRelics(current, profileDef));
+      applyAction('gather', current => botGather(current, profileDef, t, rng));
+      applyAction('expedition', current => botExpedition(current, profileDef, t, rng));
+      applyAction('upgrade', current => botBuyUpgrades(current, profileDef, t, rng));
+      applyAction('technology', current => botBuyTech(current, profileDef, t, rng));
+      applyAction('docking', current => botDock(current, profileDef, t, rng));
+      applyAction('colonies', current => botColonies(current, profileDef, t, rng));
+      applyAction('starChart', current => botStarChart(current, profileDef, t, rng));
+      applyAction('weaving', current => botWeave(current, profileDef, t, rng));
+      applyAction('trading', current => botTrade(current, profileDef, t, rng));
+      applyAction('dyson', current => botDyson(current, profileDef, t, rng));
+      applyAction('tuning', current => botCosmicTuning(current, profileDef, t, rng));
+      applyAction('senate', current => botSenate(current, profileDef, t, rng));
+      applyAction('forgetting', current => botForgetting(current, profileDef, t, rng));
+      applyAction('descend', current => botDescend(current, profileDef, t, rng));
+      applyAction('realityForge', current => botRealityForge(current, profileDef, t, rng));
+      applyAction('prestigeUpgrade', current => botPrestigeUpgrades(current, profileDef, t, rng));
+    }
 
     // Tick the engine
-    state = tick(state, DT, rng);
+    state = attention.offline
+      ? tick(state, DT, rng, { pauseForgetting: true })
+      : tick(state, DT, rng);
     recordEngagementTick(state, collector);
 
     if (stopOnCollapse && collector.operationStats.forgetting.collapsed && (state.prestigeCount || 0) > 0) {
@@ -963,7 +1006,7 @@ function runScenario(opts) {
     }
 
     // Prestige check
-    if (prestigesDone < prestige && state.era >= prestigeAtEra && getCycleReadiness(state).ready &&
+    if (attention.decisionWindow && prestigesDone < prestige && state.era >= prestigeAtEra && getCycleReadiness(state).ready &&
         (profileDef.maxRecursionDepth || 0) <= (state.recursionDepth || 0)) {
       const bonus = calculatePrestigeBonus(state);
       const points = calculatePrestigePoints(state);
@@ -1009,7 +1052,7 @@ function runScenario(opts) {
     // Stuck detection (no new upgrades/tech for extended period)
     // Uses 5-min windows; requires 6 consecutive windows (30 min) with no progress.
     // Also checks if total resource amount is growing — slow accumulation isn't stuck.
-    if (t % 300 === 0) {
+    if (t % 300 === 0 && (attention.present || !profileDef.attention)) {
       const currentCount = Object.keys(state.upgrades || {}).length + Object.keys(state.tech || {}).length;
       const totalResources = Object.values(state.resources)
         .filter(r => r.unlocked)
@@ -1059,7 +1102,9 @@ function runScenario(opts) {
           log(`  Reached era ${targetEra} at ${fmtTime(state.totalTime)}`);
         }
       }
-      if (stopOnCollapse) { /* run until the wall wins */ } else if (targetEra >= 10 ? getCycleReadiness(state).ready : t - reachedTargetAt >= 120) break;
+      if (stopOnCollapse) { /* run until the wall wins */ }
+      else if (prestigesDone >= prestige && attention.decisionWindow &&
+               (targetEra >= 10 ? getCycleReadiness(state).ready : t - reachedTargetAt >= 120)) break;
     }
   }
 
@@ -1079,6 +1124,7 @@ function runScenario(opts) {
     // compare against it, and prestige scenarios legitimately reset it.
     // peakTime is display-only — never assert on it.
     totalTime: state.totalTime,
+    cumulativeTime: collector.prestigeLog.reduce((sum, cycle) => sum + cycle.time, 0) + state.totalTime,
     peakTime,
     peakEra,
     finalEra: state.era,
@@ -1187,6 +1233,12 @@ function printHumanReport(scenarioName, opts, collector) {
   if (upgrades.length > 0) console.log(`  Most selected upgrades: ${upgrades.map(([name, count]) => `${name} x${count}`).join(', ')}`);
   if (engagement.ignoredOperations.length > 0) console.log(`  Configured but ignored: ${engagement.ignoredOperations.join(', ')}`);
 
+  const attention = engagement.attention;
+  console.log('\n── Player Attention ──');
+  console.log(`  Sessions: ${attention.sessions} | Decision windows: ${attention.decisionWindows} | Manual actions: ${attention.manualActions}`);
+  console.log(`  Present: ${fmtTime(attention.activeSeconds)} | Away: ${fmtTime(attention.awaySeconds)} | Offline: ${fmtTime(attention.offlineSeconds)}`);
+  if (attention.actionsWhileAway > 0) console.log(`  WARNING: ${attention.actionsWhileAway} actions occurred while the player was away`);
+
   // Prestige Cycles
   if (collector.prestigeLog.length > 0) {
     console.log('\n── Prestige Cycles ──');
@@ -1219,6 +1271,7 @@ function printHumanReport(scenarioName, opts, collector) {
     ? `${cs.peakEra} (reset to ${cs.finalEra})`
     : `${cs.finalEra}`;
   console.log(`  Final era: ${eraLine} | Time: ${fmtTime(displayTime(cs))} | ${cs.reachedTargetEra ? 'COMPLETED' : 'DID NOT COMPLETE'}`);
+  if (cs.prestigeCount > 0) console.log(`  Cumulative time across all cycles: ${fmtTime(cs.cumulativeTime)}`);
   console.log(`  Upgrades: ${cs.upgradeCount} | Tech: ${cs.techCount} | Prestiges: ${cs.prestigeCount} (${cs.prestigeMultiplier?.toFixed(1)}x)`);
   if (cs.gameComplete) console.log('  Game marked COMPLETE');
   console.log();
@@ -1243,10 +1296,12 @@ function buildJsonResult(scenarioName, opts, collector, seed) {
   };
 }
 
-// What a human should read as "how long this run lasted". For a run that
-// ended by a by-design reset (descent), the final clock is 0 and the peak
-// is the honest number. Display only — assertions use totalTime.
+// What a human should read as "how long this run lasted". Prestige resets the
+// cycle clock, so cumulative time is the only honest multi-cycle duration. For
+// a by-design collapse (descent), the final clock is 0 and the peak is useful.
+// Display only — existing cycle-pacing assertions still use totalTime.
 function displayTime(cs) {
+  if (cs.prestigeCount > 0) return cs.cumulativeTime ?? cs.totalTime;
   return cs.wasReset ? (cs.peakTime ?? cs.totalTime) : cs.totalTime;
 }
 
@@ -1344,11 +1399,31 @@ function assertBalanceTargets(allResults) {
     }
 
     const status = collector.completionStatus;
+    const attention = collector.engagement.attention;
     const issues = [];
     if (status.finalEra < target.requiredEra) issues.push(`final era ${status.finalEra} < ${target.requiredEra}`);
     if (target.cycleReady && !status.cycleReady) issues.push('cycle not ready to prestige');
     if (target.minPrestiges != null && status.prestigeCount < target.minPrestiges) {
       issues.push(`only completed ${status.prestigeCount}/${target.minPrestiges} prestige cycles`);
+    }
+    if (target.minSessions != null && attention.sessions < target.minSessions) {
+      issues.push(`only observed ${attention.sessions}/${target.minSessions} player sessions`);
+    }
+    if (target.minAwaySeconds != null && attention.awaySeconds < target.minAwaySeconds) {
+      issues.push(`only spent ${fmtTime(attention.awaySeconds)} away from the game`);
+    }
+    if (target.minOfflineSeconds != null && attention.offlineSeconds < target.minOfflineSeconds) {
+      issues.push(`only spent ${fmtTime(attention.offlineSeconds)} offline`);
+    }
+    if (target.maxActionsWhileAway != null && attention.actionsWhileAway > target.maxActionsWhileAway) {
+      issues.push(`${attention.actionsWhileAway} manual actions occurred while the player was away`);
+    }
+    const observedSeconds = attention.activeSeconds + attention.awaySeconds;
+    if (target.maxActiveRatio != null && attention.activeSeconds / observedSeconds > target.maxActiveRatio) {
+      issues.push(`player was present for ${(attention.activeSeconds / observedSeconds * 100).toFixed(1)}% of the run`);
+    }
+    if (target.maxDecisionWindowRatio != null && attention.decisionWindows / observedSeconds > target.maxDecisionWindowRatio) {
+      issues.push(`manual decisions were available ${(attention.decisionWindows / observedSeconds * 100).toFixed(1)}% of the time`);
     }
     if (target.maxIgnoredOperations != null && collector.engagement.ignoredOperations.length > target.maxIgnoredOperations) {
       issues.push(`ignored configured operations: ${collector.engagement.ignoredOperations.join(', ')}`);
@@ -1504,6 +1579,8 @@ Examples:
   node scripts/bot-playtest.js --scenario full --json > baseline.json
   node scripts/bot-playtest.js --scenario full --json --compare baseline.json
   node scripts/bot-playtest.js --scenario full,lowInteraction,passive --quiet
+  node scripts/bot-playtest.js --scenario newcomer,engaged,optimizer,background,check_in --seed 424242 --quiet --assert-balance
+  node scripts/bot-playtest.js --scenario offline_returner --seed 424242 --json
   node scripts/bot-playtest.js --scenario prestige3 --verbose
   node scripts/bot-playtest.js --seed 42 --verbose
   node scripts/bot-playtest.js --scenario full,casual,lowInteraction,passive --seed 424242 --quiet --assert-balance
