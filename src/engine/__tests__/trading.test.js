@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { executeTrade, getTradeRatio } from '../trading.js';
+import { advanceTradeRoute, clearTradeRoute, executeTrade, getTradeRatio, setTradeRoute } from '../trading.js';
 import { createInitialState } from '../state.js';
 
 function makeState(overrides = {}) {
@@ -167,6 +167,33 @@ describe('trading', () => {
     it('returns null for nonexistent resources', () => {
       const state = makeState();
       expect(executeTrade(state, 'unobtanium', 'food', 1)).toBeNull();
+    });
+  });
+
+  describe('standing reserve routes', () => {
+    it('converts a bounded reserve automatically when its cadence elapses', () => {
+      let state = makeState({ totalTime: 29 });
+      state = withUnlocked(state, 'food', 1000);
+      state = withUnlocked(state, 'materials', 0);
+      state = setTradeRoute(state, 'food', 'materials');
+
+      const after = advanceTradeRoute({ ...state, totalTime: 30 }, 29);
+
+      expect(after.resources.food.amount).toBe(950);
+      expect(after.resources.materials.amount).toBe(50);
+      expect(after.totalTrades).toBe(1);
+      expect(advanceTradeRoute(after, 30)).toBe(after);
+    });
+
+    it('rejects invalid routes and lets the player stop a standing order', () => {
+      let state = makeState();
+      state = withUnlocked(state, 'food', 100);
+      state = withUnlocked(state, 'materials', 0);
+
+      expect(setTradeRoute(state, 'food', 'food')).toBe(state);
+      const routed = setTradeRoute(state, 'food', 'materials');
+      expect(routed.tradeRoute).toMatchObject({ from: 'food', to: 'materials' });
+      expect(clearTradeRoute(routed).tradeRoute).toBeNull();
     });
   });
 });

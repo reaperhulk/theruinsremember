@@ -1,4 +1,4 @@
-import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige } from './resources.js';
+import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige, isGatheringAutomated } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
 import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
 import { advanceColonyMandate, getColonyBonus } from './colonies.js';
@@ -15,6 +15,8 @@ import { awardCycleGoal } from './cycles.js';
 import { advanceEchoPressure } from './relics.js';
 import { advanceForgetting, pauseForgetting } from './forgetting.js';
 import { performPrestige } from './prestige.js';
+import { researchRoutineTech } from './tech.js';
+import { advanceTradeRoute } from './trading.js';
 
 // Resource consumption rates — moderate tension without breaking low-interaction paths
 const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
@@ -289,13 +291,13 @@ export function tick(state, dt, rng = Math.random, options = {}) {
   }
 
 
-  // Auto-purchase earlier era upgrades when in era 3+.
+  // Auto-purchase earlier era upgrades once a second era exists.
   // Critical for game balance: cross-era costs grow faster than caps,
   // so upgrades MUST be bought while costs are still affordable.
   // Buys ALL affordable upgrades from prior eras (not just one) to
   // prevent deep prerequisite chains from stalling progression.
   const autoPurchaseRuns = intervalCrossings(state.totalTime, newState.totalTime, 30);
-  if (newState.era >= 3 && autoPurchaseRuns > 0) {
+  if (newState.era >= 2 && autoPurchaseRuns > 0) {
     const autoPurchaseEra = Math.max(1, newState.era - 1);
     for (let run = 0; run < autoPurchaseRuns; run++) {
       for (let pass = 0; pass < 5; pass++) { // multiple passes for chains
@@ -324,18 +326,25 @@ export function tick(state, dt, rng = Math.random, options = {}) {
       if (result.count === 0) break;
       newState = result.state;
     }
+    if (newState.era >= 2) {
+      newState = researchRoutineTech(newState).state;
+    }
   }
 
   if (newState.era >= 5) {
     newState = advanceColonyMandate(newState);
     newState = advanceDockingContracts(newState);
   }
+  if (newState.era >= 4) {
+    newState = advanceTradeRoute(newState, state.totalTime);
+  }
 
   // Auto-gather: manual gathering is a launch-phase activity. Orbital
   // robotics take over from Era 4; the 3-prestige milestone extends the
   // automation back to planetfall on later cycles.
-  const autoGatherRuns = intervalCrossings(state.totalTime, newState.totalTime, 20);
-  if ((newState.autoGather || newState.era >= 4) && autoGatherRuns > 0) {
+  const autoGatherInterval = newState.era < 4 && !newState.autoGather ? 5 : 20;
+  const autoGatherRuns = intervalCrossings(state.totalTime, newState.totalTime, autoGatherInterval);
+  if (isGatheringAutomated(newState) && autoGatherRuns > 0) {
     for (let run = 0; run < autoGatherRuns; run++) {
       for (const [id, r] of Object.entries(newState.resources)) {
         if (r.unlocked) {

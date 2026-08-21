@@ -73,3 +73,28 @@ export function getAvailableTech(state) {
     return true;
   }).map(def => ({ ...def, cost: getTechCost(def) }));
 }
+
+export function isDecisionTech(def) {
+  return !!(def?.excludes || def?.grantsEra);
+}
+
+// Labs resolve linear research queues, while breakthroughs and exclusive
+// branches always wait for an explicit player decision.
+export function researchRoutineTech(state) {
+  let current = state;
+  let count = 0;
+  for (let pass = 0; pass < 5; pass++) {
+    let progressed = false;
+    for (const tech of getAvailableTech(current)) {
+      if (isDecisionTech(tech)) continue;
+      const result = unlockTech(current, tech.id);
+      if (result) {
+        current = result;
+        count++;
+        progressed = true;
+      }
+    }
+    if (!progressed) break;
+  }
+  return { state: current, count };
+}

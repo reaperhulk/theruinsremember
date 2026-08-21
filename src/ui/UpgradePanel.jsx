@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useMemo, useEffect, memo } from 'react';
-import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable, isDecisionUpgrade } from '../engine/upgrades.js';
+import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, buyNextRepeatableMilestone, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable, isDecisionUpgrade } from '../engine/upgrades.js';
 import { getEraMasteryTier } from '../engine/eras.js';
 import { canAfford, getEffectiveRate } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -621,7 +621,16 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                       </div>
                     </button>
                     {affordable && (
-                      <button className="buy-max-btn" onClick={() => onUpdate(s => buyMaxRepeatable(s, upgrade.id))} title="Buy max">Max</button>
+                      <>
+                        <button
+                          className="buy-max-btn"
+                          onClick={() => onUpdate(s => buyNextRepeatableMilestone(s, upgrade.id))}
+                          title="Invest toward the next production milestone without buying past it"
+                        >
+                          →{getRepeatableMilestone(state, upgrade.id).nextAt}
+                        </button>
+                        <button className="buy-max-btn" onClick={() => onUpdate(s => buyMaxRepeatable(s, upgrade.id))} title="Buy max">Max</button>
+                      </>
                     )}
                     <button className="upgrade-hide-btn" onClick={(e) => { e.stopPropagation(); handleToggleHide(upgrade.id); }}>
                       {hiddenUpgrades[upgrade.id] ? 'Show' : 'Hide'}

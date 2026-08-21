@@ -84,6 +84,13 @@ export function spend(state, cost) {
   return { ...state, resources: newResources };
 }
 
+// Gathering is a launch-phase action. Once the player chooses industrial
+// Automation, machines take over; later infrastructure and prestige
+// milestones retain their existing automatic behavior.
+export function isGatheringAutomated(state) {
+  return !!state.autoGather || state.era >= 4 || (state.era >= 2 && !!state.upgrades?.automation);
+}
+
 // Manually gather a resource (clicking). Returns new state.
 // Gather amount scales with rateMult, prestige, and era so clicking stays relevant.
 export function gather(state, resourceId, amount = 1, rng = Math.random) {

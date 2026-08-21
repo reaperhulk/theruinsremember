@@ -534,6 +534,34 @@ async function run() {
   const colonyFailed = !colonyAudit || colonyAudit.mandate !== 'federation'
     || colonyAudit.choices !== 4 || colonyAudit.staffed !== 3 || !colonyAudit.explainsAutomation;
   console.log(`  Colony mandate automation: ${colonyFailed ? 'FAILED' : '4 mandates, federation staffs every focus'}`);
+  await page.evaluate(() => document.querySelector('#tab-trading')?.click());
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const routeMounted = await page.evaluate(() => !!document.querySelector('.trading-panel'));
+  if (routeMounted) {
+    await page.select('select[aria-label="Resource to give"]', 'food');
+    await new Promise(resolve => setTimeout(resolve, 50));
+    await page.select('select[aria-label="Resource to receive"]', 'materials');
+    await page.waitForSelector('.trade-route-btn:not([disabled])', { timeout: 5000 });
+    await page.evaluate(() => document.querySelector('.trade-route-btn')?.click());
+  }
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const routeBefore = await page.evaluate(() => ({
+    route: window.__game.getState().tradeRoute,
+    trades: window.__game.getState().totalTrades || 0,
+  }));
+  if (routeMounted) await page.evaluate(() => window.__game.fastForward(30));
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const routeAudit = await page.evaluate(() => ({
+    trades: window.__game.getState().totalTrades || 0,
+    explainsAutomation: document.querySelector('.trading-panel')?.textContent.includes('Reserve route'),
+  }));
+  const tradeRouteFailed = !routeMounted || routeBefore.route?.from !== 'food'
+    || routeBefore.route?.to !== 'materials' || routeAudit.trades <= routeBefore.trades
+    || !routeAudit.explainsAutomation;
+  if (tradeRouteFailed) console.log('    reserve route debug:', JSON.stringify({ routeMounted, routeBefore, routeAudit }));
+  console.log(`  Standing reserve route: ${tradeRouteFailed ? 'FAILED' : 'one choice, automated resource exchanges'}`);
+  await page.evaluate(() => document.querySelector('#tab-mini')?.click());
+  await new Promise(resolve => setTimeout(resolve, 100));
   const chartMounted = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return false;
@@ -698,7 +726,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || migrationFailed || offlineFailed || automationFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || colonyFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || migrationFailed || offlineFailed || automationFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || colonyFailed || tradeRouteFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

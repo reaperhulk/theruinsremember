@@ -6,14 +6,14 @@
 
 import { createInitialState } from '../src/engine/state.js';
 import { tick } from '../src/engine/tick.js';
-import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable } from '../src/engine/upgrades.js';
-import { unlockTech, getAvailableTech } from '../src/engine/tech.js';
-import { canAfford, gather, getEffectiveRate, getNetRate } from '../src/engine/resources.js';
+import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable, isDecisionUpgrade } from '../src/engine/upgrades.js';
+import { unlockTech, getAvailableTech, isDecisionTech } from '../src/engine/tech.js';
+import { canAfford, gather, getEffectiveRate, getNetRate, isGatheringAutomated } from '../src/engine/resources.js';
 import { attemptDock, getDockingInfo, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
 import { getColonyBonus, selectColonyMandate } from '../src/engine/colonies.js';
 import { getRouteBonus, selectNetworkPlan } from '../src/engine/starChart.js';
 import { getWeaveProductionMultiplier, getWeavingStats, weaveRealityLaw } from '../src/engine/weaving.js';
-import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
+import { getTradeRatio, setTradeRoute } from '../src/engine/trading.js';
 import { commissionDysonModule, getDysonStats } from '../src/engine/dyson.js';
 import { getTuningProductionMultiplier, getTuningStats, lockCosmicSignal } from '../src/engine/tuning.js';
 import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
@@ -257,6 +257,10 @@ const BALANCE_TARGETS = {
     maxDockingAttempts: 30,
     maxDockingActions: 3,
     maxColonyActions: 1,
+    maxTradingActions: 7,
+    maxGatherActions: 55,
+    maxTechnologyActions: 30,
+    maxUpgradeActions: 120,
     maxDysonCommissions: 3,
     maxRealityLaws: 3,
     maxTuningLocks: 3,
@@ -268,7 +272,7 @@ const BALANCE_TARGETS = {
     // Key N bounds the duration of era N-1.
     eraRanges: {
       2: [70, 240],
-      3: [70, 300],
+      3: [60, 300],
       4: [5, 180],
       // Era 4 dwell is pinned by an affordability cliff under doctrine-fork
       // power; contracts, techs, and mastery still all complete. Floor
@@ -298,8 +302,7 @@ const BALANCE_TARGETS = {
 
 function botGather(state, profile, t, rng) {
   if (!profile.gather || !profile.gatherInterval) return state;
-  // Era 4+ gathering is automated by the engine; a player stops clicking.
-  if (state.era >= 4) return state;
+  if (isGatheringAutomated(state)) return state;
   if (t % profile.gatherInterval !== 0) return state;
   for (const [id, r] of Object.entries(state.resources)) {
     if (r.unlocked) {
@@ -318,12 +321,13 @@ function botExpedition(state, profile, _t, rng) {
   return runExpedition(state, routes[routeIndex].id, rng).state;
 }
 
-function botBuyUpgrades(state, profile, _t, _rng) {
+function botBuyUpgrades(state, profile, t, _rng) {
   if (!profile.buyUpgrades) return state;
   const available = getAvailableUpgrades(state);
   // Non-repeatable first
   for (const upgrade of available) {
     if (upgrade.repeatable) continue;
+    if (state.autoBuildOut !== false && !isDecisionUpgrade(upgrade)) continue;
     const cost = getUpgradeCost(state, upgrade.id);
     if (canAfford(state, cost)) {
       const result = purchaseUpgrade(state, upgrade.id);
@@ -333,6 +337,7 @@ function botBuyUpgrades(state, profile, _t, _rng) {
   // Repeatables are a resource sink, not progression. A competent player
   // finishes the era foundation before spending the bottleneck stockpile.
   if (!getEraReadiness(state).upgradesMet) return state;
+  if (t % 15 !== 0) return state;
   // Then repeatable (buy max)
   for (const upgrade of available) {
     if (!upgrade.repeatable) continue;
@@ -346,6 +351,7 @@ function botBuyTech(state, profile, _t, _rng) {
   if (!profile.buyTech) return state;
   const techs = getAvailableTech(state);
   for (const tech of techs) {
+    if (state.era >= 2 && state.autoBuildOut !== false && !isDecisionTech(tech)) continue;
     if (canAfford(state, tech.cost)) {
       const result = unlockTech(state, tech.id);
       if (result) state = result;
@@ -408,11 +414,9 @@ function botWeave(state, profile, t, _rng) {
 
 function botTrade(state, profile, t, _rng) {
   if (!profile.trading || state.era < 4) return state;
-  // Trade every 30s
+  if (state.tradeRoute?.era === state.era) return state;
+  // Reassess a standing reserve route at most once per era.
   if (t % 30 !== 0) return state;
-
-  const aggressive = profile.tradeStrategy === 'aggressive';
-  // trade always triggered when conditions met // always trade when triggered
 
   // Find bottleneck: unlocked resource with lowest rate needed by next upgrade
   const available = getAvailableUpgrades(state);
@@ -451,24 +455,12 @@ function botTrade(state, profile, t, _rng) {
 
   if (surplus.length === 0) return state;
 
-  // Trade surplus into bottleneck
-  const maxTrades = aggressive ? 5 : 2;
-  let trades = 0;
   for (const [bottleneckId] of bottlenecks) {
-    if (trades >= maxTrades) break;
     for (const [surplusId, surplusR] of surplus) {
-      if (trades >= maxTrades) break;
       if (surplusR.amount < 10) continue;
       const ratio = getTradeRatio(surplusId, bottleneckId);
       if (!ratio) continue;
-      // Trade a reasonable amount
-      const tradeAmount = aggressive ? Math.min(50, Math.floor(surplusR.amount * 0.3)) : Math.min(20, Math.floor(surplusR.amount * 0.1));
-      if (tradeAmount < 1) continue;
-      const result = executeTrade(state, surplusId, bottleneckId, tradeAmount);
-      if (result) {
-        state = result;
-        trades++;
-      }
+      return setTradeRoute(state, surplusId, bottleneckId);
     }
   }
   return state;
@@ -666,6 +658,8 @@ function takeSnapshot(state, t, collector) {
       techs: readiness.currentTechs,
       techTarget: readiness.minTechs,
     },
+    availableUpgradeIds: getAvailableUpgrades(state).map(upgrade => upgrade.id),
+    ownedUpgradeIds: Object.keys(state.upgrades || {}),
     resources: {},
   };
   for (const [id, r] of Object.entries(state.resources)) {
@@ -1373,6 +1367,16 @@ function assertBalanceTargets(allResults) {
     if (target.maxColonyActions != null) {
       const actions = Object.values(collector.engagement.actionsByEra).reduce((sum, era) => sum + (era.colonies || 0), 0);
       if (actions > target.maxColonyActions) issues.push(`colonies required ${actions} manual actions`);
+    }
+    for (const [action, targetKey] of [
+      ['trading', 'maxTradingActions'],
+      ['gather', 'maxGatherActions'],
+      ['technology', 'maxTechnologyActions'],
+      ['upgrade', 'maxUpgradeActions'],
+    ]) {
+      if (target[targetKey] == null) continue;
+      const actions = Object.values(collector.engagement.actionsByEra).reduce((sum, era) => sum + (era[action] || 0), 0);
+      if (actions > target[targetKey]) issues.push(`${action} required ${actions} manual actions`);
     }
     if (target.maxDysonCommissions != null) {
       const commissions = Object.values(collector.engagement.actionsByEra).reduce((sum, actions) => sum + (actions.dyson || 0), 0);

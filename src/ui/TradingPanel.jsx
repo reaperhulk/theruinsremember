@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
-import { executeTrade, getTradeRatio } from '../engine/trading.js';
+import { clearTradeRoute, executeTrade, getTradeRatio, setTradeRoute } from '../engine/trading.js';
 import { formatNumber } from './format.js';
 
 export function TradingPanel({ state, onUpdate }) {
@@ -59,6 +59,13 @@ export function TradingPanel({ state, onUpdate }) {
   return (
     <div className="panel trading-panel">
       <h2>Trading ({state.totalTrades || 0} trades)</h2>
+      {state.tradeRoute && (
+        <p className="operation-commitment">
+          Reserve route: {resourceDefs[state.tradeRoute.from]?.name} → {resourceDefs[state.tradeRoute.to]?.name} every 30s.
+          {' '}
+          <button className="trade-route-stop" onClick={() => onUpdate(clearTradeRoute)}>Stop route</button>
+        </p>
+      )}
       {quickTrades.length > 0 && (
         <div className="trade-quick" style={{ marginBottom: '8px' }}>
           <div style={{ fontSize: '0.75em', color: '#888', marginBottom: '4px' }}>Quick trades:</div>
@@ -146,6 +153,13 @@ export function TradingPanel({ state, onUpdate }) {
           onClick={handleTrade}
         >
           Trade ({state.totalTrades || 0} completed)
+        </button>
+        <button
+          className="trade-route-btn"
+          disabled={!ratio}
+          onClick={() => onUpdate(current => setTradeRoute(current, fromId, toId))}
+        >
+          Maintain this reserve route automatically
         </button>
       </div>
       {(() => {

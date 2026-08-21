@@ -3,6 +3,9 @@
 
 import { resources as resourceDefs } from '../data/resources.js';
 
+export const TRADE_ROUTE_INTERVAL = 30;
+export const TRADE_ROUTE_RESERVE = 0.1;
+
 // Trade ratios:
 //   Same era: 1:1
 //   Trading up (lower era -> higher era): 4:1 per era difference
@@ -69,4 +72,41 @@ export function executeTrade(state, fromResource, toResource, amount) {
     },
     totalTrades: (state.totalTrades || 0) + 1,
   };
+}
+
+export function setTradeRoute(state, fromResource, toResource) {
+  if (state.era < 4 || fromResource === toResource) return state;
+  if (!state.resources[fromResource]?.unlocked || !state.resources[toResource]?.unlocked) return state;
+  if (!getTradeRatio(fromResource, toResource)) return state;
+  const active = state.tradeRoute;
+  if (active?.from === fromResource && active?.to === toResource && active?.era === state.era) return state;
+  return { ...state, tradeRoute: { from: fromResource, to: toResource, era: state.era } };
+}
+
+export function clearTradeRoute(state) {
+  return state.tradeRoute ? { ...state, tradeRoute: null } : state;
+}
+
+// A standing route is one strategic reserve choice. Caravans exchange a
+// bounded slice of the source reserve instead of requiring repeated trades.
+export function advanceTradeRoute(state, previousTime) {
+  const route = state.tradeRoute;
+  if (!route || state.era < 4) return state;
+  const crossings = Math.floor(state.totalTime / TRADE_ROUTE_INTERVAL)
+    - Math.floor(previousTime / TRADE_ROUTE_INTERVAL);
+  let current = state;
+
+  for (let crossing = 0; crossing < crossings; crossing++) {
+    const from = current.resources[route.from];
+    const to = current.resources[route.to];
+    const ratio = getTradeRatio(route.from, route.to);
+    if (!from?.unlocked || !to?.unlocked || !ratio) break;
+    const discount = current.prestigeUpgrades?.tradeRoutes ? 0.67 : 1;
+    const costPerUnit = (ratio.input / ratio.output) * discount;
+    const amount = Math.min(50, Math.floor((from.amount * TRADE_ROUTE_RESERVE) / costPerUnit));
+    if (amount < 1) continue;
+    current = executeTrade(current, route.from, route.to, amount) || current;
+  }
+
+  return current;
 }

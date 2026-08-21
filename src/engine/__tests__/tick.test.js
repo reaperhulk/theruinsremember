@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { tick } from '../tick.js';
 import { createInitialState } from '../state.js';
 import { isDecisionUpgrade } from '../upgrades.js';
+import { isGatheringAutomated } from '../resources.js';
 import { upgrades as allUpgradeDefs } from '../../data/upgrades.js';
 
 const NO_EVENT = () => 0.99;
@@ -275,6 +276,18 @@ describe('tick', () => {
     expect(chosenDecisions).toEqual([]);
     expect(after.upgrades.forkHearth).toBeUndefined();
     expect(after.upgrades.forkQuarry).toBeUndefined();
+  });
+
+  it('hands gathering to industrial automation without waiting for the Space Age', () => {
+    const state = createInitialState();
+    state.era = 2;
+    state.totalTime = 4;
+    state.upgrades = { automation: true };
+    state.resources.materials.amount = 100;
+
+    expect(isGatheringAutomated(state)).toBe(true);
+    const after = tick(state, 1, NO_EVENT);
+    expect(after.resources.materials.amount).toBeGreaterThan(101);
   });
 
   it('reality fragments produce immediately once era 9 unlocks them', () => {

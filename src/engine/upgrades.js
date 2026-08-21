@@ -278,6 +278,22 @@ export function buyMaxRepeatable(state, upgradeId) {
   return purchased > 0 ? current : null;
 }
 
+// Invest in the next visible breakpoint without spending beyond it. This
+// turns dozens of tiny repeatable purchases into one intentional commitment.
+export function buyNextRepeatableMilestone(state, upgradeId) {
+  const def = upgradeDefs[upgradeId];
+  if (!def?.repeatable) return null;
+
+  const target = getRepeatableMilestone(state, upgradeId).nextAt;
+  let current = state;
+  while (getRepeatableLevel(current, upgradeId) < target) {
+    const next = purchaseUpgrade(current, upgradeId);
+    if (!next) break;
+    current = next;
+  }
+  return current === state ? null : current;
+}
+
 // Get list of upgrades available to purchase
 export function getAvailableUpgrades(state) {
   return Object.values(upgradeDefs).filter(def => {

@@ -112,6 +112,7 @@ export function createInitialState() {
     dockingContractsCompleted: { cargo: 0, crew: 0, science: 0 },
     // Trading (Era 6+)
     totalTrades: 0,
+    tradeRoute: null,
     // Era time tracking
     eraStartTime: 0,    // totalTime when current era began
     bestEraTimes: {},

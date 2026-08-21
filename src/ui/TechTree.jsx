@@ -157,6 +157,11 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
             {showUnlocked ? ' (hide done)' : `, ${unlockedCount} done`}
           </span>
         )}</h2>
+      {state.era >= 2 && state.autoBuildOut !== false && (
+        <p className="operation-commitment">
+          Labs handle routine research automatically. Branch choices and era breakthroughs remain yours.
+        </p>
+      )}
       {showUnlocked && unlocked.length > 0 && (
         <div className="purchased-list">
           {unlocked.map(id => {

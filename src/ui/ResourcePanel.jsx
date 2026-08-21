@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
-import { getEffectiveRate, getEffectiveCap, getEffectivePrestige, getNetRate, gather } from '../engine/resources.js';
+import { getEffectiveRate, getEffectiveCap, getEffectivePrestige, getNetRate, gather, isGatheringAutomated } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
 import { getColonyBonus } from '../engine/colonies.js';
 import { getRouteBonus } from '../engine/starChart.js';
@@ -15,6 +15,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
   const [newResources, setNewResources] = useState(new Set());
   const prevRatesRef = useRef({});
   const [boostedResources, setBoostedResources] = useState(new Set());
+  const gatheringAutomated = isGatheringAutomated(state);
 
   const handleGather = useCallback((resourceId, amount) => {
     onUpdate(s => gather(s, resourceId));
@@ -227,7 +228,9 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                         })() : ''}
                       </span>
                       <span className="resource-gather" style={{ position: 'relative', opacity: r.rate > 0 ? 0.3 : 1 }}>
-                        <button
+                        {gatheringAutomated ? (
+                          <span className="resource-auto-label" title="Industrial systems gather this resource automatically">AUTO</span>
+                        ) : <button
                           className="gather-btn"
                           onClick={() => {
                             const eraScale = 1 + (state.era - 1);
@@ -243,7 +246,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                             const base = r.rateMult > 1 ? r.rateMult : 1;
                             return '+' + formatNumber(base * prestigeMult * eraScale);
                           })()}
-                        </button>
+                        </button>}
                         {floats.filter(f => f.resourceId === r.id).map(f => (
                           <span key={f.id} className="gather-float">{f.text}</span>
                         ))}

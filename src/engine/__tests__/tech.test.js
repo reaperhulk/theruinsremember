@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { unlockTech, getAvailableTech } from '../tech.js';
+import { unlockTech, getAvailableTech, isDecisionTech, researchRoutineTech } from '../tech.js';
 import { createInitialState } from '../state.js';
 
 describe('tech', () => {
@@ -75,6 +75,41 @@ describe('tech', () => {
       expect(after).not.toBeNull();
       // agriculture now gives production_add +1 food (was production_mult x2)
       expect(after.resources.food.rateAdd).toBe(1);
+    });
+  });
+
+  describe('routine research automation', () => {
+    it('recognizes era breakthroughs and exclusive branches as player decisions', () => {
+      expect(isDecisionTech({ grantsEra: 2 })).toBe(true);
+      expect(isDecisionTech({ excludes: 'otherBranch' })).toBe(true);
+      expect(isDecisionTech({ id: 'routineResearch' })).toBe(false);
+    });
+
+    it('researches affordable prerequisite chains without choosing a breakthrough', () => {
+      const state = createInitialState();
+      for (const [id, resource] of Object.entries(state.resources)) {
+        state.resources[id] = { ...resource, unlocked: true, amount: 1e8 };
+      }
+
+      const { state: researched, count } = researchRoutineTech(state);
+
+      expect(count).toBeGreaterThan(0);
+      expect(researched.tech.metallurgy).toBe(true);
+      expect(researched.tech.industrialRevolution).toBeUndefined();
+    });
+
+    it('never selects either side of an exclusive research branch', () => {
+      const state = createInitialState();
+      state.era = 3;
+      state.tech = { globalNetwork: true };
+      for (const [id, resource] of Object.entries(state.resources)) {
+        state.resources[id] = { ...resource, unlocked: true, amount: 1e20 };
+      }
+
+      const { state: researched } = researchRoutineTech(state);
+
+      expect(researched.tech.offensiveAI).toBeUndefined();
+      expect(researched.tech.defensiveAI).toBeUndefined();
     });
   });
 });

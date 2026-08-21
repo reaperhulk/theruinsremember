@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable, getRepeatableMilestone, getRepeatableMilestoneMultiplier, isDecisionUpgrade, buyRoutineBuildOut } from '../upgrades.js';
+import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable, buyNextRepeatableMilestone, getRepeatableMilestone, getRepeatableMilestoneMultiplier, isDecisionUpgrade, buyRoutineBuildOut } from '../upgrades.js';
 import { createInitialState } from '../state.js';
 import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 import { resources as resourceDefs } from '../../data/resources.js';
@@ -440,5 +440,18 @@ describe('upgrades', () => {
     expect(getRepeatableMilestoneMultiplier(state, 'labor')).toBeCloseTo(1.2544);
     // Other resources are untouched
     expect(getRepeatableMilestoneMultiplier(state, 'food')).toBe(1);
+  });
+
+  it('buys one intentional repeatable milestone without overshooting it', () => {
+    const state = createInitialState();
+    state.upgrades.housing = true;
+    state.resources.food.amount = 1e20;
+    state.resources.materials.amount = 1e20;
+
+    const first = buyNextRepeatableMilestone(state, 'expandWorkforce');
+    expect(first.upgrades.expandWorkforce).toBe(25);
+    const second = buyNextRepeatableMilestone(first, 'expandWorkforce');
+    expect(second.upgrades.expandWorkforce).toBe(50);
+    expect(buyNextRepeatableMilestone(state, 'tools')).toBeNull();
   });
 });
