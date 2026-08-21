@@ -84,6 +84,7 @@ Balance regression matrix and extended prestige stress tests:
 npm run test:balance
 npm run test:balance:stress
 npm run test:personas
+npm run test:impact
 node scripts/balance-matrix.mjs --seeds 424242,1,42,1337
 ```
 
@@ -103,17 +104,8 @@ Dyson commissions, government acts, reality laws, signal locks, the Forgetting
 siege, all three cycle doctrines, and prestige. Desktop and mobile runs fail on
 progression misses, console errors, or viewport overflow.
 
-The balance harness validates six scenarios across four deterministic seeds:
-
-- `full` for optimal completion pacing
-- `casual` for a normal active run
-- `lowInteraction` for low-interaction viability
-- `passive` for mostly idle viability
-- `descent` for pressure during the final siege
-- `prestige3` for repeated-cycle milestones
-
-The legacy profiles remain intact as stable economic baselines. A separate
-attention-aware matrix tests eight additional player personas across two seeds:
+The balance harness validates eight attention-aware player personas across four
+deterministic seeds:
 
 - `newcomer`: first-time decisions every 20 seconds, with an initial reading delay
 - `engaged`: continuous play with decisions every 10 seconds
@@ -129,11 +121,33 @@ actions while away. Closed-game absences use the same offline siege protection a
 game itself. Reports include sessions, decision windows, active/offline time, manual
 actions, and cumulative playtime across prestige resets.
 
-The extended stress gate also validates ten prestiges across two seeds. Every pull
-request and push to `main` runs lint, 357 unit tests, all 24 legacy balance
-scenarios, 16 attention-aware persona scenarios, the prestige stress matrix, a
-production build, and desktop/mobile browser journeys before GitHub Pages deployment
-is allowed.
+The same four-seed matrix additionally checks final-siege collapse and three-prestige
+progression. Extended stress coverage validates ten prestiges across two seeds. Every
+pull request and push to `main` runs lint, 361 unit tests, all 40 seeded balance
+scenarios, a 16-row before/after persona impact report, the prestige stress matrix, a
+production build, and desktop/mobile browser journeys before GitHub Pages deployment.
+
+## Required Before/After Impact For Changes
+
+Every change to this repository must present its before/after effect on all eight
+personas using the same seeds. This is especially important for gameplay, progression,
+economy, automation, player actions, offline behavior, and balance. Capture the
+pre-change state first:
+
+```bash
+npm run test:impact -- --capture /tmp/theruinsremember-personas-before.json
+```
+
+After making the change, compare against that exact snapshot:
+
+```bash
+npm run test:impact -- --baseline /tmp/theruinsremember-personas-before.json
+```
+
+Report each persona's elapsed completion time, active attention time, manual actions,
+session count, and progression outcome, and explicitly explain material regressions.
+The checked-in `scripts/baseline-results.json` provides the default comparison used by
+`npm run test:quality`; update it only after an intentional, reviewed baseline change.
 
 ## Recent Direction
 

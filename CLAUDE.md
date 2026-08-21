@@ -7,14 +7,42 @@
 - `src/data/` — Static data definitions (upgrades, tech, resources, prestige).
 - `scripts/` — CLI tools (bot-playtest, browser-harness).
 
+## Mandatory Before/After Persona Impact
+
+Every change to this repository MUST present before/after results for all eight
+personas (`newcomer`, `engaged`, `optimizer`, `background`, `check_in`,
+`offline_returner`, `completionist`, and `minimalist`) using identical seeds. This
+includes gameplay, progression, economy, balancing, automation, player interactions,
+prestige, saves, offline behavior, tests, and documentation.
+
+Before changing the game, capture a temporary baseline:
+
+```bash
+npm run test:impact -- --capture /tmp/theruinsremember-personas-before.json
+```
+
+After the change, run the direct comparison:
+
+```bash
+npm run test:impact -- --baseline /tmp/theruinsremember-personas-before.json
+```
+
+Present the before → after elapsed time, active attention time, manual action count,
+session count, and progression outcome for every persona. Explicitly identify and
+justify regressions, new stalls, forced participation, siege collapse, or impossible
+actions while absent. `npm run test:quality` also compares every persona against the
+checked-in `scripts/baseline-results.json`. Do not update that baseline to hide a
+regression; refresh it only when the intentional impact has been reviewed and accepted.
+
 ## Dev Commands
 - `npm run dev` — Start Vite dev server (default: http://localhost:5173)
 - `npm run test` — Run Vitest unit tests in watch mode
 - `npm run test:unit` — Run the complete Vitest unit and regression suite once
-- `npm run test:balance` — Run six progression scenarios across four deterministic seeds
+- `npm run test:balance` — Run eight personas plus siege/prestige scenarios across four deterministic seeds
 - `npm run test:balance:stress` — Exercise ten prestige cycles across two seeds
 - `npm run test:personas` — Run eight attention-aware player personas across two seeds
-- `npm run test:quality` — Run lint, unit tests, legacy balance and persona matrices, and a production build
+- `npm run test:impact` — Present before/after timing, attention, actions, sessions, and progression for every persona
+- `npm run test:quality` — Run lint, unit tests, the persona balance matrix, required impact report, and production build
 - `npm run build` — Production build to dist/
 
 ## Architecture
@@ -115,16 +143,16 @@ For pure engine testing without a browser:
 node scripts/balance-matrix.mjs --seeds 424242,1,42,1337
 node scripts/bot-playtest.js --scenario newcomer,engaged,optimizer,background,check_in,offline_returner,completionist,minimalist --seed 424242 --quiet --assert-balance
 node scripts/bot-playtest.js --scenario check_in --seed 42 --json
-node scripts/bot-playtest.js --profile optimal --max-time 14400 --target-era 10
-node scripts/bot-playtest.js --scenario speedrun --json > results.json
-node scripts/bot-playtest.js --compare results.json  # Regression detection
+node scripts/bot-playtest.js --profile optimizer --max-time 14400 --target-era 10
+node scripts/bot-playtest.js --scenario optimizer --json > results.json
+node scripts/bot-playtest.js --scenario optimizer --compare results.json  # Regression detection
 ```
 
-The original `optimal`, `casual`, `lowInteraction`, and `passive` profiles remain
-unchanged. New personas in `scripts/playtest-personas.js` separately model decision
-intervals, active sessions, background absences, and closed-game offline gaps; manual
-actions can occur only during an actual decision window. JSON results expose attention
-telemetry and `completionStatus.cumulativeTime` across prestige resets.
+The eight personas in `scripts/playtest-personas.js` separately model decision intervals,
+active sessions, background absences, and closed-game offline gaps; manual actions can
+occur only during an actual decision window. JSON results expose attention telemetry
+and `completionStatus.cumulativeTime` across prestige resets. Superseded legacy bot
+profiles are intentionally unavailable.
 
 ## Game Engine API (key exports)
 - `tick(state, dt, rng, options)` — Advance game state by dt seconds
