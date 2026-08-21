@@ -168,7 +168,7 @@ export function performPrestige(state) {
 
   // Fast Start: auto-purchase era 1 upgrades
   if (hasPrestigeUpgrade(state, 'fastStart')) {
-    const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1 && !u.repeatable && !u.requireGems && !u.requireTrades && !u.requirePrestige);
+    const era1Upgrades = Object.values(upgradeDefs).filter(u => u.era === 1 && !u.repeatable && !u.exclusiveWith && !u.requireGems && !u.requireTrades && !u.requirePrestige);
     for (const u of era1Upgrades) {
       newState.upgrades[u.id] = true;
       // Apply effects
@@ -222,7 +222,7 @@ export function performPrestige(state) {
   if (newState.prestigeCount >= 5) {
     // Auto-purchase era 1 upgrades (same as fastStart but from milestone)
     if (!hasPrestigeUpgrade(state, 'fastStart')) {
-      const era1Ups = Object.values(upgradeDefs).filter(u => u.era === 1 && !u.repeatable && !u.requireGems && !u.requireTrades && !u.requirePrestige);
+      const era1Ups = Object.values(upgradeDefs).filter(u => u.era === 1 && !u.repeatable && !u.exclusiveWith && !u.requireGems && !u.requireTrades && !u.requirePrestige);
       for (const u of era1Ups) {
         if (newState.upgrades[u.id]) continue;
         newState.upgrades[u.id] = true;

@@ -31,7 +31,8 @@ export function useGameLoop(initialState) {
           const maxChunks = (parsed.prestigeUpgrades?.infinitePatience) ? 10080 :
                             (parsed.prestigeCount > 0) ? 1440 : 240; // 7 days, 24 hours, or 4 hours of chunks
           const chunks = Math.min(Math.floor(offlineDt / chunkSize), maxChunks);
-          const after = advanceTime(migrated, offlineDt, Math.random, chunkSize);
+          const after = advanceTime(migrated, offlineDt, Math.random, chunkSize, { pauseForgetting: true });
+          const siegePaused = migrated.era >= 10 || after.era >= 10;
 
           // Calculate resource gains for offline report
           const gains = {};
@@ -48,10 +49,10 @@ export function useGameLoop(initialState) {
           // For large offline periods, show processing indicator briefly
           const eraChanged = after.era > before.era;
           if (chunks > 100) {
-            setOfflineReport({ elapsed: offlineDt, processing: true, gains: {}, era: after.era, prevEra: before.era, eraChanged, upgradesGained: 0, achievementsGained: 0 });
-            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged, upgradesGained, achievementsGained }), 300);
+            setOfflineReport({ elapsed: offlineDt, processing: true, gains: {}, era: after.era, prevEra: before.era, eraChanged, upgradesGained: 0, achievementsGained: 0, siegePaused });
+            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged, upgradesGained, achievementsGained, siegePaused }), 300);
           } else {
-            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged, upgradesGained, achievementsGained }), 100);
+            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged, upgradesGained, achievementsGained, siegePaused }), 100);
           }
           return after;
         }

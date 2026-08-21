@@ -23,6 +23,46 @@ describe('migrateState', () => {
     expect(migrated).not.toHaveProperty('hackSuccesses');
   });
 
+  it('translates earned legacy tuning and senate progress into their replacement decisions', () => {
+    const saved = {
+      ...createInitialState(),
+      era: 9,
+      tuningScore: 100,
+      senate: { merchants: 20, scholars: 8, warriors: 3 },
+    };
+    delete saved.lockedSignals;
+    delete saved.senateGov;
+
+    const migrated = migrateState(saved);
+
+    expect(migrated.lockedSignals).toEqual({ stability: true, power: true, constants: true });
+    expect(migrated.senateGov).toEqual({ leader: 'merchants', partner: 'scholars', ratified: true });
+    expect(migrated).not.toHaveProperty('tuningScore');
+    expect(migrated).not.toHaveProperty('senate');
+  });
+
+  it('preserves partially earned legacy decisions without overwriting modern choices', () => {
+    const saved = {
+      ...createInitialState(),
+      tuningScore: 25,
+      senate: { merchants: 0, scholars: 4, warriors: 1 },
+    };
+    delete saved.lockedSignals;
+    delete saved.senateGov;
+
+    const migrated = migrateState(saved);
+    expect(migrated.lockedSignals).toEqual({ stability: true, power: true });
+    expect(migrated.senateGov).toEqual({ leader: 'scholars', partner: null, ratified: false });
+
+    const modern = migrateState({
+      ...saved,
+      lockedSignals: { fragments: true },
+      senateGov: { leader: 'warriors', partner: 'merchants', ratified: true },
+    });
+    expect(modern.lockedSignals).toEqual({ fragments: true });
+    expect(modern.senateGov.leader).toBe('warriors');
+  });
+
   it('fills missing fields from fresh state', () => {
     const oldSave = { era: 3, resources: { food: { unlocked: true, amount: 100 } } };
     const migrated = migrateState(oldSave);

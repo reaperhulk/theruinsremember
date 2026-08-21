@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { tick } from '../tick.js';
 import { createInitialState } from '../state.js';
+import { isDecisionUpgrade } from '../upgrades.js';
 import { upgrades as allUpgradeDefs } from '../../data/upgrades.js';
 
 const NO_EVENT = () => 0.99;
@@ -253,8 +254,27 @@ describe('tick', () => {
       if (def) {
         expect(def.era).toBeLessThanOrEqual(4); // era 5 - 1 = era 4 max
         expect(def.repeatable).toBeFalsy();
+        expect(isDecisionUpgrade(def)).toBe(false);
       }
     }
+  });
+
+  it('prior-era automation never silently chooses forks, mechanics, lore, or resource unlocks', () => {
+    const state = createInitialState();
+    state.era = 3;
+    state.totalTime = 29;
+    state.upgrades = { tools: true };
+    for (const [id, resource] of Object.entries(state.resources)) {
+      state.resources[id] = { ...resource, unlocked: true, amount: 1e25 };
+    }
+
+    const after = tick(state, 1, NO_EVENT);
+    const chosenDecisions = Object.keys(after.upgrades)
+      .filter(id => !state.upgrades[id] && isDecisionUpgrade(allUpgradeDefs[id]));
+
+    expect(chosenDecisions).toEqual([]);
+    expect(after.upgrades.forkHearth).toBeUndefined();
+    expect(after.upgrades.forkQuarry).toBeUndefined();
   });
 
   it('reality fragments produce immediately once era 9 unlocks them', () => {

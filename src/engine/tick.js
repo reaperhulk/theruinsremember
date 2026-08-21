@@ -4,7 +4,7 @@ import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.j
 import { getColonyBonus } from './colonies.js';
 import { advanceNetworkPlan, getRouteBonus } from './starChart.js';
 import { checkAchievements } from './achievements.js';
-import { purchaseUpgrade, buyRoutineBuildOut } from './upgrades.js';
+import { purchaseUpgrade, buyRoutineBuildOut, isDecisionUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { getSenateGovernmentMultiplier, getSenatePctBonuses } from './senate.js';
 import { getTuningProductionMultiplier } from './tuning.js';
@@ -12,7 +12,7 @@ import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes
 import { getActiveSystems } from './operations.js';
 import { awardCycleGoal } from './cycles.js';
 import { advanceEchoPressure } from './relics.js';
-import { advanceForgetting } from './forgetting.js';
+import { advanceForgetting, pauseForgetting } from './forgetting.js';
 import { performPrestige } from './prestige.js';
 
 // Resource consumption rates — moderate tension without breaking low-interaction paths
@@ -42,7 +42,7 @@ function applyProductionBonus(state, fraction, dt) {
 
 // Core game loop: advance state by dt seconds.
 // Optional rng parameter for deterministic bot/testing runs.
-export function tick(state, dt, rng = Math.random) {
+export function tick(state, dt, rng = Math.random, options = {}) {
   if (dt <= 0) return state; // Guard against negative or zero dt
   state = expireEffects(state);
   const rates = calculateProduction(state);
@@ -193,7 +193,9 @@ export function tick(state, dt, rng = Math.random) {
   newState = advanceEchoPressure(newState, dt, rng);
   {
     const wasCollapsed = newState.forgetting?.collapsed;
-    newState = advanceForgetting(newState, dt, rng);
+    newState = options.pauseForgetting
+      ? pauseForgetting(newState, dt)
+      : advanceForgetting(newState, dt, rng);
     if (!wasCollapsed && newState.forgetting?.collapsed) {
       newState = {
         ...newState,
@@ -205,7 +207,7 @@ export function tick(state, dt, rng = Math.random) {
       };
     }
     // The cycle ends whether or not you are ready — rewards are banked.
-    if (newState.forgetting?.collapsed &&
+    if (!options.pauseForgetting && newState.forgetting?.collapsed &&
         newState.totalTime - (newState.forgetting.collapsedAt ?? newState.totalTime) >= 10) {
       return performPrestige(newState);
     }
@@ -301,6 +303,7 @@ export function tick(state, dt, rng = Math.random) {
           if (def.era > autoPurchaseEra) continue;
           if (def.repeatable) continue;
           if (newState.upgrades[def.id]) continue;
+          if (isDecisionUpgrade(def)) continue;
           if (def.prerequisites.some(p => !newState.upgrades[p])) continue;
           const result = purchaseUpgrade(newState, def.id);
           if (result) { newState = result; boughtAny = true; }

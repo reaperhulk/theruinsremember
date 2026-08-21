@@ -44,6 +44,11 @@ export function OfflineReport({ report, onDismiss }) {
           {offlineLore[report.era] || 'The ruins waited patiently for your return.'}
         </p>
         <p className="offline-time">You were away for {formatTime(report.elapsed)}</p>
+        {report.siegePaused && (
+          <p className="offline-time" style={{ color: '#a9d9ff' }}>
+            The Forgetting waited for your return. Your memories and wardens are safe.
+          </p>
+        )}
         {report.eraChanged && (
           <p style={{ color: '#88ff88', fontWeight: 'bold', textAlign: 'center', margin: '4px 0' }}>
             Era advanced: {eraNames[report.prevEra] || report.prevEra} → {eraNames[report.era] || report.era}!

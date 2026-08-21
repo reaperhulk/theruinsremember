@@ -177,6 +177,31 @@ describe('prestige', () => {
       expect(after.resources.materials.rateMult).toBeGreaterThan(1);
     });
 
+    it('Fast Start leaves mutually exclusive doctrine choices for the player', () => {
+      const state = createInitialState();
+      state.era = 10;
+      state.prestigeUpgrades = { fastStart: true };
+
+      const after = performPrestige(state);
+
+      expect(after.upgrades.tools).toBe(true);
+      expect(after.upgrades.forkHearth).toBeUndefined();
+      expect(after.upgrades.forkQuarry).toBeUndefined();
+    });
+
+    it('the fifth-prestige build-out milestone never purchases either doctrine fork', () => {
+      const state = createInitialState();
+      state.era = 10;
+      state.prestigeCount = 4;
+
+      const after = performPrestige(state);
+
+      expect(after.prestigeCount).toBe(5);
+      expect(after.upgrades.tools).toBe(true);
+      expect(after.upgrades.forkHearth).toBeUndefined();
+      expect(after.upgrades.forkQuarry).toBeUndefined();
+    });
+
     it('Quantum Memory keeps 10% of resources', () => {
       const state = createInitialState();
       state.era = 10;

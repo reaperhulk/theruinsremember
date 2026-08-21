@@ -17,7 +17,28 @@ export function migrateState(saved) {
   // Ensure new state fields exist
   if (!migrated.dysonSegments) migrated.dysonSegments = 0;
   if (!migrated.lockedSignals) migrated.lockedSignals = {};
+  if (Object.keys(migrated.lockedSignals).length === 0 && (saved.tuningScore || 0) > 0) {
+    const legacyScore = saved.tuningScore;
+    const earnedLocks = legacyScore >= 50 ? 3 : legacyScore >= 25 ? 2 : 1;
+    migrated.lockedSignals = Object.fromEntries(
+      ['stability', 'power', 'constants'].slice(0, earnedLocks).map(bandId => [bandId, true]),
+    );
+  }
+
   migrated.senateGov = { leader: null, partner: null, ratified: false, ...(saved.senateGov || {}) };
+  if (!migrated.senateGov.leader && saved.senate) {
+    const factions = ['merchants', 'scholars', 'warriors']
+      .map(id => ({ id, seats: Math.max(0, Number(saved.senate[id]) || 0) }))
+      .sort((left, right) => right.seats - left.seats);
+    const totalSeats = factions.reduce((sum, faction) => sum + faction.seats, 0);
+    if (totalSeats > 0) {
+      migrated.senateGov = {
+        leader: factions[0].id,
+        partner: totalSeats >= 6 ? factions[1].id : null,
+        ratified: totalSeats >= 9,
+      };
+    }
+  }
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
   if (migrated.autoBuildOut === undefined) migrated.autoBuildOut = true;
   migrated.expedition = { ...createExpeditionState(), ...(saved.expedition || {}) };

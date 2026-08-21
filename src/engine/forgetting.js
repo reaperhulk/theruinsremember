@@ -276,6 +276,37 @@ export function advanceForgetting(state, dt, rng = Math.random) {
   return { ...state, forgetting };
 }
 
+// Offline production must never punish a player for being away. Move the
+// siege's internal clock forward with the simulation clock so every threat,
+// cooldown, and depth dwell resumes exactly where the player left it.
+export function pauseForgetting(state, dt) {
+  const forgetting = state.forgetting;
+  if (!forgetting || dt <= 0) return state;
+
+  const shift = value => typeof value === 'number' ? value + dt : value;
+  return {
+    ...state,
+    forgetting: {
+      ...forgetting,
+      startedAt: shift(forgetting.startedAt),
+      depthStartedAt: shift(forgetting.depthStartedAt),
+      nextSurgeAt: shift(forgetting.nextSurgeAt),
+      collapsedAt: shift(forgetting.collapsedAt),
+      tendrils: forgetting.tendrils.map(tendril => ({
+        ...tendril,
+        spawnedAt: shift(tendril.spawnedAt),
+        arrivesAt: shift(tendril.arrivesAt),
+        heldSince: shift(tendril.heldSince),
+        consumesAt: shift(tendril.consumesAt),
+      })),
+      wardens: forgetting.wardens.map(warden => ({
+        ...warden,
+        movedAt: shift(warden.movedAt),
+      })),
+    },
+  };
+}
+
 // The only manual action: position a warden on a memory node.
 // Returns { state, warden, node } or null if unavailable.
 export function placeWarden(state, wardenId, nodeId) {
