@@ -83,6 +83,7 @@ Balance regression matrix and extended prestige stress tests:
 ```bash
 npm run test:balance
 npm run test:balance:stress
+npm run test:personas
 node scripts/balance-matrix.mjs --seeds 424242,1,42,1337
 ```
 
@@ -111,10 +112,28 @@ The balance harness validates six scenarios across four deterministic seeds:
 - `descent` for pressure during the final siege
 - `prestige3` for repeated-cycle milestones
 
+The legacy profiles remain intact as stable economic baselines. A separate
+attention-aware matrix tests eight additional player personas across two seeds:
+
+- `newcomer`: first-time decisions every 20 seconds, with an initial reading delay
+- `engaged`: continuous play with decisions every 10 seconds
+- `optimizer`: experienced, efficient decisions every two seconds
+- `background`: the game stays open, with 30-second visits every two minutes
+- `check_in`: the game closes between one-minute visits every ten minutes
+- `offline_returner`: two-minute visits separated by four-hour offline absences
+- `completionist`: deliberate five-second decisions across every optional system
+- `minimalist`: economic decisions every 30 seconds while skipping optional operations
+
+Personas cannot purchase upgrades, select research, prestige, or perform other manual
+actions while away. Closed-game absences use the same offline siege protection as the
+game itself. Reports include sessions, decision windows, active/offline time, manual
+actions, and cumulative playtime across prestige resets.
+
 The extended stress gate also validates ten prestiges across two seeds. Every pull
-request and push to `main` runs lint, 349 unit tests, all 24 seeded balance
-scenarios, the prestige stress matrix, a production build, and desktop/mobile
-browser journeys before GitHub Pages deployment is allowed.
+request and push to `main` runs lint, 357 unit tests, all 24 legacy balance
+scenarios, 16 attention-aware persona scenarios, the prestige stress matrix, a
+production build, and desktop/mobile browser journeys before GitHub Pages deployment
+is allowed.
 
 ## Recent Direction
 
@@ -125,7 +144,7 @@ Recent iteration work focused on:
 - Automating routine research, late gathering, trained orbital crews, settlement staffing, standing trade routes, and repeatable-upgrade milestones without taking strategic choices away
 - Preserving legacy Senate and tuning progress while making offline final-siege simulation safe
 - Making Reality Forge keys and cycle doctrines materially change the next run
-- Measuring repeated actions, relic timing, economic waiting, operation latency, direct rewards, ignored systems, and repeated prestige across multiple seeded playtest profiles
+- Measuring repeated actions, relic timing, economic waiting, operation latency, attention/check-in patterns, direct rewards, ignored systems, and cumulative prestige time across multiple seeded playtest profiles
 
 ## Tech Stack
 

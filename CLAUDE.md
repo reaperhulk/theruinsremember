@@ -13,7 +13,8 @@
 - `npm run test:unit` — Run the complete Vitest unit and regression suite once
 - `npm run test:balance` — Run six progression scenarios across four deterministic seeds
 - `npm run test:balance:stress` — Exercise ten prestige cycles across two seeds
-- `npm run test:quality` — Run lint, unit tests, the balance matrix, and a production build
+- `npm run test:personas` — Run eight attention-aware player personas across two seeds
+- `npm run test:quality` — Run lint, unit tests, legacy balance and persona matrices, and a production build
 - `npm run build` — Production build to dist/
 
 ## Architecture
@@ -112,10 +113,18 @@ JSON.stringify(__harness.snapshot());
 For pure engine testing without a browser:
 ```bash
 node scripts/balance-matrix.mjs --seeds 424242,1,42,1337
+node scripts/bot-playtest.js --scenario newcomer,engaged,optimizer,background,check_in,offline_returner,completionist,minimalist --seed 424242 --quiet --assert-balance
+node scripts/bot-playtest.js --scenario check_in --seed 42 --json
 node scripts/bot-playtest.js --profile optimal --max-time 14400 --target-era 10
 node scripts/bot-playtest.js --scenario speedrun --json > results.json
 node scripts/bot-playtest.js --compare results.json  # Regression detection
 ```
+
+The original `optimal`, `casual`, `lowInteraction`, and `passive` profiles remain
+unchanged. New personas in `scripts/playtest-personas.js` separately model decision
+intervals, active sessions, background absences, and closed-game offline gaps; manual
+actions can occur only during an actual decision window. JSON results expose attention
+telemetry and `completionStatus.cumulativeTime` across prestige resets.
 
 ## Game Engine API (key exports)
 - `tick(state, dt, rng, options)` — Advance game state by dt seconds
