@@ -9,27 +9,34 @@
 
 ## Dev Commands
 - `npm run dev` — Start Vite dev server (default: http://localhost:5173)
-- `npm run test` — Run Vitest unit tests
+- `npm run test` — Run Vitest unit tests in watch mode
+- `npm run test:unit` — Run the complete Vitest unit and regression suite once
+- `npm run test:balance` — Run six progression scenarios across four deterministic seeds
+- `npm run test:balance:stress` — Exercise ten prestige cycles across two seeds
+- `npm run test:quality` — Run lint, unit tests, the balance matrix, and a production build
 - `npm run build` — Production build to dist/
 
 ## Architecture
-The engine is **pure and deterministic**: `tick(state, dt, rng)` → new state. All game logic lives in `src/engine/`. The React layer in `src/hooks/useGameLoop.js` drives the loop via `requestAnimationFrame`, throttled to ~10 FPS for state updates.
+The engine is **pure and deterministic**: `tick(state, dt, rng, options)` → new state. All game logic lives in `src/engine/`. The React layer in `src/hooks/useGameLoop.js` drives the loop via `requestAnimationFrame`, throttled to ~10 FPS for state updates. Offline catch-up uses `advanceTime(state, seconds, rng, maxStep, { pauseForgetting: true })` so an unattended final siege cannot erase progress or force prestige.
 
 ## Browser Testing with Puppeteer
 
 ### Automated Browser Test
 ```bash
-# Start dev server first: npm run dev
-node scripts/browser-test.mjs                    # Quick layout validation
-node scripts/browser-test.mjs --prestige 2       # Test prestige flow
+# Start dev server first: npm run dev -- --host 127.0.0.1
+node scripts/browser-test.mjs                    # Full desktop gameplay/layout journey
+node scripts/browser-test.mjs --prestige 3       # Include three prestige cycles
 node scripts/browser-test.mjs --mobile           # Mobile viewport (375x812)
 node scripts/browser-test.mjs --screenshots      # Save screenshots to /tmp/game-screenshots/
 ```
 
-The Puppeteer test drives a real headless Chrome through the early game, then hydrates
-a deterministic Era 10 state to validate the operation archive, Weaving choices,
-Signal Locks, cycle doctrines, every main tab, and prestige. It exits nonzero for
-progression misses, console errors, or layout/viewport overflow.
+The Puppeteer test first reloads actual legacy and three-hour-offline saves, validates
+automation toggling, and drives a fresh game naturally through Era 7. Isolated late-game
+fixtures then cover the operation archive, relics, orbital crew training, colony mandates,
+standing trade routes, star-network directives, Dyson commissions, government acts,
+Reality Laws, Signal Locks, the Forgetting siege, all three cycle doctrines, every main
+tab, and prestige. It exits nonzero for progression misses, console errors, failed
+save/operation checks, or layout/viewport overflow.
 
 ### Manual Browser Testing (inject harness)
 1. Start the dev server: `npm run dev`
@@ -104,14 +111,17 @@ JSON.stringify(__harness.snapshot());
 ## Headless Bot Testing
 For pure engine testing without a browser:
 ```bash
+node scripts/balance-matrix.mjs --seeds 424242,1,42,1337
 node scripts/bot-playtest.js --profile optimal --max-time 14400 --target-era 10
 node scripts/bot-playtest.js --scenario speedrun --json > results.json
 node scripts/bot-playtest.js --compare results.json  # Regression detection
 ```
 
 ## Game Engine API (key exports)
-- `tick(state, dt, rng)` — Advance game state by dt seconds
+- `tick(state, dt, rng, options)` — Advance game state by dt seconds
+- `advanceTime(state, seconds, rng, maxStep, options)` — Advance safely through bounded simulation steps
 - `purchaseUpgrade(state, id)` / `getAvailableUpgrades(state)` / `getUpgradeCost(state, id)`
+- `buyNextRepeatableMilestone(state, id)` — Buy repeatable levels up to the next meaningful milestone
 - `unlockTech(state, id)` / `getAvailableTech(state)`
 - `canAfford(state, cost)` / `spend(state, cost)` / `gather(state, resourceId)`
 - `runExpedition(state, routeId)` — Resolve an early-era expedition

@@ -21,21 +21,23 @@ Prestige isn't just a mechanic. It's the cycle itself.
 ## How It Works
 
 - **10 Eras** spanning primitive survival to multiverse exploration
-- **579 upgrades** forming deep prerequisite chains with meaningful branching choices
+- **599 upgrades** forming deep prerequisite chains with 10 mutually exclusive doctrine forks
 - **115 tech nodes** including mutually exclusive paths that shape each run differently
-- **Era-focused operations** that evolve from ruin expeditions into orbital missions, colony mandates, star-network directives, Dyson commissions, permanent cycle laws, galactic politics, cosmic tuning, and the Reality Forge
+- **Era-focused operations** that evolve from ruin expeditions into orbital missions, colony mandates, star-network directives, Dyson commissions, cycle laws, galactic government, cosmic signal locks, and the Reality Forge
 - **Distinct cycle doctrines** that reshape early, middle, or late eras and award permanent cycle marks for doctrine-specific goals
 - **Reality keys with different identities**: faster expeditions, larger storage, stronger operation rewards, or seeded starting resources
 - **Recovered Relics** with guaranteed Echo Pressure offers and a two-slot, run-only loadout that dissolves at prestige
-- **Finite orbital contracts** with approach risk, one decisive docking attempt, and permanent run payoffs instead of unlimited farming
+- **Finite orbital contracts** with three initial docking decisions before trained crews handle later assignments automatically
+- **Self-running colony mandates and standing trade routes** that turn one strategic choice into ongoing staffing and resource exchanges
 - **Finite Dyson commissions** that turn thirty assembly clicks into three module choices before automation takes over
-- **30 prestige upgrades** including 5 "Ascension" tier endgame upgrades
-- **270 reachable achievements** tracking everything from speed milestones to narrative discovery
+- **32 prestige upgrades** including 5 "Ascension" tier endgame upgrades
+- **254 reachable achievements** tracking everything from speed milestones to narrative discovery
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players
 - **Progression-gated era advancement** — new eras require sufficient upgrade depth, era-local research depth, and the starred breakthrough technology instead of passive waiting
 - **Resource caps that matter** — storage is a real constraint requiring strategic cap upgrades
 - **Consumption chains** — food feeds labor, energy powers electronics, fuel maintains orbital infrastructure, exotic materials sustain colonies
-- **Automation cascades** — earlier eras auto-manage as you progress, shifting your focus to new challenges
+- **Automation cascades** — gathering, routine research, earlier eras, repeatable-upgrade milestones, orbital crews, colonies, and reserve routes become self-managing while exclusive choices and breakthroughs remain yours
+- **A final siege against the Forgetting** that freezes destructive timers while you are offline and cannot end an unattended cycle
 - **A narrative Chronicle** collecting lore fragments, recovered signals, and codex discoveries that piece together the story of the cycle
 - **A run-director UI layer** that explains what is blocking the next breakthrough instead of leaving progression hidden in raw numbers
 
@@ -53,7 +55,7 @@ Everything else — architecture, engine design, data balancing, CSS, canvas ren
 
 The agent researched incremental game design best practices (drawing from Cookie Clicker, Antimatter Dimensions, A Dark Room, Trimps, Synergism, and others), audited its own work repeatedly, simulated playthroughs to find dead spots, and fixed its own bugs.
 
-The game is feature-complete and stable. If you find something broken or have a suggestion, [file an issue](https://github.com/reaperhulk/theruinsremember/issues).
+The game continues to evolve through automated playtesting and player feedback. If you find something broken or have a suggestion, [file an issue](https://github.com/reaperhulk/theruinsremember/issues).
 
 ## Running Locally
 
@@ -64,10 +66,10 @@ npm run dev
 
 ## Testing And Playtesting
 
-Pure logic:
+Pure logic and save/prestige regression coverage:
 
 ```bash
-npm test -- --run
+npm run test:unit
 ```
 
 Complete non-browser quality gate:
@@ -76,40 +78,54 @@ Complete non-browser quality gate:
 npm run test:quality
 ```
 
-Balance regression harness:
+Balance regression matrix and extended prestige stress tests:
 
 ```bash
 npm run test:balance
+npm run test:balance:stress
+node scripts/balance-matrix.mjs --seeds 424242,1,42,1337
 ```
 
 Browser smoke tests:
 
 ```bash
-npm run dev
-node scripts/browser-test.mjs
+npm run dev -- --host 127.0.0.1
+node scripts/browser-test.mjs --prestige 3
 node scripts/browser-test.mjs --mobile
 ```
 
-The browser smoke test drives a real early-game flow, exercises orbital mission
-choices, fragment selection, cosmic signal locks, the operation archive, all
-three cycle doctrines, and an Era 10 prestige. It fails on progression misses,
-console errors, or viewport overflow. Use `--prestige 1` to include a reset.
+The browser suite reloads real legacy and offline saves, checks automation controls,
+advances naturally from a fresh run through Era 7, and then validates late-game
+strategic decisions using isolated fixtures. It exercises orbital crew training,
+colony mandates, standing trade routes, star-network directives, relic choices,
+Dyson commissions, government acts, reality laws, signal locks, the Forgetting
+siege, all three cycle doctrines, and prestige. Desktop and mobile runs fail on
+progression misses, console errors, or viewport overflow.
 
-The balance harness currently validates four seeded scenarios:
+The balance harness validates six scenarios across four deterministic seeds:
 
 - `full` for optimal completion pacing
 - `casual` for a normal active run
 - `lowInteraction` for low-interaction viability
 - `passive` for mostly idle viability
+- `descent` for pressure during the final siege
+- `prestige3` for repeated-cycle milestones
+
+The extended stress gate also validates ten prestiges across two seeds. Every pull
+request and push to `main` runs lint, 349 unit tests, all 24 seeded balance
+scenarios, the prestige stress matrix, a production build, and desktop/mobile
+browser journeys before GitHub Pages deployment is allowed.
 
 ## Recent Direction
 
 Recent iteration work focused on:
 
 - Presenting the current era operation prominently while keeping prior systems in an archive
-- Replacing blind or solved interactions with fragment choices, signal probes, docking approaches, colony mandates, and star directives
+- Replacing repeated actions with finite docking choices, colony mandates, star directives, government acts, cycle laws, and signal locks
+- Automating routine research, late gathering, trained orbital crews, settlement staffing, standing trade routes, and repeatable-upgrade milestones without taking strategic choices away
+- Preserving legacy Senate and tuning progress while making offline final-siege simulation safe
 - Making Reality Forge keys and cycle doctrines materially change the next run
-- Measuring repeated actions, relic timing, economic waiting, operation latency, direct rewards, and ignored systems in the seeded playtest harness
+- Measuring repeated actions, relic timing, economic waiting, operation latency, direct rewards, ignored systems, and repeated prestige across multiple seeded playtest profiles
 
 ## Tech Stack
 
