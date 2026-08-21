@@ -92,6 +92,11 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
         <span>Perfect: {info.perfects}</span>
         {combo > 0 && <span className={comboFlash ? 'combo-flash' : ''} style={{ color: '#ffdd44', display: 'inline-block' }}>Combo: x{combo} (+{Math.min(combo, 5) * 20}%)</span>}
       </div>
+      {info.automated && (
+        <p className="operation-commitment">
+          Orbital crews now renew each era's contracts automatically.
+        </p>
+      )}
       <div className="docking-missions" role="group" aria-label="Docking mission">
         {Object.values(DOCKING_MISSIONS).map(mission => (
           <button
@@ -143,7 +148,7 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
         {onCooldown ? `Wait ${cooldownRemaining.toFixed(1)}s` : info.contractComplete ? 'Contract complete' : 'Dock! (d)'}
       </button>
       <p className="operation-hint">
-        Each era offers three finite contracts | Complete a contract for a permanent run payoff | Combo streaks boost rewards up to x2
+        Master three first-cycle contracts | Later contracts run automatically | Combo streaks boost rewards up to x2
       </p>
     </div>
   );

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getAssignableColonies, assignColonies, getColonyAssignments, getColonyBonus, selectColonyMandate } from '../colonies.js';
+import { advanceColonyMandate, getAssignableColonies, assignColonies, getColonyAssignments, getColonyBonus, selectColonyMandate } from '../colonies.js';
 import { createInitialState } from '../state.js';
 
 describe('colonies', () => {
@@ -79,7 +79,28 @@ describe('colonies', () => {
     const bonus = getColonyBonus(mandated);
 
     expect(bonus.food).toBeGreaterThan(baseline.food);
-    expect(bonus.research).toBeLessThan(baseline.research);
+    expect(bonus.research || 0).toBeLessThan(baseline.research);
     expect(selectColonyMandate(mandated, 'inquiry').colonyMandate).toBe('resilience');
+  });
+
+  it('automatically staffs new colonies according to a specialized mandate', () => {
+    const mandated = selectColonyMandate(makeEra5State(), 'resilience');
+    expect(mandated.colonyAssignments).toEqual({ growth: 5, science: 0, industry: 0 });
+
+    const grown = {
+      ...mandated,
+      resources: { ...mandated.resources, colonies: { ...mandated.resources.colonies, amount: 8 } },
+    };
+    expect(advanceColonyMandate(grown).colonyAssignments).toEqual({ growth: 8, science: 0, industry: 0 });
+  });
+
+  it('keeps federation settlements balanced without requiring repeated reassignment', () => {
+    const state = makeEra5State();
+    state.resources.colonies.amount = 14;
+
+    const mandated = selectColonyMandate(state, 'federation');
+
+    expect(mandated.colonyAssignments).toEqual({ growth: 4, science: 4, industry: 6 });
+    expect(advanceColonyMandate(mandated)).toBe(mandated);
   });
 });

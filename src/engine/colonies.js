@@ -22,11 +22,12 @@ export const COLONY_MANDATES = {
 export const COLONY_MANDATE_DURATION = 120;
 
 export function selectColonyMandate(state, mandateId) {
-  if (!COLONY_MANDATES[mandateId]) return state;
+  if (state.era < 5 || !COLONY_MANDATES[mandateId]) return state;
+  if (state.colonyMandate === mandateId) return state;
   const lastChange = state.lastColonyMandateTime;
   const duration = getRelicMandateDuration(state, COLONY_MANDATE_DURATION);
   if (lastChange !== undefined && state.totalTime - lastChange < duration) return state;
-  return { ...state, colonyMandate: mandateId, lastColonyMandateTime: state.totalTime };
+  return advanceColonyMandate({ ...state, colonyMandate: mandateId, lastColonyMandateTime: state.totalTime });
 }
 
 export function getColonyMandateInfo(state) {
@@ -52,6 +53,28 @@ export function getColonyAssignments(state) {
 export function getTotalColoniesAssigned(state) {
   const assignments = getColonyAssignments(state);
   return FOCUS_TYPES.reduce((sum, f) => sum + (assignments[f] || 0), 0);
+}
+
+// The mandate is the decision. Once it is chosen, newly settled colonies
+// follow that doctrine automatically instead of asking for another click.
+export function advanceColonyMandate(state) {
+  const mandate = COLONY_MANDATES[state.colonyMandate];
+  if (state.era < 5 || !mandate) return state;
+
+  const available = getAssignableColonies(state);
+  const next = { growth: 0, science: 0, industry: 0 };
+  if (mandate.focus) {
+    next[mandate.focus] = available;
+  } else {
+    const shared = Math.floor(available / 3);
+    next.growth = shared;
+    next.science = shared;
+    next.industry = Math.max(0, available - shared - shared);
+  }
+
+  const current = getColonyAssignments(state);
+  if (FOCUS_TYPES.every(focus => (current[focus] || 0) === next[focus])) return state;
+  return { ...state, colonyAssignments: next };
 }
 
 // Assign colonies to a focus. Returns new state or null if invalid.

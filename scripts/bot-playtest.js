@@ -10,7 +10,7 @@ import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable
 import { unlockTech, getAvailableTech } from '../src/engine/tech.js';
 import { canAfford, gather, getEffectiveRate, getNetRate } from '../src/engine/resources.js';
 import { attemptDock, getDockingInfo, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
-import { assignColonies, getAssignableColonies, getColonyBonus } from '../src/engine/colonies.js';
+import { getColonyBonus, selectColonyMandate } from '../src/engine/colonies.js';
 import { getRouteBonus, selectNetworkPlan } from '../src/engine/starChart.js';
 import { getWeaveProductionMultiplier, getWeavingStats, weaveRealityLaw } from '../src/engine/weaving.js';
 import { executeTrade, getTradeRatio } from '../src/engine/trading.js';
@@ -255,6 +255,8 @@ const BALANCE_TARGETS = {
     maxFirstRelicTime: 600,
     minRelics: 2,
     maxDockingAttempts: 30,
+    maxDockingActions: 3,
+    maxColonyActions: 1,
     maxDysonCommissions: 3,
     maxRealityLaws: 3,
     maxTuningLocks: 3,
@@ -282,7 +284,7 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3, maxStarChartActions: 2, noCollapse: true },
+  casual: { minTime: 1500, maxTime: 14400, requiredEra: 10, cycleReady: true, maxFirstOperationLatency: 180, maxIgnoredOperations: 0, maxFirstRelicTime: 1800, minRelics: 2, maxDockingAttempts: 50, maxDockingActions: 3, maxColonyActions: 1, maxDysonCommissions: 3, maxRealityLaws: 3, maxTuningLocks: 3, maxSenateActs: 3, maxStarChartActions: 2, noCollapse: true },
   descent: { minRecursionDepth: 2, requireCollapse: true, minStatePrestiges: 1 },
   // The compression floor: with three prestiges banked the final run must
   // still take minutes, not seconds — decisions replay every cycle.
@@ -353,7 +355,7 @@ function botBuyTech(state, profile, _t, _rng) {
 }
 
 function botDock(state, profile, t, rng) {
-  if (!profile.docking || state.era < 4) return state;
+  if (!profile.docking || state.era !== 4) return state;
   const interval = profile.dockInterval || 3;
   if (t % interval !== 0) return state;
 
@@ -374,33 +376,16 @@ function botDock(state, profile, t, rng) {
   return state;
 }
 
-function botColonies(state, profile, t, _rng) {
+function botColonies(state, profile, _t, _rng) {
   if (!profile.colonies || state.era < 5) return state;
-  // Re-assign every 30s
-  if (t % 30 !== 0) return state;
-
-  const assignable = getAssignableColonies(state);
-  if (assignable < 1) return state;
-
-  const strategy = profile.colonyStrategy || 'diversified';
-  if (strategy === 'diversified') {
-    const perFocus = Math.floor(assignable / 3);
-    const remainder = assignable - perFocus * 3;
-    for (const [focus, count] of [['growth', perFocus], ['science', perFocus + remainder], ['industry', perFocus]]) {
-      const result = assignColonies(state, focus, count);
-      if (result) state = result;
-    }
-  } else if (strategy === 'growth') {
-    const result = assignColonies(state, 'growth', assignable);
-    if (result) state = result;
-  } else if (strategy === 'science') {
-    const result = assignColonies(state, 'science', assignable);
-    if (result) state = result;
-  } else if (strategy === 'industry') {
-    const result = assignColonies(state, 'industry', assignable);
-    if (result) state = result;
-  }
-  return state;
+  if (state.colonyMandate) return state;
+  const mandates = {
+    diversified: 'federation',
+    growth: 'resilience',
+    science: 'inquiry',
+    industry: 'extraction',
+  };
+  return selectColonyMandate(state, mandates[profile.colonyStrategy] || 'federation');
 }
 
 function botStarChart(state, profile, _t, _rng) {
@@ -1380,6 +1365,14 @@ function assertBalanceTargets(allResults) {
     if (target.minRelics != null && status.activeRelics.length < target.minRelics) issues.push(`only ${status.activeRelics.length}/${target.minRelics} relics equipped`);
     if (target.maxDockingAttempts != null && collector.operationStats.docking.attempts > target.maxDockingAttempts) {
       issues.push(`docking repeated ${collector.operationStats.docking.attempts} times`);
+    }
+    if (target.maxDockingActions != null) {
+      const actions = Object.values(collector.engagement.actionsByEra).reduce((sum, era) => sum + (era.docking || 0), 0);
+      if (actions > target.maxDockingActions) issues.push(`docking required ${actions} manual actions`);
+    }
+    if (target.maxColonyActions != null) {
+      const actions = Object.values(collector.engagement.actionsByEra).reduce((sum, era) => sum + (era.colonies || 0), 0);
+      if (actions > target.maxColonyActions) issues.push(`colonies required ${actions} manual actions`);
     }
     if (target.maxDysonCommissions != null) {
       const commissions = Object.values(collector.engagement.actionsByEra).reduce((sum, actions) => sum + (actions.dyson || 0), 0);

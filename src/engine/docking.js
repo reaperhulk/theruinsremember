@@ -44,6 +44,12 @@ export function getDockingContracts(state) {
   return { era: state.era, cargo: 0, crew: 0, science: 0 };
 }
 
+export function hasAutomatedDocking(state) {
+  if (state.era < 5) return false;
+  const completed = state.dockingContractsCompleted || {};
+  return ['cargo', 'crew', 'science'].every(missionId => (completed[missionId] || 0) > 0);
+}
+
 function applyContractPayoff(resources, missionId, era) {
   const payoff = {
     cargo: { resourceId: 'rocketFuel', rateAdd: 3 * era },
@@ -230,6 +236,22 @@ export function attemptDock(state, position) {
   };
 }
 
+// Completing the first contract board teaches the orbital crews the route.
+// Later eras renew those same finite contracts without calling the player
+// back to an operation whose decisions were already exhausted.
+export function advanceDockingContracts(state) {
+  if (!hasAutomatedDocking(state) || getDockingCooldown(state) > 0) return state;
+
+  const contracts = getDockingContracts(state);
+  const nextMission = ['cargo', 'crew', 'science'].find(
+    missionId => (contracts[missionId] || 0) < DOCKING_CONTRACT_QUOTA,
+  );
+  if (!nextMission) return state;
+
+  const queued = selectDockingMission(state, nextMission);
+  return attemptDock(queued, getTargetZone(queued)).state;
+}
+
 // Get zone info for UI rendering
 export function getDockingInfo(state) {
   const missionId = DOCKING_MISSIONS[state.dockingMission] ? state.dockingMission : 'cargo';
@@ -247,6 +269,7 @@ export function getDockingInfo(state) {
     contracts,
     contractQuota: DOCKING_CONTRACT_QUOTA,
     cooldown: getDockingCooldown(state),
+    automated: hasAutomatedDocking(state),
     contractComplete: (contracts[missionId] || 0) >= DOCKING_CONTRACT_QUOTA,
     attempts: state.dockingAttempts || 0,
     successes: state.dockingSuccesses || 0,

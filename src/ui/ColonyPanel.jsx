@@ -66,6 +66,11 @@ export const ColonyPanel = memo(function ColonyPanel({ state, onUpdate }) {
           </button>
         ))}
       </div>
+      <p className="operation-commitment">
+        {mandateInfo.mandate
+          ? `${mandateInfo.mandate.name} automatically assigns every new colony.`
+          : 'Choose a mandate once. New colonies will follow it automatically.'}
+      </p>
       {mandateInfo.cooldown > 0 && <p className="operation-commitment">Mandate committed for {Math.ceil(mandateInfo.cooldown)}s</p>}
       {maxColonies > 0 && totalAssigned > 0 && (
         <div className="colony-bar">
@@ -119,7 +124,7 @@ export const ColonyPanel = memo(function ColonyPanel({ state, onUpdate }) {
           Every colony site matches coordinates from the ancient maps.
         </p>
       )}
-      <p className="operation-hint">Specialize x2 | Diversify x1.25 | Era bonus scales output</p>
+      <p className="operation-hint">Choose one mandate | Settlement grows automatically | Specialize x2 or diversify x1.25</p>
     </div>
   );
 });

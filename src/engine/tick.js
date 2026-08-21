@@ -1,7 +1,8 @@
 import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
 import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
-import { getColonyBonus } from './colonies.js';
+import { advanceColonyMandate, getColonyBonus } from './colonies.js';
+import { advanceDockingContracts } from './docking.js';
 import { advanceNetworkPlan, getRouteBonus } from './starChart.js';
 import { checkAchievements } from './achievements.js';
 import { purchaseUpgrade, buyRoutineBuildOut, isDecisionUpgrade } from './upgrades.js';
@@ -323,6 +324,11 @@ export function tick(state, dt, rng = Math.random, options = {}) {
       if (result.count === 0) break;
       newState = result.state;
     }
+  }
+
+  if (newState.era >= 5) {
+    newState = advanceColonyMandate(newState);
+    newState = advanceDockingContracts(newState);
   }
 
   // Auto-gather: manual gathering is a launch-phase activity. Orbital

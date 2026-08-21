@@ -506,6 +506,34 @@ async function run() {
   }));
   const senateFailed = !senateAudit || senateAudit.factionChoices !== 3 || !senateAudit.acts.includes('1/3');
   console.log(`  Senate policy acts: ${senateFailed ? 'FAILED' : '3 factions, mandate granted'}`);
+  const colonyMounted = await page.evaluate(() => {
+    const select = document.querySelector('.operation-archive select');
+    if (!select) return false;
+    select.value = 'colony';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+  });
+  await new Promise(resolve => setTimeout(resolve, 100));
+  if (colonyMounted) {
+    await page.evaluate(() => {
+      const federation = [...document.querySelectorAll('.colony-mandates button')]
+        .find(button => button.textContent.includes('Federation'));
+      federation?.click();
+    });
+  }
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const colonyAudit = colonyMounted && await page.evaluate(() => {
+    const state = window.__game.getState();
+    return {
+      mandate: state.colonyMandate,
+      choices: document.querySelectorAll('.colony-mandates button').length,
+      staffed: Object.values(state.colonyAssignments || {}).filter(count => count > 0).length,
+      explainsAutomation: document.querySelector('.colony-panel')?.textContent.includes('automatically assigns'),
+    };
+  });
+  const colonyFailed = !colonyAudit || colonyAudit.mandate !== 'federation'
+    || colonyAudit.choices !== 4 || colonyAudit.staffed !== 3 || !colonyAudit.explainsAutomation;
+  console.log(`  Colony mandate automation: ${colonyFailed ? 'FAILED' : '4 mandates, federation staffs every focus'}`);
   const chartMounted = await page.evaluate(() => {
     const select = document.querySelector('.operation-archive select');
     if (!select) return false;
@@ -670,7 +698,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || migrationFailed || offlineFailed || automationFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || migrationFailed || offlineFailed || automationFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || colonyFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

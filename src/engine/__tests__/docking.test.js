@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { attemptDock, DOCKING_CONTRACT_RECOVERY, getDockingCooldown, getDockingInfo, getTargetZone, getIndicatorPosition, selectDockingApproach, selectDockingMission } from '../docking.js';
+import { advanceDockingContracts, attemptDock, DOCKING_CONTRACT_RECOVERY, getDockingCooldown, getDockingInfo, getTargetZone, getIndicatorPosition, hasAutomatedDocking, selectDockingApproach, selectDockingMission } from '../docking.js';
 import { createInitialState } from '../state.js';
 
 describe('docking', () => {
@@ -185,5 +185,29 @@ describe('docking', () => {
     state.era = 5;
 
     expect(getDockingInfo(state).contracts).toEqual({ era: 5, cargo: 0, crew: 0, science: 0 });
+  });
+
+  it('automates future contract boards only after all three orbital choices were mastered', () => {
+    const state = makeEra4State();
+    state.era = 5;
+    state.dockingContractsCompleted = { cargo: 1, crew: 1, science: 1 };
+
+    expect(hasAutomatedDocking(state)).toBe(true);
+    const cargo = advanceDockingContracts(state);
+    expect(cargo.dockingContracts.cargo).toBe(1);
+    expect(advanceDockingContracts(cargo)).toBe(cargo);
+
+    const ready = { ...cargo, totalTime: cargo.totalTime + DOCKING_CONTRACT_RECOVERY };
+    const crew = advanceDockingContracts(ready);
+    expect(crew.dockingContracts.crew).toBe(1);
+  });
+
+  it('never automates an unfinished first-cycle orbital decision', () => {
+    const state = makeEra4State();
+    state.era = 5;
+    state.dockingContractsCompleted = { cargo: 1, crew: 0, science: 1 };
+
+    expect(hasAutomatedDocking(state)).toBe(false);
+    expect(advanceDockingContracts(state)).toBe(state);
   });
 });
