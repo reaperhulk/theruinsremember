@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -14,7 +16,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run test:quality
+      - run: npm run test:balance:stress
+      - run: npx puppeteer browsers install chrome-headless-shell
+      - name: Start the game server
+        run: |
+          npm run dev -- --host 127.0.0.1 &
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:5173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+      - run: node scripts/browser-test.mjs --prestige 3
+      - run: node scripts/browser-test.mjs --mobile
+
   build:
+    if: github.event_name == 'push'
+    needs: quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

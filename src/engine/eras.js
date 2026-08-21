@@ -116,7 +116,12 @@ export function getEraMastery(state, era = state.era) {
   let current = 0;
   let target = 0;
 
-  if (era === 5) {
+  if (era === 4) {
+    title = 'Orbital Operations';
+    detail = 'Complete the cargo, crew, and science contracts, or build out the orbital economy.';
+    current = Object.values(state.dockingMissions || {}).filter(count => count > 0).length;
+    target = 3;
+  } else if (era === 5) {
     title = 'Colony Doctrine';
     const assignments = Object.values(state.colonyAssignments || {});
     if (state.cycleDoctrine === 'expansion') {

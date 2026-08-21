@@ -72,6 +72,19 @@ describe('eras', () => {
   });
 
   describe('era mastery', () => {
+    it('keeps the Space Age open until its three finite contracts resolve', () => {
+      const state = createInitialState();
+      state.era = 4;
+      state.dockingMissions = { cargo: 1, crew: 1, science: 0 };
+
+      expect(getEraMastery(state).current).toBe(2);
+      expect(getEraMastery(state).met).toBe(false);
+
+      state.dockingMissions.science = 1;
+      expect(getEraMastery(state).completedDirectly).toBe(true);
+      expect(getEraMastery(state).met).toBe(true);
+    });
+
     it('recognizes direct system mastery in later eras', () => {
       const state = createInitialState();
       state.era = 7;

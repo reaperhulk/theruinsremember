@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { attemptDock, getDockingInfo, getTargetZone, getIndicatorPosition, selectDockingApproach, selectDockingMission } from '../docking.js';
+import { attemptDock, DOCKING_CONTRACT_RECOVERY, getDockingCooldown, getDockingInfo, getTargetZone, getIndicatorPosition, selectDockingApproach, selectDockingMission } from '../docking.js';
 import { createInitialState } from '../state.js';
 
 describe('docking', () => {
@@ -71,7 +71,7 @@ describe('docking', () => {
     const { state: after1 } = attemptDock(state, 0.5);
     expect(after1.dockingAttempts).toBe(1);
     // Advance time past cooldown
-    after1.totalTime += 3;
+    after1.totalTime += DOCKING_CONTRACT_RECOVERY;
     const { state: after2 } = attemptDock(after1, 0.5);
     expect(after2.dockingAttempts).toBe(2);
   });
@@ -84,13 +84,26 @@ describe('docking', () => {
     expect(result).toBe('cooldown');
   });
 
+  it('gives a completed contract time to resolve before the next orbital commitment', () => {
+    const state = makeEra4State();
+    const first = attemptDock(state, getTargetZone(state)).state;
+
+    expect(getDockingCooldown(first)).toBe(DOCKING_CONTRACT_RECOVERY);
+    const nextMission = selectDockingMission(first, 'crew');
+    expect(attemptDock(nextMission, getTargetZone(nextMission)).result).toBe('cooldown');
+
+    const recovered = { ...nextMission, totalTime: nextMission.totalTime + DOCKING_CONTRACT_RECOVERY };
+    expect(getDockingCooldown(recovered)).toBe(0);
+    expect(attemptDock(recovered, getTargetZone(recovered)).result).toBe('perfect');
+  });
+
   it('combo increases rewards on consecutive successes', () => {
     const state = makeEra4State();
     const zone = getTargetZone(state);
     const { state: after1 } = attemptDock(state, zone);
     expect(after1.dockingCombo).toBe(1);
     // Advance past cooldown and dock again
-    after1.totalTime += 3;
+    after1.totalTime += DOCKING_CONTRACT_RECOVERY;
     const nextContract = selectDockingMission(after1, 'crew');
     const zone2 = getTargetZone(nextContract);
     const { state: after2 } = attemptDock(nextContract, zone2);
@@ -162,7 +175,7 @@ describe('docking', () => {
     expect(state.dockingContracts.cargo).toBe(1);
     expect(state.dockingContractsCompleted.cargo).toBe(1);
     expect(state.resources.rocketFuel.rateAdd).toBeCloseTo(12);
-    state.totalTime += 3;
+    state.totalTime += DOCKING_CONTRACT_RECOVERY;
     expect(attemptDock(state, getTargetZone(state)).result).toBe('contractComplete');
   });
 

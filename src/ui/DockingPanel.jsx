@@ -39,8 +39,7 @@ export const DockingPanel = memo(function DockingPanel({ state, onUpdate }) {
     }
     prevComboRef.current = combo;
   }, [combo]);
-  const lastDock = state.lastDockTime || 0;
-  const cooldownRemaining = Math.max(0, 2 - (state.totalTime - lastDock));
+  const cooldownRemaining = info.cooldown;
   const onCooldown = cooldownRemaining > 0;
 
   const handleDock = useCallback(() => {

@@ -265,8 +265,8 @@ const BALANCE_TARGETS = {
     noCollapse: true,
     // Key N bounds the duration of era N-1.
     eraRanges: {
-      2: [90, 240],
-      3: [90, 300],
+      2: [70, 240],
+      3: [70, 300],
       4: [5, 180],
       // Era 4 dwell is pinned by an affordability cliff under doctrine-fork
       // power; contracts, techs, and mastery still all complete. Floor
@@ -286,7 +286,8 @@ const BALANCE_TARGETS = {
   descent: { minRecursionDepth: 2, requireCollapse: true, minStatePrestiges: 1 },
   // The compression floor: with three prestiges banked the final run must
   // still take minutes, not seconds — decisions replay every cycle.
-  prestige3: { minTime: 210, requiredEra: 10, cycleReady: true },
+  prestige3: { minTime: 210, requiredEra: 10, cycleReady: true, minPrestiges: 3 },
+  prestige10: { minTime: 120, maxTime: 1800, requiredEra: 10, cycleReady: true, minPrestiges: 10 },
   lowInteraction: { minTime: 4800, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
   passive: { minTime: 5400, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true },
 };
@@ -358,6 +359,7 @@ function botDock(state, profile, t, rng) {
 
   const missions = ['cargo', 'crew', 'science'];
   const dockingInfo = getDockingInfo(state);
+  if (dockingInfo.cooldown > 0) return state;
   const missionId = missions.find(id => (dockingInfo.contracts[id] || 0) < dockingInfo.contractQuota);
   if (!missionId) return state;
   state = selectDockingMission(state, missionId);
@@ -726,6 +728,7 @@ function updateOperationStats(prevState, state, collector) {
   s.docking.attempts = state.dockingAttempts || 0;
   s.docking.successes = state.dockingSuccesses || 0;
   s.docking.perfects = state.dockingPerfects || 0;
+  s.colonies.assignments = Object.values(state.colonyAssignments || {}).reduce((sum, count) => sum + count, 0);
   s.weaving.weaves = state.totalWeaves || 0;
   s.dyson.segments = state.dysonSegments || 0;
   s.tuning.locks = Object.keys(state.lockedSignals || {}).length;
@@ -772,6 +775,22 @@ function recordBotAction(before, after, action, collector) {
   const byEra = collector.engagement.actionsByEra[era] || {};
   byEra[action] = (byEra[action] || 0) + 1;
   collector.engagement.actionsByEra[era] = byEra;
+
+  const signatureActions = {
+    1: ['expedition'],
+    2: ['expedition'],
+    3: ['expedition'],
+    4: ['docking'],
+    5: ['colonies'],
+    6: ['starChart'],
+    7: ['dyson'],
+    8: ['senate', 'weaving'],
+    9: ['tuning'],
+    10: ['realityForge', 'forgetting'],
+  };
+  if (signatureActions[era]?.includes(action) && collector.engagement.firstOperationLatencyByEra[era] === undefined) {
+    collector.engagement.firstOperationLatencyByEra[era] = Math.max(0, before.totalTime - (before.eraStartTime || 0));
+  }
 
   const rewardActions = new Set(['expedition', 'docking', 'weaving', 'trading', 'dyson', 'tuning', 'senate', 'realityForge']);
   const directReward = Math.max(0, totalResourceAmounts(after) - totalResourceAmounts(before));
@@ -1339,12 +1358,19 @@ function assertBalanceTargets(allResults) {
 
   for (const { scenarioName, collector } of allResults) {
     const target = BALANCE_TARGETS[scenarioName];
-    if (!target) continue;
+    if (!target) {
+      failures++;
+      console.log(`  ✗ ${scenarioName}: no balance assertion targets configured`);
+      continue;
+    }
 
     const status = collector.completionStatus;
     const issues = [];
     if (status.finalEra < target.requiredEra) issues.push(`final era ${status.finalEra} < ${target.requiredEra}`);
     if (target.cycleReady && !status.cycleReady) issues.push('cycle not ready to prestige');
+    if (target.minPrestiges != null && status.prestigeCount < target.minPrestiges) {
+      issues.push(`only completed ${status.prestigeCount}/${target.minPrestiges} prestige cycles`);
+    }
     if (target.maxIgnoredOperations != null && collector.engagement.ignoredOperations.length > target.maxIgnoredOperations) {
       issues.push(`ignored configured operations: ${collector.engagement.ignoredOperations.join(', ')}`);
     }

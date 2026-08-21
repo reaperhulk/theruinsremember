@@ -13,6 +13,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import { upgrades } from '../src/data/upgrades.js';
+import { prestigeUpgrades } from '../src/data/prestige-upgrades.js';
 
 const PRESTIGE_CYCLES = parseInt(process.argv.find((_, i, a) => a[i-1] === '--prestige') || '0');
 const MOBILE = process.argv.includes('--mobile');
@@ -87,6 +88,114 @@ async function getState(page) {
   });
 }
 
+async function reloadWithSave(page, save, offlineSeconds = 0) {
+  const script = await page.evaluateOnNewDocument((serialized, elapsed) => {
+    const restored = JSON.parse(serialized);
+    restored.lastSaved = Date.now() - elapsed * 1000;
+    localStorage.setItem('incremental-game-save', JSON.stringify(restored));
+  }, JSON.stringify(save), offlineSeconds);
+  await page.reload({ waitUntil: 'networkidle0', timeout: 30000 });
+  await page.removeScriptToEvaluateOnNewDocument(script.identifier);
+  await page.waitForFunction(() => window.__game, { timeout: 10000 });
+}
+
+async function exercisePersistenceAndAutomation(page) {
+  const legacySave = await page.evaluate(() => {
+    const initial = window.__game.getState();
+    const legacy = {
+      ...initial,
+      era: 9,
+      totalTime: 500,
+      tuningScore: 100,
+      senate: { merchants: 20, scholars: 8, warriors: 3 },
+      lastSaved: Date.now(),
+    };
+    delete legacy.lockedSignals;
+    delete legacy.senateGov;
+    return legacy;
+  });
+  await reloadWithSave(page, legacySave);
+  const migrated = await page.evaluate(() => {
+    const state = window.__game.getState();
+    return {
+      locks: Object.keys(state.lockedSignals || {}).sort(),
+      leader: state.senateGov?.leader,
+      partner: state.senateGov?.partner,
+      ratified: state.senateGov?.ratified,
+    };
+  });
+
+  const offlineSave = await page.evaluate(() => {
+    const state = window.__game.getState();
+    const totalTime = 1000;
+    const offline = {
+      ...state,
+      era: 10,
+      totalTime,
+      autoBuildOut: false,
+      lockedSignals: { stability: true },
+      forgetting: {
+        meter: 40,
+        startedAt: totalTime - 20,
+        depthStartedAt: totalTime - 10,
+        nextSurgeAt: totalTime + 15,
+        tendrils: [{
+          id: 1,
+          targetId: 'lock:stability',
+          spawnedAt: totalTime - 5,
+          spawnAngle: 1,
+          arrivesAt: totalTime + 20,
+          phase: 'approach',
+          heldSince: null,
+          consumesAt: null,
+        }],
+        scars: {},
+        wardens: [{ id: 1, nodeId: null, movedAt: totalTime - 5 }],
+        sealed: 0,
+        consumed: 0,
+        collapsed: false,
+        nextTendrilId: 2,
+      },
+    };
+    return offline;
+  });
+  await reloadWithSave(page, offlineSave, 3 * 60 * 60);
+  await page.waitForFunction(() => document.querySelector('.offline-report'), { timeout: 10000 });
+  const protectedOffline = await page.evaluate(() => {
+    const state = window.__game.getState();
+    return {
+      era: state.era,
+      prestigeCount: state.prestigeCount || 0,
+      meter: state.forgetting?.meter,
+      reportExplainsProtection: document.querySelector('.offline-report')?.textContent.includes('The Forgetting waited'),
+    };
+  });
+
+  const clearSave = await page.evaluateOnNewDocument(() => localStorage.clear());
+  await page.reload({ waitUntil: 'networkidle0', timeout: 30000 });
+  await page.removeScriptToEvaluateOnNewDocument(clearSave.identifier);
+  await page.waitForFunction(() => window.__game && document.querySelector('.buildout-toggle'), { timeout: 10000 });
+  const automation = await page.evaluate(() => {
+    const toggle = document.querySelector('.buildout-toggle');
+    const initiallyEnabled = toggle?.getAttribute('aria-pressed') === 'true';
+    toggle?.click();
+    return { initiallyEnabled };
+  });
+  await new Promise(resolve => setTimeout(resolve, 100));
+  automation.disabledAfterClick = await page.evaluate(() => (
+    window.__game.getState().autoBuildOut === false &&
+    document.querySelector('.buildout-toggle')?.getAttribute('aria-pressed') === 'false'
+  ));
+  await page.evaluate(() => document.querySelector('.buildout-toggle')?.click());
+  await new Promise(resolve => setTimeout(resolve, 100));
+  automation.enabledAfterSecondClick = await page.evaluate(() => (
+    window.__game.getState().autoBuildOut === true &&
+    document.querySelector('.buildout-toggle')?.getAttribute('aria-pressed') === 'true'
+  ));
+
+  return { migrated, protectedOffline, automation };
+}
+
 async function promoteToEra10(page) {
   const era10UpgradeIds = Object.values(upgrades).filter(upgrade => upgrade.era === 10).slice(0, 20).map(upgrade => upgrade.id);
   await page.evaluate((upgradeIds) => {
@@ -114,6 +223,9 @@ async function exerciseOrbitalOperations(page) {
       ...state,
       era: 4,
       totalTime: Math.max(100, state.totalTime),
+      eraStartTime: Math.max(100, state.totalTime),
+      dockingMissions: { cargo: 0, crew: 0, science: 0 },
+      dockingContracts: { era: 4, cargo: 0, crew: 0, science: 0 },
       resources: Object.fromEntries(Object.entries(state.resources).map(([id, resource]) => [
         id,
         { ...resource, unlocked: resource.unlocked || ['rocketFuel', 'orbitalInfra'].includes(id), amount: Math.max(resource.amount || 0, 1000) },
@@ -268,6 +380,23 @@ async function run() {
   await page.waitForFunction(() => window.__game, { timeout: 10000 });
   await new Promise(r => setTimeout(r, 500));
 
+  const persistence = await exercisePersistenceAndAutomation(page);
+  const migrationFailed = persistence.migrated.locks.join(',') !== 'constants,power,stability'
+    || persistence.migrated.leader !== 'merchants'
+    || persistence.migrated.partner !== 'scholars'
+    || !persistence.migrated.ratified;
+  const offlineFailed = persistence.protectedOffline.era !== 10
+    || persistence.protectedOffline.prestigeCount !== 0
+    || persistence.protectedOffline.meter < 40
+    || persistence.protectedOffline.meter >= 41
+    || !persistence.protectedOffline.reportExplainsProtection;
+  const automationFailed = !persistence.automation.initiallyEnabled
+    || !persistence.automation.disabledAfterClick
+    || !persistence.automation.enabledAfterSecondClick;
+  console.log(`  Legacy save migration: ${migrationFailed ? 'FAILED' : 'Senate government and three signal locks preserved'}`);
+  console.log(`  Offline siege protection: ${offlineFailed ? 'FAILED' : 'three offline hours, no collapse or reset'}`);
+  console.log(`  Automation controls: ${automationFailed ? 'FAILED' : 'build-out toggles off and on'}`);
+
   // Start auto-player
   await startPump(page);
   console.log('Auto-player started');
@@ -285,8 +414,9 @@ async function run() {
       await screenshot(page, `early_era${state.era}`);
     }
 
-    if (state.era >= 3) {
+    if (state.era >= 7) {
       earlyGameReached = true;
+      console.log(`  Natural progression reached Era ${state.era} without injecting late-game state`);
       break;
     }
   }
@@ -455,6 +585,13 @@ async function run() {
   const doctrineOrder = ['reconstruction', 'expansion', 'transcendence'];
   for (let cycle = 0; cycle < PRESTIGE_CYCLES; cycle++) {
     const doctrineId = doctrineOrder[cycle % doctrineOrder.length];
+    if (cycle === 0) {
+      await page.evaluate(() => window.__game.setState(state => ({
+        ...state,
+        prestigeUpgrades: { ...state.prestigeUpgrades, fastStart: true },
+      })));
+      await new Promise(r => setTimeout(r, 100));
+    }
     await page.evaluate(index => document.querySelectorAll('.cycle-doctrines button')[index]?.click(), cycle % doctrineOrder.length);
     await new Promise(r => setTimeout(r, 100));
     await page.evaluate(() => document.querySelector('.prestige-btn')?.click());
@@ -463,10 +600,18 @@ async function run() {
     await new Promise(r => setTimeout(r, 300));
     const cycleStart = await page.evaluate(() => {
       const state = window.__game.getState();
-      return { doctrine: state.cycleDoctrine, food: state.resources.food.amount, quantumKeys: state.realityKeys?.quantum || 0 };
+      return {
+        doctrine: state.cycleDoctrine,
+        food: state.resources.food.amount,
+        quantumKeys: state.realityKeys?.quantum || 0,
+        forkHearth: !!state.upgrades.forkHearth,
+        forkQuarry: !!state.upgrades.forkQuarry,
+      };
     });
     const expectedSeed = cycleStart.quantumKeys * 25;
-    if (cycleStart.doctrine !== doctrineId || cycleStart.food < expectedSeed) doctrineCycleFailed = true;
+    if (cycleStart.doctrine !== doctrineId || cycleStart.food < expectedSeed || cycleStart.forkHearth || cycleStart.forkQuarry) {
+      doctrineCycleFailed = true;
+    }
     console.log(`  Cycle ${cycle + 1} begins with ${cycleStart.doctrine || 'no'} doctrine and ${Math.floor(cycleStart.food)} food`);
     await promoteToEra10(page);
     console.log(`  Prestige cycle ${cycle + 1} completed`);
@@ -498,7 +643,7 @@ async function run() {
   console.log('\n=== FINAL STATE ===');
   console.log(`  Era: ${final.era} | Upgrades: ${final.upgrades} | Tech: ${final.tech}`);
   console.log(`  Achievements: ${final.achievements} | Prestige: ${final.prestigeCount} (x${final.prestigeMultiplier})`);
-  console.log(`  Prestige upgrades: ${final.prestigeUpgrades}/30`);
+  console.log(`  Prestige upgrades: ${final.prestigeUpgrades}/${Object.keys(prestigeUpgrades).length}`);
   if (final.trueEnding) console.log('  TRUE ENDING achieved');
 
   // Console errors
@@ -525,7 +670,7 @@ async function run() {
     console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
+  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || migrationFailed || offlineFailed || automationFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   await browser.close();
   process.exit(exitCode);
 }

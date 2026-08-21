@@ -11,7 +11,8 @@ const BASE_SPEED = 0.6;      // cycles per second at era 4 (~1.7s full sweep)
 
 // Resource rewards for docking — now calculated dynamically based on production rates
 const REWARD_MISS = {};
-const COOLDOWN = 2; // seconds between dock attempts
+export const DOCKING_RETRY_COOLDOWN = 2;
+export const DOCKING_CONTRACT_RECOVERY = 10;
 export const DOCKING_CONTRACT_QUOTA = 1;
 
 export const DOCKING_MISSIONS = {
@@ -108,14 +109,23 @@ export function getTargetZone(state) {
   return 0.2 + ((seed * 7 + 3) % 10) / 10 * 0.6;
 }
 
+export function getDockingCooldown(state) {
+  const retryRemaining = state.lastDockTime === undefined
+    ? 0
+    : Math.max(0, DOCKING_RETRY_COOLDOWN - (state.totalTime - state.lastDockTime));
+  const recoveryRemaining = state.lastDockContractTime === undefined
+    ? 0
+    : Math.max(0, DOCKING_CONTRACT_RECOVERY - (state.totalTime - state.lastDockContractTime));
+  return Math.max(retryRemaining, recoveryRemaining);
+}
+
 // Attempt a dock at the given position (0-1).
 // Returns { state, result } where result is 'miss' | 'good' | 'perfect'.
 export function attemptDock(state, position) {
   if (state.era < 4) return { state, result: 'miss' };
 
   // Cooldown check
-  const lastDock = state.lastDockTime || 0;
-  if (state.totalTime - lastDock < COOLDOWN) return { state, result: 'cooldown' };
+  if (getDockingCooldown(state) > 0) return { state, result: 'cooldown' };
 
   const zoneCenter = getTargetZone(state);
   const missionId = DOCKING_MISSIONS[state.dockingMission] ? state.dockingMission : 'cargo';
@@ -190,6 +200,7 @@ export function attemptDock(state, position) {
     ...state,
     resources: newResources,
     lastDockTime: state.totalTime,
+    ...(contractCompleted ? { lastDockContractTime: state.totalTime } : {}),
     dockingCombo: combo,
     dockingAttempts: (state.dockingAttempts || 0) + 1,
     dockingSuccesses: result !== 'miss'
@@ -235,6 +246,7 @@ export function getDockingInfo(state) {
     missions: state.dockingMissions || { cargo: 0, crew: 0, science: 0 },
     contracts,
     contractQuota: DOCKING_CONTRACT_QUOTA,
+    cooldown: getDockingCooldown(state),
     contractComplete: (contracts[missionId] || 0) >= DOCKING_CONTRACT_QUOTA,
     attempts: state.dockingAttempts || 0,
     successes: state.dockingSuccesses || 0,
