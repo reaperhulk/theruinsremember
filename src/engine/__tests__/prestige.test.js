@@ -202,6 +202,27 @@ describe('prestige', () => {
       expect(after.upgrades.forkQuarry).toBeUndefined();
     });
 
+    it('unlocks launch-phase auto-gathering on the third prestige', () => {
+      const state = createInitialState();
+      state.era = 10;
+      state.prestigeCount = 2;
+
+      expect(performPrestige(state).autoGather).toBe(true);
+    });
+
+    it('doubles starting resources on the tenth prestige milestone', () => {
+      const state = createInitialState();
+      state.era = 10;
+      state.prestigeCount = 9;
+
+      const after = performPrestige(state);
+
+      expect(after.prestigeCount).toBe(10);
+      expect(after.resources.labor.amount).toBe(20);
+      expect(after.upgrades.forkHearth).toBeUndefined();
+      expect(after.upgrades.forkQuarry).toBeUndefined();
+    });
+
     it('Quantum Memory keeps 10% of resources', () => {
       const state = createInitialState();
       state.era = 10;
@@ -265,6 +286,8 @@ describe('prestige', () => {
       state.dysonSegments = 30;
       state.senateGov = { leader: 'merchants', partner: 'scholars', ratified: true };
       state.lockedSignals = { power: true, stability: true, constants: true };
+      state.colonyMandate = 'federation';
+      state.tradeRoute = { from: 'food', to: 'materials', era: 10 };
       state.totalWeaves = 3;
       state.wovenLaws = { temporal: true, spatial: true, causal: true };
 
@@ -281,6 +304,8 @@ describe('prestige', () => {
       expect(after.senateGov).toEqual({ leader: null, partner: null, ratified: false });
       expect(after.wovenLaws).toEqual({});
       expect(after.lockedSignals).toEqual({});
+      expect(after.colonyMandate).toBeUndefined();
+      expect(after.tradeRoute).toBeNull();
     });
   });
 });

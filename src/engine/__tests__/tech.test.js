@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { unlockTech, getAvailableTech, isDecisionTech, researchRoutineTech } from '../tech.js';
 import { createInitialState } from '../state.js';
+import { techTree } from '../../data/tech-tree.js';
 
 describe('tech', () => {
   describe('unlockTech', () => {
@@ -47,6 +48,32 @@ describe('tech', () => {
   });
 
   describe('mutual exclusion', () => {
+    it.each(
+      Object.values(techTree)
+        .filter(tech => tech.excludes && tech.id < tech.excludes)
+        .map(tech => [tech.id, tech.excludes]),
+    )('protects both directions of the %s versus %s research branch', (leftId, rightId) => {
+      const left = techTree[leftId];
+      const right = techTree[rightId];
+      expect(right.excludes).toBe(leftId);
+
+      for (const [chosenId, rejectedId] of [[leftId, rightId], [rightId, leftId]]) {
+        const state = createInitialState();
+        state.era = Math.max(left.era, right.era);
+        state.tech = Object.fromEntries(
+          [...new Set([...left.prerequisites, ...right.prerequisites])].map(id => [id, true]),
+        );
+        for (const [id, resource] of Object.entries(state.resources)) {
+          state.resources[id] = { ...resource, unlocked: true, amount: 1e30 };
+        }
+
+        const chosen = unlockTech(state, chosenId);
+        expect(chosen?.tech[chosenId]).toBe(true);
+        expect(unlockTech(chosen, rejectedId)).toBeNull();
+        expect(getAvailableTech(chosen).map(tech => tech.id)).not.toContain(rejectedId);
+      }
+    });
+
     it('blocks purchase of excluded tech', () => {
       const state = createInitialState();
       state.era = 3;

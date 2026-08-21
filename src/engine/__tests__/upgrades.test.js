@@ -427,6 +427,33 @@ describe('upgrades', () => {
     expect(purchaseUpgrade(state, 'forkQuarry')).toBeNull();
   });
 
+  it.each(
+    Object.values(upgradeDefs)
+      .filter(upgrade => upgrade.exclusiveWith && upgrade.id < upgrade.exclusiveWith)
+      .map(upgrade => [upgrade.id, upgrade.exclusiveWith]),
+  )('keeps both sides of doctrine fork %s versus %s mutually exclusive', (leftId, rightId) => {
+    const left = upgradeDefs[leftId];
+    const right = upgradeDefs[rightId];
+    expect(right.exclusiveWith).toBe(leftId);
+    expect(right.era).toBe(left.era);
+
+    for (const [chosenId, rejectedId] of [[leftId, rightId], [rightId, leftId]]) {
+      const state = createInitialState();
+      state.era = left.era;
+      state.upgrades = Object.fromEntries(
+        [...new Set([...left.prerequisites, ...right.prerequisites])].map(id => [id, true]),
+      );
+      for (const [id, resource] of Object.entries(state.resources)) {
+        state.resources[id] = { ...resource, unlocked: true, amount: 1e30 };
+      }
+
+      const chosen = purchaseUpgrade(state, chosenId);
+      expect(chosen?.upgrades[chosenId]).toBe(true);
+      expect(purchaseUpgrade(chosen, rejectedId)).toBeNull();
+      expect(getAvailableUpgrades(chosen).map(upgrade => upgrade.id)).not.toContain(rejectedId);
+    }
+  });
+
   it('repeatable milestones multiply the target resource every 25 levels', () => {
     const state = createInitialState();
     state.upgrades.expandWorkforce = 24;

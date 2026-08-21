@@ -82,6 +82,27 @@ describe('migrateState', () => {
     expect(migrated.upgrades.tools).toBe(true);
   });
 
+  it('round-trips modern mandates, reserve routes, research settings, and siege state', () => {
+    const saved = createInitialState();
+    saved.era = 10;
+    saved.colonyMandate = 'federation';
+    saved.colonyAssignments = { growth: 4, science: 4, industry: 4 };
+    saved.tradeRoute = { from: 'food', to: 'materials', era: 10 };
+    saved.autoBuildOut = false;
+    saved.lockedSignals = { stability: true, fragments: true };
+    saved.senateGov = { leader: 'scholars', partner: 'warriors', ratified: true };
+    saved.forgetting = { meter: 24, wardens: [], tendrils: [], scars: {}, collapsed: false };
+
+    const migrated = migrateState(JSON.parse(JSON.stringify(saved)));
+
+    expect(migrated.colonyMandate).toBe('federation');
+    expect(migrated.tradeRoute).toEqual(saved.tradeRoute);
+    expect(migrated.autoBuildOut).toBe(false);
+    expect(migrated.lockedSignals).toEqual(saved.lockedSignals);
+    expect(migrated.senateGov).toEqual(saved.senateGov);
+    expect(migrated.forgetting.meter).toBe(24);
+  });
+
   it('initializes seenLoreEvents for saves that predate the field', () => {
     // Simulate a v1 save that has no seenLoreEvents field at all
     const oldSave = {
