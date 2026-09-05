@@ -1,16 +1,14 @@
-import { calculateProduction, getEffectiveCap, gather, getEffectivePrestige, isGatheringAutomated } from './resources.js';
+import { calculateEconomy } from './economy.js';
+import { getEffectiveCap, gather, isGatheringAutomated } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
-import { checkForEvent, expireEffects, getTimedRateMultiplier } from './events.js';
-import { advanceColonyMandate, getColonyBonus } from './colonies.js';
+import { checkForEvent, expireEffects } from './events.js';
+import { advanceColonyMandate } from './colonies.js';
 import { advanceDockingContracts } from './docking.js';
-import { advanceNetworkPlan, getRouteBonus } from './starChart.js';
+import { advanceNetworkPlan } from './starChart.js';
 import { checkAchievements } from './achievements.js';
 import { purchaseUpgrade, buyRoutineBuildOut, isDecisionUpgrade } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
-import { getSenateGovernmentMultiplier, getSenatePctBonuses } from './senate.js';
-import { getTuningProductionMultiplier } from './tuning.js';
 import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes, runExpedition } from './expeditions.js';
-import { getActiveSystems } from './operations.js';
 import { awardCycleGoal } from './cycles.js';
 import { advanceEchoPressure } from './relics.js';
 import { advanceForgetting, pauseForgetting } from './forgetting.js';
@@ -18,29 +16,8 @@ import { performPrestige } from './prestige.js';
 import { researchRoutineTech } from './tech.js';
 import { advanceTradeRoute } from './trading.js';
 
-// Resource consumption rates — moderate tension without breaking low-interaction paths
-const FOOD_PER_LABOR = 1.0;       // Food consumed per labor/s
-const ENERGY_PER_ELECTRONICS = 0.4; // Energy consumed per electronics/s
-const FUEL_PER_ORBITAL = 0.5;     // Fuel consumed per orbitalInfra/s
-
 function intervalCrossings(startTime, endTime, interval) {
   return Math.max(0, Math.floor(endTime / interval) - Math.floor(startTime / interval));
-}
-
-// Apply a fractional production bonus to all producing resources, respecting caps
-function applyProductionBonus(state, fraction, dt) {
-  let updated = state;
-  const prestigeMult = getEffectivePrestige(updated.prestigeMultiplier || 1);
-  for (const [id, r] of Object.entries(updated.resources)) {
-    if (r.unlocked && (r.baseRate + r.rateAdd) > 0) {
-      const rate = (r.baseRate + r.rateAdd) * r.rateMult * prestigeMult;
-      const bonus = rate * fraction * dt;
-      const cap = getEffectiveCap(updated, id);
-      const newAmount = Math.min(r.amount + bonus, cap > 0 ? cap : Infinity);
-      updated = { ...updated, resources: { ...updated.resources, [id]: { ...r, amount: newAmount } } };
-    }
-  }
-  return updated;
 }
 
 // Core game loop: advance state by dt seconds.
@@ -48,142 +25,11 @@ function applyProductionBonus(state, fraction, dt) {
 export function tick(state, dt, rng = Math.random, options = {}) {
   if (dt <= 0) return state; // Guard against negative or zero dt
   state = expireEffects(state);
-  const rates = calculateProduction(state);
-
-  // Add operation bonuses to production rates.
-  const colonyBonus = getColonyBonus(state);
-  const routeBonus = getRouteBonus(state);
-  for (const bonus of [colonyBonus, routeBonus]) {
-    for (const [id, amount] of Object.entries(bonus)) {
-      rates[id] = (rates[id] || 0) + amount;
-    }
-  }
-
-  for (const id of Object.keys(rates)) {
-    rates[id] *= getTimedRateMultiplier(state, id);
-  }
-
-  // Consumption throttling: when the consumed resource runs low,
-  // throttle the consuming resource's production proportionally.
-  // This prevents resources from producing at full rate when their
-  // input resource is depleted (consistent across all 5 chains).
-
-  // Chain 1: food → labor
-  const laborRate = rates.labor || 0;
-  const foodCost = laborRate * FOOD_PER_LABOR * dt;
-  const foodAvailable = state.resources.food?.amount || 0;
-  const foodLimited = foodCost > 0 && foodAvailable < foodCost;
-  const laborScale = foodLimited ? foodAvailable / foodCost : 1;
-
-  // Chain 2: energy → electronics
-  const electronicsRate = rates.electronics || 0;
-  const energyCostTotal = electronicsRate * ENERGY_PER_ELECTRONICS * dt;
-  const energyAvailable = state.resources.energy?.amount || 0;
-  const energyLimited = energyCostTotal > 0 && energyAvailable < energyCostTotal;
-  const electronicsScale = energyLimited ? energyAvailable / energyCostTotal : 1;
-
-  // Chain 3: rocketFuel → orbitalInfra
-  const orbitalRate = rates.orbitalInfra || 0;
-  const fuelCostTotal = orbitalRate * FUEL_PER_ORBITAL * dt;
-  const fuelAvailable = state.resources.rocketFuel?.amount || 0;
-  const fuelLimited = fuelCostTotal > 0 && fuelAvailable < fuelCostTotal;
-  const orbitalScale = fuelLimited ? fuelAvailable / fuelCostTotal : 1;
-
-  // Chain 4: exoticMaterials → colonies (Era 5+)
-  const colonyProdRate = rates.colonies || 0;
-  const exoticCostTotal = colonyProdRate * 0.2 * dt;
-  const exoticAvailable = state.resources.exoticMaterials?.amount || 0;
-  const exoticLimited = state.era >= 5 && exoticCostTotal > 0 && exoticAvailable < exoticCostTotal;
-  const colonyScale = exoticLimited ? exoticAvailable / exoticCostTotal : 1;
-
-  // Chain 5: stellarForge → megastructures (Era 7+)
-  const megaProdRate = rates.megastructures || 0;
-  const forgeCostTotal = megaProdRate * 0.3 * dt;
-  const forgeAvailable = state.resources.stellarForge?.amount || 0;
-  const forgeLimited = state.era >= 7 && forgeCostTotal > 0 && forgeAvailable < forgeCostTotal;
-  const megaScale = forgeLimited ? forgeAvailable / forgeCostTotal : 1;
-
-  // Advance resources (apply timed event multipliers)
-  const newResources = { ...state.resources };
-  for (const [id, rate] of Object.entries(rates)) {
-    if (rate === 0) continue;
-    const r = newResources[id];
-    if (!r || !r.unlocked) continue;
-
-    let effectiveRate = rate;
-    if (id === 'labor') effectiveRate = rate * laborScale;
-    if (id === 'electronics') effectiveRate = rate * electronicsScale;
-    if (id === 'orbitalInfra') effectiveRate = rate * orbitalScale;
-    if (id === 'colonies') effectiveRate = rate * colonyScale;
-    if (id === 'megastructures') effectiveRate = rate * megaScale;
-
-    // Apply senate directive and government bonuses (era 8+)
-    if (state.era >= 8) {
-      const senateBonuses = getSenatePctBonuses(state);
-      if (senateBonuses[id] && senateBonuses[id] > 1) effectiveRate *= senateBonuses[id];
-      effectiveRate *= getSenateGovernmentMultiplier(state, id);
-    }
-
-    // Apply locked cosmic signal bands (era 9+)
-    if (state.era >= 9) {
-      effectiveRate *= getTuningProductionMultiplier(state, id);
-    }
-
-    if (id === 'stellarForge' && state.upgrades?.forgeMemory) {
-      effectiveRate *= 1 + Math.min(100, state.dysonSegments || 0) / 100;
-    }
-
-    const cap = getEffectiveCap(state, id);
-    let newAmount = r.amount + effectiveRate * dt;
-    // Enforce resource cap: production cannot push above cap
-    if (cap > 0 && newAmount > cap && effectiveRate > 0) {
-      newAmount = Math.max(r.amount, cap); // don't reduce if already over cap (e.g. from giveAll)
-    }
-    newResources[id] = { ...r, amount: Math.max(0, newAmount) };
-  }
-
-  // Deduct food consumed by labor
-  if (laborRate > 0 && newResources.food) {
-    const consumed = laborRate * laborScale * FOOD_PER_LABOR * dt;
-    newResources.food = {
-      ...newResources.food,
-      amount: Math.max(0, newResources.food.amount - consumed),
-    };
-  }
-
-  // Deduct energy consumed by electronics production (Era 2+)
-  if (electronicsRate > 0 && newResources.energy) {
-    const energyCost = electronicsRate * electronicsScale * ENERGY_PER_ELECTRONICS * dt;
-    newResources.energy = {
-      ...newResources.energy,
-      amount: Math.max(0, newResources.energy.amount - energyCost),
-    };
-  }
-
-  // Deduct fuel consumed by orbital infra production (Era 4+)
-  if (orbitalRate > 0 && newResources.rocketFuel) {
-    const fuelCost = orbitalRate * orbitalScale * FUEL_PER_ORBITAL * dt;
-    newResources.rocketFuel = {
-      ...newResources.rocketFuel,
-      amount: Math.max(0, newResources.rocketFuel.amount - fuelCost),
-    };
-  }
-
-  // Era 5+: colonies consume exoticMaterials
-  if (state.era >= 5 && newResources.exoticMaterials?.unlocked && newResources.colonies?.unlocked) {
-    if (colonyProdRate > 0) {
-      const consumed = colonyProdRate * colonyScale * 0.2 * dt;
-      newResources.exoticMaterials = { ...newResources.exoticMaterials, amount: Math.max(0, newResources.exoticMaterials.amount - consumed) };
-    }
-  }
-
-  // Era 7+: megastructures consume stellarForge output
-  if (state.era >= 7 && newResources.stellarForge?.unlocked && newResources.megastructures?.unlocked) {
-    if (megaProdRate > 0) {
-      const consumed = megaProdRate * megaScale * 0.3 * dt;
-      newResources.stellarForge = { ...newResources.stellarForge, amount: Math.max(0, newResources.stellarForge.amount - consumed) };
-    }
-  }
+  const economy = calculateEconomy(state, dt);
+  const rates = economy.gross;
+  const newResources = Object.fromEntries(Object.entries(state.resources).map(([id, resource]) => [
+    id, { ...resource, amount: economy.amounts[id] },
+  ]));
 
   let newState = {
     ...state,
@@ -268,7 +114,7 @@ export function tick(state, dt, rng = Math.random, options = {}) {
     const totalRate = Object.entries(rates).reduce((sum, [id, rate]) => {
       return sum + (rate > 0 && newState.resources[id]?.unlocked ? rate : 0);
     }, 0);
-    totalProduced += totalRate * dt;
+    totalProduced += Object.values(economy.produced).reduce((sum, amount) => sum + amount, 0);
     // Track peak production rate (every 30 ticks to reduce overhead)
     const peakRate = intervalCrossings(state.totalTime, newState.totalTime, 30) > 0
       ? Math.max(newState.peakProductionRate || 0, totalRate)
@@ -370,7 +216,7 @@ export function tick(state, dt, rng = Math.random, options = {}) {
         if (cap > 0 && r.amount >= cap * 0.95 && id !== lowest.id) {
           const overflow = r.amount - cap * 0.9;
           if (overflow > 0) {
-            const transfer = overflow * 0.05 * dt;
+            const transfer = Math.min(overflow, overflow * 0.05 * dt);
             newState = { ...newState, resources: { ...newState.resources, [id]: { ...newState.resources[id], amount: newState.resources[id].amount - transfer } } };
             converted += transfer;
           }
@@ -383,88 +229,14 @@ export function tick(state, dt, rng = Math.random, options = {}) {
     }
   }
 
-  // Complexity tax (eras 7+): stacked mechanic bonuses are dampened slightly to prevent runaway
-  // Divisor = 1 + 0.05*(era-7): 1.0 at era 7, 1.05 at era 8, 1.1 at era 9, 1.15 at era 10
-  const complexityTaxFactor = 1 / (1 + 0.05 * Math.max(0, (newState.era || 1) - 7));
-
-  // Mechanic: upgradeCountBonus — +1% production per upgrade owned
-  if (newState.upgrades?.communalEffort) {
-    const upgradeCount = Object.keys(newState.upgrades).length;
-    const maxBonus = 0.5 + (newState.prestigeCount || 0) * 0.05; // scales with prestige
-    const bonusFraction = Math.min(maxBonus, upgradeCount * 0.005);
-    newState = applyProductionBonus(newState, bonusFraction * complexityTaxFactor, dt);
-  }
-
-  // Mechanic: productionPulse — double production for 10s every 60s
-  if (newState.upgrades?.overclockProtocol) {
-    const cyclePos = (newState.totalTime || 0) % 60;
-    if (cyclePos < 10) {
-      newState = applyProductionBonus(newState, 1 * complexityTaxFactor, dt);
-    }
-  }
-
-  // Mechanic: capOverflow — capped resources overflow to research
+  // Overflow is derived from actual production after consumption and storage.
   if (newState.upgrades?.resourcePipeline && newState.resources.research?.unlocked) {
-    let totalOverflow = 0;
-    for (const [id, r] of Object.entries(newState.resources)) {
-      if (id === 'research' || !r.unlocked) continue;
-      const cap = getEffectiveCap(newState, id);
-      if (cap > 0 && r.amount >= cap) {
-        const rate = (r.baseRate + r.rateAdd) * r.rateMult * getEffectivePrestige(newState.prestigeMultiplier || 1);
-        totalOverflow += rate * dt * 0.1;
-      }
-    }
-    if (totalOverflow > 0) {
-      const rr = newState.resources.research;
-      const rCap = getEffectiveCap(newState, 'research');
-      newState = { ...newState, resources: { ...newState.resources, research: { ...rr, amount: Math.min(rr.amount + totalOverflow, rCap > 0 ? rCap : Infinity) } } };
-    }
-  }
-
-  // Mechanic: eraCompounding — each era multiplies production by 1.1x
-  if (newState.upgrades?.recursiveOptimizer) {
-    const eraBonus = Math.pow(1.1, (newState.era || 1) - 1);
-    if (eraBonus > 1) {
-      newState = applyProductionBonus(newState, (eraBonus - 1) * complexityTaxFactor, dt);
-    }
-  }
-
-  // System synergy: +10% per operation system engaged with this cycle.
-  if (newState.upgrades?.orbitalResonance) {
-    const activeSystemCount = getActiveSystems(newState).length;
-    if (activeSystemCount > 0) {
-      newState = applyProductionBonus(newState, activeSystemCount * 0.10 * complexityTaxFactor, dt);
-    }
-  }
-
-  // routeBonus: +3% per star route
-  if (newState.upgrades?.warpEcho) {
-    const routes = newState.starRoutes?.length || 0;
-    if (routes > 0) {
-      newState = applyProductionBonus(newState, routes * 0.03 * complexityTaxFactor, dt);
-    }
-  }
-
-  // Mechanic: prestigeAccumulator — +5% production per prestige run completed
-  if (newState.upgrades?.galacticMemory) {
-    const prestigeBonus = (newState.prestigeCount || 0) * 0.05;
-    if (prestigeBonus > 0) {
-      newState = applyProductionBonus(newState, prestigeBonus * complexityTaxFactor, dt);
-    }
-  }
-
-  // Mechanic: diversityBonus — 1.05^count multiplier per unlocked resource type
-  if (newState.upgrades?.echoMultiplier) {
-    const unlockedCount = Object.values(newState.resources).filter(r => r.unlocked).length;
-    const diversityMult = Math.pow(1.05, unlockedCount) - 1;
-    if (diversityMult > 0) {
-      newState = applyProductionBonus(newState, diversityMult * complexityTaxFactor, dt);
-    }
-  }
-
-  // Mechanic: compoundingTick — production compounds slightly each tick
-  if (newState.upgrades?.infiniteLoop) {
-    newState = applyProductionBonus(newState, 0.001 * complexityTaxFactor, dt);
+    const overflow = Object.entries(economy.overflow).reduce((sum, [id, value]) => sum + (id === 'research' ? 0 : value * 0.1), 0);
+    const research = newState.resources.research;
+    const cap = getEffectiveCap(newState, 'research');
+    if (overflow > 0) newState = { ...newState, resources: { ...newState.resources,
+      research: { ...research, amount: Math.min(Math.max(cap, research.amount), research.amount + overflow) },
+    } };
   }
 
   // Network plan survey crews lay committed routes on their own schedule

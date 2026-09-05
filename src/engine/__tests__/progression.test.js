@@ -119,8 +119,8 @@ describe('era transition fixtures', () => {
 
     // Tick 10 seconds
     state = tick(state, 10);
-    // Food has baseRate 1.5, so should gain ~15
-    expect(state.resources.food.amount).toBeCloseTo(initialFood + 15, 0);
+    // Food produces 15 and feeds 2 labor during this interval.
+    expect(state.resources.food.amount).toBeCloseTo(initialFood + 13, 0);
   });
 
   it('events fire in era 3+', () => {

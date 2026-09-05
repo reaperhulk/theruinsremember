@@ -5,6 +5,8 @@ import { tick } from './tick.js';
 export function advanceTime(state, seconds, rng = Math.random, maxStep = 1, options = {}) {
   if (!Number.isFinite(seconds) || seconds <= 0) return state;
   if (!Number.isFinite(maxStep) || maxStep <= 0) throw new RangeError('maxStep must be positive');
+  // Offline callers cannot skip purchases, supply chains, or event boundaries.
+  maxStep = Math.min(1, maxStep);
 
   let current = state;
   const fullSteps = Math.floor(seconds / maxStep);

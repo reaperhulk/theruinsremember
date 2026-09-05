@@ -3,6 +3,7 @@ import { getEraReadiness } from '../src/engine/eras.js';
 import { getAvailableTech } from '../src/engine/tech.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../src/engine/upgrades.js';
 import { getEffectiveCap, getNetRate } from '../src/engine/resources.js';
+import { upgrades } from '../src/data/upgrades.js';
 
 // Success is an assertion about the requested FINAL cycle. A high-water mark
 // is telemetry, never proof that a reset or a later cycle remains playable.
@@ -49,6 +50,7 @@ export function describeProgressionBlockers(state) {
     era: state.era,
     eraReadiness: getEraReadiness(state),
     cycleReadiness: state.era >= 10 ? getCycleReadiness(state) : null,
+    lockedUpgrades: Object.values(upgrades).filter(u => u.era <= state.era && !u.repeatable && !state.upgrades[u.id] && !(u.exclusiveWith && state.upgrades[u.exclusiveWith])).map(u => ({ id: u.id, prerequisites: u.prerequisites.filter(id => !state.upgrades[id]), gems: u.requireGems, trades: u.requireTrades, prestige: u.requirePrestige })),
     purchases: purchases.map(purchase => ({
       ...purchase,
       blockers: Object.entries(purchase.cost).filter(([id, cost]) => state.resources[id]?.amount < cost)

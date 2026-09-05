@@ -155,6 +155,8 @@ export function createInitialState() {
     hiddenUpgrades: {},
     // Routine current-era upgrades buy themselves; decisions never do.
     autoBuildOut: true,
-    saveVersion: 6,
+    consumerControls: {},
+    runUpgradePurchases: 0,
+    saveVersion: 7,
   };
 }

@@ -164,6 +164,9 @@ export function getUpgradeCost(state, upgradeId) {
     baseCost = doubled;
   }
 
+  if (state.echoUpgrades?.echoTemporalAnchor && (state.runUpgradePurchases || 0) < 10) {
+    baseCost = Object.fromEntries(Object.entries(baseCost).map(([id, amount]) => [id, Math.ceil(amount * 0.5)]));
+  }
   if (!def.repeatable) return baseCost;
   const count = typeof state.upgrades[upgradeId] === 'number' ? state.upgrades[upgradeId] : 0;
   // Universal Optimizer prestige upgrade: reduce cost scaling by 20%
@@ -194,6 +197,10 @@ export function purchaseUpgrade(state, upgradeId) {
   const hasQT = state.prestigeUpgrades?.quantumTunneling;
   if (unmetPrereqs.length > (hasQT ? 1 : 0)) return null;
 
+  if (def.requireGems && (state.totalGems || 0) < def.requireGems) return null;
+  if (def.requireTrades && (state.totalTrades || 0) < def.requireTrades) return null;
+  if (def.requirePrestige && (state.prestigeCount || 0) < def.requirePrestige) return null;
+
   // Get actual cost (scaled for repeatables, with prestige discounts)
   const cost = getUpgradeCost(state, upgradeId);
 
@@ -211,6 +218,7 @@ export function purchaseUpgrade(state, upgradeId) {
     ...afterEffects,
     upgrades: { ...afterEffects.upgrades, [upgradeId]: newValue },
     lastUpgradeTime: afterEffects.totalTime || 0,
+    runUpgradePurchases: (state.runUpgradePurchases || 0) + 1,
   };
 
   // Repeatable milestones: announce each crossing
@@ -391,7 +399,7 @@ export function buyAllAffordable(state) {
     let boughtAny = false;
     for (const def of Object.values(upgradeDefs)) {
       if (def.era > current.era) continue;
-      if (def.repeatable) continue;
+      if (def.repeatable || isDecisionUpgrade(def)) continue;
       if (current.upgrades[def.id]) continue;
       const result = purchaseUpgrade(current, def.id);
       if (result) {

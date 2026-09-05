@@ -226,19 +226,10 @@ export function getEraReadiness(state, era = state.era) {
   const foundationProgress = currentUpgrades + activityCredits;
   const mastery = getEraMastery(state, era);
 
-  // The ruins test what you remember: on prestiged runs, banked wealth can
-  // buy out an era's economy in seconds, so eras 1-4 also demand the era's
-  // signature activity before the timeline moves on. Fresh runs meet these
-  // thresholds naturally and never notice them.
-  let echoProof = null;
-  if ((state.prestigeCount || 0) > 0 && era === state.era) {
-    if (era <= 3) {
-      echoProof = { label: 'Rediscover the ruins (expeditions)', current: state.expedition?.eraFinds || 0, target: 2 };
-    } else if (era === 4) {
-      echoProof = { label: 'Re-run orbital contracts', current: Math.floor(operationCredits / 3), target: 3 };
-    }
-  }
-  const activityMet = !echoProof || echoProof.current >= echoProof.target;
+  // Mastered playstyles remain valid after a reset. Operations can accelerate
+  // the foundation, but never become a second, compulsory prestige-only gate.
+  const echoProof = null;
+  const activityMet = true;
 
   return {
     echoProof,
@@ -300,11 +291,7 @@ export function transitionEra(state, newEra) {
     bestEraTimes[newEra] = currentTime;
   }
 
-  // Prestiged timelines carry exactly one supply into each era, so the
-  // rediscovery proof paces every early era instead of only the first.
-  const carriedSupplies = (state.prestigeCount || 0) > 0
-    ? 1
-    : Math.max(1, state.expedition?.supplies ?? 1);
+  const carriedSupplies = Math.max(1, state.expedition?.supplies ?? 1);
   const expedition = state.expedition
     ? { ...state.expedition, eraFinds: 0, supplies: carriedSupplies }
     : state.expedition;

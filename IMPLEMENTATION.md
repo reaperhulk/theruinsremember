@@ -6,11 +6,11 @@ to main, with the testing harness audited before gameplay changes.
 
 ## Delivery checklist
 
-- [ ] Audit harness success criteria, CLI failure reporting, and fixture claims.
+- [x] Audit harness success criteria, CLI failure reporting, and fixture claims.
 - [ ] Add bounded player actions, final-cycle journeys for every persona,
       alternative branches, and negative tests that prove stalls are detected.
-- [ ] Remove post-prestige compulsory operations; preserve optional playstyles.
-- [ ] Enforce the same purchase requirements in manual, bulk, and automatic paths.
+- [x] Remove post-prestige compulsory operations; preserve optional playstyles.
+- [x] Enforce the same purchase requirements in manual, bulk, and automatic paths.
 - [ ] Unify production, consumption, caps, affordability estimates, and previews.
 - [ ] Add consumer controls, reserves, queued goals, and visible recovery routes.
 - [ ] Make active/background/offline simulation consistent; protect unattended play.
@@ -98,3 +98,30 @@ collapse, invalid numbers, and CLI timeouts. No gameplay changed.
 | completionist | 42 | 1081s → 1081s | 1081s / 172 / 1 (unchanged) | Era 10; target 10 |
 | minimalist | 424242 | 6091s → 6091s | 6091s / 60 / 1 (unchanged) | Era 10; target 10 |
 | minimalist | 42 | 6421s → 6421s | 6421s / 61 / 1 (unchanged) | Era 10; target 10 |
+
+### 2. Reachable purchases and a consistent economy
+
+375 unit tests and lint pass. Fixed a first-run dependency on the prestige-only Cosmic Recollection, previously hidden by automation bypassing its requirement. Minimalist bounded journeys now complete two cycles (12,840s, 167 commands) instead of stalling after the first reset. Engaged completes two cycles in 2,580s / 320 actual commands. Full eight-persona two-cycle matrix is being validated.
+
+Purchases now enforce milestone requirements, bulk buying preserves decisions, consumers use contemporaneous supply and stop at full storage, rates/ETAs use the simulation calculation, and input pauses/reserves plus independent storage expansion provide recovery. Offline stepping is bounded to one second. Head Start, Wisdom, Temporal Echo and offline descriptions match behavior; Quantum Tunneling applies to tech; Temporal Anchor discounts its first ten purchases.
+
+Intentional timing differences below reflect removing illicit first-run prestige multipliers, correcting supply consumption, and changing offline simulation granularity. All original persona targets remain reachable; no manual actions occur during absence. These changes are measured against the retained original baseline.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Final era / ready |
+|---|---|---|---|---|---|---|
+| newcomer | 424242 | 1961 → 1741 | 1961 → 1741 | 123 → 114 | 1 → 1 | 10 / True |
+| engaged | 424242 | 1881 → 1411 | 1881 → 1411 | 157 → 140 | 1 → 1 | 10 / True |
+| optimizer | 424242 | 961 → 931 | 961 → 931 | 217 → 204 | 1 → 1 | 10 / True |
+| background | 424242 | 2161 → 1921 | 541 → 481 | 109 → 120 | 19 → 17 | 10 / True |
+| check_in | 424242 | 4201 → 4201 | 421 → 421 | 112 → 104 | 8 → 8 | 10 / True |
+| offline_returner | 424242 | 28801 → 43201 | 241 → 361 | 69 → 98 | 3 → 4 | 6 / False |
+| completionist | 424242 | 1081 → 1171 | 1081 → 1171 | 182 → 183 | 1 → 1 | 10 / True |
+| minimalist | 424242 | 6091 → 10681 | 6091 → 10681 | 60 → 70 | 1 → 1 | 10 / True |
+| newcomer | 42 | 1961 → 1741 | 1961 → 1741 | 119 → 116 | 1 → 1 | 10 / True |
+| engaged | 42 | 2161 → 1561 | 2161 → 1561 | 161 → 140 | 1 → 1 | 10 / True |
+| optimizer | 42 | 871 → 961 | 871 → 961 | 171 → 232 | 1 → 1 | 10 / True |
+| background | 42 | 2161 → 1921 | 541 → 481 | 108 → 118 | 19 → 17 | 10 / True |
+| check_in | 42 | 4231 → 4201 | 451 → 421 | 112 → 104 | 8 → 8 | 10 / True |
+| offline_returner | 42 | 28801 → 43201 | 241 → 361 | 68 → 99 | 3 → 4 | 6 / False |
+| completionist | 42 | 1081 → 1081 | 1081 → 1081 | 172 → 183 | 1 → 1 | 10 / True |
+| minimalist | 42 | 6421 → 10231 | 6421 → 10231 | 61 → 72 | 1 → 1 | 10 / True |

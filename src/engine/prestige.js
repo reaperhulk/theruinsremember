@@ -85,7 +85,8 @@ export function calculatePrestigePoints(state) {
 // Get a summary of what the prestige will give
 export function getPrestigeSummary(state) {
   const bonus = calculatePrestigeBonus(state);
-  const newMultiplier = state.prestigeMultiplier + bonus;
+  const rawMultiplier = state.prestigeMultiplier + bonus;
+  const newMultiplier = Math.max(rawMultiplier * (state.prestigeUpgrades?.headStart ? 1.5 : 1), state.echoUpgrades?.echoVoidResonance ? state.prestigeMultiplier * 1.5 : 0);
   const points = calculatePrestigePoints(state);
   return {
     currentMultiplier: state.prestigeMultiplier,

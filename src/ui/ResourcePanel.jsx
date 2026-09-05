@@ -1,6 +1,7 @@
-import { useState, useCallback, useRef, useEffect, memo } from 'react';
+import { calculateEconomy, SUPPLY_CHAINS, setConsumerControl, expandStorage } from '../engine/economy.js';
+import { useState, useCallback, useRef, useEffect, useMemo, memo } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
-import { getEffectiveRate, getEffectiveCap, getEffectivePrestige, getNetRate, gather, isGatheringAutomated } from '../engine/resources.js';
+import { getEffectiveCap, getEffectivePrestige, gather, isGatheringAutomated } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
 import { getColonyBonus } from '../engine/colonies.js';
 import { getRouteBonus } from '../engine/starChart.js';
@@ -15,6 +16,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
   const [newResources, setNewResources] = useState(new Set());
   const prevRatesRef = useRef({});
   const [boostedResources, setBoostedResources] = useState(new Set());
+  const economy = useMemo(() => calculateEconomy(state), [state]);
   const gatheringAutomated = isGatheringAutomated(state);
 
   const handleGather = useCallback((resourceId, amount) => {
@@ -55,7 +57,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
       id,
       ...r,
       def: resourceDefs[id],
-      rate: getEffectiveRate(state, id),
+      rate: economy.gross[id],
       cap: getEffectiveCap(state, id),
     }));
 
@@ -105,9 +107,9 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
   ];
   for (const { id, consumer, era } of consumedResources) {
     if (state.era < era || !state.resources[id]?.unlocked) continue;
-    if (getEffectiveRate(state, consumer) <= 0) continue;
-    const net = getNetRate(state, id);
-    if (net < 0) {
+    if (economy.gross[consumer] <= 0) continue;
+    const net = economy.net[id];
+    if (net < 0 || economy.constrained[consumer] === 'input') {
       const name = { food: 'Food', energy: 'Energy', rocketFuel: 'Fuel', exoticMaterials: 'Exotic', stellarForge: 'Forge' }[id];
       throttledChains.push(name + ' draining');
     }
@@ -178,7 +180,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                   return (
                     <div key={r.id} className={`resource-row-wrapper`}>
                     <div
-                      className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${boostedResources.has(r.id) ? 'rate-boosted' : ''} ${((r.id === 'food' && getEffectiveRate(state, 'labor') > 0) || (r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0) || (r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0) || (r.id === 'exoticMaterials' && state.era >= 5 && getEffectiveRate(state, 'colonies') > 0) || (r.id === 'stellarForge' && state.era >= 7 && getEffectiveRate(state, 'megastructures') > 0)) ? 'consuming' : ''} ${r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0 ? 'resource-capped' : r.cap > 0 && r.amount >= r.cap * 0.9 && r.rate > 0 ? 'resource-near-cap' : ''}`}
+                      className={`resource-row ${r.rate > 0 ? 'producing' : ''} ${newResources.has(r.id) ? 'new-resource' : ''} ${boostedResources.has(r.id) ? 'rate-boosted' : ''} ${((r.id === 'food' && economy.gross['labor'] > 0) || (r.id === 'energy' && economy.gross['electronics'] > 0) || (r.id === 'rocketFuel' && state.era >= 4 && economy.gross['orbitalInfra'] > 0) || (r.id === 'exoticMaterials' && state.era >= 5 && economy.gross['colonies'] > 0) || (r.id === 'stellarForge' && state.era >= 7 && economy.gross['megastructures'] > 0)) ? 'consuming' : ''} ${r.cap > 0 && r.amount >= r.cap * 0.98 && r.rate > 0 ? 'resource-capped' : r.cap > 0 && r.amount >= r.cap * 0.9 && r.rate > 0 ? 'resource-near-cap' : ''}`}
                       title={tooltip}
                       style={r.cap > 0 ? { '--resource-fill': `${Math.min(100, Math.max(0, (r.amount / r.cap) * 100))}%` } : undefined}
                     >
@@ -201,13 +203,13 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                       </span>
                       <span className="resource-rate">
                         {r.rate > 0 ? (() => {
-                          const net = getNetRate(state, r.id);
+                          const net = economy.net[r.id];
                           const isConsumed = ['food','energy','rocketFuel','exoticMaterials','stellarForge'].includes(r.id) && net < r.rate;
                           // Check if this resource is throttled by its supply chain
                           const supplyChain = { labor: 'food', electronics: 'energy', orbitalInfra: 'rocketFuel', colonies: 'exoticMaterials', megastructures: 'stellarForge' };
                           const supplier = supplyChain[r.id];
                           const isThrottled = supplier && state.resources[supplier]?.unlocked &&
-                            getNetRate(state, supplier) < 0;
+                            economy.net[supplier] < 0;
                           if (isConsumed) {
                             return <>
                               {net > 0 && <span className="rate-active" />}
@@ -259,7 +261,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                       const cb = getColonyBonus(state);
                       const rb = getRouteBonus(state);
                       const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
-                      const net = getNetRate(state, r.id);
+                      const net = economy.net[r.id];
                       const cap = r.cap;
                       const pctFull = cap > 0 ? Math.floor(r.amount / cap * 100) : 0;
                       return (
@@ -270,13 +272,13 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                           {cb[r.id] > 0 && <div>Colonies: +{cb[r.id].toFixed(1)}/s</div>}
                           {rb[r.id] > 0 && <div>Star routes: +{rb[r.id].toFixed(1)}/s</div>}
                           {prestigeMult > 1 && <div>Prestige: x{formatNumber(prestigeMult)}</div>}
-                          {r.id === 'food' && getEffectiveRate(state, 'labor') > 0 && (
+                          {r.id === 'food' && economy.gross['labor'] > 0 && (
                             <div style={{ color: '#ff9966' }}>Consumed by: labor (1.0/labor/s)</div>
                           )}
-                          {r.id === 'energy' && getEffectiveRate(state, 'electronics') > 0 && (
+                          {r.id === 'energy' && economy.gross['electronics'] > 0 && (
                             <div style={{ color: '#ff9966' }}>Consumed by: electronics (0.4/elec/s)</div>
                           )}
-                          {r.id === 'rocketFuel' && state.era >= 4 && getEffectiveRate(state, 'orbitalInfra') > 0 && (
+                          {r.id === 'rocketFuel' && state.era >= 4 && economy.gross['orbitalInfra'] > 0 && (
                             <div style={{ color: '#ff9966' }}>Consumed by: orbital infra (0.5/orbital/s)</div>
                           )}
                           {r.id === 'exoticMaterials' && state.era >= 5 && state.resources.colonies?.unlocked && (
@@ -286,7 +288,17 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                             <div style={{ color: '#ff9966' }}>Consumed by: megastructures (0.3/mega/s)</div>
                           )}
                           <div style={{ color: '#88dd88' }}>Effective: {formatNumber(r.rate)}/s{net !== r.rate ? ` (net: ${formatNumber(net)}/s)` : ''}</div>
-                          {cap > 0 && <div>Cap: {formatNumber(cap)} ({pctFull}% full)</div>}
+                          {cap > 0 && <div>Cap: {formatNumber(cap)} ({pctFull}% full)
+                            <button disabled={r.amount < cap * 0.6} onClick={() => onUpdate(s => expandStorage(s, r.id))}>Expand storage ×1.5 · {formatNumber(cap * 0.6)} {r.def?.name}</button>
+                          </div>}
+                          {SUPPLY_CHAINS.filter(chain => chain.input === r.id && state.resources[chain.output]?.unlocked).map(chain => (
+                            <div key={chain.output} className="consumer-controls">
+                              <label><input type="checkbox" checked={!!state.consumerControls?.[chain.output]?.paused} onChange={e => onUpdate(s => setConsumerControl(s, chain.output, { paused: e.target.checked }))} /> Pause {resourceDefs[chain.output]?.name} consumption</label>
+                              <label>Reserve <select value={state.consumerControls?.[chain.output]?.reserveFraction || 0} onChange={e => onUpdate(s => setConsumerControl(s, chain.output, { reserveFraction: Number(e.target.value) }))}>
+                                <option value={0}>None</option><option value={0.25}>25% of storage</option><option value={0.5}>50% of storage</option><option value={0.9}>90% of storage</option>
+                              </select></label>
+                            </div>
+                          ))}
                           {net > 0 && cap > 0 && r.amount < cap && (
                             <div style={{ color: '#aabbcc' }}>Full in: {formatTime(Math.ceil((cap - r.amount) / net))}</div>
                           )}

@@ -148,6 +148,7 @@ describe('resources', () => {
 
     it('subtracts food consumed by labor', () => {
       const state = createInitialState();
+      state.resources.food.amount = 10;
       state.resources.labor = { ...state.resources.labor, unlocked: true, rateAdd: 2, rateMult: 1 };
       // labor effective rate = (baseRate 0.2 + rateAdd 2) * 1 * 1 = 2.2
       // food gross = (1.5 + 0) * 1 * 1 = 1.5
@@ -160,6 +161,7 @@ describe('resources', () => {
 
     it('subtracts energy consumed by electronics', () => {
       const state = createInitialState();
+      state.resources.energy.amount = 10;
       state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 3, rateMult: 1 };
       // electronics effective rate = (0.1 + 3) * 1 * 1 = 3.1
       // energy gross = (0.5 + 0) * 1 * 1 = 0.5

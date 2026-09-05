@@ -9,9 +9,8 @@ export function unlockTech(state, techId) {
   if (def.era > state.era) return null;
 
   // Check prerequisites
-  for (const prereq of def.prerequisites) {
-    if (!state.tech[prereq]) return null;
-  }
+  const missing = def.prerequisites.filter(prereq => !state.tech[prereq]).length;
+  if (missing > (state.prestigeUpgrades?.quantumTunneling ? 1 : 0)) return null;
 
   // Check mutual exclusion
   if (def.excludes && state.tech[def.excludes]) return null;
@@ -67,9 +66,8 @@ export function getAvailableTech(state) {
     if (def.era > state.era) return false;
     if (state.tech[def.id]) return false;
     if (def.excludes && state.tech[def.excludes]) return false;
-    for (const prereq of def.prerequisites) {
-      if (!state.tech[prereq]) return false;
-    }
+    const missing = def.prerequisites.filter(prereq => !state.tech[prereq]).length;
+    if (missing > (state.prestigeUpgrades?.quantumTunneling ? 1 : 0)) return false;
     return true;
   }).map(def => ({ ...def, cost: getTechCost(def) }));
 }

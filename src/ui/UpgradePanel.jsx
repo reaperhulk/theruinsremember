@@ -1,7 +1,8 @@
+import { calculateEconomy, estimateAffordability } from '../engine/economy.js';
 import { useState, useRef, useCallback, useMemo, useEffect, memo } from 'react';
 import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, buyNextRepeatableMilestone, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable, isDecisionUpgrade } from '../engine/upgrades.js';
 import { getEraMasteryTier } from '../engine/eras.js';
-import { canAfford, getEffectiveRate } from '../engine/resources.js';
+import { canAfford } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 
@@ -88,21 +89,6 @@ function formatEffects(effects) {
 }
 
 // Estimate seconds until affordable (worst bottleneck resource)
-function getTimeToAfford(state, cost) {
-  let maxTime = 0;
-  for (const [resourceId, amount] of Object.entries(cost)) {
-    const r = state.resources[resourceId];
-    const have = r ? r.amount : 0;
-    if (have >= amount) continue;
-    const rate = getEffectiveRate(state, resourceId);
-    if (rate <= 0) return Infinity;
-    const needed = amount - have;
-    const time = needed / rate;
-    if (time > maxTime) maxTime = time;
-  }
-  return maxTime;
-}
-
 // Calculate overall progress toward affording an upgrade (0-1)
 function getAffordProgress(state, cost) {
   let totalNeeded = 0;
@@ -117,6 +103,7 @@ function getAffordProgress(state, cost) {
 }
 
 export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
+  const economy = useMemo(() => calculateEconomy(state), [state]);
   const [showPurchased, setShowPurchased] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
@@ -349,6 +336,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
         </div>
       )}
       {(() => {
+        if (focusMode) return null;
         // Simulate the actual buy sequence to get accurate count
         const currentFilterType = filterType;
         const hidden = state.hiddenUpgrades || {};
@@ -359,7 +347,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
           const avail = getAvailableUpgrades(simState);
           let boughtThisPass = 0;
           for (const u of avail) {
-            if (u.repeatable) continue;
+            if (u.repeatable || isDecisionUpgrade(u)) continue;
             if (hidden[u.id]) continue;
             if (currentFilterType !== 'all' && !u.effects.some(e => {
               if (currentFilterType === 'mult') return e.type === 'production_mult' || e.type === 'production_mult_all';
@@ -388,7 +376,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 const avail = getAvailableUpgrades(current);
                 let boughtThisPass = 0;
                 for (const u of avail) {
-                  if (u.repeatable) continue;
+                  if (u.repeatable || isDecisionUpgrade(u)) continue;
                   if (hid[u.id]) continue;
                   if (currentFilterType !== 'all' && !u.effects.some(e => {
                     if (currentFilterType === 'mult') return e.type === 'production_mult' || e.type === 'production_mult_all';
@@ -548,7 +536,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 <div className="text-hint" style={{ color: enablesCountMap[upgrade.id] >= 5 ? '#ddaa44' : enablesCountMap[upgrade.id] >= 3 ? '#88ccaa' : '#777' }} title={enablesCountMap._names[upgrade.id]?.join(', ') || ''}>Enables {enablesCountMap[upgrade.id]} upgrade{enablesCountMap[upgrade.id] > 1 ? 's' : ''}: {(enablesCountMap._names[upgrade.id] || []).slice(0, 3).join(', ')}{enablesCountMap[upgrade.id] > 3 ? '...' : ''}</div>
               )}
               {!affordable && (() => {
-                const eta = getTimeToAfford(state, cost);
+                const eta = estimateAffordability(state, cost, economy).seconds;
                 return (
                   <div className="upgrade-progress-bar">
                     <div

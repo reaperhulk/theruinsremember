@@ -1,9 +1,7 @@
+import { calculateEconomy } from './economy.js';
 import { resources as resourceDefs } from '../data/resources.js';
-import { ERA_COST_MULTIPLIERS, getRepeatableMilestoneMultiplier } from './upgrades.js';
-import { getCycleProductionMultiplier } from './cycles.js';
-import { getRelicCapacityMultiplier, getRelicProductionMultiplier } from './relics.js';
-import { getWeaveProductionMultiplier } from './weaving.js';
-import { getEraMasteryTier } from './eras.js';
+import { ERA_COST_MULTIPLIERS } from './upgrades.js';
+import { getRelicCapacityMultiplier } from './relics.js';
 
 // Soft-scale prestige multiplier: first 10x is linear, beyond that sqrt.
 // Prevents early prestiges from trivializing the game while still rewarding
@@ -17,56 +15,24 @@ export function getEffectivePrestige(rawMultiplier) {
   return Math.min(PRESTIGE_HARD_CAP, 10 + Math.sqrt(rawMultiplier - 10) * 3);
 }
 
-// Calculate effective production rate for a single resource.
+// All rates and forecasts share the simulation's calculation.
 export function getEffectiveRate(state, resourceId) {
-  const r = state.resources[resourceId];
-  if (!r || !r.unlocked) return 0;
-  const def = resourceDefs[resourceId];
-  if (!def) return 0;
-  const prestigeMult = getEffectivePrestige(state.prestigeMultiplier || 1);
-  return (def.baseRate + r.rateAdd) * r.rateMult * prestigeMult * getCycleProductionMultiplier(state) * getRelicProductionMultiplier(state, resourceId) * getWeaveProductionMultiplier(state, resourceId) * getEraMasteryTier(state).multiplier * getRepeatableMilestoneMultiplier(state, resourceId);
+  return calculateEconomy(state).gross[resourceId] || 0;
 }
 
-// Calculate all production rates
 export function calculateProduction(state) {
-  const rates = {};
-  for (const id of Object.keys(state.resources)) {
-    rates[id] = getEffectiveRate(state, id);
-  }
-  return rates;
+  return calculateEconomy(state).gross;
 }
 
-// Calculate net production (accounting for consumption)
 export function getNetRate(state, resourceId) {
-  const grossRate = getEffectiveRate(state, resourceId);
-  if (resourceId === 'food') {
-    const laborRate = getEffectiveRate(state, 'labor');
-    return grossRate - laborRate * 1.0;
-  }
-  if (resourceId === 'energy') {
-    const elecRate = getEffectiveRate(state, 'electronics');
-    return grossRate - elecRate * 0.4;
-  }
-  if (resourceId === 'rocketFuel' && state.era >= 4) {
-    const orbRate = getEffectiveRate(state, 'orbitalInfra');
-    return grossRate - orbRate * 0.5;
-  }
-  if (resourceId === 'exoticMaterials' && state.era >= 5) {
-    const colonyRate = getEffectiveRate(state, 'colonies');
-    return grossRate - colonyRate * 0.2;
-  }
-  if (resourceId === 'stellarForge' && state.era >= 7) {
-    const megaRate = getEffectiveRate(state, 'megastructures');
-    return grossRate - megaRate * 0.3;
-  }
-  return grossRate;
+  return calculateEconomy(state).net[resourceId] || 0;
 }
 
 // Check if we can afford a cost object { resourceId: amount, ... }
 export function canAfford(state, cost) {
   for (const [resourceId, amount] of Object.entries(cost)) {
     const r = state.resources[resourceId];
-    if (!r || r.amount < amount) return false;
+    if (!r || !Number.isFinite(amount) || amount < 0 || !Number.isFinite(r.amount) || r.amount < amount || (amount > 0 && !r.unlocked)) return false;
   }
   return true;
 }
