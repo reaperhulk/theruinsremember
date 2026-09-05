@@ -12,7 +12,6 @@ import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes
 import { awardCycleGoal } from './cycles.js';
 import { advanceEchoPressure } from './relics.js';
 import { advanceForgetting, pauseForgetting } from './forgetting.js';
-import { performPrestige } from './prestige.js';
 import { researchRoutineTech } from './tech.js';
 import { advanceTradeRoute } from './trading.js';
 
@@ -42,7 +41,7 @@ export function tick(state, dt, rng = Math.random, options = {}) {
   newState = advanceEchoPressure(newState, dt, rng);
   {
     const wasCollapsed = newState.forgetting?.collapsed;
-    newState = options.pauseForgetting
+    newState = options.pauseForgetting || !newState.forgettingChallengeActive
       ? pauseForgetting(newState, dt)
       : advanceForgetting(newState, dt, rng);
     if (!wasCollapsed && newState.forgetting?.collapsed) {
@@ -55,11 +54,8 @@ export function tick(state, dt, rng = Math.random, options = {}) {
         }].slice(-20),
       };
     }
-    // The cycle ends whether or not you are ready — rewards are banked.
-    if (!options.pauseForgetting && newState.forgetting?.collapsed &&
-        newState.totalTime - (newState.forgetting.collapsedAt ?? newState.totalTime) >= 10) {
-      return performPrestige(newState);
-    }
+    // A lost optional challenge never resets a civilization. The player can
+    // retreat, restore the memories, or close the cycle on their own terms.
   }
   if (newState.era <= 3 && newState.prestigeUpgrades?.autoClicker && newState.expedition?.supplies >= EXPEDITION_MAX_SUPPLIES) {
     const safeRoute = getExpeditionRoutes(newState.era)[0];

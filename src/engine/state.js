@@ -5,7 +5,7 @@ import { createExpeditionState } from './expeditions.js';
 export function migrateState(saved) {
   const fresh = createInitialState();
   // Ensure all fields exist by merging with defaults
-  const migrated = { ...fresh, ...saved };
+  const migrated = { ...fresh, ...saved, resources: { ...saved.resources } };
   // Ensure resources have all required fields
   for (const [id, freshR] of Object.entries(fresh.resources)) {
     if (!migrated.resources[id]) {
@@ -134,6 +134,7 @@ export function createInitialState() {
     senatePct: { merchants: 34, scholars: 33, warriors: 33 },
     // The Forgetting (Era 10+) — run-ending siege state
     forgetting: null,
+    forgettingChallengeActive: false,
     recursionDepth: 0,
     // Reality Forge (Era 10+)
     realityKeys: {},

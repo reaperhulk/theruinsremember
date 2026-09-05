@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
+  beginForgettingChallenge, retreatFromForgetting,
   autoStationWarden,
   canDescend,
   descendRecursion,
@@ -262,8 +263,11 @@ export const ForgettingPanel = memo(function ForgettingPanel({ state, onUpdate }
 
   const meterColor = stats.meter >= 75 ? '#e05a5a' : stats.meter >= 40 ? '#ddaa44' : '#9f7fd0';
 
+  if (!state.forgettingChallengeActive) return <div className="panel forgetting-panel"><h2>The Forgetting</h2><p>Optional siege challenge. Defend your memories to descend for greater rewards. You can retreat and restore your memories at any time; a defeat never resets the cycle.</p><button onClick={() => onUpdate(beginForgettingChallenge)}>Begin challenge</button></div>;
+
   return (
     <div className="panel forgetting-panel">
+      <button onClick={() => onUpdate(retreatFromForgetting)}>Retreat and restore memories</button>
       <div className="tuning-header">
         <div>
           <span className="panel-kicker">{depth > 0 ? `Recursion depth ${depth}` : 'The cycle turns'}</span>

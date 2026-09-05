@@ -1,5 +1,6 @@
+import { serializeSave } from '../engine/saves.js';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { createInitialState, migrateState } from '../engine/state.js';
+import { createInitialState } from '../engine/state.js';
 import { useGameLoop } from '../hooks/useGameLoop.js';
 import { ResourcePanel } from './ResourcePanel.jsx';
 import { UpgradePanel } from './UpgradePanel.jsx';
@@ -69,7 +70,7 @@ function getAvailableTabs(era) {
 }
 
 export function App() {
-  const { state, updateState, resetSave, offlineReport, dismissOfflineReport } = useGameLoop(initialState);
+  const { state, updateState, resetSave, offlineReport, dismissOfflineReport, saveWarning, restoreBackup, importSave } = useGameLoop(initialState);
   const [activeTab, setActiveTab] = useState('upgrades');
   const [activeOperation, setActiveOperation] = useState(null);
   const prevEraRef = useRef(state.era);
@@ -255,7 +256,7 @@ export function App() {
             {saveMenuOpen && (
               <div className="save-menu" role="menu">
           <button className="reset-btn" role="menuitem" aria-label="Export save file" onClick={() => {
-            const save = localStorage.getItem('incremental-game-save');
+            const save = serializeSave(state);
             if (save) {
               const blob = new Blob([save], { type: 'application/json' });
               const url = URL.createObjectURL(blob);
@@ -267,7 +268,7 @@ export function App() {
             Export
           </button>
           <button className="reset-btn" role="menuitem" aria-label="Copy save to clipboard" onClick={() => {
-            const save = localStorage.getItem('incremental-game-save');
+            const save = serializeSave(state);
             if (save) { navigator.clipboard.writeText(save).catch(() => {}); }
           }} title="Copy save data to clipboard">
             Copy
@@ -281,12 +282,7 @@ export function App() {
               const reader = new FileReader();
               reader.onload = (ev) => {
                 try {
-                  const data = JSON.parse(ev.target.result);
-                  if (data.era && data.resources) {
-                    const migrated = migrateState(data);
-                    updateState(() => ({ ...migrated, lastSaved: Date.now() }));
-                    try { localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() })); } catch { /* storage unavailable */ }
-                  }
+                  importSave(ev.target.result);
                 } catch { alert('Invalid save file. Please select a valid .json save.'); }
               };
               reader.readAsText(file);
@@ -298,16 +294,12 @@ export function App() {
           <button className="reset-btn" role="menuitem" aria-label="Paste save from clipboard" onClick={async () => {
             try {
               const text = await navigator.clipboard.readText();
-              const data = JSON.parse(text);
-              if (data.era && data.resources) {
-                const migrated = migrateState(data);
-                updateState(() => ({ ...migrated, lastSaved: Date.now() }));
-                try { localStorage.setItem('incremental-game-save', JSON.stringify({ ...migrated, lastSaved: Date.now() })); } catch { /* storage unavailable */ }
-              }
-            } catch { /* clipboard unavailable or invalid data */ }
+              importSave(text);
+            } catch { alert('Clipboard unavailable or invalid save. Use Import to choose an exported file.'); }
           }} title="Import save from clipboard">
             Paste
           </button>
+          <button className="reset-btn" role="menuitem" onClick={restoreBackup}>Restore backup</button>
           <button className="reset-btn danger" role="menuitem" aria-label="Hard reset all progress" onClick={() => {
             setConfirmDialog({
               lines: ['Hard reset?', 'This erases ALL progress including prestige upgrades!'],
@@ -322,6 +314,7 @@ export function App() {
           </div>
         </div>
       </header>
+      {saveWarning && <div className="save-warning" role="alert">{saveWarning} <button onClick={restoreBackup}>Restore backup</button></div>}
       <div className="control-ribbon">
         <span className="control-chip">Era {state.era}: {eraNames[state.era]}</span>
         <span className="control-chip">{affordableUpgrades} options ready</span>

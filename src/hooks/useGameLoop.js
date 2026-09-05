@@ -1,168 +1,141 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { tick } from '../engine/tick.js';
 import { advanceTime } from '../engine/advanceTime.js';
-import { migrateState } from '../engine/state.js';
-
-const SAVE_KEY = 'incremental-game-save';
-const SAVE_INTERVAL = 15000; // 15 seconds — more frequent saves
+import { loadSave, writeSave, parseSave, SAVE_KEY, BACKUP_KEYS, offlineAllowance } from '../engine/saves.js';
 
 export function useGameLoop(initialState) {
+  const [loaded] = useState(() => ({ ...loadSave(localStorage), loadedAt: Date.now() }));
+  const [state, setState] = useState(loaded.state || initialState);
+  const [saveWarning, setSaveWarning] = useState(loaded.warning);
   const [offlineReport, setOfflineReport] = useState(null);
-
-  const [state, setState] = useState(() => {
-    // Try to load saved state
-    const saved = localStorage.getItem(SAVE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Calculate offline progress
-        const now = Date.now();
-        const elapsed = (now - parsed.lastSaved) / 1000;
-        const migrated = migrateState(parsed);
-        if (elapsed > 10) {
-          // Cap offline time: 4h for first run, 24h for prestiged, 7d with infinitePatience
-          const maxOffline = (parsed.prestigeUpgrades?.infinitePatience) ? 604800 :
-                             (parsed.prestigeCount > 0) ? 86400 : 14400; // 7 days, 24 hours, or 4 hours
-          const offlineDt = Math.min(elapsed, maxOffline);
-          const before = migrated;
-
-          // Process offline in chunks for proper event/achievement checking
-          const chunkSize = 60;
-          const maxChunks = (parsed.prestigeUpgrades?.infinitePatience) ? 10080 :
-                            (parsed.prestigeCount > 0) ? 1440 : 240; // 7 days, 24 hours, or 4 hours of chunks
-          const chunks = Math.min(Math.floor(offlineDt / chunkSize), maxChunks);
-          const after = advanceTime(migrated, offlineDt, Math.random, chunkSize, { pauseForgetting: true });
-          const siegePaused = migrated.era >= 10 || after.era >= 10;
-
-          // Calculate resource gains for offline report
-          const gains = {};
-          for (const [id, r] of Object.entries(after.resources)) {
-            if (r.unlocked) {
-              const gained = r.amount - (before.resources[id]?.amount || 0);
-              if (gained > 0) gains[id] = gained;
-            }
-          }
-          // Track upgrades and achievements earned offline
-          const upgradesGained = Object.keys(after.upgrades || {}).length - Object.keys(before.upgrades || {}).length;
-          const achievementsGained = Object.keys(after.achievements || {}).length - Object.keys(before.achievements || {}).length;
-          // Store offline report (will be shown by UI)
-          // For large offline periods, show processing indicator briefly
-          const eraChanged = after.era > before.era;
-          if (chunks > 100) {
-            setOfflineReport({ elapsed: offlineDt, processing: true, gains: {}, era: after.era, prevEra: before.era, eraChanged, upgradesGained: 0, achievementsGained: 0, siegePaused });
-            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged, upgradesGained, achievementsGained, siegePaused }), 300);
-          } else {
-            setTimeout(() => setOfflineReport({ elapsed: offlineDt, gains, era: after.era, prevEra: before.era, eraChanged, upgradesGained, achievementsGained, siegePaused }), 100);
-          }
-          return after;
-        }
-        return migrated;
-      } catch {
-        // Corrupted save, start fresh
-      }
-    }
-    return initialState;
-  });
-
   const stateRef = useRef(state);
-  useEffect(() => {
-    stateRef.current = state;
-  }, [state]);
-
-  const lastTimeRef = useRef(0);
-  const lastStateUpdateRef = useRef(0);
-  const accumulatedDtRef = useRef(0);
-  const rafRef = useRef(null);
-  const saveTimerRef = useRef(null);
+  const blocked = useRef(!!loaded.blocked);
+  const busy = useRef(false);
   const speedRef = useRef(1);
+  const pending = useRef(0);
+  const initialElapsed = useRef(loaded.state ? Math.max(0, (loaded.loadedAt - loaded.state.lastSaved) / 1000) : 0);
 
-  // Expose debug helpers on window for play-testing
+  const commit = useCallback(next => {
+    stateRef.current = next;
+    setState(next);
+  }, []);
+  const save = useCallback(() => {
+    if (blocked.current || busy.current) return;
+    setSaveWarning(writeSave(localStorage, stateRef.current));
+  }, []);
+  const updateState = useCallback(fn => {
+    if (busy.current) return;
+    const previous = stateRef.current;
+    const next = fn(previous) || previous;
+    if (next !== previous) { commit(next); save(); }
+  }, [commit, save]);
+
   useEffect(() => {
+    let cancelled = false;
+    let raf;
+    let lastFrame = performance.now();
+    let lastRender = lastFrame;
+    let hiddenAt = document.hidden ? Date.now() : null;
+    const catchUp = async elapsed => {
+      if (busy.current || elapsed <= 0 || blocked.current) return;
+      busy.current = true;
+      const before = stateRef.current;
+      const seconds = Math.min(elapsed, offlineAllowance(before));
+      let current = before;
+      setOfflineReport({ processing: true, elapsed: seconds });
+      // Yield between chunks; every second still runs the same engine. Long
+      // returns stay responsive without approximating away purchase boundaries.
+      for (let done = 0; done < seconds && !cancelled; done += 300) {
+        current = advanceTime(current, Math.min(300, seconds - done), Math.random, 1, { pauseForgetting: true });
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+      if (cancelled) return;
+      commit(current);
+      initialElapsed.current = 0;
+        busy.current = false;
+      save();
+      setOfflineReport({ elapsed: seconds, gains: Object.fromEntries(Object.entries(current.resources).filter(([, r]) => r.unlocked).map(([id, r]) => [id, r.amount - (before.resources[id]?.amount || 0)])), era: current.era, prevEra: before.era, eraChanged: current.era > before.era, upgradesGained: Object.keys(current.upgrades).length - Object.keys(before.upgrades).length, achievementsGained: Object.keys(current.achievements).length - Object.keys(before.achievements).length, siegePaused: current.era >= 10 });
+      lastFrame = performance.now();
+    };
+    const startupGap = initialElapsed.current;
+    if (startupGap > 10) catchUp(startupGap);
+    const frame = now => {
+      const elapsed = Math.max(0, (now - lastFrame) / 1000);
+      lastFrame = now;
+      if (!document.hidden && !busy.current && !blocked.current) {
+        if (elapsed > 5) catchUp(elapsed);
+        else pending.current += elapsed * speedRef.current;
+        // Fixed one-second simulation frames make foreground, hidden-tab,
+        // fast-forward and saved-game catch-up agree on event/purchase timing.
+        if (pending.current >= 1 && now - lastRender >= 100) {
+          const seconds = Math.min(60, Math.floor(pending.current));
+          pending.current -= seconds;
+          commit(advanceTime(stateRef.current, seconds));
+          lastRender = now;
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    const visibility = () => {
+      if (document.hidden) { hiddenAt = Date.now(); save(); }
+      else {
+        const gap = hiddenAt == null ? 0 : Math.max(0, (Date.now() - hiddenAt) / 1000);
+        hiddenAt = null;
+        lastFrame = performance.now();
+        catchUp(gap);
+      }
+    };
+    const timer = setInterval(save, 15000);
+    document.addEventListener('visibilitychange', visibility);
+    window.addEventListener('pagehide', save);
+    window.addEventListener('beforeunload', save);
     window.__game = {
       getState: () => stateRef.current,
-      setState: (fn) => setState(prev => fn(prev) || prev),
-      fastForward: (seconds) => setState(prev => advanceTime(prev, seconds)),
-      setSpeed: (mult) => { speedRef.current = Math.max(0, mult); },
+      setState: updateState,
+      fastForward: seconds => updateState(s => advanceTime(s, seconds)),
+      setSpeed: value => { speedRef.current = Number.isFinite(value) ? Math.max(0, value) : 1; },
       getSpeed: () => speedRef.current,
-      giveAll: (amount = 1000) => setState(prev => {
-        const res = { ...prev.resources };
-        for (const [id, r] of Object.entries(res)) {
-          if (r.unlocked) res[id] = { ...r, amount };
-        }
-        return { ...prev, resources: res };
-      }),
+      giveAll: (amount = 1000) => updateState(s => ({ ...s, resources: Object.fromEntries(Object.entries(s.resources).map(([id, r]) => [id, r.unlocked ? { ...r, amount } : r])) })),
     };
-    return () => { delete window.__game; };
-  }, []);
-
-  // Start/stop the loop
-  useEffect(() => {
-    const gameLoop = (now) => {
-      const dt = (now - lastTimeRef.current) / 1000;
-      lastTimeRef.current = now;
-      accumulatedDtRef.current += Math.max(0, Math.min(dt, 1)) * speedRef.current;
-
-      if (now - lastStateUpdateRef.current > 100) {
-        const accDt = accumulatedDtRef.current;
-        accumulatedDtRef.current = 0;
-        lastStateUpdateRef.current = now;
-        setState(prev => tick(prev, accDt));
-      }
-      rafRef.current = requestAnimationFrame(gameLoop);
-    };
-
-    const startedAt = performance.now();
-    lastTimeRef.current = startedAt;
-    lastStateUpdateRef.current = startedAt;
-    rafRef.current = requestAnimationFrame(gameLoop);
-
-    // Auto-save with error handling for quota/disabled localStorage
-    const safeSave = () => {
-      try {
-        const toSave = { ...stateRef.current, lastSaved: Date.now() };
-        localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
-      } catch {
-        // localStorage may be full or disabled — silently skip
-      }
-    };
-    saveTimerRef.current = setInterval(safeSave, SAVE_INTERVAL);
-
-    // Save on tab close / page unload
-    const handleBeforeUnload = () => safeSave();
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
     return () => {
-      cancelAnimationFrame(rafRef.current);
-      clearInterval(saveTimerRef.current);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      safeSave();
+      cancelled = true;
+      const wasBusy = busy.current;
+      busy.current = false;
+      cancelAnimationFrame(raf);
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', visibility);
+      window.removeEventListener('pagehide', save);
+      window.removeEventListener('beforeunload', save);
+      delete window.__game;
+      if (!wasBusy) save();
     };
-  }, []);
+  }, [commit, save, updateState]);
 
-  const updateState = useCallback((fn) => {
-    setState(prev => {
-      const result = fn(prev);
-      if (result && result !== prev) {
-        // Save immediately on meaningful state changes (upgrades, era transitions)
-        const upgradesBefore = Object.keys(prev.upgrades || {}).length;
-        const upgradesAfter = Object.keys(result.upgrades || {}).length;
-        if (upgradesAfter > upgradesBefore || result.era !== prev.era) {
-          try {
-            const toSave = { ...result, lastSaved: Date.now() };
-            localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
-          } catch { /* localStorage may be full */ }
-        }
-      }
-      return result || prev;
-    });
-  }, []);
-
+  const importSave = useCallback(text => {
+    const next = parseSave(text);
+    try {
+      const previous = localStorage.getItem(SAVE_KEY);
+      if (previous) localStorage.setItem(`${SAVE_KEY}-replaced`, previous);
+    } catch { setSaveWarning('Could not preserve the existing save. Export it before importing.'); return false; }
+    blocked.current = false;
+    pending.current = 0;
+    commit({ ...next, lastSaved: Date.now() });
+    save();
+    return true;
+  }, [commit, save]);
+  const restoreBackup = useCallback(() => {
+    for (const key of BACKUP_KEYS) {
+      try { const text = localStorage.getItem(key); if (text && importSave(text)) return; } catch { /* try the next backup */ }
+    }
+    setSaveWarning('No valid backup is available. Import a previously exported save.');
+  }, [importSave]);
   const resetSave = useCallback(() => {
-    localStorage.removeItem(SAVE_KEY);
-    setState(initialState);
-  }, [initialState]);
-
+    try { for (const key of [SAVE_KEY, ...BACKUP_KEYS, `${SAVE_KEY}-replaced`]) localStorage.removeItem(key); } catch { /* writeSave reports storage failure */ }
+    blocked.current = false;
+    pending.current = 0;
+    commit({ ...initialState, lastSaved: Date.now() });
+    save();
+  }, [initialState, commit, save]);
   const dismissOfflineReport = useCallback(() => setOfflineReport(null), []);
-
-  return { state, updateState, resetSave, offlineReport, dismissOfflineReport };
+  return { state, updateState, resetSave, offlineReport, dismissOfflineReport, saveWarning, restoreBackup, importSave };
 }

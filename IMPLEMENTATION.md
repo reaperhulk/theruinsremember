@@ -13,8 +13,8 @@ to main, with the testing harness audited before gameplay changes.
 - [x] Enforce the same purchase requirements in manual, bulk, and automatic paths.
 - [ ] Unify production, consumption, caps, affordability estimates, and previews.
 - [ ] Add consumer controls, reserves, queued goals, and visible recovery routes.
-- [ ] Make active/background/offline simulation consistent; protect unattended play.
-- [ ] Add validated saves, rotating backups, recovery, and current-state export.
+- [x] Make active/background/offline simulation consistent; protect unattended play.
+- [x] Add validated saves, rotating backups, recovery, and current-state export.
 - [ ] Strengthen signature upgrades and repeatable milestones.
 - [ ] Add permanent Archive, remembered plans, distinct doctrine research,
       deterministic relic crafting, reconstruction projects, and optional challenges.
@@ -125,3 +125,28 @@ Intentional timing differences below reflect removing illicit first-run prestige
 | offline_returner | 42 | 28801 → 43201 | 241 → 361 | 68 → 99 | 3 → 4 | 6 / False |
 | completionist | 42 | 1081 → 1081 | 1081 → 1081 | 172 → 183 | 1 → 1 | 10 / True |
 | minimalist | 42 | 6421 → 10231 | 6421 → 10231 | 61 → 72 | 1 → 1 | 10 / True |
+
+### 3. Save recovery and safe unattended play
+
+381 unit tests, lint, and the production build pass. All 16 persona timings are unchanged; manual inputs decrease because ordinary runs no longer require siege defense.
+
+Validated primary saves and two rotating backups, non-destructive recovery, visible storage errors, current-state export, fixed-step foreground updates, responsive offline processing, and hidden-tab catch-up. The Forgetting requires an explicit start and no longer forces a prestige after a loss. Negative controls cover invalid/future saves, quotas, backup recovery, migration purity, unattended Era 10, and retreat.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Final era / ready |
+|---|---|---|---|---|---|---|
+| newcomer | 424242 | 1741 → 1741 | 1741 → 1741 | 114 → 111 | 1 → 1 | 10 / True |
+| engaged | 424242 | 1411 → 1411 | 1411 → 1411 | 140 → 138 | 1 → 1 | 10 / True |
+| optimizer | 424242 | 931 → 931 | 931 → 931 | 204 → 202 | 1 → 1 | 10 / True |
+| background | 424242 | 1921 → 1921 | 481 → 481 | 120 → 116 | 17 → 17 | 10 / True |
+| check_in | 424242 | 4201 → 4201 | 421 → 421 | 104 → 103 | 8 → 8 | 10 / True |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 98 → 98 | 4 → 4 | 6 / False |
+| completionist | 424242 | 1171 → 1171 | 1171 → 1171 | 183 → 181 | 1 → 1 | 10 / True |
+| minimalist | 424242 | 10681 → 10681 | 10681 → 10681 | 70 → 70 | 1 → 1 | 10 / True |
+| newcomer | 42 | 1741 → 1741 | 1741 → 1741 | 116 → 113 | 1 → 1 | 10 / True |
+| engaged | 42 | 1561 → 1561 | 1561 → 1561 | 140 → 138 | 1 → 1 | 10 / True |
+| optimizer | 42 | 961 → 961 | 961 → 961 | 232 → 230 | 1 → 1 | 10 / True |
+| background | 42 | 1921 → 1921 | 481 → 481 | 118 → 114 | 17 → 17 | 10 / True |
+| check_in | 42 | 4201 → 4201 | 421 → 421 | 104 → 103 | 8 → 8 | 10 / True |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 99 → 99 | 4 → 4 | 6 / False |
+| completionist | 42 | 1081 → 1081 | 1081 → 1081 | 183 → 181 | 1 → 1 | 10 / True |
+| minimalist | 42 | 10231 → 10231 | 10231 → 10231 | 72 → 72 | 1 → 1 | 10 / True |

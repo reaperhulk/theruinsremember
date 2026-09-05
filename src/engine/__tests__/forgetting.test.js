@@ -239,7 +239,7 @@ describe('the Forgetting', () => {
     expect(canDescend(deeper).allowed).toBe(false);
   });
 
-  it('forces the cycle to end after collapse', () => {
+  it('keeps the cycle available after challenge collapse', () => {
     const rng = makeRng();
     let state = run(makeSiegeState(), 1, rng);
     state = {
@@ -248,12 +248,12 @@ describe('the Forgetting', () => {
       recursionDepth: 2,
     };
     const after = tick(state, 1, rng);
-    expect(after.era).toBe(1);
-    expect(after.prestigeCount).toBe(1);
-    expect(after.forgetting).toBeNull();
-    expect(after.recursionDepth).toBe(0);
-    // Depth points were banked
-    expect(after.prestigePoints).toBeGreaterThanOrEqual(16);
+    expect(after.era).toBe(10);
+    expect(after.prestigeCount).toBe(0);
+    expect(after.forgetting.collapsed).toBe(true);
+    expect(after.recursionDepth).toBe(2);
+    // Earned depth remains available when the player chooses to prestige.
+    expect(calculatePrestigePoints(after)).toBeGreaterThanOrEqual(16);
   });
 
   it('reports stats for bots and UI', () => {

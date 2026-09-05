@@ -117,6 +117,16 @@ function createForgetting(state) {
   };
 }
 
+export function beginForgettingChallenge(state) {
+  if (state.era < 10 || state.forgettingChallengeActive) return state;
+  return { ...state, forgettingChallengeActive: true, forgetting: createForgetting(state), recursionDepth: 0 };
+}
+
+export function retreatFromForgetting(state) {
+  if (!state.forgettingChallengeActive && !state.forgetting) return state;
+  return { ...state, forgettingChallengeActive: false, forgetting: null, recursionDepth: 0 };
+}
+
 function ensureWardens(forgetting, capacity) {
   if (forgetting.wardens.length >= capacity) return forgetting;
   const wardens = [...forgetting.wardens];

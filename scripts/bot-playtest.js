@@ -21,7 +21,7 @@ import { getEraReadiness } from '../src/engine/eras.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
 import { countSenateActs, enactSenatePolicy, getSenateGovernmentMultiplier, getSenatePctBonuses, getSenateStats } from '../src/engine/senate.js';
 import { selectNextCycleDoctrine } from '../src/engine/cycles.js';
-import { descendRecursion, getForgettingStats, placeWarden } from '../src/engine/forgetting.js';
+import { beginForgettingChallenge, descendRecursion, getForgettingStats, placeWarden } from '../src/engine/forgetting.js';
 import { claimRelic, declineRelicOffer } from '../src/engine/relics.js';
 import { performPrestige, calculatePrestigeBonus, calculatePrestigePoints, purchasePrestigeUpgrade, getPrestigeShop } from '../src/engine/prestige.js';
 import { createPersonaProfiles, getPlayerAttention } from './playtest-personas.js';
@@ -151,7 +151,7 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  descent: { minRecursionDepth: 2, requireCollapse: true, minStatePrestiges: 1 },
+  descent: { minRecursionDepth: 2, requireCollapse: true, maxStatePrestiges: 0 },
   // The compression floor: with three prestiges banked the final run must
   // still take minutes, not seconds — decisions replay every cycle.
   prestige3: { minTime: 210, requiredEra: 10, cycleReady: true, minPrestiges: 3 },
@@ -377,6 +377,7 @@ function botSenate(state, profile, _t, _rng) {
 }
 
 function botForgetting(state, profile, t, _rng) {
+  if (state.era >= 10 && profile.maxRecursionDepth > 0 && !state.forgettingChallengeActive) return beginForgettingChallenge(state);
   if (!profile.forgettingDefense || state.era < 10 || !state.forgetting || state.forgetting.collapsed) return state;
   if (t % profile.forgettingDefense !== 0) return state;
 
@@ -842,7 +843,7 @@ export function runScenario(opts) {
       if (invalidState.length) break;
     }
 
-    if (stopOnCollapse && collector.operationStats.forgetting.collapsed && (state.prestigeCount || 0) > 0) {
+    if (stopOnCollapse && collector.operationStats.forgetting.collapsed) {
       break;
     }
 
@@ -1354,8 +1355,8 @@ function assertBalanceTargets(allResults) {
     if (target.requireCollapse && !status.forgettingCollapsed) {
       issues.push('the wall never won — no collapse');
     }
-    if (target.minStatePrestiges != null && (status.statePrestigeCount || 0) < target.minStatePrestiges) {
-      issues.push('collapse did not force the cycle to end');
+    if (target.maxStatePrestiges != null && (status.statePrestigeCount || 0) > target.maxStatePrestiges) {
+      issues.push('challenge collapse unexpectedly reset the cycle');
     }
     if (target.maxFirstOperationLatency != null) {
       for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {
