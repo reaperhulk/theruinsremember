@@ -196,7 +196,7 @@ async function exercisePersistenceAndAutomation(page) {
   return { migrated, protectedOffline, automation };
 }
 
-async function promoteToEra10(page) {
+async function loadEra10Fixture(page) {
   const era10UpgradeIds = Object.values(upgrades).filter(upgrade => upgrade.era === 10).slice(0, 20).map(upgrade => upgrade.id);
   await page.evaluate((upgradeIds) => {
     window.__game.setState(state => ({
@@ -430,7 +430,7 @@ async function run() {
   console.log(`  Recovered relic offer: ${relicFailed ? 'FAILED' : '3 choices, 1 equipped'}`);
   await screenshot(page, 'orbital_operations');
   await stopPump(page);
-  await promoteToEra10(page);
+  await loadEra10Fixture(page);
   await page.evaluate(() => document.querySelector('#tab-mini')?.click());
   await new Promise(resolve => setTimeout(resolve, 150));
   const operationShell = await page.evaluate(() => ({
@@ -669,8 +669,8 @@ async function run() {
       doctrineCycleFailed = true;
     }
     console.log(`  Cycle ${cycle + 1} begins with ${cycleStart.doctrine || 'no'} doctrine and ${Math.floor(cycleStart.food)} food`);
-    await promoteToEra10(page);
-    console.log(`  Prestige cycle ${cycle + 1} completed`);
+    await loadEra10Fixture(page);
+    console.log(`  Prestige reset fixture ${cycle + 1} checked (not a progression journey)`);
   }
 
   // Always run layout check at current state

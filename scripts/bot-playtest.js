@@ -535,115 +535,1043 @@ function takeSnapshot(state, t, collector) {
       techTarget: readiness.minTechs,
     },
     availableUpgradeIds: getAvailableUpgrades(state).map(upgrade => upgrade.id),
-    ownedUpgradeIds: Obje…20107 tokens truncated…iege: ${siegeFailed ? 'FAILED' : 'canvas + mirror, warden stationed via mirror'}`);
-  const forgeReady = await page.evaluate(() => {
-    const select = document.querySelector('.operation-archive select');
-    if (!select) return false;
-    select.value = '';
-    select.dispatchEvent(new Event('change', { bubbles: true }));
-    return true;
-  });
-  await new Promise(resolve => setTimeout(resolve, 150));
-  const cycleReadyVisible = forgeReady && await page.evaluate(() => (
-    !!document.querySelector('.reality-forge-panel .cycle-readiness') &&
-    !!document.querySelector('.prestige-btn') &&
-    document.querySelectorAll('.cycle-doctrines button').length === 3
-  ));
-  const forgeFailed = !cycleReadyVisible;
-  console.log(`  Reality Forge cycle readiness: ${cycleReadyVisible ? 'visible' : 'FAILED'}`);
-
-  let doctrineCycleFailed = false;
-  const doctrineOrder = ['reconstruction', 'expansion', 'transcendence'];
-  for (let cycle = 0; cycle < PRESTIGE_CYCLES; cycle++) {
-    const doctrineId = doctrineOrder[cycle % doctrineOrder.length];
-    if (cycle === 0) {
-      await page.evaluate(() => window.__game.setState(state => ({
-        ...state,
-        prestigeUpgrades: { ...state.prestigeUpgrades, fastStart: true },
-      })));
-      await new Promise(r => setTimeout(r, 100));
+    ownedUpgradeIds: Object.keys(state.upgrades || {}),
+    resources: {},
+  };
+  for (const [id, r] of Object.entries(state.resources)) {
+    if (r.unlocked) {
+      const rate = (r.baseRate + r.rateAdd) * r.rateMult * (state.prestigeMultiplier || 1);
+      snap.resources[id] = { amount: Math.floor(r.amount * 10) / 10, rate: Math.floor(rate * 100) / 100 };
     }
-    await page.evaluate(index => document.querySelectorAll('.cycle-doctrines button')[index]?.click(), cycle % doctrineOrder.length);
-    await new Promise(r => setTimeout(r, 100));
-    await page.evaluate(() => document.querySelector('.prestige-btn')?.click());
-    await new Promise(r => setTimeout(r, 200));
-    await page.evaluate(() => document.querySelector('.confirm-yes')?.click());
-    await new Promise(r => setTimeout(r, 300));
-    const cycleStart = await page.evaluate(() => {
-      const state = window.__game.getState();
-      return {
-        doctrine: state.cycleDoctrine,
-        food: state.resources.food.amount,
-        quantumKeys: state.realityKeys?.quantum || 0,
-        forkHearth: !!state.upgrades.forkHearth,
-        forkQuarry: !!state.upgrades.forkQuarry,
-      };
-    });
-    const expectedSeed = cycleStart.quantumKeys * 25;
-    if (cycleStart.doctrine !== doctrineId || cycleStart.food < expectedSeed || cycleStart.forkHearth || cycleStart.forkQuarry) {
-      doctrineCycleFailed = true;
-    }
-    console.log(`  Cycle ${cycle + 1} begins with ${cycleStart.doctrine || 'no'} doctrine and ${Math.floor(cycleStart.food)} food`);
-    await loadEra10Fixture(page);
-    console.log(`  Prestige reset fixture ${cycle + 1} checked (not a progression journey)`);
   }
-
-  // Always run layout check at current state
-  await stopPump(page);
-  await new Promise(r => setTimeout(r, 300));
-  await page.evaluate(() => document.querySelector('#tab-upgrades')?.click());
-  await new Promise(r => setTimeout(r, 200));
-  const layout = await checkLayout(page);
-  console.log('\n=== LAYOUT CHECK ===');
-  layout.ok.forEach(o => console.log('  ✓ ' + o));
-  layout.issues.forEach(i => console.log('  ✗ ' + i));
-  await screenshot(page, 'era10_check');
-  await stopPump(page);
-
-  const tabIssues = [];
-  for (const tab of ['tech', 'mini', 'trading', 'prestige', 'stats']) {
-    await page.evaluate(tabId => document.querySelector('#tab-' + tabId)?.click(), tab);
-    await new Promise(r => setTimeout(r, 100));
-    const tabLayout = await checkLayout(page);
-    tabIssues.push(...tabLayout.issues.map(issue => `${tab}: ${issue}`));
-  }
-  await page.evaluate(() => document.querySelector('#tab-upgrades')?.click());
-
-  // Final state
-  const final = await getState(page);
-  console.log('\n=== FINAL STATE ===');
-  console.log(`  Era: ${final.era} | Upgrades: ${final.upgrades} | Tech: ${final.tech}`);
-  console.log(`  Achievements: ${final.achievements} | Prestige: ${final.prestigeCount} (x${final.prestigeMultiplier})`);
-  console.log(`  Prestige upgrades: ${final.prestigeUpgrades}/${Object.keys(prestigeUpgrades).length}`);
-  if (final.trueEnding) console.log('  TRUE ENDING achieved');
-
-  // Console errors
-  if (consoleErrors.length > 0) {
-    console.log(`\n=== CONSOLE ERRORS (${consoleErrors.length}) ===`);
-    [...new Set(consoleErrors)].slice(0, 10).forEach(e => console.log('  ' + e.substring(0, 120)));
-  } else {
-    console.log('\n  ✓ No console errors');
-  }
-
-  // Mobile check
-  if (MOBILE) {
-    const mobileLayout = await checkLayout(page);
-    console.log('\n=== MOBILE LAYOUT ===');
-    mobileLayout.ok.forEach(o => console.log('  ✓ ' + o));
-    mobileLayout.issues.forEach(i => console.log('  ✗ ' + i));
-  }
-
-  if (SCREENSHOTS) console.log(`\nScreenshots: ${SCREENSHOT_DIR}/`);
-
-  const finalLayout = await checkLayout(page);
-  const progressionFailed = !earlyGameReached || final.era < 10 || final.prestigeCount < PRESTIGE_CYCLES;
-  if (progressionFailed) {
-    console.log(`\n  ✗ Progression target missed: era ${final.era}/10, prestige ${final.prestigeCount}/${PRESTIGE_CYCLES}`);
-  }
-  tabIssues.forEach(issue => console.log('  ✗ ' + issue));
-  const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || migrationFailed || offlineFailed || automationFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || colonyFailed || tradeRouteFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
-  await browser.close();
-  process.exit(exitCode);
+  snap.purchaseBlockers = getAvailableUpgrades(state)
+    .filter(upgrade => upgrade.era === state.era)
+    .map(upgrade => {
+      const cost = getUpgradeCost(state, upgrade.id);
+      const missing = Object.entries(cost)
+        .map(([resource, amount]) => {
+          const current = state.resources[resource]?.amount || 0;
+          const rate = getNetRate(state, resource);
+          const deficit = Math.max(0, amount - current);
+          return { resource, deficit, eta: deficit <= 0 ? 0 : rate > 0 ? deficit / rate : null };
+        })
+        .filter(entry => entry.deficit > 0);
+      const eta = missing.some(entry => entry.eta === null)
+        ? null
+        : Math.max(0, ...missing.map(entry => entry.eta));
+      return { id: upgrade.id, eta, missing };
+    })
+    .filter(entry => entry.missing.length > 0)
+    .sort((a, b) => (b.eta ?? Infinity) - (a.eta ?? Infinity))
+    .slice(0, 5);
+  collector.resourceSnapshots.push(snap);
 }
 
-run().catch(e => { console.error(e); process.exit(1); });
+function recordUpgradeTimeline(state, t, collector) {
+  collector.upgradeTimeline.push({
+    time: t,
+    era: state.era,
+    upgradeCount: Object.keys(state.upgrades || {}).length,
+    techCount: Object.keys(state.tech || {}).length,
+  });
+}
+
+function updateOperationStats(prevState, state, collector) {
+  const s = collector.operationStats;
+  s.expeditions.gems = state.totalGems || 0;
+  s.expeditions.finds = state.expedition?.totalFinds || 0;
+  s.docking.attempts = state.dockingAttempts || 0;
+  s.docking.successes = state.dockingSuccesses || 0;
+  s.docking.perfects = state.dockingPerfects || 0;
+  s.colonies.assignments = Object.values(state.colonyAssignments || {}).reduce((sum, count) => sum + count, 0);
+  s.weaving.weaves = state.totalWeaves || 0;
+  s.dyson.segments = state.dysonSegments || 0;
+  s.tuning.locks = Object.keys(state.lockedSignals || {}).length;
+  s.starChart.routes = (state.starRoutes || []).length;
+  s.realityForge.keys = Object.values(state.realityKeys || {}).reduce((s, v) => s + v, 0);
+  if (state.forgetting) {
+    s.forgetting.sealed = Math.max(s.forgetting.sealed, state.forgetting.sealed || 0);
+    s.forgetting.consumed = Math.max(s.forgetting.consumed, state.forgetting.consumed || 0);
+    s.forgetting.meterMax = Math.max(s.forgetting.meterMax, state.forgetting.meter || 0);
+    if (state.forgetting.collapsed) s.forgetting.collapsed = true;
+  }
+  s.forgetting.depthMax = Math.max(s.forgetting.depthMax, state.recursionDepth || 0);
+  s.senate.acts = countSenateActs(state);
+}
+
+function totalResourceAmounts(state) {
+  return Object.values(state.resources || {}).reduce((sum, resource) => sum + (resource.amount || 0), 0);
+}
+
+function recordSelections(before, after, collector) {
+  const engagement = collector.engagement;
+  for (const [id, value] of Object.entries(after.upgrades || {})) {
+    const previous = before.upgrades?.[id];
+    const gained = typeof value === 'number' ? value - (typeof previous === 'number' ? previous : 0) : !previous && value ? 1 : 0;
+    if (gained > 0) engagement.upgradeSelections[id] = (engagement.upgradeSelections[id] || 0) + gained;
+  }
+  for (const id of Object.keys(after.tech || {})) {
+    if (!before.tech?.[id]) engagement.techSelections[id] = (engagement.techSelections[id] || 0) + 1;
+  }
+  if (after.nextCycleDoctrine && after.nextCycleDoctrine !== before.nextCycleDoctrine) {
+    engagement.doctrineSelections[after.nextCycleDoctrine] = (engagement.doctrineSelections[after.nextCycleDoctrine] || 0) + 1;
+  }
+  for (const relicId of after.activeRelics || []) {
+    if (!(before.activeRelics || []).includes(relicId)) {
+      engagement.relicSelections[relicId] = (engagement.relicSelections[relicId] || 0) + 1;
+      if (engagement.firstRelicTime === null) engagement.firstRelicTime = after.totalTime || 0;
+    }
+  }
+}
+
+function recordBotAction(before, after, action, collector) {
+  if (after === before) return;
+  const era = before.era || 1;
+  const byEra = collector.engagement.actionsByEra[era] || {};
+  byEra[action] = (byEra[action] || 0) + 1;
+  collector.engagement.actionsByEra[era] = byEra;
+
+  const signatureActions = {
+    1: ['expedition'],
+    2: ['expedition'],
+    3: ['expedition'],
+    4: ['docking'],
+    5: ['colonies'],
+    6: ['starChart'],
+    7: ['dyson'],
+    8: ['senate', 'weaving'],
+    9: ['tuning'],
+    10: ['realityForge', 'forgetting'],
+  };
+  if (signatureActions[era]?.includes(action) && collector.engagement.firstOperationLatencyByEra[era] === undefined) {
+    collector.engagement.firstOperationLatencyByEra[era] = Math.max(0, before.totalTime - (before.eraStartTime || 0));
+  }
+
+  const rewardActions = new Set(['expedition', 'docking', 'weaving', 'trading', 'dyson', 'tuning', 'senate', 'realityForge']);
+  const directReward = Math.max(0, totalResourceAmounts(after) - totalResourceAmounts(before));
+  if (rewardActions.has(action) && directReward > 0) {
+    collector.engagement.directRewardsByOperation[action] =
+      (collector.engagement.directRewardsByOperation[action] || 0) + directReward;
+  }
+  recordSelections(before, after, collector);
+}
+
+function hasEraOperationProgress(state) {
+  if (state.era <= 3) return (state.expedition?.eraFinds || 0) > 0;
+  if (state.era === 4) return Object.values(state.dockingMissions || {}).some(count => count > 0);
+  if (state.era === 5) return Object.values(state.colonyAssignments || {}).some(count => count > 0);
+  if (state.era === 6) return (state.starRoutes?.length || 0) > 0;
+  if (state.era === 7) return (state.dysonSegments || 0) > 0;
+  if (state.era === 8) return !!state.senateGov?.leader || (state.totalWeaves || 0) > 0;
+  if (state.era === 9) return Object.keys(state.lockedSignals || {}).length > 0;
+  return Object.values(state.realityKeys || {}).some(count => count > 0);
+}
+
+function recordEngagementTick(state, collector) {
+  const era = state.era || 1;
+  collector.peak.era = Math.max(collector.peak.era, era);
+  collector.peak.time = Math.max(collector.peak.time, state.totalTime || 0);
+  const affordableUpgrade = getAvailableUpgrades(state).some(upgrade => canAfford(state, getUpgradeCost(state, upgrade.id)));
+  const affordableTech = getAvailableTech(state).some(tech => canAfford(state, tech.cost));
+  if (!affordableUpgrade && !affordableTech) {
+    collector.engagement.economicWaitSecondsByEra[era] = (collector.engagement.economicWaitSecondsByEra[era] || 0) + 1;
+  }
+  if (collector.engagement.firstOperationLatencyByEra[era] === undefined && hasEraOperationProgress(state)) {
+    collector.engagement.firstOperationLatencyByEra[era] = Math.max(0, state.totalTime - (state.eraStartTime || 0));
+  }
+}
+
+function getPassiveOperationRates(state) {
+  const sumRates = rates => Object.values(rates).reduce((sum, rate) => sum + Math.max(0, rate), 0);
+  const tuningRate = ['cosmicPower', 'universalConstants', 'realityFragments'].reduce(
+    (sum, resourceId) => sum + getEffectiveRate(state, resourceId) * (getTuningProductionMultiplier(state, resourceId) - 1),
+    0,
+  );
+  const senateRate = Object.entries(getSenatePctBonuses(state)).reduce(
+    (sum, [resourceId, multiplier]) => {
+      const combined = multiplier * getSenateGovernmentMultiplier(state, resourceId);
+      return sum + getEffectiveRate(state, resourceId) * Math.max(0, combined - 1);
+    },
+    0,
+  );
+  const weavingRate = Object.keys(state.wovenLaws || {}).reduce((sum, lawId) => {
+    const resourceIds = { temporal: 'cosmicPower', spatial: 'exoticMatter', causal: 'universalConstants', quantum: 'realityFragments' };
+    const resourceId = resourceIds[lawId];
+    const multiplier = getWeaveProductionMultiplier(state, resourceId);
+    return sum + getEffectiveRate(state, resourceId) * Math.max(0, 1 - 1 / multiplier);
+  }, 0);
+  return {
+    colonies: sumRates(getColonyBonus(state)),
+    starChart: sumRates(getRouteBonus(state)),
+    senate: senateRate,
+    weaving: weavingRate,
+    tuning: tuningRate,
+  };
+}
+
+function detectBottlenecks(state, collector) {
+  const available = getAvailableUpgrades(state);
+
+  for (const u of available) {
+    const cost = getUpgradeCost(state, u.id);
+    for (const [resId, amount] of Object.entries(cost)) {
+      const r = state.resources[resId];
+      if (r && r.unlocked && r.amount < amount) {
+        const rate = (r.baseRate + r.rateAdd) * r.rateMult * (state.prestigeMultiplier || 1);
+        if (rate <= 0) {
+          const existing = collector.bottlenecks.find(b => b.resource === resId && b.era === state.era);
+          if (!existing) {
+            collector.bottlenecks.push({
+              resource: resId,
+              era: state.era,
+              time: state.totalTime,
+              neededBy: u.id,
+              amount,
+            });
+          }
+        }
+      }
+    }
+  }
+}
+
+// ─── Formatting ─────────────────────────────────────────────────────────────
+
+function fmtTime(seconds) {
+  if (seconds >= 3600) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return `${h}h${m.toString().padStart(2, '0')}m${s.toString().padStart(2, '0')}s`;
+  }
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}m${s.toString().padStart(2, '0')}s`;
+}
+
+function fmtNum(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toFixed(1);
+}
+
+// ─── Run a Single Scenario ──────────────────────────────────────────────────
+
+// Log to stderr when in JSON mode so stdout stays clean
+let _jsonMode = false;
+function log(msg) {
+  if (_jsonMode) process.stderr.write(msg + '\n');
+  else console.log(msg);
+}
+function logWrite(msg) {
+  if (_jsonMode) process.stderr.write(msg);
+  else process.stdout.write(msg);
+}
+
+export function runScenario(opts) {
+  const { profile, maxTime, targetEra, prestige, prestigeAtEra, seed, snapshotInterval, verbose, quiet, profileOverrides, stopOnCollapse } = opts;
+  const baseProfile = PROFILES[profile];
+  if (!baseProfile) throw new Error(`Unknown profile: ${profile}`);
+  const profileDef = profileOverrides ? { ...baseProfile, ...profileOverrides } : baseProfile;
+
+  const rng = mulberry32(seed);
+  const DT = 1;
+  const maxTicks = maxTime;
+  const collector = createCollector();
+
+  let state = createInitialState();
+  let lastEra = 1;
+  let stuckCounter = 0;
+  let lastProgressCount = 0;
+  let prestigesDone = 0;
+  let currentCycleStart = 0;
+  let reachedTargetAt = null;
+  let lastTotalResources = 0;
+  let invalidState = [];
+  let elapsedSeconds = 0;
+
+  for (let t = 0; t < maxTicks; t++) {
+    elapsedSeconds = t + 1;
+    const prevState = state;
+    const attention = getPlayerAttention(profileDef, t);
+    const attentionMetrics = collector.engagement.attention;
+    if (attention.sessionStart) attentionMetrics.sessions++;
+    if (attention.present) attentionMetrics.activeSeconds++;
+    else attentionMetrics.awaySeconds++;
+    if (attention.offline) attentionMetrics.offlineSeconds++;
+    if (attention.decisionWindow) attentionMetrics.decisionWindows++;
+    const applyAction = (name, action) => {
+      const before = state;
+      state = action(state);
+      recordBotAction(before, state, name, collector);
+      if (state !== before) {
+        attentionMetrics.manualActions++;
+        if (!attention.present) attentionMetrics.actionsWhileAway++;
+      }
+    };
+
+    // --- Bot actions ---
+    if (attention.decisionWindow) {
+      applyAction('relic', current => botRelics(current, profileDef));
+      applyAction('gather', current => botGather(current, profileDef, t, rng));
+      applyAction('expedition', current => botExpedition(current, profileDef, t, rng));
+      applyAction('upgrade', current => botBuyUpgrades(current, profileDef, t, rng));
+      applyAction('technology', current => botBuyTech(current, profileDef, t, rng));
+      applyAction('docking', current => botDock(current, profileDef, t, rng));
+      applyAction('colonies', current => botColonies(current, profileDef, t, rng));
+      applyAction('starChart', current => botStarChart(current, profileDef, t, rng));
+      applyAction('weaving', current => botWeave(current, profileDef, t, rng));
+      applyAction('trading', current => botTrade(current, profileDef, t, rng));
+      applyAction('dyson', current => botDyson(current, profileDef, t, rng));
+      applyAction('tuning', current => botCosmicTuning(current, profileDef, t, rng));
+      applyAction('senate', current => botSenate(current, profileDef, t, rng));
+      applyAction('forgetting', current => botForgetting(current, profileDef, t, rng));
+      applyAction('descend', current => botDescend(current, profileDef, t, rng));
+      applyAction('realityForge', current => botRealityForge(current, profileDef, t, rng));
+      applyAction('prestigeUpgrade', current => botPrestigeUpgrades(current, profileDef, t, rng));
+    }
+
+    // Tick the engine
+    state = attention.offline
+      ? tick(state, DT, rng, { pauseForgetting: true })
+      : tick(state, DT, rng);
+    recordEngagementTick(state, collector);
+    if (t % 60 === 0) {
+      invalidState = validateSimulationState(state);
+      if (invalidState.length) break;
+    }
+
+    if (stopOnCollapse && collector.operationStats.forgetting.collapsed && (state.prestigeCount || 0) > 0) {
+      break;
+    }
+
+    // Track era transitions
+    if (state.era !== lastEra) {
+      const prevTime = collector.eraTimings[lastEra]?.reachedAt || 0;
+      collector.eraTimings[state.era] = {
+        reachedAt: state.totalTime,
+        duration: state.totalTime - prevTime,
+      };
+      if (!quiet) {
+        log(`  Era ${lastEra} → ${state.era} at ${fmtTime(state.totalTime)} (era took ${fmtTime(state.totalTime - prevTime)})`);
+      }
+      lastEra = state.era;
+      stuckCounter = 0;
+    }
+
+    // Prestige check
+    if (attention.decisionWindow && prestigesDone < prestige && state.era >= prestigeAtEra && getCycleReadiness(state).ready &&
+        (profileDef.maxRecursionDepth || 0) <= (state.recursionDepth || 0)) {
+      const bonus = calculatePrestigeBonus(state);
+      const points = calculatePrestigePoints(state);
+      collector.prestigeLog.push({
+        cycle: prestigesDone + 1,
+        eraReached: state.era,
+        time: state.totalTime - currentCycleStart,
+        bonus,
+        points,
+      });
+
+      if (!quiet) {
+        log(`  PRESTIGE #${prestigesDone + 1} at era ${state.era}, ${fmtTime(state.totalTime)} (bonus: ${bonus.toFixed(2)}x, points: ${points})`);
+      }
+
+      state = performPrestige(state);
+      prestigesDone++;
+      lastEra = state.era;
+      currentCycleStart = state.totalTime;
+      reachedTargetAt = null;
+      stuckCounter = 0;
+      lastProgressCount = 0;
+      lastTotalResources = 0;
+
+      // Reset era timings for new cycle
+      collector.eraTimings = { [state.era]: { reachedAt: state.totalTime, duration: 0 } };
+    }
+
+    // Snapshots
+    if (snapshotInterval > 0 && t > 0 && t % snapshotInterval === 0) {
+      takeSnapshot(state, t, collector);
+    }
+
+    // Upgrade timeline every 5 min
+    if (t > 0 && t % 300 === 0) {
+      recordUpgradeTimeline(state, t, collector);
+    }
+
+    // Operation stats
+    updateOperationStats(prevState, state, collector);
+
+    // Bottleneck detection every 5 min
+    if (t % 300 === 0) {
+      detectBottlenecks(state, collector);
+    }
+
+    // Stuck detection (no new upgrades/tech for extended period)
+    // Uses 5-min windows; requires 6 consecutive windows (30 min) with no progress.
+    // Also checks if total resource amount is growing — slow accumulation isn't stuck.
+    if (t % 300 === 0 && (attention.present || !profileDef.attention)) {
+      const currentCount = Object.keys(state.upgrades || {}).length + Object.keys(state.tech || {}).length;
+      const totalResources = Object.values(state.resources)
+        .filter(r => r.unlocked)
+        .reduce((sum, r) => sum + r.amount, 0);
+      if (currentCount === lastProgressCount) {
+        // Check if resources are still growing (passive accumulation)
+        if (lastTotalResources > 0 && totalResources > lastTotalResources * 1.01) {
+          // Resources growing > 1% — not truly stuck, just slow
+          stuckCounter = Math.max(0, stuckCounter - 1);
+        } else {
+          stuckCounter++;
+        }
+        if (stuckCounter >= 6) {
+          if (!quiet) {
+            log(`  STUCK at era ${state.era} after ${fmtTime(state.totalTime)} — no progress for 30 min`);
+            printResourceSnapshot(state);
+          }
+          break;
+        }
+      } else {
+        stuckCounter = 0;
+      }
+      lastProgressCount = currentCount;
+      lastTotalResources = totalResources;
+    }
+
+    // Verbose output every 60s
+    if (verbose && t > 0 && t % 60 === 0) {
+      const upgCount = Object.keys(state.upgrades || {}).length;
+      const techCount = Object.keys(state.tech || {}).length;
+      log(`  [${fmtTime(state.totalTime)}] Era ${state.era} | ${upgCount} upgrades, ${techCount} techs | prestige: ${state.prestigeMultiplier?.toFixed(1) || '1'}x`);
+    }
+
+    // Progress update every 10 min (non-quiet, non-verbose)
+    if (!quiet && !verbose && t > 0 && t % 600 === 0) {
+      const upgCount = Object.keys(state.upgrades || {}).length;
+      const techCount = Object.keys(state.tech || {}).length;
+      logWrite(`  [${fmtTime(state.totalTime)}] Era ${state.era} | ${upgCount} upgrades, ${techCount} techs\r`);
+    }
+
+    // Done? Era 10 runs until the cycle is actually ready; earlier targets get
+    // 120 extra ticks to exercise their newly unlocked systems.
+    if (state.era >= targetEra) {
+      if (!reachedTargetAt) {
+        reachedTargetAt = t;
+        if (!quiet) {
+          log(`  Reached era ${targetEra} at ${fmtTime(state.totalTime)}`);
+        }
+      }
+      if (stopOnCollapse) { /* run until the wall wins */ }
+      else if (prestigesDone >= prestige && attention.decisionWindow &&
+               (targetEra >= 10 ? getCycleReadiness(state).ready : t - reachedTargetAt >= 120)) break;
+    }
+  }
+
+  // Final snapshot
+  takeSnapshot(state, Math.floor(state.totalTime), collector);
+  recordUpgradeTimeline(state, Math.floor(state.totalTime), collector);
+
+  // Completion status
+  const peakEra = Math.max(collector.peak.era, state.era);
+  const peakTime = Math.max(collector.peak.time, state.totalTime);
+  const outcome = scenarioOutcome(state, opts, {
+    prestiges: prestigesDone,
+    collapsed: collector.operationStats.forgetting.collapsed || !!state.forgetting?.collapsed,
+    actionsWhileAway: collector.engagement.attention.actionsWhileAway,
+    invalidState,
+  });
+  collector.blockers = outcome.completed ? null : describeProgressionBlockers(state);
+  collector.completionStatus = {
+    completed: outcome.completed,
+    failureReasons: outcome.failures,
+    terminationReason: outcome.completed ? 'completed' : invalidState.length ? 'invalid-state' : elapsedSeconds >= maxTime ? 'time-budget' : 'stalled',
+    // Did the run EVER reach the target? A by-design reset at the end is
+    // not a failure to progress. finalEra and wasReset keep the end state
+    // visible, so a reset is reported rather than hidden.
+    reachedTargetEra: peakEra >= targetEra,
+    // totalTime stays the FINAL-state clock: minTime/maxTime assertions
+    // compare against it, and prestige scenarios legitimately reset it.
+    // peakTime is display-only — never assert on it.
+    totalTime: state.totalTime,
+    cumulativeTime: elapsedSeconds,
+    peakTime,
+    peakEra,
+    finalEra: state.era,
+    wasReset: state.era < peakEra,
+    gameComplete: state.gameComplete || false,
+    cycleReady: getCycleReadiness(state).ready,
+    upgradeCount: Object.keys(state.upgrades || {}).length,
+    techCount: Object.keys(state.tech || {}).length,
+    prestigeCount: prestigesDone,
+    prestigeMultiplier: state.prestigeMultiplier || 1,
+    activeRelics: state.activeRelics || [],
+    relicsRecoveredThisRun: state.relicsRecoveredThisRun || 0,
+    forgettingCollapsed: collector.operationStats.forgetting.collapsed || !!state.forgetting?.collapsed,
+    statePrestigeCount: state.prestigeCount || 0,
+  };
+
+  const operationActivity = {
+    expedition: collector.operationStats.expeditions.finds,
+    docking: collector.operationStats.docking.attempts,
+    colonies: Object.values(state.colonyAssignments || {}).reduce((sum, count) => sum + count, 0),
+    starChart: collector.operationStats.starChart.routes,
+    dyson: collector.operationStats.dyson.segments,
+    senate: collector.operationStats.senate.acts,
+    weaving: collector.operationStats.weaving.weaves,
+    tuning: collector.operationStats.tuning.locks,
+    realityForge: collector.operationStats.realityForge.keys,
+  };
+  const configuredOperations = {
+    expedition: profileDef.expeditions,
+    docking: profileDef.docking,
+    colonies: profileDef.colonies,
+    starChart: profileDef.starChart,
+    dyson: profileDef.dysonAssembly,
+    senate: !!profileDef.senateFocus,
+    weaving: profileDef.weaving,
+    tuning: profileDef.cosmicTuning,
+    realityForge: profileDef.realityForge,
+  };
+  collector.engagement.ignoredOperations = Object.keys(configuredOperations)
+    .filter(operation => configuredOperations[operation] && !operationActivity[operation]);
+  collector.engagement.finalPassiveRatesByOperation = getPassiveOperationRates(state);
+
+  return { state, collector };
+}
+
+// ─── Output Formatting ──────────────────────────────────────────────────────
+
+function printHumanReport(scenarioName, opts, collector) {
+  console.log(`\n${'═'.repeat(60)}`);
+  console.log(`  Scenario: ${scenarioName} | Profile: ${opts.profile}`);
+  console.log(`${'═'.repeat(60)}`);
+
+  // Era Progression
+  console.log('\n── Era Progression ──');
+  const eras = Object.keys(collector.eraTimings).map(Number).sort((a, b) => a - b);
+  for (const era of eras) {
+    const { reachedAt, duration } = collector.eraTimings[era];
+    if (era === eras[0] && reachedAt === 0) {
+      console.log(`  Era ${era}: start`);
+    } else {
+      console.log(`  Era ${era}: reached at ${fmtTime(reachedAt)} (took ${fmtTime(duration)})`);
+    }
+  }
+
+  // Operation contribution
+  const mg = collector.operationStats;
+  const hasAnyOperation = mg.expeditions.finds > 0 || mg.docking.attempts > 0 ||
+    mg.starChart.routes > 0 || mg.weaving.weaves > 0 || mg.dyson.segments > 0 ||
+    mg.tuning.locks > 0 || mg.senate.acts > 0 || mg.realityForge.keys > 0;
+
+  if (hasAnyOperation) {
+    console.log('\n── Operation Stats ──');
+    if (mg.expeditions.finds > 0) console.log(`  Expeditions: ${mg.expeditions.finds} discoveries, ${mg.expeditions.gems} gems`);
+    if (mg.docking.attempts > 0) console.log(`  Docking: ${mg.docking.successes}/${mg.docking.attempts} hits (${mg.docking.perfects} perfect)`);
+    if (mg.starChart.routes > 0) console.log(`  Star Chart: ${mg.starChart.routes} routes`);
+    if (mg.weaving.weaves > 0) console.log(`  Weaving: ${mg.weaving.weaves} weaves`);
+    if (mg.dyson.segments > 0) console.log(`  Dyson: ${mg.dyson.segments} segments`);
+    if (mg.tuning.locks > 0) console.log(`  Tuning: ${mg.tuning.locks} signal locks`);
+    if (mg.senate.acts > 0) console.log(`  Senate: ${mg.senate.acts} policy acts`);
+    if (mg.realityForge.keys > 0) console.log(`  Reality Forge: ${mg.realityForge.keys} keys forged`);
+    if (mg.forgetting.meterMax > 0) console.log(`  Forgetting: peak ${mg.forgetting.meterMax.toFixed(1)}, ${mg.forgetting.sealed} sealed, ${mg.forgetting.consumed} memories lost${mg.forgetting.depthMax > 0 ? `, depth ${mg.forgetting.depthMax}` : ''}${mg.forgetting.collapsed ? ' — COLLAPSED' : ''}`);
+  }
+
+  const engagement = collector.engagement;
+  console.log('\n── Engagement Audit ──');
+  for (const [era, actions] of Object.entries(engagement.actionsByEra)) {
+    const repeated = Object.entries(actions).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const wait = engagement.economicWaitSecondsByEra[era] || 0;
+    const latency = engagement.firstOperationLatencyByEra[era];
+    console.log(`  Era ${era}: ${repeated.map(([name, count]) => `${name} x${count}`).join(', ') || 'no active actions'} | economic wait ${fmtTime(wait)}${latency === undefined ? '' : ` | first operation ${fmtTime(latency)}`}`);
+  }
+  const rewardEntries = Object.entries(engagement.directRewardsByOperation).sort((a, b) => b[1] - a[1]);
+  if (rewardEntries.length > 0) {
+    console.log(`  Direct action rewards: ${rewardEntries.map(([name, amount]) => `${name} ${fmtNum(amount)}`).join(', ')}`);
+  }
+  const passiveRates = Object.entries(engagement.finalPassiveRatesByOperation).filter(([, rate]) => rate > 0);
+  if (passiveRates.length > 0) {
+    console.log(`  Final passive operation rates: ${passiveRates.map(([name, rate]) => `${name} +${fmtNum(rate)}/s`).join(', ')}`);
+  }
+  const doctrines = Object.entries(engagement.doctrineSelections);
+  if (doctrines.length > 0) console.log(`  Doctrines: ${doctrines.map(([name, count]) => `${name} x${count}`).join(', ')}`);
+  const relics = Object.entries(engagement.relicSelections);
+  if (relics.length > 0) console.log(`  Relics equipped: ${relics.map(([name, count]) => `${name} x${count}`).join(', ')}`);
+  if (engagement.firstRelicTime !== null) console.log(`  First relic equipped at ${fmtTime(engagement.firstRelicTime)}`);
+  const upgrades = Object.entries(engagement.upgradeSelections).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  if (upgrades.length > 0) console.log(`  Most selected upgrades: ${upgrades.map(([name, count]) => `${name} x${count}`).join(', ')}`);
+  if (engagement.ignoredOperations.length > 0) console.log(`  Configured but ignored: ${engagement.ignoredOperations.join(', ')}`);
+
+  const attention = engagement.attention;
+  console.log('\n── Player Attention ──');
+  console.log(`  Sessions: ${attention.sessions} | Decision windows: ${attention.decisionWindows} | Manual actions: ${attention.manualActions}`);
+  console.log(`  Present: ${fmtTime(attention.activeSeconds)} | Away: ${fmtTime(attention.awaySeconds)} | Offline: ${fmtTime(attention.offlineSeconds)}`);
+  if (attention.actionsWhileAway > 0) console.log(`  WARNING: ${attention.actionsWhileAway} actions occurred while the player was away`);
+
+  // Prestige Cycles
+  if (collector.prestigeLog.length > 0) {
+    console.log('\n── Prestige Cycles ──');
+    for (const p of collector.prestigeLog) {
+      console.log(`  Cycle ${p.cycle}: era ${p.eraReached} in ${fmtTime(p.time)} (bonus: ${p.bonus.toFixed(2)}x, points: ${p.points})`);
+    }
+  }
+
+  // Bottlenecks
+  if (collector.bottlenecks.length > 0) {
+    console.log('\n── Bottlenecks (0-rate resources blocking progress) ──');
+    const unique = [];
+    const seen = new Set();
+    for (const b of collector.bottlenecks) {
+      const key = `${b.resource}-era${b.era}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(b);
+      }
+    }
+    for (const b of unique.slice(0, 10)) {
+      console.log(`  ${b.resource} at era ${b.era} (${fmtTime(b.time)}) — needed by ${b.neededBy}: ${fmtNum(b.amount)}`);
+    }
+  }
+
+  // Summary
+  const cs = collector.completionStatus;
+  console.log('\n── Summary ──');
+  const eraLine = cs.wasReset
+    ? `${cs.peakEra} (reset to ${cs.finalEra})`
+    : `${cs.finalEra}`;
+  console.log(`  Final era: ${eraLine} | Time: ${fmtTime(displayTime(cs))} | ${cs.completed ? 'COMPLETED' : 'DID NOT COMPLETE'}`);
+  if (cs.prestigeCount > 0) console.log(`  Cumulative time across all cycles: ${fmtTime(cs.cumulativeTime)}`);
+  console.log(`  Upgrades: ${cs.upgradeCount} | Tech: ${cs.techCount} | Prestiges: ${cs.prestigeCount} (${cs.prestigeMultiplier?.toFixed(1)}x)`);
+  if (cs.gameComplete) console.log('  Game marked COMPLETE');
+  console.log();
+}
+
+function buildJsonResult(scenarioName, opts, collector, seed) {
+  return {
+    scenario: scenarioName,
+    profile: opts.profile,
+    options: {
+      maxTime: opts.maxTime,
+      targetEra: opts.targetEra,
+      prestige: opts.prestige,
+      prestigeAtEra: opts.prestigeAtEra,
+      seed,
+    },
+    results: collector,
+    metadata: {
+      timestamp: new Date().toISOString(),
+      seed,
+    },
+  };
+}
+
+// What a human should read as "how long this run lasted". Prestige resets the
+// cycle clock, so cumulative time is the only honest multi-cycle duration. For
+// a by-design collapse (descent), the final clock is 0 and the peak is useful.
+// Display only — existing cycle-pacing assertions still use totalTime.
+function displayTime(cs) {
+  if (cs.prestigeCount > 0) return cs.cumulativeTime ?? cs.totalTime;
+  return cs.wasReset ? (cs.peakTime ?? cs.totalTime) : cs.totalTime;
+}
+
+function printSummaryTable(allResults) {
+  console.log(`\n${'═'.repeat(70)}`);
+  console.log('  SCENARIO COMPARISON TABLE');
+  console.log(`${'═'.repeat(70)}`);
+
+  const header = `  ${'Scenario'.padEnd(15)} ${'Profile'.padEnd(14)} ${'Final Era'.padEnd(10)} ${'Time'.padEnd(12)} ${'Status'.padEnd(10)}`;
+  console.log(header);
+  console.log(`  ${'─'.repeat(65)}`);
+
+  for (const { scenarioName, collector } of allResults) {
+    const cs = collector.completionStatus;
+    const status = cs.completed ? 'OK' : 'STUCK';
+    // '10>1' reads: peaked at era 10, ended at 1 (a by-design reset).
+    const era = cs.wasReset ? `${cs.peakEra}>${cs.finalEra}` : String(cs.finalEra);
+    console.log(`  ${scenarioName.padEnd(15)} ${(cs.profile || '').padEnd(14)} ${era.padEnd(10)} ${fmtTime(displayTime(cs)).padEnd(12)} ${status}`);
+  }
+  console.log();
+}
+
+function runComparison(currentResults, compareFile) {
+  let previousData;
+  try {
+    previousData = JSON.parse(readFileSync(compareFile, 'utf-8'));
+  } catch {
+    console.error(`  ERROR: Could not load comparison file: ${compareFile}`);
+    return;
+  }
+
+  // Handle both single result and array
+  const prevResults = Array.isArray(previousData) ? previousData : [previousData];
+  const currResults = currentResults;
+
+  console.log(`\n${'═'.repeat(60)}`);
+  console.log('  REGRESSION COMPARISON');
+  console.log(`${'═'.repeat(60)}`);
+
+  for (const curr of currResults) {
+    const prev = prevResults.find(p => (p.scenarioName || p.scenario) === curr.scenarioName);
+    if (!prev) continue;
+
+    console.log(`\n  Scenario: ${curr.scenarioName}`);
+
+    const currTimings = curr.collector.eraTimings;
+    const prevTimings = prev.collector?.eraTimings || prev.results?.eraTimings;
+
+    if (!prevTimings) continue;
+
+    const allEras = new Set([...Object.keys(currTimings), ...Object.keys(prevTimings)]);
+    let regressions = 0;
+
+    for (const era of [...allEras].sort((a, b) => Number(a) - Number(b))) {
+      const currT = currTimings[era]?.reachedAt;
+      const prevT = prevTimings[era]?.reachedAt;
+      if (currT == null || prevT == null || prevT === 0) continue;
+
+      const delta = currT - prevT;
+      const pct = ((delta / prevT) * 100).toFixed(1);
+      const flag = delta > prevT * 0.1 ? ' ⚠️  REGRESSION' : delta < -prevT * 0.1 ? ' ✓ IMPROVEMENT' : '';
+
+      if (delta > prevT * 0.1) regressions++;
+      console.log(`    Era ${era}: ${fmtTime(prevT)} → ${fmtTime(currT)} (${delta >= 0 ? '+' : ''}${pct}%)${flag}`);
+    }
+
+    // Final comparison
+    const currCS = curr.collector.completionStatus;
+    const prevCS = prev.collector?.completionStatus || prev.results?.completionStatus;
+    if (prevCS) {
+      console.log(`    Final: era ${prevCS.finalEra} → ${currCS.finalEra} | ${fmtTime(prevCS.totalTime)} → ${fmtTime(currCS.totalTime)}`);
+    }
+
+    if (regressions > 0) {
+      console.log(`    ⚠️  ${regressions} era(s) regressed by >10%`);
+    } else {
+      console.log('    No significant regressions detected.');
+    }
+  }
+  console.log();
+}
+
+function assertBalanceTargets(allResults) {
+  let failures = 0;
+  console.log(`\n${'═'.repeat(60)}`);
+  console.log('  BALANCE ASSERTIONS');
+  console.log(`${'═'.repeat(60)}`);
+
+  for (const { scenarioName, collector } of allResults) {
+    const target = BALANCE_TARGETS[scenarioName];
+    if (!target) {
+      failures++;
+      console.log(`  ✗ ${scenarioName}: no balance assertion targets configured`);
+      continue;
+    }
+
+    const status = collector.completionStatus;
+    const attention = collector.engagement.attention;
+    const issues = [...status.failureReasons];
+    if (status.finalEra < target.requiredEra) issues.push(`final era ${status.finalEra} < ${target.requiredEra}`);
+    if (target.cycleReady && !status.cycleReady) issues.push('cycle not ready to prestige');
+    if (target.minPrestiges != null && status.prestigeCount < target.minPrestiges) {
+      issues.push(`only completed ${status.prestigeCount}/${target.minPrestiges} prestige cycles`);
+    }
+    if (target.minSessions != null && attention.sessions < target.minSessions) {
+      issues.push(`only observed ${attention.sessions}/${target.minSessions} player sessions`);
+    }
+    if (target.minAwaySeconds != null && attention.awaySeconds < target.minAwaySeconds) {
+      issues.push(`only spent ${fmtTime(attention.awaySeconds)} away from the game`);
+    }
+    if (target.minOfflineSeconds != null && attention.offlineSeconds < target.minOfflineSeconds) {
+      issues.push(`only spent ${fmtTime(attention.offlineSeconds)} offline`);
+    }
+    if (target.maxActionsWhileAway != null && attention.actionsWhileAway > target.maxActionsWhileAway) {
+      issues.push(`${attention.actionsWhileAway} manual actions occurred while the player was away`);
+    }
+    const observedSeconds = attention.activeSeconds + attention.awaySeconds;
+    if (target.maxActiveRatio != null && attention.activeSeconds / observedSeconds > target.maxActiveRatio) {
+      issues.push(`player was present for ${(attention.activeSeconds / observedSeconds * 100).toFixed(1)}% of the run`);
+    }
+    if (target.maxDecisionWindowRatio != null && attention.decisionWindows / observedSeconds > target.maxDecisionWindowRatio) {
+      issues.push(`manual decisions were available ${(attention.decisionWindows / observedSeconds * 100).toFixed(1)}% of the time`);
+    }
+    if (target.maxIgnoredOperations != null && collector.engagement.ignoredOperations.length > target.maxIgnoredOperations) {
+      issues.push(`ignored configured operations: ${collector.engagement.ignoredOperations.join(', ')}`);
+    }
+    if (target.maxFirstRelicTime != null && (collector.engagement.firstRelicTime === null || collector.engagement.firstRelicTime > target.maxFirstRelicTime)) {
+      issues.push(collector.engagement.firstRelicTime === null ? 'no relic equipped' : `first relic took ${fmtTime(collector.engagement.firstRelicTime)}`);
+    }
+    if (target.minRelics != null && status.activeRelics.length < target.minRelics) issues.push(`only ${status.activeRelics.length}/${target.minRelics} relics equipped`);
+    if (target.maxDockingAttempts != null && collector.operationStats.docking.attempts > target.maxDockingAttempts) {
+      issues.push(`docking repeated ${collector.operationStats.docking.attempts} times`);
+    }
+    if (target.maxDockingActions != null) {
+      const actions = Object.values(collector.engagement.actionsByEra).reduce((sum, era) => sum + (era.docking || 0), 0);
+      if (actions > target.maxDockingActions) issues.push(`docking required ${actions} manual actions`);
+    }
+    if (target.maxColonyActions != null) {
+      const actions = Object.values(collector.engagement.actionsByEra).reduce((sum, era) => sum + (era.colonies || 0), 0);
+      if (actions > target.maxColonyActions) issues.push(`colonies required ${actions} manual actions`);
+    }
+    for (const [action, targetKey] of [
+      ['trading', 'maxTradingActions'],
+      ['gather', 'maxGatherActions'],
+      ['technology', 'maxTechnologyActions'],
+      ['upgrade', 'maxUpgradeActions'],
+    ]) {
+      if (target[targetKey] == null) continue;
+      const actions = Object.values(collector.engagement.actionsByEra).reduce((sum, era) => sum + (era[action] || 0), 0);
+      if (actions > target[targetKey]) issues.push(`${action} required ${actions} manual actions`);
+    }
+    if (target.maxDysonCommissions != null) {
+      const commissions = Object.values(collector.engagement.actionsByEra).reduce((sum, actions) => sum + (actions.dyson || 0), 0);
+      if (commissions > target.maxDysonCommissions) issues.push(`Dyson commissioned ${commissions} times`);
+    }
+    if (target.maxRealityLaws != null && collector.operationStats.weaving.weaves > target.maxRealityLaws) {
+      issues.push(`Reality Laws established ${collector.operationStats.weaving.weaves} times`);
+    }
+    if (target.maxTuningLocks != null && collector.operationStats.tuning.locks > target.maxTuningLocks) {
+      issues.push(`signal bands locked ${collector.operationStats.tuning.locks} times`);
+    }
+    if (target.maxSenateActs != null && collector.operationStats.senate.acts > target.maxSenateActs) {
+      issues.push(`senate acts enacted ${collector.operationStats.senate.acts} times`);
+    }
+    if (target.maxStarChartActions != null) {
+      const chartActions = Object.values(collector.engagement.actionsByEra).reduce((sum, actions) => sum + (actions.starChart || 0), 0);
+      if (chartActions > target.maxStarChartActions) issues.push(`star chart acted ${chartActions} times`);
+    }
+    if (target.minTendrilsSealed != null && collector.operationStats.forgetting.sealed < target.minTendrilsSealed) {
+      issues.push(`only ${collector.operationStats.forgetting.sealed} tendrils sealed`);
+    }
+    if (target.maxMemoriesConsumed != null && collector.operationStats.forgetting.consumed > target.maxMemoriesConsumed) {
+      issues.push(`${collector.operationStats.forgetting.consumed} memories consumed`);
+    }
+    if (target.noCollapse && status.forgettingCollapsed) {
+      issues.push('the Forgetting collapsed the run');
+    }
+    if (target.minRecursionDepth != null && collector.operationStats.forgetting.depthMax < target.minRecursionDepth) {
+      issues.push(`only reached recursion depth ${collector.operationStats.forgetting.depthMax}`);
+    }
+    if (target.requireCollapse && !status.forgettingCollapsed) {
+      issues.push('the wall never won — no collapse');
+    }
+    if (target.minStatePrestiges != null && (status.statePrestigeCount || 0) < target.minStatePrestiges) {
+      issues.push('collapse did not force the cycle to end');
+    }
+    if (target.maxFirstOperationLatency != null) {
+      for (const [era, latency] of Object.entries(collector.engagement.firstOperationLatencyByEra)) {
+        if (latency > target.maxFirstOperationLatency) issues.push(`era ${era} first operation took ${fmtTime(latency)}`);
+      }
+    }
+    if (target.minTime != null && status.totalTime < target.minTime) issues.push(`too fast (${fmtTime(status.totalTime)} < ${fmtTime(target.minTime)})`);
+    if (target.maxTime != null && status.totalTime > target.maxTime) issues.push(`too slow (${fmtTime(status.totalTime)} > ${fmtTime(target.maxTime)})`);
+    for (const [era, [minDuration, maxDuration]] of Object.entries(target.eraRanges || {})) {
+      const timing = collector.eraTimings[era];
+      if (!timing) {
+        issues.push(`era ${era} timing missing`);
+      } else if (timing.duration < minDuration || timing.duration > maxDuration) {
+        issues.push(`era ${Number(era) - 1} duration ${fmtTime(timing.duration)} outside ${fmtTime(minDuration)}-${fmtTime(maxDuration)}`);
+      }
+    }
+
+    if (issues.length > 0) {
+      failures++;
+      console.log(`  ✗ ${scenarioName}: ${issues.join(', ')}`);
+    } else {
+      console.log(`  ✓ ${scenarioName}: ${fmtTime(displayTime(status))}`);
+    }
+  }
+
+  if (failures > 0) {
+    console.log(`\n  ${failures} balance assertion${failures === 1 ? '' : 's'} failed.`);
+  } else {
+    console.log('\n  All balance assertions passed.');
+  }
+  return failures === 0;
+}
+
+// ─── Resource Snapshot (for stuck detection) ────────────────────────────────
+
+function printResourceSnapshot(state) {
+  log('  Resources:');
+  for (const [id, r] of Object.entries(state.resources)) {
+    if (r.unlocked) {
+      const rate = (r.baseRate + r.rateAdd) * r.rateMult * (state.prestigeMultiplier || 1);
+      log(`    ${id}: ${fmtNum(r.amount)} (rate: ${rate.toFixed(2)}/s)`);
+    }
+  }
+  const avail = getAvailableUpgrades(state);
+  const unaffordable = avail.filter(u => !canAfford(state, getUpgradeCost(state, u.id)));
+  if (unaffordable.length > 0) {
+    log('  Unaffordable upgrades:');
+    for (const u of unaffordable.slice(0, 5)) {
+      const cost = getUpgradeCost(state, u.id);
+      log(`    ${u.id}: ${JSON.stringify(cost)}`);
+    }
+  }
+  const availTech = getAvailableTech(state);
+  const unaffordTech = availTech.filter(t => !canAfford(state, t.cost));
+  if (unaffordTech.length > 0) {
+    log('  Unaffordable tech:');
+    for (const t of unaffordTech.slice(0, 5)) {
+      log(`    ${t.id}: ${JSON.stringify(t.cost)}`);
+    }
+  }
+}
+
+// ─── Help ───────────────────────────────────────────────────────────────────
+
+function printHelp() {
+  console.log(`
+Bot Playtest CLI — Configurable game balance testing tool.
+
+Usage: node scripts/bot-playtest.js [options]
+
+Options:
+  --scenario <name,...>     Comma-separated scenario names (default: engaged)
+  --profile <name>          Attention-aware player persona (default: engaged)
+  --max-time <seconds>      Max game-time before abort (default: 14400)
+  --target-era <N>          Stop at this era (default: 10)
+  --prestige <N>            Number of prestige resets (default: 0)
+  --prestige-at-era <N>     Era at which bot prestiges (default: 7)
+  --json                    JSON output mode
+  --verbose                 Per-tick detail every 60s
+  --quiet                   Only final report
+  --compare <file>          Compare against previous JSON run
+  --assert-balance          Enforce built-in pacing targets for key scenarios
+  --seed <N>                Fixed RNG seed for deterministic runs
+  --snapshot-interval <N>   Seconds between snapshots (default: 300)
+  --list-scenarios          Print built-in scenarios and exit
+  --list-profiles           Print bot profiles and exit
+  -h, --help                Show this help
+
+Examples:
+  node scripts/bot-playtest.js --scenario engaged --json > baseline.json
+  node scripts/bot-playtest.js --scenario engaged --json --compare baseline.json
+  node scripts/bot-playtest.js --scenario optimizer,background,minimalist --quiet
+  node scripts/bot-playtest.js --scenario newcomer,engaged,optimizer,background,check_in --seed 424242 --quiet --assert-balance
+  node scripts/bot-playtest.js --scenario offline_returner --seed 424242 --json
+  node scripts/bot-playtest.js --scenario prestige3 --verbose
+  node scripts/bot-playtest.js --seed 42 --verbose
+  node scripts/bot-playtest.js --scenario newcomer,engaged,optimizer,background,check_in,offline_returner,completionist,minimalist --seed 424242 --quiet --assert-balance
+`);
+}
+
+// ─── Main ───────────────────────────────────────────────────────────────────
+
+function main() {
+const args = parseArgs(process.argv.slice(2));
+
+if (args.help) {
+  printHelp();
+  process.exit(0);
+}
+
+if (args.listScenarios) {
+  console.log('\nBuilt-in Scenarios:');
+  console.log(`  ${'Name'.padEnd(15)} ${'Profile'.padEnd(14)} ${'Prestiges'.padEnd(10)} ${'Target'.padEnd(8)} ${'Max Time'.padEnd(10)} Purpose`);
+  console.log(`  ${'─'.repeat(80)}`);
+  for (const [name, s] of Object.entries(SCENARIOS)) {
+    console.log(`  ${name.padEnd(15)} ${s.profile.padEnd(14)} ${String(s.prestige).padEnd(10)} ${String(s.targetEra).padEnd(8)} ${fmtTime(s.maxTime).padEnd(10)} ${s.purpose}`);
+  }
+  console.log();
+  process.exit(0);
+}
+
+if (args.listProfiles) {
+  console.log('\nBot Profiles:');
+  for (const [name, p] of Object.entries(PROFILES)) {
+    const systems = [];
+    if (p.gather) systems.push('gather');
+    if (p.docking) systems.push('dock');
+    if (p.colonies) systems.push('colonies');
+    if (p.starChart) systems.push('starChart');
+    if (p.weaving) systems.push('weave');
+    if (p.trading) systems.push('trade');
+    if (p.dysonAssembly) systems.push('dyson');
+    if (p.cosmicTuning) systems.push('tuning');
+    if (p.senateFocus) systems.push('senate');
+    if (p.realityForge) systems.push('forge');
+    console.log(`  ${name.padEnd(15)} ${p.description}`);
+    console.log(`${''.padEnd(17)}Systems: ${systems.join(', ') || 'none'}`);
+  }
+  console.log();
+  process.exit(0);
+}
+
+// Resolve scenarios
+_jsonMode = args.json;
+const scenarioNames = args.scenario.split(',').map(s => s.trim());
+const allResults = [];
+const jsonOutputs = [];
+
+const globalSeed = args.seed != null ? args.seed : Math.floor(Math.random() * 2147483647);
+
+for (const scenarioName of scenarioNames) {
+  // Merge scenario defaults with CLI overrides
+  const scenarioDef = SCENARIOS[scenarioName];
+  const opts = {
+    profile: scenarioDef ? scenarioDef.profile : args.profile,
+    maxTime: scenarioDef ? scenarioDef.maxTime : args.maxTime,
+    targetEra: scenarioDef ? scenarioDef.targetEra : args.targetEra,
+    prestige: scenarioDef ? scenarioDef.prestige : args.prestige,
+    prestigeAtEra: scenarioDef?.prestigeAtEra || args.prestigeAtEra,
+    profileOverrides: scenarioDef?.profileOverrides,
+    stopOnCollapse: scenarioDef?.stopOnCollapse || false,
+    seed: globalSeed,
+    snapshotInterval: args.snapshotInterval,
+    verbose: args.verbose,
+    quiet: args.quiet,
+  };
+
+  // CLI overrides take precedence when explicitly provided
+  const rawArgs = process.argv.slice(2);
+  if (rawArgs.includes('--profile')) opts.profile = args.profile;
+  if (rawArgs.includes('--max-time')) opts.maxTime = args.maxTime;
+  if (rawArgs.includes('--target-era')) opts.targetEra = args.targetEra;
+  if (rawArgs.includes('--prestige')) opts.prestige = args.prestige;
+  if (rawArgs.includes('--prestige-at-era')) opts.prestigeAtEra = args.prestigeAtEra;
+
+  if (!args.quiet) {
+    log(`\nRunning scenario: ${scenarioName} (profile: ${opts.profile}, target: era ${opts.targetEra}, max: ${fmtTime(opts.maxTime)}, seed: ${opts.seed})`);
+  }
+
+  const { state, collector } = runScenario(opts);
+  collector.completionStatus.profile = opts.profile;
+
+  allResults.push({ scenarioName, opts, collector, state });
+  jsonOutputs.push(buildJsonResult(scenarioName, opts, collector, opts.seed));
+}
+
+// Output
+if (args.json) {
+  const output = jsonOutputs.length === 1 ? jsonOutputs[0] : jsonOutputs;
+  console.log(JSON.stringify(output, null, 2));
+} else if (args.quiet) {
+  // Summary table only
+  printSummaryTable(allResults);
+} else {
+  // Full human-readable reports
+  for (const { scenarioName, opts, collector } of allResults) {
+    printHumanReport(scenarioName, opts, collector);
+  }
+  if (allResults.length > 1) {
+    printSummaryTable(allResults);
+  }
+}
+
+// Comparison
+if (args.compare) {
+  runComparison(allResults, args.compare);
+}
+
+if (args.assertBalance) {
+  const passed = assertBalanceTargets(allResults);
+  if (!passed) process.exit(1);
+}
+
+if (!args.allowIncomplete && allResults.some(result => !result.collector.completionStatus.completed)) {
+  process.exitCode = 1;
+}
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();
