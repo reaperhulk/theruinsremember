@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { RELICS } from '../data/relics.js';
-import { claimRelic, declineRelicOffer, ECHO_PRESSURE_TARGET, RELIC_SLOT_LIMIT } from '../engine/relics.js';
+import { claimRelic, declineRelicOffer, ECHO_PRESSURE_TARGET, getRelicSlotLimit } from '../engine/relics.js';
 
 export const RelicPanel = memo(function RelicPanel({ state, onUpdate }) {
   const active = state.activeRelics || [];
@@ -20,7 +20,7 @@ export const RelicPanel = memo(function RelicPanel({ state, onUpdate }) {
           <span className="panel-kicker">Run loadout</span>
           <h2 id="relic-title">Recovered Relics</h2>
         </div>
-        <strong>{active.length}/{RELIC_SLOT_LIMIT} active</strong>
+        <strong>{active.length}/{getRelicSlotLimit(state)} active</strong>
       </div>
 
       <div className="echo-pressure" aria-label={`Echo Pressure ${Math.floor(pressure)} of ${ECHO_PRESSURE_TARGET}`}>
@@ -52,7 +52,7 @@ export const RelicPanel = memo(function RelicPanel({ state, onUpdate }) {
                 <span className="relic-domain">{relic.domain}</span>
                 <strong>{relic.name}</strong>
                 <p>{relic.description}</p>
-                {active.length < RELIC_SLOT_LIMIT ? (
+                {active.length < getRelicSlotLimit(state) ? (
                   <button onClick={() => onUpdate(current => claimRelic(current, id))}>Equip relic</button>
                 ) : (
                   <div className="relic-replacements">

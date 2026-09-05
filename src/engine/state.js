@@ -1,3 +1,4 @@
+import { createArchive } from './archive.js';
 import { resources } from '../data/resources.js';
 import { createExpeditionState } from './expeditions.js';
 
@@ -63,6 +64,7 @@ export function migrateState(saved) {
   if (!Number.isFinite(migrated.prestigeMultiplier) || migrated.prestigeMultiplier <= 0) {
     migrated.prestigeMultiplier = 1;
   }
+  migrated.archive = { ...createArchive(), ...(saved.archive || {}) };
   migrated.saveVersion = fresh.saveVersion;
   return migrated;
 }
@@ -136,6 +138,7 @@ export function createInitialState() {
     forgetting: null,
     forgettingChallengeActive: false,
     recursionDepth: 0,
+    bestRecursionDepth: 0,
     // Reality Forge (Era 10+)
     realityKeys: {},
     echoPressure: 0,
@@ -158,6 +161,10 @@ export function createInitialState() {
     autoBuildOut: true,
     consumerControls: {},
     runUpgradePurchases: 0,
-    saveVersion: 7,
+    goals: [],
+    commissions: [],
+    archive: createArchive(),
+    plannedPrestigeUpgrades: [],
+    saveVersion: 8,
   };
 }

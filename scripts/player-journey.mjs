@@ -1,4 +1,7 @@
-import { createInitialState, migrateState } from '../src/engine/state.js';
+import { parseSave, serializeSave } from '../src/engine/saves.js';
+import { researchDoctrine, craftRelic, contributeProject, RECONSTRUCTION_PROJECTS } from '../src/engine/archive.js';
+import { queueGoal } from '../src/engine/goals.js';
+import { createInitialState } from '../src/engine/state.js';
 import { advanceTime } from '../src/engine/advanceTime.js';
 import { tick } from '../src/engine/tick.js';
 import { getAvailableUpgrades, getUpgradeCost, purchaseUpgrade, isDecisionUpgrade, buyNextRepeatableMilestone } from '../src/engine/upgrades.js';
@@ -25,7 +28,7 @@ const BUDGETS = { newcomer: 1, engaged: 2, optimizer: 4, background: 2, check_in
 
 // Each returned transition is ONE visible player command. No giveAll, direct
 // ownership writes, hidden prerequisite bypass, or batch of exclusive choices.
-function candidateActions(state, profile, options, rng) {
+export function candidateActions(state, profile, options, rng) {
   const reverse = options.branch === 'reverse';
   const ordered = values => reverse ? [...values].reverse() : values;
   const actions = [];
@@ -104,8 +107,20 @@ function candidateActions(state, profile, options, rng) {
   if (profile.buyPrestigeUpgrades) {
     const shop = getPrestigeShop(state);
     const order = profile.prestigeUpgradeOrder || [];
-    const upgrade = [...shop].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)).find(u => !u.owned && !u.locked && u.affordable);
+    const upgrade = [...shop].sort((a, b) => (order.includes(a.id) ? order.indexOf(a.id) : 999) - (order.includes(b.id) ? order.indexOf(b.id) : 999)).find(u => !u.owned && !u.locked && u.affordable);
     if (upgrade) add(`memory:${upgrade.id}`, s => purchasePrestigeUpgrade(s, upgrade.id));
+  }
+  if (options.useNewSystems && profile.buyPrestigeUpgrades) {
+    if (state.prestigeCount >= 2) {
+      const research = ordered(['reconstruction', 'expansion', 'transcendence']).find(id => !state.archive.research[id]);
+      if (research && state.archive.shards >= 5) add('research-doctrine', s => researchDoctrine(s, research));
+      if (state.archive.shards >= 3 && !state.activeRelics.includes('openCircuit') && state.activeRelics.length < 2) add('craft-relic', s => craftRelic(s, 'openCircuit'));
+    }
+    if (state.prestigeCount >= 3) for (const id of Object.keys(RECONSTRUCTION_PROJECTS)) add(`project:${id}`, s => contributeProject(s, id));
+    if (!state.goals.length) {
+      const goal = techs.find(t => t.grantsEra && !canAfford(state, t.cost));
+      if (goal) add('queue-research', s => queueGoal(s, 'tech', goal.id));
+    }
   }
   if (!isGatheringAutomated(state) && profile.gather) {
     const resources = Object.entries(state.resources).filter(([id, r]) => r.unlocked && r.amount < getEffectiveCap(state, id));
@@ -144,7 +159,7 @@ export function runPlayerJourney(options = {}) {
       const gap = Math.min(maxSeconds - elapsed, profile.attention.sessionInterval - phase);
       // Exactly the save serialization, migration, and catch-up path used by
       // a closing browser. No player command can occur during this interval.
-      state = migrateState(JSON.parse(JSON.stringify(state)));
+      state = parseSave(serializeSave(state));
       state = advanceTime(state, gap, rng, 60, { pauseForgetting: true });
       elapsed += gap;
       offlineSeconds += gap;
@@ -196,6 +211,7 @@ export function runPlayerJourney(options = {}) {
   return {
     persona, seed, options, completed, elapsedSeconds: elapsed, activeSeconds, offlineSeconds,
     manualActions: commands, sessions, finalEra: state.era, cycleResults,
+    archive: { cycles: state.archive.entries.length, research: Object.keys(state.archive.research), projects: state.archive.projects, crafted: state.archive.relicsCrafted || 0 },
     failures: completed ? [] : [...outcome.failures, ...(cycleResults.length < cycles ? [`finished ${cycleResults.length}/${cycles} cycles`] : [])],
     blockers: completed ? null : describeProgressionBlockers(state), trace: completed ? undefined : trace,
   };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary, toggleEchoMode, purchaseEchoUpgrade, getEchoShop } from '../engine/prestige.js';
+import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary, toggleEchoMode, purchaseEchoUpgrade, getEchoShop, resolvePrestigePlan, togglePrestigePlan } from '../engine/prestige.js';
 import { getEffectivePrestige, PRESTIGE_HARD_CAP } from '../engine/resources.js';
 import { eraNames } from '../engine/eras.js';
 import { events as eventDefs } from '../data/events.js';
@@ -28,6 +28,8 @@ function getPrestigeInsight(state) {
 export function PrestigePanel({ state, onUpdate }) {
   const [showPreview, setShowPreview] = useState(false);
   const shop = getPrestigeShop(state);
+  const planned = resolvePrestigePlan(state);
+  const plannedShop = getPrestigeShop(planned);
   const summary = getPrestigeSummary(state);
   const points = state.prestigePoints || 0;
   const bestTimes = state.bestEraTimes || {};
@@ -124,6 +126,16 @@ export function PrestigePanel({ state, onUpdate }) {
           )}
         </div>
       )}
+
+      {cycle.ready && <section className="prestige-allocation">
+        <h3>Prepare the next cycle</h3>
+        <p>{planned.prestigePoints} points remain after selected rewards. Starting perks apply immediately when you prestige.</p>
+        <p>New permanent system: {state.prestigeCount === 0 ? 'Archive and saved plans' : state.prestigeCount === 1 ? 'Doctrine research and relic crafting' : state.prestigeCount === 2 ? 'Reconstruction projects across cycles' : 'Continue your research and reconstruction'}</p>
+        <div className="reward-options">{plannedShop.filter(u => !state.prestigeUpgrades?.[u.id]).map(u => <label key={u.id}>
+          <input type="checkbox" checked={(state.plannedPrestigeUpgrades || []).includes(u.id)} disabled={!u.owned && (u.locked || !u.affordable)} onChange={() => onUpdate(s => togglePrestigePlan(s, u.id))} />
+          {u.name} · {u.cost} points <span>{u.description}</span>
+        </label>)}</div>
+      </section>}
 
       {state.era >= 7 && !state.prestigeUpgrades?.eternalReturn && (
         <div style={{ marginBottom: '8px' }}>

@@ -1,6 +1,7 @@
 import { RELICS, RELIC_IDS } from '../data/relics.js';
 
 export const RELIC_SLOT_LIMIT = 2;
+export function getRelicSlotLimit(state) { return RELIC_SLOT_LIMIT + (state.archive?.projects?.echoObservatory >= 2 ? 1 : 0); }
 export const ECHO_PRESSURE_TARGET = 100;
 export const ECHO_PRESSURE_PER_SECOND = 0.24;
 
@@ -34,7 +35,7 @@ export function addEchoPressure(state, amount, rolls = [Math.random(), Math.rand
 
 export function advanceEchoPressure(state, dt, rng = Math.random) {
   if (dt <= 0 || state.relicOffer?.length) return state;
-  const nextPressure = (state.echoPressure || 0) + dt * ECHO_PRESSURE_PER_SECOND;
+  const nextPressure = (state.echoPressure || 0) + dt * ECHO_PRESSURE_PER_SECOND * (state.archive?.research?.transcendence ? 2 : 1);
   if (nextPressure < ECHO_PRESSURE_TARGET) return { ...state, echoPressure: nextPressure };
   return addEchoPressure(state, ECHO_PRESSURE_TARGET, [rng(), rng(), rng()]);
 }
@@ -42,7 +43,7 @@ export function advanceEchoPressure(state, dt, rng = Math.random) {
 export function claimRelic(state, relicId, replaceRelicId = null) {
   if (!(state.relicOffer || []).includes(relicId) || !RELICS[relicId]) return state;
   const active = [...(state.activeRelics || [])];
-  if (active.length >= RELIC_SLOT_LIMIT) {
+  if (active.length >= getRelicSlotLimit(state)) {
     const replaceIndex = active.indexOf(replaceRelicId);
     if (replaceIndex < 0) return state;
     active.splice(replaceIndex, 1, relicId);

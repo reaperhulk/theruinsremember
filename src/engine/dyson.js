@@ -10,7 +10,7 @@ export const DYSON_COMMISSION_INTERVAL = 105;
 
 // Perfect Memory: the hands remember — commissioning takes half the time.
 function commissionInterval(state) {
-  return DYSON_COMMISSION_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1);
+  return DYSON_COMMISSION_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1) * (state.archive?.projects?.relayNetwork >= 2 ? 0.5 : 1);
 }
 
 export const DYSON_MODULES = {

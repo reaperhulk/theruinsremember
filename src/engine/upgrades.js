@@ -1,3 +1,6 @@
+import { preservesGoalReserve } from './goals.js';
+import { recordHistory } from './archive.js';
+import { calculateEconomy } from './economy.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { LORE_UPGRADE_IDS } from '../data/lore.js';
@@ -6,11 +9,11 @@ import { getEraMasteryTier } from './eras.js';
 
 const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 
-// Repeatable milestones: every 25 levels of a repeatable upgrade crosses a
+// Repeatable milestones: every ten levels of a repeatable upgrade crosses a
 // named breakpoint that multiplies its target resource. Levels stop being
 // noise — each one climbs toward the next milestone.
-export const REPEATABLE_MILESTONE_STEP = 25;
-export const REPEATABLE_MILESTONE_BONUS = 1.12;
+export const REPEATABLE_MILESTONE_STEP = 10;
+export const REPEATABLE_MILESTONE_BONUS = 1.5;
 const REPEATABLE_DEFS = Object.values(upgradeDefs).filter(def => def.repeatable);
 
 export function getRepeatableLevel(state, upgradeId) {
@@ -164,7 +167,7 @@ export function getUpgradeCost(state, upgradeId) {
     baseCost = doubled;
   }
 
-  if (state.echoUpgrades?.echoTemporalAnchor && (state.runUpgradePurchases || 0) < 10) {
+  if ((state.echoUpgrades?.echoTemporalAnchor || state.archive?.research?.reconstruction) && (state.runUpgradePurchases || 0) < 10) {
     baseCost = Object.fromEntries(Object.entries(baseCost).map(([id, amount]) => [id, Math.ceil(amount * 0.5)]));
   }
   if (!def.repeatable) return baseCost;
@@ -267,6 +270,7 @@ export function purchaseUpgrade(state, upgradeId) {
     };
   }
 
+  if (LORE_UPGRADE_ID_SET.has(upgradeId)) finalState = recordHistory(finalState, [{ isLore: true, message: `${def.name}: ${def.description}` }]);
   return finalState;
 }
 
@@ -359,6 +363,7 @@ export function isDecisionUpgrade(def) {
   if (def.exclusiveWith) return true;
   if (def.mechanic) return true;
   if (LORE_UPGRADE_ID_SET.has(def.id)) return true;
+  if (SIGNATURE_UPGRADES.has(def.id)) return true;
   return (def.effects || []).some(effect => effect.type === 'unlock_resource');
 }
 
@@ -378,6 +383,7 @@ export function buyRoutineBuildOut(state) {
       if (current.upgrades[def.id]) continue;
       if (hidden[def.id]) continue;
       if (isDecisionUpgrade(def)) continue;
+      if (!preservesGoalReserve(current, getUpgradeCost(current, def.id))) continue;
       const result = purchaseUpgrade(current, def.id);
       if (result) {
         current = result;
@@ -421,4 +427,27 @@ export function getPurchasedUpgrades(state) {
     const count = typeof state.upgrades[id] === 'number' ? state.upgrades[id] : 1;
     return { ...def, purchaseCount: count };
   }).filter(Boolean);
+}
+
+// Signature breakthroughs stay in the decision list; their existing large
+// multipliers become deliberate purchases with visible before/after output.
+export const SIGNATURE_UPGRADES = new Set([
+  'tools', 'irrigation', 'basicPower', 'terraceFields',
+  'assemblyLines', 'powerGrid', 'microchipFab', 'industrialBoiler',
+  'patternAnalysis', 'openSource', 'aiResearch', 'quantumComputing',
+  'advancedMaterials', 'reusableRockets', 'solarArrays', 'zeroGManufacturing',
+  'asteroidMining', 'outerColony', 'geneticEngineering', 'fusionPower',
+  'warpDrive', 'stellarCartography', 'dysonSwarms', 'aiGovernance',
+  'dysonSphere', 'starLifting', 'stellarNursery', 'matrioshkaBrain',
+  'wormholeNetwork', 'darkMatterHarvest', 'galacticSenate', 'matterReplicators',
+  'galaxySeeding', 'cosmicInfrastructure', 'voidBridges', 'universalTranslator',
+  'realityWeaving', 'parallelProcessing', 'omniscienceEngine', 'multiversalHarmony',
+]);
+
+export function previewUpgrade(state, id) {
+  const def = upgradeDefs[id];
+  if (!def) return null;
+  const effected = applyEffects(state, def.effects);
+  const level = def.repeatable ? getRepeatableLevel(state, id) + 1 : true;
+  return calculateEconomy({ ...effected, upgrades: { ...state.upgrades, [id]: level } });
 }

@@ -1,6 +1,7 @@
+import { queueGoal } from '../engine/goals.js';
 import { calculateEconomy, estimateAffordability } from '../engine/economy.js';
 import { useState, useRef, useCallback, useMemo, useEffect, memo } from 'react';
-import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, buyNextRepeatableMilestone, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable, isDecisionUpgrade } from '../engine/upgrades.js';
+import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, buyNextRepeatableMilestone, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable, isDecisionUpgrade, previewUpgrade, SIGNATURE_UPGRADES } from '../engine/upgrades.js';
 import { getEraMasteryTier } from '../engine/eras.js';
 import { canAfford } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -18,6 +19,7 @@ function getFocusScore(state, upgrade) {
   // Forks are the only upgrades with a real opportunity cost — taking one
   // locks its opposite out for the rest of the run. They lead the list.
   if (upgrade.exclusiveWith) score += 200;
+  if (SIGNATURE_UPGRADES.has(upgrade.id)) score += 100;
   if (upgrade.mechanic) score += 80;
   if (LORE_UPGRADE_ID_SET.has(upgrade.id)) score += 20;
   for (const effect of upgrade.effects) {
@@ -48,7 +50,7 @@ const mechanicDescriptions = {
   prestigeAccumulator: '+5% production per prestige run completed',
   crisisInversion: 'Crisis events boost production instead of reducing it',
   diversityBonus: '1.05x per unlocked resource type',
-  compoundingTick: 'Production compounds slightly each tick',
+  compoundingTick: 'All production +0.1%',
 };
 
 function resourceName(id) {
@@ -518,6 +520,10 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 })}
                 {isMechanic && <span className="effect-tag effect-mechanic" title={mechanicDescriptions[upgrade.mechanic] || 'Special mechanic'}>MECHANIC</span>}
               </div>
+              {SIGNATURE_UPGRADES.has(upgrade.id) && <div className="signature-preview"><strong>Breakthrough</strong>{(() => {
+                const preview = previewUpgrade(state, upgrade.id);
+                return Object.keys(state.resources).filter(id => preview.gross[id] > economy.gross[id] * 1.05).slice(0, 3).map(id => <span key={id}>{resourceName(id)} potential: {formatNumber(economy.gross[id])} → {formatNumber(preview.gross[id])}/s</span>);
+              })()}</div>}
               {upgrade.repeatable && (() => {
                 const milestone = getRepeatableMilestone(state, upgrade.id);
                 return (
@@ -552,6 +558,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 );
               })()}
             </button>
+            {!upgrade.repeatable && <button className="queue-goal-btn" disabled={state.goals?.some(g => g.id === upgrade.id) || state.goals?.length >= 5} onClick={() => onUpdate(s => queueGoal(s, 'upgrade', upgrade.id))}>Queue goal</button>}
             {upgrade.repeatable && affordable && (
               <button
                 className="buy-max-btn"

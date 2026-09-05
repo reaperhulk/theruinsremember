@@ -26,16 +26,18 @@ describe('upgrades', () => {
       expect(isDecisionUpgrade(upgradeDefs.forkHearth)).toBe(true);      // fork
       expect(isDecisionUpgrade(upgradeDefs.deadStarAtlas)).toBe(true);   // lore
       expect(isDecisionUpgrade(upgradeDefs.foundry)).toBe(true);         // unlocks steel
-      expect(isDecisionUpgrade(upgradeDefs.tools)).toBe(false);          // routine multiplier
+      expect(isDecisionUpgrade(upgradeDefs.tools)).toBe(true);          // routine multiplier
     });
 
     it('leaves decisions to the player while buying routine build-out', () => {
-      const state = createInitialState();
+      let state = createInitialState();
       state.resources.labor.amount = 1e6;
       state.resources.materials.amount = 1e6;
       state.resources.food.amount = 1e6;
       state.resources.energy.amount = 1e6;
 
+      expect(buyRoutineBuildOut(state).state.upgrades.tools).toBeUndefined();
+      state = purchaseUpgrade(state, 'tools');
       const { state: after, count } = buyRoutineBuildOut(state);
       expect(count).toBeGreaterThan(0);
 
@@ -454,17 +456,17 @@ describe('upgrades', () => {
     }
   });
 
-  it('repeatable milestones multiply the target resource every 25 levels', () => {
+  it('repeatable milestones multiply the target resource every ten levels', () => {
     const state = createInitialState();
-    state.upgrades.expandWorkforce = 24;
+    state.upgrades.expandWorkforce = 9;
     expect(getRepeatableMilestone(state, 'expandWorkforce').milestones).toBe(0);
     expect(getRepeatableMilestoneMultiplier(state, 'labor')).toBe(1);
 
-    state.upgrades.expandWorkforce = 50;
+    state.upgrades.expandWorkforce = 20;
     const milestone = getRepeatableMilestone(state, 'expandWorkforce');
     expect(milestone.milestones).toBe(2);
-    expect(milestone.nextAt).toBe(75);
-    expect(getRepeatableMilestoneMultiplier(state, 'labor')).toBeCloseTo(1.2544);
+    expect(milestone.nextAt).toBe(30);
+    expect(getRepeatableMilestoneMultiplier(state, 'labor')).toBeCloseTo(2.25);
     // Other resources are untouched
     expect(getRepeatableMilestoneMultiplier(state, 'food')).toBe(1);
   });
@@ -476,9 +478,9 @@ describe('upgrades', () => {
     state.resources.materials.amount = 1e20;
 
     const first = buyNextRepeatableMilestone(state, 'expandWorkforce');
-    expect(first.upgrades.expandWorkforce).toBe(25);
+    expect(first.upgrades.expandWorkforce).toBe(10);
     const second = buyNextRepeatableMilestone(first, 'expandWorkforce');
-    expect(second.upgrades.expandWorkforce).toBe(50);
+    expect(second.upgrades.expandWorkforce).toBe(20);
     expect(buyNextRepeatableMilestone(state, 'tools')).toBeNull();
   });
 });

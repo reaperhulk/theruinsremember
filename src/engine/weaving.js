@@ -49,7 +49,7 @@ export function getWeaveCost(state) {
 export function getWeavingStats(state) {
   const laws = getWovenLaws(state);
   const wovenCount = Object.keys(laws).length;
-  const interval = REALITY_LAW_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1);
+  const interval = REALITY_LAW_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1) * (state.archive?.projects?.relayNetwork >= 2 ? 0.5 : 1);
   const elapsed = state.totalTime - (state.lastLawWeaveTime ?? -interval);
   return {
     totalWeaves: state.totalWeaves || 0,

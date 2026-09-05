@@ -135,5 +135,5 @@ export function getEffectiveCap(state, resourceId) {
   const currentEra = state.era || 1;
   const eraCapScale = ERA_COST_MULTIPLIERS[currentEra] || 1;
   const spatialKeyBonus = 1 + (state.realityKeys?.spatial || 0) * 0.15;
-  return def.baseCap * r.capMult * eraCapScale * spatialKeyBonus * getRelicCapacityMultiplier(state);
+  return (state.archive?.research?.expansion ? 2 : 1) * def.baseCap * r.capMult * eraCapScale * spatialKeyBonus * getRelicCapacityMultiplier(state);
 }

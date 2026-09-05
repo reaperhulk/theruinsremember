@@ -46,7 +46,7 @@ export function getSenateStats(state) {
   const government = getSenateGovernment(state);
   const acts = countSenateActs(state);
   const nextAct = getNextSenateAct(state);
-  const interval = SENATE_ACT_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1);
+  const interval = SENATE_ACT_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1) * (state.archive?.projects?.relayNetwork >= 2 ? 0.5 : 1);
   const elapsed = state.totalTime - (state.lastSenateActTime ?? -interval);
   return {
     government,

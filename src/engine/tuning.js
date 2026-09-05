@@ -44,7 +44,7 @@ export function getLockedSignals(state) {
 export function getTuningStats(state) {
   const locked = getLockedSignals(state);
   const lockedCount = Object.keys(locked).length;
-  const interval = TUNING_LOCK_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1);
+  const interval = TUNING_LOCK_INTERVAL * (state.prestigeUpgrades?.perfectMemory ? 0.5 : 1) * (state.archive?.projects?.relayNetwork >= 2 ? 0.5 : 1);
   const elapsed = state.totalTime - (state.lastSignalLockTime ?? -interval);
   return {
     locked,

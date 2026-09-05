@@ -1,3 +1,6 @@
+import { advanceCommissions } from './commissions.js';
+import { advanceGoal, preservesGoalReserve } from './goals.js';
+import { recordHistory } from './archive.js';
 import { calculateEconomy } from './economy.js';
 import { getEffectiveCap, gather, isGatheringAutomated } from './resources.js';
 import { checkEraTransition, transitionEra } from './eras.js';
@@ -6,7 +9,7 @@ import { advanceColonyMandate } from './colonies.js';
 import { advanceDockingContracts } from './docking.js';
 import { advanceNetworkPlan } from './starChart.js';
 import { checkAchievements } from './achievements.js';
-import { purchaseUpgrade, buyRoutineBuildOut, isDecisionUpgrade } from './upgrades.js';
+import { purchaseUpgrade, buyRoutineBuildOut, isDecisionUpgrade, getUpgradeCost } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes, runExpedition } from './expeditions.js';
 import { awardCycleGoal } from './cycles.js';
@@ -133,6 +136,9 @@ export function tick(state, dt, rng = Math.random, options = {}) {
   }
 
 
+  newState = advanceGoal(newState);
+  newState = advanceCommissions(newState);
+
   // Auto-purchase earlier era upgrades once a second era exists.
   // Critical for game balance: cross-era costs grow faster than caps,
   // so upgrades MUST be bought while costs are still affordable.
@@ -150,6 +156,7 @@ export function tick(state, dt, rng = Math.random, options = {}) {
           if (newState.upgrades[def.id]) continue;
           if (isDecisionUpgrade(def)) continue;
           if (def.prerequisites.some(p => !newState.upgrades[p])) continue;
+          if (!preservesGoalReserve(newState, getUpgradeCost(newState, def.id))) continue;
           const result = purchaseUpgrade(newState, def.id);
           if (result) { newState = result; boughtAny = true; }
         }
@@ -306,5 +313,5 @@ export function tick(state, dt, rng = Math.random, options = {}) {
     };
   }
 
-  return newState;
+  return recordHistory(newState, newState.eventLog || []);
 }

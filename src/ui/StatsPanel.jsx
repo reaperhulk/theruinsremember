@@ -64,7 +64,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
     .map(id => upgradeDefs[id])
     .filter(Boolean);
   // Lore events from event log
-  const loreEvents = (state.eventLog || []).filter(e => e.isLore);
+  const loreEvents = [...new Set([...(state.archive?.lore || []), ...(state.eventLog || []).filter(e => e.isLore).map(e => e.message)])].map(message => ({ message }));
   const chronicle = [...discoveredLore.map(u => ({
     type: 'upgrade',
     era: u.era,

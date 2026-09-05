@@ -1,3 +1,5 @@
+import { rememberCycle } from './archive.js';
+import { getEffectiveCap } from './resources.js';
 import { createInitialState } from './state.js';
 import { prestigeUpgrades, echoUpgrades } from '../data/prestige-upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
@@ -78,12 +80,14 @@ export function calculatePrestigePoints(state) {
   if (Object.keys(state.wovenLaws || {}).length >= 3) points += 1;
   if (Object.keys(state.lockedSignals || {}).length >= 3) points += 1;
   // The depth ladder: every recursion survived is the run's real score
-  points += (state.recursionDepth || 0) * 8;
+  points += Math.max(state.recursionDepth || 0, state.bestRecursionDepth || 0) * 8;
   return points;
 }
 
 // Get a summary of what the prestige will give
 export function getPrestigeSummary(state) {
+  const original = state;
+  state = resolvePrestigePlan(state);
   const bonus = calculatePrestigeBonus(state);
   const rawMultiplier = state.prestigeMultiplier + bonus;
   const newMultiplier = Math.max(rawMultiplier * (state.prestigeUpgrades?.headStart ? 1.5 : 1), state.echoUpgrades?.echoVoidResonance ? state.prestigeMultiplier * 1.5 : 0);
@@ -93,7 +97,8 @@ export function getPrestigeSummary(state) {
     bonus,
     newMultiplier,
     points,
-    totalPoints: (state.prestigePoints || 0) + points,
+    totalPoints: state.prestigePoints || 0,
+    spentPoints: (original.prestigePoints || 0) + points - (state.prestigePoints || 0),
     prestigeCount: (state.prestigeCount || 0) + 1,
     lifetimeEras: Math.max(state.era, state.lifetimeHighestEra || 0),
   };
@@ -136,11 +141,10 @@ export function getPrestigeShop(state) {
 
 // Perform a prestige reset. Returns fresh state with multiplier, lifetime stats, and prestige upgrades.
 export function performPrestige(state) {
+  state = resolvePrestigePlan(state);
   const bonus = calculatePrestigeBonus(state);
   // Additive prestige: each prestige adds the bonus to the cumulative multiplier
   const newMultiplier = state.prestigeMultiplier + bonus;
-  const points = calculatePrestigePoints(state);
-
   const freshState = createInitialState();
 
   // Head Start: +50% of current multiplier (additive, not x2)
@@ -153,7 +157,9 @@ export function performPrestige(state) {
     ...freshState,
     prestigeMultiplier: startMult,
     prestigeCount: (state.prestigeCount || 0) + 1,
-    prestigePoints: (state.prestigePoints || 0) + points,
+    prestigePoints: state.prestigePoints || 0,
+    archive: rememberCycle(state),
+    autoBuildOut: state.autoBuildOut !== false,
     prestigeUpgrades: state.prestigeUpgrades || {},
     lifetimeHighestEra: Math.max(state.era, state.lifetimeHighestEra || 0),
     lifetimeGems: (state.lifetimeGems || 0) + (state.totalGems || 0),
@@ -266,9 +272,8 @@ export function performPrestige(state) {
       };
     }
   }
-  // A prestiged timeline starts spent: one expedition supply, so the early
-  // eras are paced by rediscovery rather than skipped by banked wealth.
-  newState.expedition = { ...newState.expedition, supplies: 1 };
+  // New cycles start stocked; repeated mastery is an advantage.
+  newState.expedition = { ...newState.expedition, supplies: 3 };
   newState.echoMode = state.echoMode || false;
   newState.echoResource = state.echoResource || 0;
   newState.echoUpgrades = state.echoUpgrades || {};
@@ -468,5 +473,27 @@ export function performPrestige(state) {
     }
   }
 
+  if (newState.archive.projects.seedVault >= 2) {
+    for (const id of ['food', 'labor', 'materials', 'energy']) {
+      newState.resources[id] = { ...newState.resources[id], amount: Math.max(newState.resources[id].amount, getEffectiveCap(newState, id) * 0.25) };
+    }
+  }
   return newState;
+}
+
+// Allocate the earned points before applying any starting perk. The same plan
+// drives the preview and reset, and illegal or unaffordable entries are ignored.
+export function resolvePrestigePlan(state) {
+  let planned = { ...state, prestigePoints: (state.prestigePoints || 0) + calculatePrestigePoints(state) };
+  for (const id of state.plannedPrestigeUpgrades || []) {
+    planned = purchasePrestigeUpgrade(planned, id) || planned;
+  }
+  return planned;
+}
+export function togglePrestigePlan(state, id) {
+  if (!prestigeUpgrades[id] || state.prestigeUpgrades?.[id]) return state;
+  const selected = state.plannedPrestigeUpgrades || [];
+  const proposal = selected.includes(id) ? selected.filter(value => value !== id) : [...selected, id];
+  const resolved = resolvePrestigePlan({ ...state, plannedPrestigeUpgrades: proposal });
+  return { ...state, plannedPrestigeUpgrades: proposal.filter(value => resolved.prestigeUpgrades[value]) };
 }

@@ -11,16 +11,16 @@ to main, with the testing harness audited before gameplay changes.
       alternative branches, and negative tests that prove stalls are detected.
 - [x] Remove post-prestige compulsory operations; preserve optional playstyles.
 - [x] Enforce the same purchase requirements in manual, bulk, and automatic paths.
-- [ ] Unify production, consumption, caps, affordability estimates, and previews.
-- [ ] Add consumer controls, reserves, queued goals, and visible recovery routes.
+- [x] Unify production, consumption, caps, affordability estimates, and previews.
+- [x] Add consumer controls, reserves, queued goals, and visible recovery routes.
 - [x] Make active/background/offline simulation consistent; protect unattended play.
 - [x] Add validated saves, rotating backups, recovery, and current-state export.
-- [ ] Strengthen signature upgrades and repeatable milestones.
-- [ ] Add permanent Archive, remembered plans, distinct doctrine research,
+- [x] Strengthen signature upgrades and repeatable milestones.
+- [x] Add permanent Archive, remembered plans, distinct doctrine research,
       deterministic relic crafting, reconstruction projects, and optional challenges.
-- [ ] Add prestige reward selection before the new run and accurate reset previews.
+- [x] Add prestige reward selection before the new run and accurate reset previews.
 - [ ] Make operation choices affect later production and defenses; queue commissions.
-- [ ] Preserve narrative history and landmarks between cycles.
+- [x] Preserve narrative history and landmarks between cycles.
 - [ ] Improve the opening scene, readable decision cards, navigation, touch,
       keyboard access, and reduced-motion support.
 - [ ] Add ambient music and independent audio controls.
@@ -150,3 +150,30 @@ Validated primary saves and two rotating backups, non-destructive recovery, visi
 | offline_returner | 42 | 43201 → 43201 | 361 → 361 | 99 → 99 | 4 → 4 | 6 / False |
 | completionist | 42 | 1081 → 1081 | 1081 → 1081 | 183 → 181 | 1 → 1 | 10 / True |
 | minimalist | 42 | 10231 → 10231 | 10231 → 10231 | 72 → 72 | 1 → 1 | 10 / True |
+
+### 4. Impactful decisions and new prestige systems
+
+Forty large existing breakthroughs are now explicit signature decisions with production previews. Repeatable milestones award ×1.5 every ten levels. Queued purchases reserve their cost without starving their prerequisites; player-selected commissions resolve through the normal operation commands.
+
+Prestige one preserves the Archive and saved plans; two opens permanent doctrine research and deterministic relic crafting; three opens three projects requiring contributions from distinct cycles. Rewards selected before prestige are priced from newly earned points and applied before starting perks. Narrative history persists independently of the rolling event log. Six naturally played cycles completed in 5,140s / 854 commands, earning all three research branches, crafting four relics, and finishing all three projects.
+
+393 unit and journey contract tests pass. Alternate branches, failed expeditions, inefficient spending and individual skipped operations are also exercised. Additional manual inputs below are deliberate: major breakthroughs are now player decisions. The check-in profile needs one additional visit; no progression failures or absent player actions occur.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Final era / ready |
+|---|---|---|---|---|---|---|
+| newcomer | 424242 | 1741 → 1921 | 1741 → 1921 | 111 → 139 | 1 → 1 | 10 / True |
+| engaged | 424242 | 1411 → 1411 | 1411 → 1411 | 138 → 163 | 1 → 1 | 10 / True |
+| optimizer | 424242 | 931 → 961 | 931 → 961 | 202 → 239 | 1 → 1 | 10 / True |
+| background | 424242 | 1921 → 2041 | 481 → 511 | 116 → 129 | 17 → 18 | 10 / True |
+| check_in | 424242 | 4201 → 4801 | 421 → 481 | 103 → 138 | 8 → 9 | 10 / True |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 98 → 101 | 4 → 4 | 5 / False |
+| completionist | 424242 | 1171 → 1171 | 1171 → 1171 | 181 → 218 | 1 → 1 | 10 / True |
+| minimalist | 424242 | 10681 → 11491 | 10681 → 11491 | 70 → 93 | 1 → 1 | 10 / True |
+| newcomer | 42 | 1741 → 1681 | 1741 → 1681 | 113 → 137 | 1 → 1 | 10 / True |
+| engaged | 42 | 1561 → 1531 | 1561 → 1531 | 138 → 166 | 1 → 1 | 10 / True |
+| optimizer | 42 | 961 → 961 | 961 → 961 | 230 → 260 | 1 → 1 | 10 / True |
+| background | 42 | 1921 → 2041 | 481 → 511 | 114 → 130 | 17 → 18 | 10 / True |
+| check_in | 42 | 4201 → 4801 | 421 → 481 | 103 → 138 | 8 → 9 | 10 / True |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 99 → 102 | 4 → 4 | 5 / False |
+| completionist | 42 | 1081 → 1141 | 1081 → 1141 | 181 → 209 | 1 → 1 | 10 / True |
+| minimalist | 42 | 10231 → 9211 | 10231 → 9211 | 72 → 90 | 1 → 1 | 10 / True |

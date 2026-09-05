@@ -124,7 +124,7 @@ export function beginForgettingChallenge(state) {
 
 export function retreatFromForgetting(state) {
   if (!state.forgettingChallengeActive && !state.forgetting) return state;
-  return { ...state, forgettingChallengeActive: false, forgetting: null, recursionDepth: 0 };
+  return { ...state, forgettingChallengeActive: false, forgetting: null, bestRecursionDepth: Math.max(state.bestRecursionDepth || 0, state.recursionDepth || 0), recursionDepth: 0 };
 }
 
 function ensureWardens(forgetting, capacity) {

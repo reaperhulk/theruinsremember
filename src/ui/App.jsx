@@ -1,3 +1,5 @@
+import { ArchivePanel } from './ArchivePanel.jsx';
+import { GoalsPanel } from './GoalsPanel.jsx';
 import { serializeSave } from '../engine/saves.js';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createInitialState } from '../engine/state.js';
@@ -64,6 +66,7 @@ function getAvailableTabs(era) {
   ];
   if (era >= 5) tabs.push({ id: 'mini', label: 'Operations', sublabel: 'active systems', key: '3' });
   if (era >= 4) tabs.push({ id: 'trading', label: 'Trading', sublabel: 'reroute surplus', key: '4' });
+  tabs.push({ id: 'archive', label: 'Archive', sublabel: 'remembered civilizations', key: '7' });
   tabs.push({ id: 'prestige', label: 'Prestige', sublabel: 'bank the cycle', key: '5' });
   tabs.push({ id: 'stats', label: 'Stats', sublabel: 'codex and run data', key: '6' });
   return tabs;
@@ -153,11 +156,11 @@ export function App() {
       '--- The Cycle Ends. The Cycle Begins. ---',
       '',
       `Multiplier: x${formatNumber(getEffectivePrestige(summary.currentMultiplier))} → x${formatNumber(getEffectivePrestige(summary.newMultiplier))} (x${summary.bonus.toFixed(1)} bonus)`,
-      `Prestige Points: +${summary.points} (total: ${summary.totalPoints})`,
+      `Prestige Points: +${summary.points}, ${summary.spentPoints} allocated (${summary.totalPoints} remaining)`,
       `Cycle: #${summary.prestigeCount}`,
       `Next doctrine: ${CYCLE_DOCTRINES[state.nextCycleDoctrine]?.name || 'None selected'}`,
       '',
-      'KEPT: Achievements, prestige upgrades, multiplier, reality keys, lifetime stats',
+      'KEPT: Archive, research, reconstruction, saved plans, achievements, prestige upgrades, multiplier, reality keys, lifetime stats',
       'LOST: All resources, upgrades, tech, era progress, operation state',
       `LOST: ${state.activeRelics?.length || 0} equipped relics and current Echo Pressure`,
       ...milestones,
@@ -405,7 +408,7 @@ export function App() {
             }}
           >
             {activeTab === 'upgrades' && (
-              <UpgradePanel state={state} onUpdate={updateState} />
+              <><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel state={state} onUpdate={updateState} /></>
             )}
             {activeTab === 'tech' && (
               <TechTree state={state} onUpdate={updateState} />
@@ -424,7 +427,8 @@ export function App() {
             {activeTab === 'prestige' && (
               <PrestigePanel state={state} onUpdate={updateState} />
             )}
-            {activeTab === 'stats' && (
+            {activeTab === 'archive' && <ArchivePanel state={state} onUpdate={updateState} />}
+          {activeTab === 'stats' && (
               <StatsPanel state={state} />
             )}
           </div>

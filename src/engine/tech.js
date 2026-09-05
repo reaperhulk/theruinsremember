@@ -1,3 +1,4 @@
+import { preservesGoalReserve } from './goals.js';
 import { techTree } from '../data/tech-tree.js';
 import { spend } from './resources.js';
 
@@ -84,7 +85,7 @@ export function researchRoutineTech(state) {
   for (let pass = 0; pass < 5; pass++) {
     let progressed = false;
     for (const tech of getAvailableTech(current)) {
-      if (isDecisionTech(tech)) continue;
+      if (isDecisionTech(tech) || !preservesGoalReserve(current, tech.cost)) continue;
       const result = unlockTech(current, tech.id);
       if (result) {
         current = result;
