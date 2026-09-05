@@ -1,7 +1,9 @@
+import { UpgradeImpact } from './UpgradeImpact.jsx';
+import { getPurchaseTarget } from '../engine/guidance.js';
 import { queueGoal } from '../engine/goals.js';
 import { calculateEconomy, estimateAffordability } from '../engine/economy.js';
 import { useState, useRef, useCallback, useMemo, useEffect, memo } from 'react';
-import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, buyNextRepeatableMilestone, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable, isDecisionUpgrade, previewUpgrade, SIGNATURE_UPGRADES } from '../engine/upgrades.js';
+import { getAvailableUpgrades, purchaseUpgrade, getPurchasedUpgrades, getUpgradeCost, buyMaxRepeatable, buyNextRepeatableMilestone, getRepeatableMilestone, getUpcomingUpgrades, buyAllAffordable, isDecisionUpgrade, getRecommendedRepeatables, SIGNATURE_UPGRADES } from '../engine/upgrades.js';
 import { getEraMasteryTier } from '../engine/eras.js';
 import { canAfford } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -235,8 +237,10 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const routine = focusCandidates.filter(upgrade => !isDecisionUpgrade(upgrade));
   const routineWaiting = autoBuildOut ? routine.filter(u => u.era === state.era).length : 0;
   const byFocus = (a, b) => getFocusScore(state, b) - getFocusScore(state, a);
+  const target = getPurchaseTarget(state);
+  const investments = getRecommendedRepeatables(state, target?.cost, filteredAvailable, economy);
   const visibleAvailable = focusMode
-    ? [...decisions.sort(byFocus), ...routine.sort(byFocus)].slice(0, 6)
+    ? [...investments, ...decisions.sort(byFocus), ...routine.sort(byFocus)].slice(0, 6)
     : filteredAvailable;
 
   const affordableCount = visibleAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
@@ -520,10 +524,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                 })}
                 {isMechanic && <span className="effect-tag effect-mechanic" title={mechanicDescriptions[upgrade.mechanic] || 'Special mechanic'}>MECHANIC</span>}
               </div>
-              {SIGNATURE_UPGRADES.has(upgrade.id) && <div className="signature-preview"><strong>Breakthrough</strong>{(() => {
-                const preview = previewUpgrade(state, upgrade.id);
-                return Object.keys(state.resources).filter(id => preview.gross[id] > economy.gross[id] * 1.05).slice(0, 3).map(id => <span key={id}>{resourceName(id)} potential: {formatNumber(economy.gross[id])} → {formatNumber(preview.gross[id])}/s</span>);
-              })()}</div>}
+              {(SIGNATURE_UPGRADES.has(upgrade.id) || upgrade.exclusiveWith) && <UpgradeImpact state={state} upgrade={upgrade} economy={economy} />}
               {upgrade.repeatable && (() => {
                 const milestone = getRepeatableMilestone(state, upgrade.id);
                 return (
@@ -605,6 +606,8 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                         <span className="repeatable-badge">repeatable</span>
                       </div>
                       <div className="upgrade-cost"><CostDisplay cost={cost} state={state} /></div>
+                      <div className="text-hint">{upgrade.focusResource && `Improves ${resourceName(upgrade.focusResource)} for your next purchase. `}{getRepeatableMilestone(state, upgrade.id).nextAt - count} levels to the next ×1.5 output milestone.</div>
+                      {upgrade.focusResource && <UpgradeImpact state={state} upgrade={upgrade} economy={economy} />}
                       <div className="upgrade-effects">
                         {upgrade.effects.map((e, i) => {
                           let label = '';

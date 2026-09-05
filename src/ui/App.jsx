@@ -1,4 +1,5 @@
 const ArchivePanel = lazy(() => import('./ArchivePanel.jsx').then(module => ({ default: module.ArchivePanel })));
+import { PurchaseGuidance } from './PurchaseGuidance.jsx';
 import { GoalsPanel } from './GoalsPanel.jsx';
 import { PublicWorksPanel } from './PublicWorksPanel.jsx';
 import { RestoredDistricts } from './RestoredDistricts.jsx';
@@ -369,8 +370,9 @@ export function App() {
         </div>
       )}
 
+      <nav className="mobile-section-links" aria-label="Jump to game section"><a href="#game-actions">Actions</a><a href="#game-resources">Resources and field operations</a></nav>
       <main className={`game-layout ${state.era <= 4 ? 'early-game-layout' : ''}`}>
-        <div className="left-column">
+        <div className="left-column" id="game-resources">
           <Suspense fallback={<div className="scene-placeholder">The ruins emerge…</div>}><GameCanvas state={state} onUpdate={updateState} /></Suspense>
           <RestoredDistricts state={state} />
           <ResourcePanel state={state} onUpdate={updateState} />
@@ -383,7 +385,7 @@ export function App() {
             <EventLog state={state} />
           )}
         </div>
-        <div className="right-column">
+        <div className="right-column" id="game-actions">
           <div className="tab-bar" role="tablist" aria-label="Game tabs" onKeyDown={e => {
             if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
             e.preventDefault();
@@ -442,7 +444,7 @@ export function App() {
           >
             <Suspense fallback={<div className="panel">Opening the archive…</div>}>
             {activeTab === 'upgrades' && (
-              <><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel state={state} onUpdate={updateState} /></>
+              <><PurchaseGuidance state={state} onUpdate={updateState} /><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel state={state} onUpdate={updateState} /></>
             )}
             {activeTab === 'tech' && (
               <TechTree state={state} onUpdate={updateState} />

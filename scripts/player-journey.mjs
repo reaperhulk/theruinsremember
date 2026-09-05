@@ -24,6 +24,8 @@ import { getRelicSlotLimit, claimRelic, declineRelicOffer } from '../src/engine/
 import { getForgettingStats, placeWarden } from '../src/engine/forgetting.js';
 import { createPersonaProfiles, getPlayerAttention } from './playtest-personas.js';
 import { mulberry32 } from './bot-playtest.js';
+import { getPurchaseTarget, prioritizePurchase } from '../src/engine/guidance.js';
+import { calculateEconomy, getCostPressure, expandStorage } from '../src/engine/economy.js';
 import { createPacingMonitor } from './journey-pacing.mjs';
 import { scenarioOutcome, describeProgressionBlockers, validateSimulationState } from './progression-contract.mjs';
 
@@ -33,8 +35,17 @@ const BUDGETS = { newcomer: 1, engaged: 2, optimizer: 4, background: 2, check_in
 // ownership writes, hidden prerequisite bypass, or batch of exclusive choices.
 export function candidateActions(state, profile, options, rng) {
   const reverse = options.branch === 'reverse';
-  const ordered = values => reverse ? [...values].reverse() : values;
+  const rank = value => [...`${options.seed || 424242}:${state.prestigeCount}:${value.id || value}`].reduce((hash, c) => Math.imul(hash ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261);
+  const ordered = values => options.branch === 'random' ? [...values].sort((a, b) => rank(a) - rank(b)) : reverse ? [...values].reverse() : values;
   const actions = [];
+  if (options.useRecovery) {
+    const target = getPurchaseTarget(state);
+    const economy = calculateEconomy(state);
+    const pressure = target && getCostPressure(state, target.cost, economy);
+    const storage = pressure?.find(p => p.reason === 'capacity' && state.resources[p.id].amount >= economy.capacity[p.id] * 0.6);
+    if (storage) return [{ name: 'expand-storage', fn: s => expandStorage(s, storage.id) }];
+    if (target && pressure.some(p => p.reason === 'production') && (!target.queued || state.protectProgression === false) && (target.queued || state.goals.length < 5)) return [{ name: 'protect-purchase', fn: s => prioritizePurchase(s, target) }];
+  }
   const add = (name, fn) => actions.push({ name, fn });
   const techs = ordered(getAvailableTech(state)).filter(tech => tech.id !== options.blockedTech);
   for (const tech of techs) {
@@ -118,11 +129,13 @@ export function candidateActions(state, profile, options, rng) {
       const route = state.prestigeCount % 2 ? 'electrolysis' : 'biospheres';
       if (state.productionRoute !== route) add('production-route', s => selectProductionRoute(s, route));
     }
-    if (options.collectLegacy && Object.keys(state.archive.research).length === Object.keys(DOCTRINE_RESEARCH).length && state.archive.shards >= 3 && state.activeRelics.length < getRelicSlotLimit(state)) {
-      const relic = ['openCircuit', 'loomNeedle', ...RELIC_IDS].find(id => !state.activeRelics.includes(id));
-      add('craft-loadout', s => craftRelic(s, relic));
+    if (options.collectLegacy && Object.keys(state.archive.research).length === Object.keys(DOCTRINE_RESEARCH).length && state.archive.shards >= 3) {
+      const pair = ['openCircuit', 'loomNeedle'];
+      const relic = pair.find(id => !state.activeRelics.includes(id)) || (state.activeRelics.length < getRelicSlotLimit(state) && RELIC_IDS.find(id => !state.activeRelics.includes(id)));
+      const replace = state.activeRelics.length >= getRelicSlotLimit(state) ? state.activeRelics.find(id => !pair.includes(id)) : null;
+      if (relic) add('craft-loadout', s => craftRelic(s, relic, replace));
     }
-    if (options.collectLegacy && state.archive.research.conservation && state.archive.savedPlan && state.activeRelics.length > state.archive.savedPlan.loadout.length) add('save-loadout', saveAutomationPlan);
+    if (options.collectLegacy && state.archive.research.conservation && state.archive.savedPlan && (state.activeRelics.length > state.archive.savedPlan.loadout.length || ['openCircuit', 'loomNeedle'].every(id => state.activeRelics.includes(id)) && !['openCircuit', 'loomNeedle'].every(id => state.archive.savedPlan.loadout.includes(id)))) add('save-loadout', saveAutomationPlan);
     if (state.prestigeCount >= 2) {
       const research = ordered(Object.keys(DOCTRINE_RESEARCH)).find(id => !state.archive.research[id] && state.prestigeCount >= (DOCTRINE_RESEARCH[id].unlockAt || 2));
       if (research && state.archive.shards >= DOCTRINE_RESEARCH[research].cost) add('research-doctrine', s => researchDoctrine(s, research));
@@ -197,7 +210,7 @@ export function runPlayerJourney(options = {}) {
     if (attention.decisionWindow) {
       let budget = BUDGETS[persona];
       const outstandingProjects = options.collectLegacy && Object.entries(RECONSTRUCTION_PROJECTS).some(([id, p]) => state.prestigeCount >= (p.unlockAt || 3) && state.era >= p.era && (state.archive.projects[id] || 0) < (p.stages || 2) && state.archive.contributions[id] !== state.prestigeCount);
-      const affordableLoadout = options.collectLegacy && Object.keys(state.archive.research).length === Object.keys(DOCTRINE_RESEARCH).length && state.archive.shards >= 3 && state.activeRelics.length < getRelicSlotLimit(state);
+      const affordableLoadout = options.collectLegacy && Object.keys(state.archive.research).length === Object.keys(DOCTRINE_RESEARCH).length && state.archive.shards >= 3 && (state.activeRelics.length < getRelicSlotLimit(state) || ['openCircuit', 'loomNeedle'].some(id => !state.activeRelics.includes(id)));
       if (getCycleReadiness(state).ready && !outstandingProjects && !affordableLoadout) {
         cycleResults.push({ cycle: (state.prestigeCount || 0) + 1, elapsed, duration: state.totalTime });
         if (cycleResults.length >= cycles) break;

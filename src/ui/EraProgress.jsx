@@ -2,12 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { eraNames, ERA_COUNT, getEraReadiness } from '../engine/eras.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
-import { calculateProduction, canAfford, getEffectivePrestige, getEffectiveRate } from '../engine/resources.js';
+import { canAfford, getEffectivePrestige } from '../engine/resources.js';
 import { getAvailableTech } from '../engine/tech.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber, formatTime } from './format.js';
 import { getCycleReadiness } from '../engine/realityForge.js';
+import { calculateEconomy, getCostPressure, getSupplyChains } from '../engine/economy.js';
+import { getPublicWorks } from '../engine/publicWorks.js';
 import { getActiveSystems } from '../engine/operations.js';
 
 function pickHint(options, era, totalTime) {
@@ -94,45 +96,15 @@ function getLoreHint(eraCompletion, isMaxEra, era, totalTime) {
   return pickHint(final, era, totalTime) || 'The horizon shifts. A new age dawns.';
 }
 
-function summarizeCostPressure(state, cost) {
-  return Object.entries(cost)
-    .map(([resourceId, amount]) => {
-      const have = state.resources[resourceId]?.amount || 0;
-      const missing = Math.max(0, amount - have);
-      const rate = getEffectiveRate(state, resourceId);
-      const eta = missing <= 0 ? 0 : (rate > 0 ? missing / rate : Infinity);
-      return { resourceId, missing, eta };
-    })
-    .filter(entry => entry.missing > 0)
-    .sort((a, b) => a.eta - b.eta)
-    .slice(0, 3);
-}
-
-// Supply chains: [consumer, producer, consumption_ratio_label, fix_upgrade_id]
-const SUPPLY_CHAINS = [
-  { consumer: 'labor', producer: 'food', ratio: 1.0, label: 'food → labor', fix: 'farmingEfficiency' },
-  { consumer: 'electronics', producer: 'energy', ratio: 0.4, label: 'energy → electronics', fix: 'solarPanels' },
-  { consumer: 'orbitalInfra', producer: 'rocketFuel', ratio: 0.5, label: 'fuel → orbital', fix: 'fuelRefinery' },
-  { consumer: 'colonies', producer: 'exoticMaterials', ratio: 0.2, label: 'exoticMaterials → colonies', fix: 'exoticHarvester' },
-  { consumer: 'megastructures', producer: 'stellarForge', ratio: 0.3, label: 'stellarForge → megastructures', fix: 'stellarCore' },
-];
-
 function getSupplyChainAlert(state) {
-  const rates = calculateProduction(state);
-  const alerts = [];
-  for (const chain of SUPPLY_CHAINS) {
-    const consumerRate = Math.max(0, rates[chain.consumer] || 0);
-    const producerRate = Math.max(0, rates[chain.producer] || 0);
-    if (!state.resources[chain.consumer]?.unlocked || !state.resources[chain.producer]?.unlocked) continue;
-    if (consumerRate <= 0) continue;
-    const consumptionRate = consumerRate * chain.ratio;
-    if (consumptionRate > producerRate * 1.1) {
-      const deficit = consumptionRate - producerRate;
-      const ratio = producerRate > 0 ? consumptionRate / producerRate : Infinity;
-      alerts.push({ label: chain.label, deficit: deficit.toFixed(2), ratio: ratio.toFixed(1), fix: chain.fix });
-    }
-  }
-  return alerts;
+  const economy = calculateEconomy(state);
+  return getSupplyChains(state).filter(c => state.resources[c.output]?.unlocked && (economy.net[c.input] < 0 || economy.constrained[c.output] === 'input')).map(c => ({
+    label: `${resourceDefs[c.input].name} → ${resourceDefs[c.output].name}`,
+    detail: economy.net[c.input] < 0 ? `${formatNumber(-economy.net[c.input])}/s drawn from savings`
+      : economy.reserves[c.input] && state.resources[c.input].amount < economy.reserves[c.input].amount
+        ? `Saving inputs for ${economy.reserves[c.input].name}; downstream output uses the remainder`
+        : `Input limited · ${formatNumber(economy.produced[c.output])}/s actual output`,
+  }));
 }
 
 function buildDirector(state, readiness) {
@@ -175,9 +147,10 @@ function buildDirector(state, readiness) {
 
   if (!readiness.mastery.met) {
     const mastery = readiness.mastery;
+    const work = getPublicWorks(state);
     return {
       title: mastery.title,
-      detail: mastery.detail,
+      detail: work && !work.complete ? `${mastery.detail} Or supply ${work.name} through production (${Math.floor(work.progress * 100)}%).` : mastery.detail,
       chips: [
         `${Math.min(mastery.current, mastery.target)}/${mastery.target} mastery`,
         ...(mastery.decisionsRemaining > 0 ? [`${mastery.decisionsRemaining} decisions shorten the wait`] : []),
@@ -222,9 +195,11 @@ function buildDirector(state, readiness) {
     };
   }
 
-  const blockers = summarizeCostPressure(state, gateTech.cost).map(entry => {
-    const label = resourceDefs[entry.resourceId]?.name || entry.resourceId;
-    if (!Number.isFinite(entry.eta)) return `${label} stalled`;
+  const blockers = getCostPressure(state, gateTech.cost).slice(0, 3).map(entry => {
+    const label = resourceDefs[entry.id]?.name || entry.id;
+    if (entry.reason === 'capacity') return `${label}: expand storage`;
+    if (entry.reason === 'locked') return `${label}: not unlocked`;
+    if (!Number.isFinite(entry.eta)) return `${label}: no net income`;
     if (entry.eta < 60) return `${label} ~${Math.ceil(entry.eta)}s`;
     if (entry.eta < 3600) return `${label} ~${Math.ceil(entry.eta / 60)}m`;
     return `${label} ~${Math.ceil(entry.eta / 3600)}h`;
@@ -255,7 +230,7 @@ export function EraProgress({ state }) {
   const cycleReadiness = getCycleReadiness(state);
 
   // Calculate total production rate across all unlocked resources
-  const rates = calculateProduction(state);
+  const rates = calculateEconomy(state).net;
   const totalRate = Object.entries(rates)
     .filter(([id]) => state.resources[id]?.unlocked)
     .reduce((sum, [, rate]) => sum + Math.max(0, rate), 0);
@@ -308,7 +283,8 @@ export function EraProgress({ state }) {
     if (!readiness.mastery.met) {
       const mastery = readiness.mastery;
       const n = mastery.decisionsRemaining;
-      const alternative = n > 0
+      const work = getPublicWorks(state);
+      const alternative = work && !work.complete ? ` Or supply ${work.name}: ${Math.floor(work.progress * 100)}% complete.` : n > 0
         ? ` Building the economy shortens the wait — ${n} more era decision${n === 1 ? '' : 's'}.`
         : '';
       return { text: `${mastery.detail}${alternative}`, color: '#ddcc44' };
@@ -336,7 +312,7 @@ export function EraProgress({ state }) {
                 {Math.min(readiness.foundationProgress, minUpgrades)}/{minUpgrades} foundation
               </span>
             )}
-            <span className="era-strip-metric">{formatNumber(totalRate)}/s</span>
+            <span className="era-strip-metric">{formatNumber(totalRate)}/s net</span>
             <button className="era-strip-toggle" onClick={toggleExpanded} aria-expanded={false}>
               Details
             </button>
@@ -379,7 +355,7 @@ export function EraProgress({ state }) {
             <div className={`readiness-card${upgradesMet ? ' ready' : ''}`}>
               <span className="readiness-label">Foundation</span>
               <strong>{Math.min(readiness.foundationProgress, minUpgrades)}/{minUpgrades}</strong>
-              <span>{eraUpgradeCount} decisions + {readiness.activityCredits} {readiness.activityLabel} credit</span>
+              <span>{eraUpgradeCount} decisions + {readiness.activityCredits} {readiness.activityLabel} credit + {readiness.economicCredits || 0} economic credit</span>
             </div>
             <div className={`readiness-card${readiness.techsMet ? ' ready' : ''}`}>
               <span className="readiness-label">Era Research</span>
@@ -390,7 +366,8 @@ export function EraProgress({ state }) {
               const mastery = readiness.mastery;
               const n = mastery.decisionsRemaining;
               let note;
-              if (mastery.completedDirectly) note = 'operational mastery complete';
+              if (getPublicWorks(state)?.complete) note = 'economic mastery complete';
+              else if (mastery.completedDirectly) note = 'operational mastery complete';
               else if (mastery.met) note = 'resolved';
               else if (mastery.shortenedByDecisions) note = `${n} more decision${n === 1 ? '' : 's'} shortens the wait further`;
               else note = `${formatTime(mastery.fallbackRemaining)} left, or finish the operation`;
@@ -421,11 +398,7 @@ export function EraProgress({ state }) {
             {director.supplyAlerts.map(alert => (
               <div key={alert.label} style={{ marginBottom: '2px' }}>
                 <span style={{ color: '#ff8866' }}>⚠ {alert.label}</span>
-                {' — consuming '}
-                <span style={{ color: '#ffaa66' }}>{alert.ratio}×</span>
-                {' faster than production (deficit: '}
-                <span style={{ color: '#ffaa66' }}>{alert.deficit}/s</span>
-                {')'}
+                {' — '}{alert.detail}
               </div>
             ))}
           </div>
@@ -461,7 +434,7 @@ export function EraProgress({ state }) {
           return <span title={`Raw: x${formatNumber(raw)}, Effective: x${formatNumber(effective)} (soft-scaled)`}> | x{formatNumber(effective)}</span>;
         })()}
         {totalRate > 0 && (
-          <span style={rateFlash ? { color: '#88ff88', transition: 'color 0.6s ease' } : { transition: 'color 0.6s ease' }}> | {formatNumber(totalRate)}/s total</span>
+          <span style={rateFlash ? { color: '#88ff88', transition: 'color 0.6s ease' } : { transition: 'color 0.6s ease' }}> | {formatNumber(totalRate)}/s net total</span>
         )}
         {state.upgrades?.overclockProtocol && (() => {
           const cyclePos = (state.totalTime || 0) % 60;

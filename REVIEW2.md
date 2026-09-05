@@ -59,3 +59,36 @@ The first-cycle impact comparison against the preceding implementation is unchan
 | minimalist | 42 | 3391 → 3391 | 3391 → 3391 | 86 → 86 | 1 → 1 | Era 10 → 10; complete |
 
 No first-cycle timing, attention, command, session, or progression regressions; no collapse or commands while absent. The permanent unlocks are optional and become available in subsequent cycles.
+
+## Honest income, purchase guidance, and useful relic offers
+
+Resource totals, rates, and purchase estimates now use actual net income after consumption, public works, and storage. The slowest blocker is listed first. Guidance exposes storage expansion and reversible consumer controls, and can protect and queue the selected purchase. Production-route and relic-combination recipes use the same definitions in the engine and UI.
+
+Upgrade previews account for the actual purchase cost when affordable, including purchase effects, supply constraints, storage, and changed goal timing. Unaffordable previews are labelled as effect estimates before the purchase cost. Repeatable investments that improve the current bottleneck appear in the priority list with their next output milestone. Relic offers draw from effects useful in the current era; older saved offers remain intact and explain future-era benefits. Mobile section links keep actions and resources reachable.
+
+Browser journeys now fail on prolonged stalls, era overruns, or enabled gameplay controls that do nothing. Natural journeys include deterministic shuffled branches and recovery from disabled savings protection. Later-content journeys explicitly craft a chosen relic combination, so a different random loadout cannot silently remove that coverage.
+
+| Persona | Seed | Elapsed | Present | Commands | Sessions | Outcome |
+|---|---:|---:|---:|---:|---:|---|
+| newcomer | 424242 | 1241 → 1121 | 1241 → 1121 | 109 → 107 | 1 → 1 | Era 10 → 10; complete |
+| engaged | 424242 | 971 → 941 | 971 → 941 | 129 → 127 | 1 → 1 | Era 10 → 10; complete |
+| optimizer | 424242 | 577 → 577 | 577 → 577 | 221 → 222 | 1 → 1 | Era 10 → 10; complete |
+| background | 424242 | 1681 → 1441 | 421 → 361 | 120 → 116 | 15 → 13 | Era 10 → 10; complete |
+| check_in | 424242 | 3601 → 3601 | 361 → 361 | 109 → 109 | 7 → 7 | Era 10 → 10; complete |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 100 → 98 | 4 → 4 | Era 5 → 5; complete |
+| completionist | 424242 | 696 → 666 | 696 → 666 | 172 → 164 | 1 → 1 | Era 10 → 10; complete |
+| minimalist | 424242 | 3781 → 3781 | 3781 → 3781 | 88 → 88 | 1 → 1 | Era 10 → 10; complete |
+| newcomer | 42 | 1061 → 1061 | 1061 → 1061 | 106 → 106 | 1 → 1 | Era 10 → 10; complete |
+| engaged | 42 | 911 → 821 | 911 → 821 | 132 → 127 | 1 → 1 | Era 10 → 10; complete |
+| optimizer | 42 | 457 → 457 | 457 → 457 | 207 → 205 | 1 → 1 | Era 10 → 10; complete |
+| background | 42 | 1441 → 1441 | 361 → 361 | 114 → 114 | 13 → 13 | Era 10 → 10; complete |
+| check_in | 42 | 3601 → 3601 | 361 → 361 | 108 → 109 | 7 → 7 | Era 10 → 10; complete |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 100 → 99 | 4 → 4 | Era 5 → 5; complete |
+| completionist | 42 | 696 → 696 | 696 → 696 | 156 → 157 | 1 → 1 | Era 10 → 10; complete |
+| minimalist | 42 | 3391 → 3391 | 3391 → 3391 | 86 → 86 | 1 → 1 | Era 10 → 10; complete |
+
+No timing, attention, session, or progression regressions; no collapse or commands while absent. Optimizer seed 424242, check-in seed 42, and completionist seed 42 each issue one additional command. Curating relic offers changes their chosen loadouts and subsequent purchases; these small action-count increases do not add required interaction or extend the runs.
+
+The final completion-focused 22-cycle journeys take 5,710 seconds / 1,111 commands (seed 424242) and 6,240 seconds / 1,218 commands (seed 42), with all research and projects complete and three relics equipped. The latter is 510 seconds and 107 commands above the preceding deep run: the changed early offers produce a different loadout, and this driver now explicitly completes its chosen relic combination instead of depending on a random offer. This is optional collection work; the ordinary eight-persona comparison above adds no elapsed or attention time, and both deep journeys satisfy the same era and stall limits.
+
+Local validation: 425 tests; all four balance seeds; both ten-prestige stress runs; all 16 bounded two-cycle persona journeys; all 42 adversarial journeys; lint and production build. Browser CI covers desktop and mobile natural two-cycle runs, mid-run reloads, and separate operation/save fixtures. It must pass before deployment.

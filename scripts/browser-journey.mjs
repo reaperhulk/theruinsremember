@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Natural UI journey: no resource grants, ownership writes, era fixtures, or
 // engine purchase calls. Only time acceleration and visible player controls.
+import { createPacingMonitor } from './journey-pacing.mjs';
 import puppeteer, { PUPPETEER_REVISIONS } from 'puppeteer';
 import { Browser, computeExecutablePath, detectBrowserPlatform } from '@puppeteer/browsers';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -16,19 +17,26 @@ const errors = [];
 const trace = [];
 page.on('pageerror', error => errors.push(error.message));
 page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-await page.setViewport(mobile ? { width: 375, height: 812, isMobile: true } : { width: 1280, height: 900 });
+await page.setViewport(mobile ? { width: 375, height: 812, isMobile: true } : { width: 1366, height: 768 });
 const settle = () => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 const click = async selector => {
   const handle = await page.$(selector);
   if (!handle || await handle.evaluate(el => el.disabled)) { await handle?.dispose(); return false; }
+  const changesGame = /upgrade-btn|tech-btn|expedition-route|relic-choice|gather-btn|cycle-doctrines|confirm-yes/.test(selector);
+  const before = changesGame && await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount]); });
   await handle.click();
   await handle.dispose();
   await settle();
+  if (changesGame) {
+    const after = await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount]); });
+    if (before === after) throw new Error(`Enabled gameplay control had no effect: ${selector}`);
+  }
   return true;
 };
 let commands = 0;
 let cycles = 0;
 let elapsed = 0;
+const pacing = createPacingMonitor({ attention: {} });
 try {
   await page.goto(process.env.GAME_URL || 'http://127.0.0.1:5173', { waitUntil: 'networkidle0' });
   await page.evaluate(() => localStorage.clear());
@@ -39,7 +47,9 @@ try {
   const screenshots = new Set();
   let reloaded = false;
   while (elapsed < requestedCycles * 21600 && cycles < requestedCycles) {
-    const state = await page.evaluate(() => { const s = window.__game.getState(); return { era: s.era, prestigeCount: s.prestigeCount, nextDoctrine: s.nextCycleDoctrine, totalTime: s.totalTime, upgrades: Object.keys(s.upgrades).length, ready: !!document.querySelector('.prestige-btn') }; });
+    const state = await page.evaluate(() => { const s = window.__game.getState(); return { era: s.era, prestigeCount: s.prestigeCount, nextDoctrine: s.nextCycleDoctrine, totalTime: s.totalTime, upgrades: Object.keys(s.upgrades).length, ready: !!document.querySelector('.prestige-btn'), progress: { era: s.era, prestigeCount: s.prestigeCount, upgrades: s.upgrades, tech: s.tech, wovenLaws: s.wovenLaws, lockedSignals: s.lockedSignals, dysonSegments: s.dysonSegments, realityKeys: s.realityKeys, nextCycleDoctrine: s.nextCycleDoctrine } }; });
+    pacing.observe(state.progress, elapsed, elapsed);
+    if (pacing.failures.length) throw new Error(pacing.failures.join('; '));
     if (state.era !== previousEra) {
       console.log(`Cycle ${state.prestigeCount + 1}, era ${state.era}, ${state.totalTime}s, ${state.upgrades} upgrades`);
       previousEra = state.era;
@@ -103,7 +113,7 @@ try {
   if (cycles !== requestedCycles) throw new Error(`Only ${cycles}/${requestedCycles} cycles complete`);
   if (errors.length) throw new Error(errors.join('\n'));
   mkdirSync('test-results', { recursive: true });
-  writeFileSync(`test-results/journey-${mobile ? 'mobile' : 'desktop'}-success.json`, JSON.stringify({ cycles, elapsed, commands, reloaded, errors }, null, 2));
+  writeFileSync(`test-results/journey-${mobile ? 'mobile' : 'desktop'}-success.json`, JSON.stringify({ cycles, elapsed, commands, reloaded, errors, pacing: pacing.report() }, null, 2));
   console.log(`PASS ${mobile ? 'mobile' : 'desktop'}: ${cycles} natural cycles, ${elapsed}s, ${commands} gameplay commands, mid-run reload preserved progress.`);
 } catch (error) {
   mkdirSync('test-results', { recursive: true });

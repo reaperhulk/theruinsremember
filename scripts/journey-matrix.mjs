@@ -7,7 +7,7 @@ const seeds = value('--seeds', '424242,42').split(',').map(Number);
 const personas = value('--personas', PERSONA_IDS.join(',')).split(',');
 const cycles = Number(value('--cycles', '2'));
 const variants = process.argv.includes('--adversarial')
-  ? [{ manualBuildOut: true }, { branch: 'reverse' }, { inefficient: true }, { badLuck: true },
+  ? [{ manualBuildOut: true }, { branch: 'reverse' }, { branch: 'random' }, { useRecovery: true, disableProtection: true }, { inefficient: true }, { badLuck: true },
     ...['expedition', 'docking', 'colonies', 'starChart', 'dyson', 'senate', 'weaving', 'tuning', 'realityForge'].map(skip => ({ skip }))]
   : [{}];
 if (seeds.some(seed => !Number.isSafeInteger(seed)) || personas.some(id => !PERSONA_IDS.includes(id)) || !Number.isInteger(cycles) || cycles < 1) {
@@ -27,7 +27,7 @@ for (const seed of seeds) {
       if (!report.completed) {
         failures++;
         mkdirSync('test-results', { recursive: true });
-        const name = `${persona}-${seed}-${variant.skip || variant.branch || (variant.badLuck ? 'bad-luck' : variant.inefficient ? 'inefficient' : 'default')}`;
+        const name = `${persona}-${seed}-${Object.entries(variant).map(([key, value]) => `${key}-${value}`).join('-') || 'default'}`;
         writeFileSync(`test-results/journey-${name}.json`, JSON.stringify(report, null, 2));
         console.error(report.failures.join('; '));
       }

@@ -3487,3 +3487,18 @@ button:focus-visible, select:focus-visible, summary:focus-visible, input:focus-v
 .public-works-panel progress { width: 100%; height: 8px; accent-color: #93d5c3; }
 .public-works-panel p { font-size: 12px; margin: 6px 0; color: #bbc6cf; }
 .relic-synergy { font-size: 12px; color: #93d5c3; }
+
+.purchase-guidance { border-color: #637d7b; padding: 10px 12px; }
+.purchase-guidance p { margin: 5px 0; font-size: 13px; }
+.purchase-guidance small { display: block; margin-top: 6px; color: #a5b1b5; line-height: 1.4; }
+.purchase-blocker { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 5px 0; font-size: 13px; }
+.purchase-guidance button { padding: 6px 9px; border: 1px solid #657e7b; border-radius: 4px; background: #1d3435; color: #e0efeb; font: inherit; cursor: pointer; }
+.purchase-guidance button:disabled { opacity: .5; cursor: default; }
+.resource-rate { white-space: normal; overflow-wrap: anywhere; }
+.mobile-section-links { display: none; }
+#game-actions, #game-resources { scroll-margin-top: 48px; }
+@media (max-width: 900px) {
+  .mobile-section-links { display: flex; justify-content: space-around; position: sticky; top: 0; z-index: 30; gap: 8px; margin-bottom: 8px; background: #151e25; border: 1px solid #405454; border-radius: 5px; }
+  .tab-bar { position: sticky; top: 46px; z-index: 20; background: #151b25; }
+  .mobile-section-links a { color: #c6e4db; padding: 10px 6px; font-size: 13px; text-align: center; min-height: 44px; display: flex; align-items: center; }
+}

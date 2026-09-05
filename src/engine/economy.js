@@ -150,6 +150,7 @@ export function calculateEconomy(state, seconds = 1) {
     amounts[id] = Math.max(0, Math.min(cap, balance));
     overflow[id] = Math.max(0, balance - cap);
     net[id] = (amounts[id] - resource.amount) / dt;
+    if (!constrained[id] && overflow[id] > 0) constrained[id] = 'storage';
   }
   return { gross, produced, consumed, capacity, constrained, amounts, overflow, net, reserves, construction };
 }
@@ -175,16 +176,17 @@ export function expandStorage(state, id) {
   } } };
 }
 
-export function estimateAffordability(state, cost, economy = calculateEconomy(state)) {
-  let seconds = 0;
-  const blockers = [];
-  for (const [id, required] of Object.entries(cost || {})) {
+export function getCostPressure(state, cost, economy = calculateEconomy(state)) {
+  return Object.entries(cost || {}).map(([id, required]) => {
     const have = state.resources[id]?.amount || 0;
-    if (have >= required) continue;
-    if (!state.resources[id]?.unlocked) blockers.push({ id, reason: 'locked', required });
-    else if (economy.capacity[id] > 0 && required > economy.capacity[id]) blockers.push({ id, reason: 'capacity', required });
-    else if (economy.net[id] <= 0) blockers.push({ id, reason: 'production', required });
-    else seconds = Math.max(seconds, (required - have) / economy.net[id]);
-  }
-  return { seconds: blockers.length ? Infinity : seconds, blockers };
+    const missing = Math.max(0, required - have);
+    const reason = !state.resources[id]?.unlocked ? 'locked'
+      : economy.capacity[id] > 0 && required > economy.capacity[id] ? 'capacity'
+        : economy.net[id] <= 0 ? 'production' : null;
+    return { id, required, missing, reason: missing > 0 ? reason : null, eta: missing <= 0 ? 0 : reason ? Infinity : missing / economy.net[id] };
+  }).filter(p => p.missing > 0).sort((a, b) => a.eta === b.eta ? a.id.localeCompare(b.id) : b.eta - a.eta);
+}
+export function estimateAffordability(state, cost, economy = calculateEconomy(state)) {
+  const pressure = getCostPressure(state, cost, economy);
+  return { seconds: pressure[0]?.eta || 0, blockers: pressure.filter(p => p.reason).map(({ id, reason, required }) => ({ id, reason, required })) };
 }

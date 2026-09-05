@@ -1,7 +1,7 @@
 import { preservesGoalReserve } from './goals.js';
 import { recordBuildChoice } from './blueprints.js';
 import { recordHistory } from './archive.js';
-import { calculateEconomy } from './economy.js';
+import { calculateEconomy, getCostPressure, getSupplyChains } from './economy.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { LORE_UPGRADE_IDS } from '../data/lore.js';
@@ -448,7 +448,22 @@ export const SIGNATURE_UPGRADES = new Set([
 export function previewUpgrade(state, id) {
   const def = upgradeDefs[id];
   if (!def) return null;
+  const purchased = purchaseUpgrade(state, id);
   const effected = applyEffects(state, def.effects);
   const level = def.repeatable ? getRepeatableLevel(state, id) + 1 : true;
-  return calculateEconomy({ ...effected, upgrades: { ...state.upgrades, [id]: level } });
+  const previewState = purchased || { ...effected, upgrades: { ...state.upgrades, [id]: level } };
+  return { ...calculateEconomy(previewState), previewState, includesCost: !!purchased };
+}
+
+// Keep investments that improve the actual purchase bottleneck in the short
+// decision list. A bigger nominal output with no net benefit is not a fix.
+export function getRecommendedRepeatables(state, cost, available = getAvailableUpgrades(state), economy = calculateEconomy(state)) {
+  const pressures = getCostPressure(state, cost, economy).filter(p => p.reason !== 'capacity' && p.reason !== 'locked');
+  const targets = new Set(pressures.slice(0, 2).map(p => p.id));
+  for (const chain of getSupplyChains(state)) if (targets.has(chain.output) && economy.constrained[chain.output] === 'input') targets.add(chain.input);
+  return available.filter(u => u.repeatable && u.effects.some(e => targets.has(e.target))).map(u => {
+    const preview = previewUpgrade(state, u.id);
+    const target = pressures.find(p => preview.net[p.id] > economy.net[p.id] + 1e-9);
+    return target ? { ...u, focusResource: target.id } : null;
+  }).filter(Boolean).slice(0, 2);
 }

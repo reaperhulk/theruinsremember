@@ -12,7 +12,7 @@ export function hasRelic(state, relicId) {
 
 function createRelicOffer(state, rolls) {
   const active = new Set(state.activeRelics || []);
-  const pool = RELIC_IDS.filter(id => !active.has(id));
+  const pool = RELIC_IDS.filter(id => !active.has(id) && (RELICS[id].availableEra || 1) <= state.era);
   const offer = [];
   for (let index = 0; index < 3 && pool.length > 0; index++) {
     const roll = rolls[index] ?? 0;

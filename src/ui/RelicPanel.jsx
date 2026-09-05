@@ -37,7 +37,7 @@ export const RelicPanel = memo(function RelicPanel({ state, onUpdate }) {
           {active.map(id => (
             <div key={id}>
               <strong>{RELICS[id].name}</strong>
-              <span>{RELICS[id].description}</span>
+              <span>{RELICS[id].description}</span>{state.era < RELICS[id].availableEra && <small>Benefits begin in Era {RELICS[id].availableEra}</small>}
             </div>
           ))}
         </div>
@@ -53,7 +53,7 @@ export const RelicPanel = memo(function RelicPanel({ state, onUpdate }) {
               <div key={id} className="relic-choice">
                 <span className="relic-domain">{relic.domain}</span>
                 <strong>{relic.name}</strong>
-                <p>{relic.description}</p>
+                <p>{relic.description}</p>{state.era < relic.availableEra && <p>Benefits begin in Era {relic.availableEra}</p>}
                 {active.length < getRelicSlotLimit(state) ? (
                   <button onClick={() => onUpdate(current => claimRelic(current, id))}>Equip relic</button>
                 ) : (
