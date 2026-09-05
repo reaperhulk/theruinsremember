@@ -11,6 +11,17 @@ export function parseSave(text) {
   for (const field of ['upgrades', 'tech', 'prestigeUpgrades', 'achievements']) {
     if (saved[field] != null && (typeof saved[field] !== 'object' || Array.isArray(saved[field]))) throw new Error(`Invalid ${field}`);
   }
+  for (const field of ['eventLog', 'activeEffects', 'activeRelics', 'relicOffer', 'goals', 'commissions', 'plannedPrestigeUpgrades']) {
+    if (saved[field] !== undefined && !Array.isArray(saved[field])) throw new Error(`Invalid ${field}`);
+  }
+  if (saved.archive !== undefined) {
+    const archive = saved.archive;
+    if (!archive || typeof archive !== 'object' || Array.isArray(archive)) throw new Error('Invalid archive');
+    for (const field of ['entries', 'lore']) if (archive[field] !== undefined && !Array.isArray(archive[field])) throw new Error(`Invalid archive ${field}`);
+    for (const field of ['research', 'projects', 'contributions']) if (archive[field] !== undefined && (!archive[field] || typeof archive[field] !== 'object' || Array.isArray(archive[field]))) throw new Error(`Invalid archive ${field}`);
+    if (archive.shards !== undefined && (!Number.isFinite(archive.shards) || archive.shards < 0)) throw new Error('Invalid memory shards');
+  }
+  if (saved.forgetting && (!Array.isArray(saved.forgetting.tendrils) || !Array.isArray(saved.forgetting.wardens) || !saved.forgetting.scars || !Number.isFinite(saved.forgetting.meter))) throw new Error('Invalid siege save');
   for (const resource of Object.values(saved.resources)) {
     if (!resource || typeof resource !== 'object') throw new Error('Invalid resource');
     for (const field of ['amount', 'rateAdd', 'rateMult', 'capMult']) {

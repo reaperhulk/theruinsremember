@@ -3424,3 +3424,53 @@ canvas:hover {
 .confirm-no:hover {
   background: #3a3a4e;
 }
+
+/* Readable decisions and permanent progression. */
+.game-layout > *, .left-column, .right-column, .tab-content { min-width: 0; }
+.panel p { line-height: 1.55; }
+.upgrade-btn:disabled, .tech-btn:disabled { opacity: 1; background: #181c25; border-color: #465060; color: #bbc3cc; }
+.upgrade-btn .upgrade-name, .tech-btn .tech-name { font-size: 16px; line-height: 1.4; }
+.upgrade-btn .upgrade-desc, .tech-btn .tech-desc { font-size: 13px; line-height: 1.6; color: #c2c9d1; }
+.upgrade-cost, .effect-tag { line-height: 1.65; }
+.signature-preview { display: grid; gap: 4px; margin: 10px 0 3px; padding: 10px; border-left: 3px solid #d6b065; background: #252a30; color: #dbe8d9; font-size: 13px; }
+.signature-preview strong { color: #ebc880; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
+.queue-goal-btn { margin-top: 5px; padding: 6px 12px; }
+.goals-panel { margin-bottom: 12px; padding: 12px 16px; }
+.goals-panel summary, .archive-panel summary, .audio-controls summary { cursor: pointer; font-weight: 600; color: #dacaad; }
+.goals-panel p, .archive-panel p, .prestige-allocation p { margin: 8px 0 12px; font-size: 13px; }
+.goals-panel select { max-width: 100%; }
+.goals-panel ol, .archive-panel ol { margin: 12px 0 12px 22px; }
+.goals-panel li, .archive-panel li { margin-bottom: 8px; line-height: 1.5; overflow-wrap: anywhere; }
+.goals-panel button, .archive-panel button, .prestige-allocation button, .consumer-controls select { padding: 8px 10px; margin: 4px 4px 4px 0; border: 1px solid #65727f; border-radius: 5px; color: #e2ddd0; background: #242c36; font: inherit; font-size: 12px; cursor: pointer; }
+.goals-panel button:disabled, .archive-panel button:disabled { cursor: default; color: #aeb7c0; background: #1b2028; border-color: #424b55; }
+.archive-panel h3, .prestige-allocation h3 { margin-top: 22px; color: #dfc087; }
+.archive-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); gap: 12px; margin: 14px 0; }
+.archive-cards article { padding: 14px; border: 1px solid #4e535e; border-radius: 8px; background: #1a202b; }
+.archive-cards strong { font-size: 14px; color: #e5d7be; }
+.reward-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 10px; max-height: 360px; overflow: auto; margin: 12px 0; }
+.reward-options label { padding: 12px; border: 1px solid #56515b; border-radius: 6px; font-size: 13px; }
+.reward-options span { display: block; margin-top: 6px; color: #bbc4d0; line-height: 1.5; }
+.reward-options input { margin-right: 6px; }
+.consumer-controls { display: grid; gap: 7px; margin-top: 12px; font-size: 13px; line-height: 1.6; }
+.resource-panel .resource-name { font-size: 13px; }
+.save-warning { padding: 14px 18px; margin: 10px 0; border: 1px solid #d6b065; background: #322719; color: #ffdf9f; line-height: 1.6; }
+.save-warning button { margin-left: 12px; padding: 7px 12px; }
+.audio-controls { position: relative; font-size: 12px; padding: 8px; border: 1px solid #58606b; border-radius: 4px; }
+.audio-controls[open] { background: #1d2530; }
+.audio-controls label { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 0; }
+.audio-controls input { max-width: 140px; }
+.scene-placeholder { min-height: 220px; display: grid; place-items: center; color: #ad9c81; background: #121923; }
+.tab-bar { overflow-x: auto; }
+.tab-btn { flex-shrink: 0; }
+button:focus-visible, select:focus-visible, summary:focus-visible, input:focus-visible, [role="button"]:focus-visible { outline: 3px solid #acdede; outline-offset: 3px; }
+.text-lore { line-height: 1.65; }
+@media (max-width: 640px) {
+  .header-controls { flex-wrap: wrap; }
+  .tab-bar { position: sticky; top: 0; z-index: 5; background: #151b25; }
+  .tab-btn, .gather-btn, .queue-goal-btn, .archive-panel button, .goals-panel button { min-height: 44px; }
+  .archive-cards, .reward-options { grid-template-columns: minmax(0, 1fr); }
+  .resource-panel .resource-name { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}

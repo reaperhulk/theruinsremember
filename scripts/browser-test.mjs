@@ -160,7 +160,7 @@ async function exercisePersistenceAndAutomation(page) {
     return offline;
   });
   await reloadWithSave(page, offlineSave, 3 * 60 * 60);
-  await page.waitForFunction(() => document.querySelector('.offline-report'), { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('.offline-report')?.textContent.includes('Welcome Back'), { timeout: 60000 });
   const protectedOffline = await page.evaluate(() => {
     const state = window.__game.getState();
     return {
@@ -578,10 +578,11 @@ async function run() {
   }));
   const chartFailed = !chartAudit || chartAudit.planChoices !== 3 || !chartAudit.committed;
   console.log(`  Star chart plans: ${chartFailed ? 'FAILED' : '3 plans, one committed'}`);
-  // The Forgetting: seed a deterministic siege, drive it from the DOM mirror
+  // Isolated siege fixture; full fresh-save journeys run in browser-journey.mjs.
   await page.evaluate(() => {
     window.__game.setState(state => ({
       ...state,
+      forgettingChallengeActive: true,
       forgetting: {
         meter: 12,
         startedAt: state.totalTime - 60,

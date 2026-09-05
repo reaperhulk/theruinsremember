@@ -22,11 +22,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run test:quality
       - run: npm run test:balance:stress
+      - run: npm run test:journeys
+      - run: npm run test:journeys:adversarial
       - run: npx puppeteer browsers install chrome-headless-shell
       - name: Start the game server
         run: |
@@ -38,8 +40,16 @@ jobs:
             sleep 1
           done
           exit 1
+      - run: node scripts/browser-journey.mjs
+      - run: node scripts/browser-journey.mjs --mobile
       - run: node scripts/browser-test.mjs --prestige 3
       - run: node scripts/browser-test.mjs --mobile
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: progression-diagnostics
+          path: test-results/
+          if-no-files-found: ignore
 
   build:
     if: github.event_name == 'push'
@@ -49,7 +59,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run build

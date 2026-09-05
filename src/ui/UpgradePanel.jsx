@@ -44,7 +44,7 @@ const mechanicDescriptions = {
   miniGameSynergy: '+10% production per operation system engaged',
   dockingBoost: 'Perfect docks boost all production 5% for 30s',
   colonyMultiplier: 'Colony focus multiplies target resources 1.5x',
-  autoDeposit: 'Canvas deposits auto-collected after 5s',
+  autoDeposit: 'Every 30s recover 4s of research, energy, or software production',
   routeBonus: '+3% production per star route',
   dysonForgeMemory: 'Dyson progress raises Stellar Forge output, up to x2',
   prestigeAccumulator: '+5% production per prestige run completed',

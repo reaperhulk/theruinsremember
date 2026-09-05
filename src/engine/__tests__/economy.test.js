@@ -57,6 +57,21 @@ describe('player economy contracts', () => {
     expect(offline).toEqual(online);
   });
 
+  it('automatic harvests happen without a renderer and survive offline catch-up', () => {
+    const state = createInitialState();
+    state.autoBuildOut = false;
+    state.upgrades.stellarHarvester = true;
+    state.resources.research.unlocked = true;
+    state.resources.software.unlocked = true;
+    const noHarvester = { ...state, upgrades: {} };
+    const passive = advanceTime(noHarvester, 90, () => 0.99);
+    const harvest = advanceTime(state, 90, () => 0.99, 60, { pauseForgetting: true });
+    expect(harvest.resources.research.amount - passive.resources.research.amount).toBeCloseTo(0.8);
+    expect(harvest.resources.energy.amount - passive.resources.energy.amount).toBeCloseTo(2);
+    expect(harvest.resources.software.amount - passive.resources.software.amount).toBeCloseTo(2);
+    expect(advanceTime(state, 90, () => 0.99, 1).resources).toEqual(harvest.resources);
+  });
+
   it('bulk buying leaves every explicit decision to the player', () => {
     const state = createInitialState();
     for (const r of Object.values(state.resources)) r.amount = 1e12;

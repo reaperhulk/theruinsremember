@@ -3131,8 +3131,13 @@ export function GameCanvas({ state, onUpdate }) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let lastDraw = 0;
     function draw(now) {
-      const t = now / 1000;
+      const frameInterval = reducedMotion.matches ? 1000 : 1000 / 30;
+      if (document.hidden || now - lastDraw < frameInterval) { rafRef.current = requestAnimationFrame(draw); return; }
+      lastDraw = now;
+      const t = reducedMotion.matches ? Math.floor(now / 1000) : now / 1000;
       const w = LOGICAL_W;
       const h = LOGICAL_H;
       const era = eraRef.current;
@@ -3407,7 +3412,7 @@ export function GameCanvas({ state, onUpdate }) {
 
       // --- Resource deposits system ---
       // Spawn deposits periodically
-      if ((t - lastDepositCheckRef.current) >= nextDepositDelayRef.current) {
+      if (!stateRef.current?.upgrades?.stellarHarvester && (t - lastDepositCheckRef.current) >= nextDepositDelayRef.current) {
         lastDepositCheckRef.current = t;
         nextDepositDelayRef.current = 20 + Math.random() * 20;
         // Pick an era-appropriate resource
@@ -3438,29 +3443,7 @@ export function GameCanvas({ state, onUpdate }) {
           color: depColor,
         });
       }
-      // Auto-deposit: collect deposits automatically if stellarHarvester owned
-      if (stateRef.current?.upgrades?.stellarHarvester) {
-        for (const dep of depositsRef.current) {
-          if (dep.collected) continue;
-          const age = t - dep.spawnTime;
-          // Auto-collect after 5 seconds
-          if (age > 5) {
-            dep.collected = true;
-            // Apply reward
-            onUpdateRef.current(s => {
-              const r = s.resources[dep.resourceId];
-              if (!r?.unlocked) return null;
-              const cap = getEffectiveCap(s, dep.resourceId);
-              return {
-                ...s,
-                resources: { ...s.resources, [dep.resourceId]: { ...r, amount: Math.min(r.amount + dep.amount, cap > 0 ? cap : Infinity) } },
-              };
-            });
-            spawnParticles(particlesRef.current, dep.x, dep.y, 5, resourceColorMap[dep.resourceId] || 'rgba(200,200,200,1)');
-            floatingTextsRef.current.push({ x: dep.x, y: dep.y, label: `+${Math.floor(dep.amount)} (auto)`, startTime: performance.now() });
-          }
-        }
-      }
+      if (stateRef.current?.upgrades?.stellarHarvester) depositsRef.current = [];
 
       // Expire old deposits (also remove collected ones)
       depositsRef.current = depositsRef.current.filter(d => !d.collected && (t - d.spawnTime) < d.duration);
@@ -3595,7 +3578,7 @@ export function GameCanvas({ state, onUpdate }) {
         cssH = maxHeight;
         cssW = cssH * CANVAS_ASPECT;
       }
-      const dpr = Math.min(window.devicePixelRatio || 1, 3);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.style.width = `${cssW}px`;
       canvas.style.height = `${cssH}px`;
       const nextW = Math.round(cssW * dpr);

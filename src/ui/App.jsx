@@ -1,33 +1,33 @@
-import { ArchivePanel } from './ArchivePanel.jsx';
+const ArchivePanel = lazy(() => import('./ArchivePanel.jsx').then(module => ({ default: module.ArchivePanel })));
 import { GoalsPanel } from './GoalsPanel.jsx';
 import { serializeSave } from '../engine/saves.js';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { createInitialState } from '../engine/state.js';
 import { useGameLoop } from '../hooks/useGameLoop.js';
 import { ResourcePanel } from './ResourcePanel.jsx';
 import { UpgradePanel } from './UpgradePanel.jsx';
 import { TechTree } from './TechTree.jsx';
 import { EraProgress } from './EraProgress.jsx';
-import { GameCanvas } from './GameCanvas.jsx';
+const GameCanvas = lazy(() => import('./GameCanvas.jsx').then(module => ({ default: module.GameCanvas })));
 import { ExpeditionPanel } from './ExpeditionPanel.jsx';
 import { DockingPanel } from './DockingPanel.jsx';
-import { ColonyPanel } from './ColonyPanel.jsx';
-import { StarChartPanel } from './StarChartPanel.jsx';
-import { WeavingPanel } from './WeavingPanel.jsx';
-import { TuningPanel } from './TuningPanel.jsx';
-import { ForgettingPanel } from './ForgettingPanel.jsx';
-import { DysonPanel } from './DysonPanel.jsx';
+const ColonyPanel = lazy(() => import('./ColonyPanel.jsx').then(module => ({ default: module.ColonyPanel })));
+const StarChartPanel = lazy(() => import('./StarChartPanel.jsx').then(module => ({ default: module.StarChartPanel })));
+const WeavingPanel = lazy(() => import('./WeavingPanel.jsx').then(module => ({ default: module.WeavingPanel })));
+const TuningPanel = lazy(() => import('./TuningPanel.jsx').then(module => ({ default: module.TuningPanel })));
+const ForgettingPanel = lazy(() => import('./ForgettingPanel.jsx').then(module => ({ default: module.ForgettingPanel })));
+const DysonPanel = lazy(() => import('./DysonPanel.jsx').then(module => ({ default: module.DysonPanel })));
 import { TradingPanel } from './TradingPanel.jsx';
-import { SenatePanel } from './SenatePanel.jsx';
-import { RealityForgePanel } from './RealityForgePanel.jsx';
+const SenatePanel = lazy(() => import('./SenatePanel.jsx').then(module => ({ default: module.SenatePanel })));
+const RealityForgePanel = lazy(() => import('./RealityForgePanel.jsx').then(module => ({ default: module.RealityForgePanel })));
 import { OperationsPanel } from './OperationsPanel.jsx';
 import { RelicPanel } from './RelicPanel.jsx';
 import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
-import { setMuted, playPrestige } from './AudioManager.js';
-import { StatsPanel } from './StatsPanel.jsx';
+import { setMuted, playPrestige, setVolumes, setMusicEra, startAmbient, stopAmbient, syncAudioVisibility } from './AudioManager.js';
+const StatsPanel = lazy(() => import('./StatsPanel.jsx').then(module => ({ default: module.StatsPanel })));
 import { EventLog } from './EventLog.jsx';
-import { PrestigePanel } from './PrestigePanel.jsx';
+const PrestigePanel = lazy(() => import('./PrestigePanel.jsx').then(module => ({ default: module.PrestigePanel })));
 import { EraTransition } from './EraTransition.jsx';
 import { Toast } from './Toast.jsx';
 import { OfflineReport } from './OfflineReport.jsx';
@@ -85,7 +85,8 @@ export function App() {
   const prevLoreCountRef = useRef((state.eventLog || []).filter(e => e.isLore).length);
   const [unseenLoreCount, setUnseenLoreCount] = useState(0);
   const [hintsDismissed, setHintsDismissed] = useState(false);
-  const [audioMuted, setAudioMuted] = useState(() => localStorage.getItem('audioMuted') === 'true');
+  const [audioMuted, setAudioMuted] = useState(() => { try { return localStorage.getItem('audioMuted') === 'true'; } catch { return false; } });
+  const [audioLevels, setAudioLevels] = useState(() => { try { return JSON.parse(localStorage.getItem('audioLevels')) || { effects: 0.7, music: 0.18 }; } catch { return { effects: 0.7, music: 0.18 }; } });
   const [victoryDismissed, setVictoryDismissed] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(null);
@@ -112,8 +113,22 @@ export function App() {
   // Sync audio muted state
   useEffect(() => {
     setMuted(audioMuted);
-    localStorage.setItem('audioMuted', audioMuted);
+    try { localStorage.setItem('audioMuted', audioMuted); } catch { /* optional preference */ }
   }, [audioMuted]);
+
+  useEffect(() => {
+    setVolumes(audioLevels.effects, audioLevels.music);
+    try { localStorage.setItem('audioLevels', JSON.stringify(audioLevels)); } catch { /* optional preference */ }
+  }, [audioLevels]);
+  useEffect(() => { setMusicEra(state.era); }, [state.era]);
+  useEffect(() => {
+    const begin = () => { startAmbient(); document.removeEventListener('pointerdown', begin); document.removeEventListener('keydown', begin); };
+    const visibility = syncAudioVisibility;
+    document.addEventListener('pointerdown', begin);
+    document.addEventListener('keydown', begin);
+    document.addEventListener('visibilitychange', visibility);
+    return () => { document.removeEventListener('pointerdown', begin); document.removeEventListener('keydown', begin); document.removeEventListener('visibilitychange', visibility); stopAmbient(); };
+  }, []);
 
   // Badge the Stats tab when new lore entries arrive
   const currentLoreCount = (state.eventLog || []).filter(e => e.isLore).length;
@@ -245,6 +260,10 @@ export function App() {
           <button className="reset-btn" aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'} onClick={() => setAudioMuted(m => !m)} title={audioMuted ? 'Sound OFF' : 'Sound ON'}>
             {audioMuted ? 'Sound OFF' : 'Sound ON'}
           </button>
+          <details className="audio-controls"><summary>Audio mix</summary>
+            <label>Music <input aria-label="Music volume" type="range" min="0" max="1" step="0.05" value={audioLevels.music} onChange={e => setAudioLevels(a => ({ ...a, music: Number(e.target.value) }))} /></label>
+            <label>Effects <input aria-label="Effects volume" type="range" min="0" max="1" step="0.05" value={audioLevels.effects} onChange={e => setAudioLevels(a => ({ ...a, effects: Number(e.target.value) }))} /></label>
+          </details>
           <div className="save-menu-wrap" ref={saveMenuRef}>
             <button
               className="reset-btn"
@@ -348,10 +367,11 @@ export function App() {
 
       <main className={`game-layout ${state.era <= 4 ? 'early-game-layout' : ''}`}>
         <div className="left-column">
+          <Suspense fallback={<div className="scene-placeholder">The ruins emerge…</div>}><GameCanvas state={state} onUpdate={updateState} /></Suspense>
           <ResourcePanel state={state} onUpdate={updateState} />
           {state.era <= 3 && <ExpeditionPanel state={state} onUpdate={updateState} />}
           {state.era === 4 && <DockingPanel state={state} onUpdate={updateState} />}
-          {state.era > 4 && <GameCanvas state={state} onUpdate={updateState} />}
+
           <RelicPanel state={state} onUpdate={updateState} />
           {state.era <= 4 && <EraProgress state={state} />}
           {(state.eventLog?.length > 0 || state.activeEffects?.length > 0) && (
@@ -359,7 +379,14 @@ export function App() {
           )}
         </div>
         <div className="right-column">
-          <div className="tab-bar" role="tablist" aria-label="Game tabs">
+          <div className="tab-bar" role="tablist" aria-label="Game tabs" onKeyDown={e => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+            e.preventDefault();
+            const current = tabs.findIndex(t => t.id === activeTab);
+            const index = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (current + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+            setActiveTab(tabs[index].id);
+            document.getElementById(`tab-${tabs[index].id}`)?.focus();
+          }}>
             {tabs.map(tab => {
               let badge = 0;
               if (tab.id === 'upgrades') badge = affordableUpgrades;
@@ -379,6 +406,7 @@ export function App() {
                   onClick={() => tab.id === 'stats' ? handleStatsTabClick() : setActiveTab(tab.id)}
                   title={`Press ${tab.key}`}
                   role="tab"
+                  tabIndex={activeTab === tab.id ? 0 : -1}
                   aria-selected={activeTab === tab.id}
                   aria-controls={`tabpanel-${tab.id}`}
                   id={`tab-${tab.id}`}
@@ -407,6 +435,7 @@ export function App() {
               if (dx > 0 && idx > 0) setActiveTab(tabIds[idx - 1]);
             }}
           >
+            <Suspense fallback={<div className="panel">Opening the archive…</div>}>
             {activeTab === 'upgrades' && (
               <><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel state={state} onUpdate={updateState} /></>
             )}
@@ -431,9 +460,10 @@ export function App() {
           {activeTab === 'stats' && (
               <StatsPanel state={state} />
             )}
+            </Suspense>
           </div>
           <div className="shortcut-legend" aria-hidden="true">
-            [1–6] tabs &nbsp;·&nbsp; [D] dock &nbsp;·&nbsp; [?] help
+            [1–7] tabs &nbsp;·&nbsp; [D] dock &nbsp;·&nbsp; [?] help
           </div>
         </div>
       </main>
@@ -450,7 +480,7 @@ export function App() {
               ))}
             </div>
             <div className="confirm-actions">
-              <button className="confirm-yes" onClick={confirmDialog.onConfirm} autoFocus>Confirm</button>
+              <button className="confirm-yes" autoFocus onClick={confirmDialog.onConfirm} autoFocus>Confirm</button>
               <button className="confirm-no" onClick={confirmDialog.onCancel}>Cancel</button>
             </div>
           </div>

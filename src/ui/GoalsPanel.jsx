@@ -10,8 +10,8 @@ export function GoalsPanel({ state, onUpdate }) {
   const [selection, setSelection] = useState('');
   const goal = getGoalInfo(state);
   const options = [...getAvailableTech(state).map(t => ({ value: `tech:${t.id}`, name: t.name })), ...getAvailableUpgrades(state).filter(u => !u.repeatable).map(u => ({ value: `upgrade:${u.id}`, name: u.name }))];
-  return <section className="panel goals-panel">
-    <h2>Next goal</h2>
+  return <details className="panel goals-panel">
+    <summary>Next goal{goal ? `: ${goal.name}` : " · plan purchases and reserves"}</summary>
     <p>Queue up to five purchases. Automation saves for the first available goal and buys it when ready.</p>
     <label>Purchase <select value={selection} onChange={e => setSelection(e.target.value)}><option value="">Choose a goal</option>{options.map(option => <option key={option.value} value={option.value}>{option.name}</option>)}</select></label>
     <button disabled={!selection || state.goals.length >= 5} onClick={() => { const [kind, id] = selection.split(':'); onUpdate(s => queueGoal(s, kind, id)); }}>Queue purchase</button>
@@ -23,5 +23,5 @@ export function GoalsPanel({ state, onUpdate }) {
       </p>)}
     </div>}
     {state.era >= 7 && <details><summary>Commission queue · {state.commissions.length}/6</summary><p>Choose operations now; their normal costs and cooldowns still apply.</p>{Object.entries(COMMISSION_TYPES).filter(([, type]) => state.era >= type.era).map(([kind, type]) => <div key={kind}>{Object.entries(type.definitions).map(([id, def]) => <button key={id} disabled={state.commissions.some(c => c.kind === kind && c.id === id)} onClick={() => onUpdate(s => queueCommission(s, kind, id))}>Queue {def.name || def.label || id}</button>)}</div>)}<ol>{state.commissions.map((c, i) => <li key={`${c.kind}:${c.id}`}>{c.id} <button onClick={() => onUpdate(s => removeCommission(s, i))}>Cancel</button></li>)}</ol></details>}
-  </section>;
+  </details>;
 }

@@ -15,6 +15,7 @@
     "test:personas": "node scripts/balance-matrix.mjs --scenario newcomer,engaged,optimizer,background,check_in,offline_returner,completionist,minimalist --seeds 424242,42",
     "test:impact": "node scripts/persona-impact.mjs",
     "test:browser": "node scripts/browser-test.mjs",
+    "test:browser:journey": "node scripts/browser-journey.mjs",
     "test:browser:mobile": "node scripts/browser-test.mjs --mobile",
     "test:journeys": "node scripts/journey-matrix.mjs",
     "test:journeys:adversarial": "node scripts/journey-matrix.mjs --personas engaged,minimalist --adversarial",

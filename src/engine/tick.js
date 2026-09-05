@@ -203,6 +203,19 @@ export function tick(state, dt, rng = Math.random, options = {}) {
     }
   }
 
+  // Automatic harvesting belongs to simulation, so mounting a canvas or
+  // switching tabs cannot change production. Manual discoveries stay optional.
+  if (newState.upgrades.stellarHarvester) {
+    const runs = intervalCrossings(state.totalTime, newState.totalTime, 30);
+    for (let run = 1; run <= runs; run++) {
+      const id = ['research', 'energy', 'software'][(Math.floor(state.totalTime / 30) + run) % 3];
+      const resource = newState.resources[id];
+      if (!resource?.unlocked) continue;
+      const cap = getEffectiveCap(newState, id);
+      newState = { ...newState, resources: { ...newState.resources, [id]: { ...resource, amount: Math.min(Math.max(cap, resource.amount), resource.amount + economy.gross[id] * 4) } } };
+    }
+  }
+
   // Mechanic: surplusConvert — resources at cap trickle to lowest resource
   if (newState.upgrades?.surplusExchange) {
     const unlocked = Object.entries(newState.resources).filter(([, r]) => r.unlocked);

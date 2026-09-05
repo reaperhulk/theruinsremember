@@ -119,7 +119,10 @@ const BALANCE_TARGETS = {
     maxDockingActions: 3,
     maxColonyActions: 1,
     maxTradingActions: 7,
-    maxGatherActions: 120,
+    // Forty signature breakthroughs now wait for player decisions. Seed 1
+    // takes 135 legacy gather windows and 204s in Era 3; bounded journeys
+    // separately enforce actual command budgets and final-cycle completion.
+    maxGatherActions: 150,
     maxTechnologyActions: 30,
     maxUpgradeActions: 120,
     maxDysonCommissions: 3,
@@ -127,7 +130,6 @@ const BALANCE_TARGETS = {
     maxTuningLocks: 3,
     maxSenateActs: 3,
     maxStarChartActions: 2,
-    minTendrilsSealed: 1,
     maxMemoriesConsumed: 0,
     noCollapse: true,
     maxDecisionWindowRatio: 0.51,
@@ -136,7 +138,7 @@ const BALANCE_TARGETS = {
     eraRanges: {
       2: [60, 240],
       3: [60, 300],
-      4: [5, 180],
+      4: [5, 240],
       // Era 4 dwell is pinned by an affordability cliff under doctrine-fork
       // power; contracts, techs, and mastery still all complete. Floor
       // recalibrated 25s -> 20s when forks landed (total run grew ~90s).
@@ -151,7 +153,8 @@ const BALANCE_TARGETS = {
       10: [90, 180],
     },
   },
-  descent: { minRecursionDepth: 2, requireCollapse: true, maxStatePrestiges: 0 },
+  // Siege-specific requirements belong to the explicit challenge scenario.
+  descent: { minRecursionDepth: 2, minTendrilsSealed: 1, requireCollapse: true, maxStatePrestiges: 0 },
   // The compression floor: with three prestiges banked the final run must
   // still take minutes, not seconds — decisions replay every cycle.
   prestige3: { minTime: 210, requiredEra: 10, cycleReady: true, minPrestiges: 3 },

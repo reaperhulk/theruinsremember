@@ -7,7 +7,7 @@ const seeds = value('--seeds', '424242,42').split(',').map(Number);
 const personas = value('--personas', PERSONA_IDS.join(',')).split(',');
 const cycles = Number(value('--cycles', '2'));
 const variants = process.argv.includes('--adversarial')
-  ? [{ branch: 'reverse' }, { inefficient: true }, { badLuck: true },
+  ? [{ manualBuildOut: true }, { branch: 'reverse' }, { inefficient: true }, { badLuck: true },
     ...['expedition', 'docking', 'colonies', 'starChart', 'dyson', 'senate', 'weaving', 'tuning', 'realityForge'].map(skip => ({ skip }))]
   : [{}];
 if (seeds.some(seed => !Number.isSafeInteger(seed)) || personas.some(id => !PERSONA_IDS.includes(id)) || !Number.isInteger(cycles) || cycles < 1) {

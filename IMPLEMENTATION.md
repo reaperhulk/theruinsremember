@@ -21,10 +21,10 @@ to main, with the testing harness audited before gameplay changes.
 - [x] Add prestige reward selection before the new run and accurate reset previews.
 - [ ] Make operation choices affect later production and defenses; queue commissions.
 - [x] Preserve narrative history and landmarks between cycles.
-- [ ] Improve the opening scene, readable decision cards, navigation, touch,
+- [x] Improve the opening scene, readable decision cards, navigation, touch,
       keyboard access, and reduced-motion support.
-- [ ] Add ambient music and independent audio controls.
-- [ ] Move automatic visual rewards into simulation and profile/render efficiently.
+- [x] Add ambient music and independent audio controls.
+- [x] Move automatic visual rewards into simulation and profile/render efficiently.
 - [ ] Complete natural progression and UI journeys, run quality gates, inspect CI.
 
 ## Harness audit
@@ -177,3 +177,32 @@ Prestige one preserves the Archive and saved plans; two opens permanent doctrine
 | offline_returner | 42 | 43201 → 43201 | 361 → 361 | 99 → 102 | 4 → 4 | 5 / False |
 | completionist | 42 | 1081 → 1141 | 1081 → 1141 | 181 → 209 | 1 → 1 | 10 / True |
 | minimalist | 42 | 10231 → 9211 | 10231 → 9211 | 72 → 90 | 1 → 1 | 10 / True |
+
+### 5. Presentation and full browser journeys
+
+394 unit/journey contracts, lint, and build pass. All 16 bounded two-cycle persona journeys pass; both ten-prestige stress seeds pass. Four balance seeds pass after the explicitly documented seed-1 pacing calibration. Browser journeys are awaiting CI execution.
+
+Illustrations now appear from Era 1; new panels have readable cards, keyboard tabs, touch targets, and reduced-motion support. Ambient music has separate music/effects controls and pauses when hidden. Panels and scenes load in separate bundles (main JS 608KB versus the previous 971KB; all required startup chunks still load normally). Canvas drawing is bounded to 30fps / 2× pixels; economy rendering reuses the shared calculation. Automatic harvesting now runs in simulation, including offline.
+
+Added a natural desktop/mobile browser journey that earns two complete cycles, reloads earned mid-run progress, and allocates a reward through visible UI controls. No resource grants, era fixtures, or engine purchase calls occur in that journey. Existing operation fixtures remain separate and explicitly labeled. CI now runs every bounded persona for two cycles, adversarial branches and optional-system omissions, ten-prestige stress, and desktop/mobile UI journeys, and preserves diagnostic artifacts.
+
+Intentional gate changes: siege-sealing assertions moved from ordinary optimizer play to the explicit descent challenge. Forty manual signature decisions increased seed 1 to 135 legacy gather windows and 204s in Era 3, so their limits are 150 and 240s. Final-cycle completion, no-absence-actions, no unexpected collapse, and bounded actual command gates remain required.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Final era / ready |
+|---|---|---|---|---|---|---|
+| newcomer | 424242 | 1921 → 1921 | 1921 → 1921 | 139 → 139 | 1 → 1 | 10 / True |
+| engaged | 424242 | 1411 → 1411 | 1411 → 1411 | 163 → 163 | 1 → 1 | 10 / True |
+| optimizer | 424242 | 961 → 961 | 961 → 961 | 239 → 239 | 1 → 1 | 10 / True |
+| background | 424242 | 2041 → 2041 | 511 → 511 | 129 → 129 | 18 → 18 | 10 / True |
+| check_in | 424242 | 4801 → 4801 | 481 → 481 | 138 → 138 | 9 → 9 | 10 / True |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 101 → 101 | 4 → 4 | 5 / False |
+| completionist | 424242 | 1171 → 1171 | 1171 → 1171 | 218 → 218 | 1 → 1 | 10 / True |
+| minimalist | 424242 | 11491 → 11461 | 11491 → 11461 | 93 → 92 | 1 → 1 | 10 / True |
+| newcomer | 42 | 1681 → 1681 | 1681 → 1681 | 137 → 137 | 1 → 1 | 10 / True |
+| engaged | 42 | 1531 → 1531 | 1531 → 1531 | 166 → 166 | 1 → 1 | 10 / True |
+| optimizer | 42 | 961 → 961 | 961 → 961 | 260 → 260 | 1 → 1 | 10 / True |
+| background | 42 | 2041 → 2041 | 511 → 511 | 130 → 130 | 18 → 18 | 10 / True |
+| check_in | 42 | 4801 → 4801 | 481 → 481 | 138 → 138 | 9 → 9 | 10 / True |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | 5 / False |
+| completionist | 42 | 1141 → 1141 | 1141 → 1141 | 209 → 209 | 1 → 1 | 10 / True |
+| minimalist | 42 | 9211 → 9181 | 9211 → 9181 | 90 → 89 | 1 → 1 | 10 / True |
