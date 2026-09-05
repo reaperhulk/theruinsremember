@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { getAvailableUpgrades } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
 import { queueGoal, removeGoal, getGoalInfo } from '../engine/goals.js';
-import { COMMISSION_TYPES, queueCommission, removeCommission } from '../engine/commissions.js';
+import { COMMISSION_TYPES, canQueueCommission, queueCommission, removeCommission } from '../engine/commissions.js';
 import { expandStorage, SUPPLY_CHAINS, setConsumerControl } from '../engine/economy.js';
 import { formatTime } from './format.js';
 
@@ -22,6 +22,6 @@ export function GoalsPanel({ state, onUpdate }) {
         {blocker.reason === 'production' && SUPPLY_CHAINS.filter(c => c.input === blocker.id && state.resources[c.output]?.unlocked).map(c => <button key={c.output} onClick={() => onUpdate(s => setConsumerControl(s, c.output, { paused: true }))}>Pause {c.output}</button>)}
       </p>)}
     </div>}
-    {state.era >= 7 && <details><summary>Commission queue · {state.commissions.length}/6</summary><p>Choose operations now; their normal costs and cooldowns still apply.</p>{Object.entries(COMMISSION_TYPES).filter(([, type]) => state.era >= type.era).map(([kind, type]) => <div key={kind}>{Object.entries(type.definitions).map(([id, def]) => <button key={id} disabled={state.commissions.some(c => c.kind === kind && c.id === id)} onClick={() => onUpdate(s => queueCommission(s, kind, id))}>Queue {def.name || def.label || id}</button>)}</div>)}<ol>{state.commissions.map((c, i) => <li key={`${c.kind}:${c.id}`}>{c.id} <button onClick={() => onUpdate(s => removeCommission(s, i))}>Cancel</button></li>)}</ol></details>}
+    {state.era >= 7 && <details><summary>Commission queue · {state.commissions.length}/6</summary><p>Choose operations now; their normal costs and cooldowns still apply.</p>{Object.entries(COMMISSION_TYPES).filter(([, type]) => state.era >= type.era).map(([kind, type]) => <div key={kind}>{Object.entries(type.definitions).map(([id, def]) => <button key={id} disabled={!canQueueCommission(state, kind, id)} onClick={() => onUpdate(s => queueCommission(s, kind, id))}>Queue {def.name || def.label || id}</button>)}</div>)}<ol>{state.commissions.map((c, i) => <li key={`${c.kind}:${c.id}:${i}`}>{c.id} <button onClick={() => onUpdate(s => removeCommission(s, i))}>Cancel</button></li>)}</ol></details>}
   </details>;
 }

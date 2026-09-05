@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { runPlayerJourney } from './player-journey.mjs';
-import { PERSONA_IDS } from './playtest-personas.js';
+import { PERSONA_IDS, createPersonaProfiles } from './playtest-personas.js';
 
 const value = (flag, fallback) => process.argv.includes(flag) ? process.argv[process.argv.indexOf(flag) + 1] : fallback;
 const seeds = value('--seeds', '424242,42').split(',').map(Number);
@@ -13,10 +13,15 @@ const variants = process.argv.includes('--adversarial')
 if (seeds.some(seed => !Number.isSafeInteger(seed)) || personas.some(id => !PERSONA_IDS.includes(id)) || !Number.isInteger(cycles) || cycles < 1) {
   throw new Error('Invalid seeds, personas, or cycle count');
 }
+const profiles = createPersonaProfiles();
+const operationFlags = { expedition: 'expeditions', docking: 'docking', colonies: 'colonies', starChart: 'starChart', dyson: 'dysonAssembly', senate: 'senateFocus', weaving: 'weaving', tuning: 'cosmicTuning', realityForge: 'realityForge' };
 let failures = 0;
 for (const seed of seeds) {
   for (const persona of personas) {
     for (const variant of variants) {
+      // The base minimalist already skips these systems. Repeating an
+      // identical journey for a disabled operation adds no coverage.
+      if (variant.skip && !profiles[persona][operationFlags[variant.skip]]) continue;
       const report = runPlayerJourney({ persona, seed, cycles, ...variant });
       console.log(`${report.completed ? 'PASS' : 'FAIL'} ${persona} seed=${seed} cycles=${report.cycleResults.length}/${cycles} era=${report.finalEra} elapsed=${report.elapsedSeconds}s attention=${report.activeSeconds}s commands=${report.manualActions} ${JSON.stringify(variant)}`);
       if (!report.completed) {

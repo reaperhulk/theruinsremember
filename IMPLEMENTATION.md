@@ -7,7 +7,7 @@ to main, with the testing harness audited before gameplay changes.
 ## Delivery checklist
 
 - [x] Audit harness success criteria, CLI failure reporting, and fixture claims.
-- [ ] Add bounded player actions, final-cycle journeys for every persona,
+- [x] Add bounded player actions, final-cycle journeys for every persona,
       alternative branches, and negative tests that prove stalls are detected.
 - [x] Remove post-prestige compulsory operations; preserve optional playstyles.
 - [x] Enforce the same purchase requirements in manual, bulk, and automatic paths.
@@ -19,7 +19,7 @@ to main, with the testing harness audited before gameplay changes.
 - [x] Add permanent Archive, remembered plans, distinct doctrine research,
       deterministic relic crafting, reconstruction projects, and optional challenges.
 - [x] Add prestige reward selection before the new run and accurate reset previews.
-- [ ] Make operation choices affect later production and defenses; queue commissions.
+- [x] Make operation choices affect later production and defenses; queue commissions.
 - [x] Preserve narrative history and landmarks between cycles.
 - [x] Improve the opening scene, readable decision cards, navigation, touch,
       keyboard access, and reduced-motion support.
@@ -206,3 +206,46 @@ Intentional gate changes: siege-sealing assertions moved from ordinary optimizer
 | offline_returner | 42 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | 5 / False |
 | completionist | 42 | 1141 → 1141 | 1141 → 1141 | 209 → 209 | 1 → 1 | 10 / True |
 | minimalist | 42 | 9211 → 9181 | 9211 → 9181 | 90 → 89 | 1 → 1 | 10 / True |
+
+### 6. Final edge cases and operating documentation
+
+396 unit/journey contracts, lint, and production build pass. Commission queues now
+support deliberate repeated Dyson modules, respect the three-module limit, and
+retain normal cooldowns. Two frames trade another production specialization for
+an additional Warden. Very long prestige histories remain finite and their reset
+previews stay exact. Resource rows explain storage stops, paused consumers, and
+actual input-limited production; relic capacity and prestige text match earned
+rewards. Tech affordability uses the same net economy calculation. README and development instructions distinguish natural journeys from
+legacy calibration helpers and isolated fixtures.
+
+The adversarial matrix skips duplicate runs only when that persona already disables
+the omitted operation; base minimalist journeys still skip all optional operations.
+All 16 before/after legacy persona results are unchanged. No new stalls, forced
+participation, collapses, or actions while away appear. The legacy offline calibration
+still targets Era 4; its row is not claimed as full-game completion. The separate
+bounded offline journey completes both full cycles on both seeds.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Final era / ready |
+|---|---|---|---|---|---|---|
+| newcomer | 424242 | 1921 → 1921 | 1921 → 1921 | 139 → 139 | 1 → 1 | 10 / True |
+| engaged | 424242 | 1411 → 1411 | 1411 → 1411 | 163 → 163 | 1 → 1 | 10 / True |
+| optimizer | 424242 | 961 → 961 | 961 → 961 | 239 → 239 | 1 → 1 | 10 / True |
+| background | 424242 | 2041 → 2041 | 511 → 511 | 129 → 129 | 18 → 18 | 10 / True |
+| check_in | 424242 | 4801 → 4801 | 481 → 481 | 138 → 138 | 9 → 9 | 10 / True |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 101 → 101 | 4 → 4 | 5 / False |
+| completionist | 424242 | 1171 → 1171 | 1171 → 1171 | 218 → 218 | 1 → 1 | 10 / True |
+| minimalist | 424242 | 11461 → 11461 | 11461 → 11461 | 92 → 92 | 1 → 1 | 10 / True |
+| newcomer | 42 | 1681 → 1681 | 1681 → 1681 | 137 → 137 | 1 → 1 | 10 / True |
+| engaged | 42 | 1531 → 1531 | 1531 → 1531 | 166 → 166 | 1 → 1 | 10 / True |
+| optimizer | 42 | 961 → 961 | 961 → 961 | 260 → 260 | 1 → 1 | 10 / True |
+| background | 42 | 2041 → 2041 | 511 → 511 | 130 → 130 | 18 → 18 | 10 / True |
+| check_in | 42 | 4801 → 4801 | 481 → 481 | 138 → 138 | 9 → 9 | 10 / True |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | 5 / False |
+| completionist | 42 | 1141 → 1141 | 1141 → 1141 | 209 → 209 | 1 → 1 | 10 / True |
+| minimalist | 42 | 9181 → 9181 | 9181 → 9181 | 89 → 89 | 1 → 1 | 10 / True |
+
+The first complete desktop UI journey passed on `17e9b4d`. The final workflow
+runs desktop/mobile natural journeys and operation fixtures in four independent
+jobs with separate diagnostic artifacts; deployment requires all four plus the
+engine quality job. Final-head browser and deployment results are checked after
+publication.

@@ -90,7 +90,7 @@ export function getPrestigeSummary(state) {
   state = resolvePrestigePlan(state);
   const bonus = calculatePrestigeBonus(state);
   const rawMultiplier = state.prestigeMultiplier + bonus;
-  const newMultiplier = Math.max(rawMultiplier * (state.prestigeUpgrades?.headStart ? 1.5 : 1), state.echoUpgrades?.echoVoidResonance ? state.prestigeMultiplier * 1.5 : 0);
+  const newMultiplier = Math.min(Number.MAX_SAFE_INTEGER, Math.max(rawMultiplier * (state.prestigeUpgrades?.headStart ? 1.5 : 1), state.echoUpgrades?.echoVoidResonance ? state.prestigeMultiplier * 1.5 : 0));
   const points = calculatePrestigePoints(state);
   return {
     currentMultiplier: state.prestigeMultiplier,
@@ -473,6 +473,9 @@ export function performPrestige(state) {
     }
   }
 
+  // Raw score is already far beyond the effective production cap here.
+  // Keep repeated resets serializable instead of eventually producing Infinity.
+  newState.prestigeMultiplier = Math.min(Number.MAX_SAFE_INTEGER, newState.prestigeMultiplier);
   if (newState.archive.projects.seedVault >= 2) {
     for (const id of ['food', 'labor', 'materials', 'energy']) {
       newState.resources[id] = { ...newState.resources[id], amount: Math.max(newState.resources[id].amount, getEffectiveCap(newState, id) * 0.25) };

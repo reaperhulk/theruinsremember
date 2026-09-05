@@ -17,7 +17,7 @@ export const DYSON_MODULES = {
   frame: {
     id: 'frame',
     name: 'Frame Network',
-    description: '+10 segments, Megastructure production, and an immediate construction reserve.',
+    description: '+10 segments, Megastructure production, and an immediate construction reserve. Two frames grant an extra Warden for the final siege.',
     resourceId: 'megastructures',
     ratePerEra: 0.4,
   },

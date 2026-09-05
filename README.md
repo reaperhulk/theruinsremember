@@ -21,7 +21,7 @@ Prestige isn't just a mechanic. It's the cycle itself.
 ## How It Works
 
 - **10 Eras** spanning primitive survival to multiverse exploration
-- **599 upgrades** forming deep prerequisite chains with 10 mutually exclusive doctrine forks
+- **599 upgrades**, including 40 player-controlled signature breakthroughs, production previews, ten doctrine forks, and ×1.5 repeatable milestones every ten levels
 - **115 tech nodes** including mutually exclusive paths that shape each run differently
 - **Era-focused operations** that evolve from ruin expeditions into orbital missions, colony mandates, star-network directives, Dyson commissions, cycle laws, galactic government, cosmic signal locks, and the Reality Forge
 - **Distinct cycle doctrines** that reshape early, middle, or late eras and award permanent cycle marks for doctrine-specific goals
@@ -34,11 +34,14 @@ Prestige isn't just a mechanic. It's the cycle itself.
 - **254 reachable achievements** tracking everything from speed milestones to narrative discovery
 - **A canvas that reflects your progress** — buildings appear as you buy upgrades, production intensity glows, weather changes, bonus orbs spawn for active players
 - **Progression-gated era advancement** — new eras require sufficient upgrade depth, era-local research depth, and the starred breakthrough technology instead of passive waiting
-- **Resource caps that matter** — storage is a real constraint requiring strategic cap upgrades
+- **Recoverable resource bottlenecks** — expand storage without prerequisite chains, pause consumers, hold reserves, and queue a goal
 - **Consumption chains** — food feeds labor, energy powers electronics, fuel maintains orbital infrastructure, exotic materials sustain colonies
 - **Automation cascades** — gathering, routine research, earlier eras, repeatable-upgrade milestones, orbital crews, colonies, and reserve routes become self-managing while exclusive choices and breakthroughs remain yours
-- **A final siege against the Forgetting** that freezes destructive timers while you are offline and cannot end an unattended cycle
-- **A narrative Chronicle** collecting lore fragments, recovered signals, and codex discoveries that piece together the story of the cycle
+- **An optional siege against the Forgetting** with protected offline timers and retreat; defeat never forces a reset
+- **A permanent Archive** that preserves narrative history and saved plans after the first prestige; the second opens doctrine research and exact relic crafting, and the third starts reconstruction projects across cycles
+- **Prestige reward planning** that spends newly earned points before starting perks are applied
+- **Validated saves and rotating backups**, current-state export, and visible recovery controls
+- **Era illustrations from Planetfall** and ambient music with independent music/effects controls
 - **A run-director UI layer** that explains what is blocking the next breakthrough instead of leaving progression hidden in raw numbers
 
 ## The Experiment
@@ -88,15 +91,22 @@ npm run test:impact
 node scripts/balance-matrix.mjs --seeds 424242,1,42,1337
 ```
 
-Browser smoke tests:
+Natural UI journeys and isolated operation fixtures:
 
 ```bash
 npm run dev -- --host 127.0.0.1
+node scripts/browser-journey.mjs
+node scripts/browser-journey.mjs --mobile
 node scripts/browser-test.mjs --prestige 3
 node scripts/browser-test.mjs --mobile
 ```
 
-The browser suite reloads real legacy and offline saves, checks automation controls,
+The natural browser journey earns two complete cycles through visible controls,
+including a mid-run reload and a planned prestige reward. It never grants
+resources, writes ownership, or injects an era. Failures preserve the final state,
+command trace, and screenshot in `test-results/`.
+
+The separate operation fixture suite reloads real legacy and offline saves, checks automation controls,
 advances naturally from a fresh run through Era 7, and then validates late-game
 strategic decisions using isolated fixtures. It exercises orbital crew training,
 colony mandates, standing trade routes, star-network directives, relic choices,
@@ -123,9 +133,20 @@ actions, and cumulative playtime across prestige resets.
 
 The same four-seed matrix additionally checks final-siege collapse and three-prestige
 progression. Extended stress coverage validates ten prestiges across two seeds. Every
-pull request and push to `main` runs lint, 361 unit tests, all 40 seeded balance
-scenarios, a 16-row before/after persona impact report, the prestige stress matrix, a
-production build, and desktop/mobile browser journeys before GitHub Pages deployment.
+pull request and push to `main` runs lint, unit and negative-control tests, all 40
+seeded balance scenarios, the original 16-row persona impact comparison, two full
+cycles for every bounded persona on both seeds, adversarial playstyles, prestige
+stress, a production build, and desktop/mobile browser journeys before deployment.
+
+```bash
+npm run test:journeys
+npm run test:journeys:adversarial
+```
+
+The older balance bot retains its historical calibration role; its helper counts
+are not individual player inputs. The bounded journey harness counts individual
+commands, and only final-cycle completion can pass. See [IMPLEMENTATION.md](IMPLEMENTATION.md)
+for the harness audit, reproduced deadlocks, and each batch’s before/after results.
 
 ## Required Before/After Impact For Changes
 

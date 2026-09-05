@@ -204,12 +204,13 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                       <span className="resource-rate">
                         {r.rate > 0 ? (() => {
                           const net = economy.net[r.id];
-                          const isConsumed = ['food','energy','rocketFuel','exoticMaterials','stellarForge'].includes(r.id) && net < r.rate;
+                          const isConsumed = economy.consumed[r.id] > 0;
                           // Check if this resource is throttled by its supply chain
                           const supplyChain = { labor: 'food', electronics: 'energy', orbitalInfra: 'rocketFuel', colonies: 'exoticMaterials', megastructures: 'stellarForge' };
                           const supplier = supplyChain[r.id];
-                          const isThrottled = supplier && state.resources[supplier]?.unlocked &&
-                            economy.net[supplier] < 0;
+                          const isThrottled = economy.constrained[r.id] === 'input';
+                          if (economy.constrained[r.id] === 'paused') return <span>Paused</span>;
+                          if (economy.constrained[r.id] === 'storage') return <span>Storage full</span>;
                           if (isConsumed) {
                             return <>
                               {net > 0 && <span className="rate-active" />}
@@ -222,14 +223,14 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                           if (isThrottled) {
                             return <>
                               <span className="rate-active" />
-                              <span style={{ color: '#ddaa44' }}>+{formatNumber(r.rate)}/s</span>
+                              <span style={{ color: '#ddaa44' }}>+{formatNumber(economy.produced[r.id])}/s</span>
                               <span style={{ fontSize: '0.6em', color: '#ddaa44', marginLeft: '3px' }} title={`Production limited — ${resourceDefs[supplier]?.name || supplier} supply is low`}>SLOW</span>
                             </>;
                           }
                           return <><span className="rate-active" />+{formatNumber(r.rate)}/s</>;
                         })() : ''}
                       </span>
-                      <span className="resource-gather" style={{ position: 'relative', opacity: r.rate > 0 ? 0.3 : 1 }}>
+                      <span className="resource-gather" style={{ position: 'relative' }}>
                         {gatheringAutomated ? (
                           <span className="resource-auto-label" title="Industrial systems gather this resource automatically">AUTO</span>
                         ) : <button
@@ -265,7 +266,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
                       const cap = r.cap;
                       const pctFull = cap > 0 ? Math.floor(r.amount / cap * 100) : 0;
                       return (
-                        <div style={{ fontSize: '0.7em', background: '#1a1a2a', padding: '4px 8px', margin: '0 0 2px 0', borderLeft: '2px solid #555', color: '#aaa' }}>
+                        <div className="resource-details" style={{ fontSize: '13px', background: '#1a1a2a', padding: '4px 8px', margin: '0 0 2px 0', borderLeft: '2px solid #555', color: '#aaa' }}>
                           <div>Base: {baseRate}/s</div>
                           {upgradeAdd > 0 && <div>Upgrades: +{upgradeAdd.toFixed(1)}/s</div>}
                           {mult > 1 && <div>Multiplier: x{mult}</div>}

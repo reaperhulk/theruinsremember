@@ -1,6 +1,7 @@
-import { useState, useCallback, useRef, memo } from 'react';
+import { useState, useCallback, useRef, useMemo, memo } from 'react';
 import { getAvailableTech, unlockTech } from '../engine/tech.js';
-import { canAfford, getEffectiveRate, getEffectiveCap } from '../engine/resources.js';
+import { canAfford, getEffectiveCap } from '../engine/resources.js';
+import { calculateEconomy, estimateAffordability } from '../engine/economy.js';
 import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { formatNumber } from './format.js';
@@ -34,19 +35,6 @@ function CostDisplay({ cost, state }) {
       })}
     </span>
   );
-}
-
-function getTimeToAfford(state, cost) {
-  let maxTime = 0;
-  for (const [resourceId, amount] of Object.entries(cost)) {
-    const r = state.resources[resourceId];
-    const have = r ? r.amount : 0;
-    if (have >= amount) continue;
-    const rate = getEffectiveRate(state, resourceId);
-    if (rate <= 0) return Infinity;
-    maxTime = Math.max(maxTime, (amount - have) / rate);
-  }
-  return maxTime;
 }
 
 // Get afford progress for tech (same pattern as upgrades)
@@ -98,6 +86,7 @@ function stepsToBreakthrough(startId) {
 }
 
 export const TechTree = memo(function TechTree({ state, onUpdate }) {
+  const economy = useMemo(() => calculateEconomy(state), [state]);
   const [flashId, setFlashId] = useState(null);
   const [showUnlocked, setShowUnlocked] = useState(false);
   const [hoveredTechId, setHoveredTechId] = useState(null);
@@ -314,7 +303,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
                 </div>
               )}
               {!affordable && (() => {
-                const eta = getTimeToAfford(state, tech.cost);
+                const eta = estimateAffordability(state, tech.cost, economy).seconds;
                 return (
                   <div className="upgrade-progress-bar">
                     <div className="upgrade-progress-fill" style={{ width: `${Math.floor(progress * 100)}%` }} />

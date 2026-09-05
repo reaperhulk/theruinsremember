@@ -98,7 +98,7 @@ export function isMemoryScarred(state, nodeId) {
 }
 
 export function getWardenCapacity(state) {
-  return 2 + (state.senateGov?.ratified ? 1 : 0) + (state.prestigeUpgrades?.wardenEternal ? 1 : 0);
+  return 2 + (state.senateGov?.ratified ? 1 : 0) + (state.prestigeUpgrades?.wardenEternal ? 1 : 0) + ((state.dysonModules?.frame || 0) >= 2 ? 1 : 0);
 }
 
 function createForgetting(state) {

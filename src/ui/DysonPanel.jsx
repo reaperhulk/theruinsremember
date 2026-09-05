@@ -56,7 +56,7 @@ export const DysonPanel = memo(function DysonPanel({ state, onUpdate }) {
         <span>{stats.autoRate} automated segments/min</span>
       </div>
       <p className="operation-hint">
-        Construction wings recover every 60s | Choose any mix of three modules | Each commission adds 10 segments
+        Choose any mix of three modules · Each commission adds 10 segments · Recovery time appears above
       </p>
     </div>
   );

@@ -22,6 +22,7 @@ const SenatePanel = lazy(() => import('./SenatePanel.jsx').then(module => ({ def
 const RealityForgePanel = lazy(() => import('./RealityForgePanel.jsx').then(module => ({ default: module.RealityForgePanel })));
 import { OperationsPanel } from './OperationsPanel.jsx';
 import { RelicPanel } from './RelicPanel.jsx';
+import { getRelicSlotLimit } from '../engine/relics.js';
 import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
 import { setMuted, playPrestige, setVolumes, setMusicEra, startAmbient, stopAmbient, syncAudioVisibility } from './AudioManager.js';
@@ -341,7 +342,7 @@ export function App() {
         <span className="control-chip">Era {state.era}: {eraNames[state.era]}</span>
         <span className="control-chip">{affordableUpgrades} options ready</span>
         <span className="control-chip">{affordableTech} tech options</span>
-        <span className="control-chip">{state.activeRelics?.length || 0}/2 relics | {Math.floor(state.echoPressure || 0)} pressure</span>
+        <span className="control-chip">{state.activeRelics?.length || 0}/{getRelicSlotLimit(state)} relics | {Math.floor(state.echoPressure || 0)} pressure</span>
         {state.era >= ERA_COUNT && (
           <span className="control-chip">{cycleReadiness.ready ? 'Prestige available' : `Cycle ${cycleReadiness.completed}/${cycleReadiness.total}`}</span>
         )}
@@ -480,7 +481,7 @@ export function App() {
               ))}
             </div>
             <div className="confirm-actions">
-              <button className="confirm-yes" autoFocus onClick={confirmDialog.onConfirm} autoFocus>Confirm</button>
+              <button className="confirm-yes" autoFocus onClick={confirmDialog.onConfirm}>Confirm</button>
               <button className="confirm-no" onClick={confirmDialog.onCancel}>Cancel</button>
             </div>
           </div>

@@ -7,6 +7,7 @@ import { queueCommission, advanceCommissions } from '../commissions.js';
 import { calculateEconomy } from '../economy.js';
 import { getUpgradeCost, purchaseUpgrade, previewUpgrade } from '../upgrades.js';
 import { getEffectiveCap } from '../resources.js';
+import { getWardenCapacity } from '../forgetting.js';
 
 describe('persistent rewards and deliberate automation', () => {
   it('selecting a starting perk spends newly earned points before the next run begins', () => {
@@ -27,6 +28,13 @@ describe('persistent rewards and deliberate automation', () => {
     expect(next.prestigeUpgrades.eternalReturn).toBeUndefined();
     expect(next.prestigeUpgrades.temporalMastery).toBeUndefined();
     expect(next.prestigePoints).toBeGreaterThanOrEqual(0);
+  });
+  it('keeps extremely long prestige histories finite and the preview exact', () => {
+    const state = { ...createInitialState(), era: 10, prestigeMultiplier: Number.MAX_VALUE, prestigeUpgrades: { headStart: true } };
+    const next = performPrestige(state);
+    expect(next.prestigeMultiplier).toBe(Number.MAX_SAFE_INTEGER);
+    expect(getPrestigeSummary(state).newMultiplier).toBe(next.prestigeMultiplier);
+    expect(JSON.parse(JSON.stringify(next)).prestigeMultiplier).toBe(next.prestigeMultiplier);
   });
   it('preserves narrative beyond the rolling event log and across resets', () => {
     let state = createInitialState();
@@ -101,5 +109,22 @@ describe('persistent rewards and deliberate automation', () => {
     expect(after.commissions).toHaveLength(1);
     expect(advanceCommissions(after).dysonModules.collector).toBe(0);
     expect(after.resources.realityFragments.amount).toBeLessThan(state.resources.realityFragments.amount);
+  });
+  it('can deliberately commission two frames for an extra Warden, within the three-module limit', () => {
+    let state = { ...createInitialState(), era: 7 };
+    for (const r of Object.values(state.resources)) r.unlocked = true;
+    state = queueCommission(queueCommission(queueCommission(state, 'dyson', 'frame'), 'dyson', 'frame'), 'dyson', 'collector');
+    expect(queueCommission(state, 'dyson', 'forge')).toBe(state);
+    state = advanceCommissions(state);
+    expect(state.dysonModules.frame).toBe(1);
+    expect(getWardenCapacity(state)).toBe(2);
+    expect(advanceCommissions(state).commissions).toHaveLength(2);
+    state = advanceCommissions({ ...state, totalTime: 105 });
+    expect(state.dysonModules.frame).toBe(2);
+    expect(getWardenCapacity(state)).toBe(3);
+    state = advanceCommissions({ ...state, totalTime: 210 });
+    expect(state.dysonModules.collector).toBe(1);
+    expect(state.commissions).toEqual([]);
+    expect(queueCommission(state, 'dyson', 'frame')).toBe(state);
   });
 });

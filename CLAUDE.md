@@ -39,6 +39,9 @@ regression; refresh it only when the intentional impact has been reviewed and ac
 - `npm run test` — Run Vitest unit tests in watch mode
 - `npm run test:unit` — Run the complete Vitest unit and regression suite once
 - `npm run test:balance` — Run eight personas plus siege/prestige scenarios across four deterministic seeds
+- `npm run test:journeys` — Every bounded persona, both seeds, two naturally earned cycles
+- `npm run test:journeys:adversarial` — Alternate branches, bad luck, inefficient spending, manual build-out, and skipped operations
+- `npm run test:browser:journey` — Two full cycles through visible browser controls with no injected progression
 - `npm run test:balance:stress` — Exercise ten prestige cycles across two seeds
 - `npm run test:personas` — Run eight attention-aware player personas across two seeds
 - `npm run test:impact` — Present before/after timing, attention, actions, sessions, and progression for every persona
@@ -46,7 +49,7 @@ regression; refresh it only when the intentional impact has been reviewed and ac
 - `npm run build` — Production build to dist/
 
 ## Architecture
-The engine is **pure and deterministic**: `tick(state, dt, rng, options)` → new state. All game logic lives in `src/engine/`. The React layer in `src/hooks/useGameLoop.js` drives the loop via `requestAnimationFrame`, throttled to ~10 FPS for state updates. Offline catch-up uses `advanceTime(state, seconds, rng, maxStep, { pauseForgetting: true })` so an unattended final siege cannot erase progress or force prestige.
+The engine is **pure and deterministic**: `tick(state, dt, rng, options)` → new state. All game logic lives in `src/engine/`. The React layer in `src/hooks/useGameLoop.js` drives the loop via `requestAnimationFrame`, with fixed one-second simulation steps. Offline catch-up uses `advanceTime(state, seconds, rng, maxStep, { pauseForgetting: true })` so an unattended final siege cannot erase progress or force prestige.
 
 ## Browser Testing with Puppeteer
 
@@ -59,7 +62,11 @@ node scripts/browser-test.mjs --mobile           # Mobile viewport (375x812)
 node scripts/browser-test.mjs --screenshots      # Save screenshots to /tmp/game-screenshots/
 ```
 
-The Puppeteer test first reloads actual legacy and three-hour-offline saves, validates
+The natural journey in `scripts/browser-journey.mjs` earns two complete cycles
+through visible UI controls, verifies a mid-run reload, and plans a prestige reward.
+It must never use resource grants, era fixtures, or direct engine purchases.
+
+The separate Puppeteer fixture test first reloads actual legacy and three-hour-offline saves, validates
 automation toggling, and drives a fresh game naturally through Era 7. Isolated late-game
 fixtures then cover the operation archive, relics, orbital crew training, colony mandates,
 standing trade routes, star-network directives, Dyson commissions, government acts,
@@ -80,7 +87,7 @@ save/operation checks, or layout/viewport overflow.
 - `50`–`100` = good for rapid testing (higher values work but UI updates are throttled to ~10 FPS so visual feedback caps out)
 - `0` = paused
 
-The speed multiplier is applied inside `useGameLoop.js` before dt accumulation. The 1-second dt cap is applied *before* the multiplier, so at 100x speed each frame contributes up to 100s of game time.
+The speed multiplier scales accumulated elapsed time. Simulation uses one-second steps at every speed; each render update processes at most 60 seconds and retains any remainder. Hidden tabs receive bounded catch-up when visible again.
 
 ### Instant Time Skip
 For even faster testing, `__harness.fastForward(seconds)` or `__game.fastForward(seconds)` advances the engine in bounded one-second simulation steps. This preserves periodic automation, event, and achievement checks.

@@ -169,7 +169,7 @@ export function PrestigePanel({ state, onUpdate }) {
             if (owned.cycleMastery) activePerks.push({ name: 'Cycle Mastery', desc: 'All production x2' });
             if (owned.acceleratedDecay) activePerks.push({ name: 'Accelerated Decay', desc: 'All production x5' });
             if (owned.eraMomentum) activePerks.push({ name: 'Era Momentum', desc: 'Keep 5% of production rates' });
-            if (hasPerfectMemory) activePerks.push({ name: 'Perfect Memory', desc: 'Keep operation progress' });
+            if (hasPerfectMemory) activePerks.push({ name: 'Perfect Memory', desc: 'Keep operation statistics; halve commission cooldowns' });
             if (owned.cosmicAwareness) activePerks.push({ name: 'Cosmic Awareness', desc: 'Auto-buy lore upgrades' });
 
             const rowStyle = { display: 'flex', justifyContent: 'space-between', padding: '2px 0' };

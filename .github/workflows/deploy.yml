@@ -29,6 +29,35 @@ jobs:
       - run: npm run test:balance:stress
       - run: npm run test:journeys
       - run: npm run test:journeys:adversarial
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: engine-progression-diagnostics
+          path: test-results/
+          if-no-files-found: ignore
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: desktop-journey
+            command: node scripts/browser-journey.mjs
+          - name: mobile-journey
+            command: node scripts/browser-journey.mjs --mobile
+          - name: desktop-operations
+            command: node scripts/browser-test.mjs --prestige 3
+          - name: mobile-operations
+            command: node scripts/browser-test.mjs --mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
       - run: npx puppeteer browsers install chrome-headless-shell
       - name: Start the game server
         run: |
@@ -40,20 +69,17 @@ jobs:
             sleep 1
           done
           exit 1
-      - run: node scripts/browser-journey.mjs
-      - run: node scripts/browser-journey.mjs --mobile
-      - run: node scripts/browser-test.mjs --prestige 3
-      - run: node scripts/browser-test.mjs --mobile
+      - run: ${{ matrix.command }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: progression-diagnostics
+          name: ${{ matrix.name }}-diagnostics
           path: test-results/
           if-no-files-found: ignore
 
   build:
     if: github.event_name == 'push'
-    needs: quality
+    needs: [quality, browser]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
