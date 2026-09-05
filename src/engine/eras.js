@@ -16,6 +16,7 @@ export const ERA_COUNT = 10;
 import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
+import { getPublicWorks } from './publicWorks.js';
 
 // Minimum upgrades purchased in the current era before transition is allowed.
 const ERA_MIN_UPGRADES = {
@@ -174,6 +175,7 @@ export function getEraMastery(state, era = state.era) {
   const required = target > 0;
 
   const completedDirectly = required && current >= target;
+  const economic = getPublicWorks(state, era);
 
   // Either kind of engagement buys the backstop down: partial progress on the
   // operation, or era decisions bought past the foundation minimum.
@@ -201,8 +203,9 @@ export function getEraMastery(state, era = state.era) {
     fallbackSeconds,
     fallbackRemaining,
     completedDirectly,
+    economic,
     shortenedByDecisions: required && !completedDirectly && decisionProgress > operationProgress,
-    met: !required || completedDirectly || fallbackRemaining === 0,
+    met: !required || completedDirectly || economic?.complete || fallbackRemaining === 0,
   };
 }
 
@@ -220,10 +223,11 @@ export function getEraReadiness(state, era = state.era) {
     ? Object.values(state.dockingMissions || {}).reduce((sum, count) => sum + (count > 0 ? 3 : 0), 0)
     : 0;
   const activityCredits = discoveryCredits + operationCredits;
+  const economicCredits = getPublicWorks(state, era)?.complete ? Math.max(0, minUpgrades - (era === 4 ? 12 : 10)) : 0;
   const minimumEconomicUpgrades = era <= 3
     ? Math.ceil(minUpgrades * (state.cycleDoctrine === 'reconstruction' ? 0.3 : 0.4))
-    : era === 4 ? 12 : minUpgrades;
-  const foundationProgress = currentUpgrades + activityCredits;
+    : era === 4 ? 12 : economicCredits ? 10 : minUpgrades;
+  const foundationProgress = currentUpgrades + activityCredits + economicCredits;
   const mastery = getEraMastery(state, era);
 
   // Mastered playstyles remain valid after a reset. Operations can accelerate
@@ -239,6 +243,7 @@ export function getEraReadiness(state, era = state.era) {
     discoveryCredits,
     operationCredits,
     activityCredits,
+    economicCredits,
     activityLabel: era <= 3 ? 'discovery' : era === 4 ? 'operation' : 'activity',
     minimumEconomicUpgrades,
     foundationProgress,

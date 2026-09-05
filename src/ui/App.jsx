@@ -1,5 +1,6 @@
 const ArchivePanel = lazy(() => import('./ArchivePanel.jsx').then(module => ({ default: module.ArchivePanel })));
 import { GoalsPanel } from './GoalsPanel.jsx';
+import { PublicWorksPanel } from './PublicWorksPanel.jsx';
 import { serializeSave } from '../engine/saves.js';
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { createInitialState } from '../engine/state.js';
@@ -359,6 +360,7 @@ export function App() {
       <EraTransition era={state.era} />
       <Toast state={state} />
       {state.era > 4 && <EraProgress state={state} />}
+      <PublicWorksPanel state={state} onUpdate={updateState} />
       {!hintsDismissed && state.totalTime >= 60 && state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
         <div style={{ textAlign: 'center', fontSize: '0.85em', color: '#998866', padding: '4px 0', position: 'relative' }}>
           Expeditions recover resources and discoveries; discoveries reduce routine build-out

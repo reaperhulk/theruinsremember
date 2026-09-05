@@ -160,6 +160,8 @@ export function performPrestige(state) {
     prestigePoints: state.prestigePoints || 0,
     archive: rememberCycle(state),
     autoBuildOut: state.autoBuildOut !== false,
+    autoPublicWorks: state.autoPublicWorks !== false,
+    protectProgression: state.protectProgression !== false,
     prestigeUpgrades: state.prestigeUpgrades || {},
     lifetimeHighestEra: Math.max(state.era, state.lifetimeHighestEra || 0),
     lifetimeGems: (state.lifetimeGems || 0) + (state.totalGems || 0),

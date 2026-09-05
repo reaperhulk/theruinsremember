@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createInitialState, migrateState } from '../state.js';
-import { parseSave, serializeSave, loadSave, writeSave, SAVE_KEY, BACKUP_KEYS } from '../saves.js';
+import { parseSave, serializeSave, loadSave, writeSave, SAVE_KEY, BACKUP_KEYS, CHECKPOINT_KEYS } from '../saves.js';
 import { advanceTime } from '../advanceTime.js';
 import { beginForgettingChallenge, retreatFromForgetting } from '../forgetting.js';
 
@@ -34,6 +34,28 @@ describe('save and unattended progress protection', () => {
     expect(loadSave(store)).toMatchObject({ state: null, blocked: true });
     store.setItem = () => { throw new DOMException('full', 'QuotaExceededError'); };
     expect(writeSave(store, createInitialState())).toMatch(/could not be saved/);
+  });
+  it('rejects nested corrupt entries before accepting a primary save or import', () => {
+    const store = storage();
+    const valid = serializeSave(createInitialState());
+    store.setItem(BACKUP_KEYS[0], valid);
+    for (const patch of [{ commissions: [null] }, { goals: [null] }, { activeRelics: ['missing'] },
+      { activeEffects: [null] }, { eventLog: [null] }, { archive: { savedPlan: { era: 999 } } },
+      { archive: { entries: [null] } }, { consumerControls: { labor: null } }]) {
+      const text = JSON.stringify({ ...createInitialState(), ...patch });
+      expect(() => parseSave(text)).toThrow();
+      store.setItem(SAVE_KEY, text);
+      expect(loadSave(store)).toMatchObject({ blocked: true, state: { era: 1 } });
+      expect(store.getItem(SAVE_KEY)).toBe(text);
+    }
+  });
+  it('retains a pre-prestige checkpoint after frequent autosaves rotate recent backups', () => {
+    const store = storage();
+    const state = { ...createInitialState(), era: 10, totalTime: 3000 };
+    writeSave(store, state, 1000);
+    for (let i = 0; i < 10; i++) writeSave(store, { ...createInitialState(), prestigeCount: 1, totalTime: i }, 2000 + i * 15000);
+    expect(parseSave(store.getItem(CHECKPOINT_KEYS[0]))).toMatchObject({ era: 10, prestigeCount: 0 });
+    expect(parseSave(store.getItem(CHECKPOINT_KEYS[2]))).toMatchObject({ era: 10 });
   });
   it('exports current progress and migration leaves the original object intact', () => {
     const state = createInitialState();

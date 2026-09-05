@@ -11,6 +11,11 @@ import { getTimedRateMultiplier } from './events.js';
 import { getSenateGovernmentMultiplier, getSenatePctBonuses } from './senate.js';
 import { getTuningProductionMultiplier } from './tuning.js';
 import { getActiveSystems } from './operations.js';
+import { getAvailableUpgrades, getUpgradeCost } from './upgrades.js';
+import { getAvailableTech } from './tech.js';
+import { getActiveGoal } from './goals.js';
+import { techTree } from '../data/tech-tree.js';
+import { getPublicWorks } from './publicWorks.js';
 
 export const SUPPLY_CHAINS = [
   { input: 'food', output: 'labor', cost: 1 },
@@ -19,6 +24,39 @@ export const SUPPLY_CHAINS = [
   { input: 'exoticMaterials', output: 'colonies', cost: 0.2 },
   { input: 'stellarForge', output: 'megastructures', cost: 0.3 },
 ];
+
+// Keep the next affordable step within reach before downstream factories use
+// its inputs. Prices use the same era scaling and discounts as purchases.
+const reserveChoiceCache = new WeakMap();
+function getReserveChoices(state) {
+  // Engine transitions replace ownership maps. Idle ticks can reuse the
+  // catalogue; production, balances, and capacity are still calculated anew.
+  const signature = [state.tech, state.era, state.prestigeUpgrades, state.archive?.research,
+    state.totalGems, state.totalTrades, state.prestigeCount, state.echoMode, state.echoUpgrades, Math.min(10, state.runUpgradePurchases || 0),
+    Object.keys(state.upgrades).length, Object.keys(state.tech).length];
+  const cached = reserveChoiceCache.get(state.upgrades);
+  if (cached && signature.every((v, i) => v === cached.signature[i])) return cached.choices;
+  const choices = [
+    ...getAvailableTech(state).map(d => ({ kind: 'tech', id: d.id, name: d.name, cost: d.cost })),
+    ...getAvailableUpgrades(state).filter(d => !d.repeatable).map(d => ({ kind: 'upgrade', id: d.id, name: d.name, cost: getUpgradeCost(state, d.id) })),
+  ];
+  reserveChoiceCache.set(state.upgrades, { signature, choices });
+  return choices;
+}
+export function getProgressionReserves(state) {
+  if (state.protectProgression === false) return {};
+  const choices = getReserveChoices(state);
+  const goal = state.goalsPaused ? null : getActiveGoal(state);
+  const pinned = goal && { ...goal, cost: goal.kind === 'tech' ? techTree[goal.id].cost : getUpgradeCost(state, goal.id) };
+  const reserves = {};
+  for (const { input, output } of SUPPLY_CHAINS) {
+    if (!state.resources[output]?.unlocked) continue;
+    const target = pinned?.cost[input] ? choices.find(c => c.kind === pinned.kind && c.id === pinned.id)
+      : choices.filter(c => c.cost[input] > 0).sort((a, b) => a.cost[input] - b.cost[input])[0];
+    if (target) reserves[input] = { amount: target.cost[input], name: target.name, kind: target.kind, id: target.id };
+  }
+  return reserves;
+}
 
 function mechanicalBonus(state) {
   const u = state.upgrades || {};
@@ -49,6 +87,7 @@ export function calculateEconomy(state, seconds = 1) {
   const consumed = {};
   const capacity = {};
   const constrained = {};
+  const reserves = getProgressionReserves(state);
   for (const [id, resource] of Object.entries(state.resources)) {
     capacity[id] = getEffectiveCap(state, id);
     const base = (definitions[id]?.baseRate || 0) + resource.rateAdd;
@@ -56,6 +95,9 @@ export function calculateEconomy(state, seconds = 1) {
       * getRelicProductionMultiplier(state, id) * getWeaveProductionMultiplier(state, id)
       * getRepeatableMilestoneMultiplier(state, id) + (colonies[id] || 0) + (routes[id] || 0) : 0;
     rate *= getTimedRateMultiplier(state, id);
+    // Supplied infrastructure carries the old economy into its new scale.
+    // It helps the economic route fund cross-era inputs without operations.
+    if (definitions[id]?.era < state.era && getPublicWorks(state)?.complete) rate *= 5;
     if (state.era >= 8) rate *= (senate[id] || 1) * getSenateGovernmentMultiplier(state, id);
     if (state.era >= 9) rate *= getTuningProductionMultiplier(state, id);
     if (id === 'stellarForge' && state.upgrades.forgeMemory) rate *= 1 + Math.min(100, state.dysonSegments || 0) / 100;
@@ -68,7 +110,8 @@ export function calculateEconomy(state, seconds = 1) {
     const output = state.resources[chain.output];
     if (!input?.unlocked || !output?.unlocked) continue;
     const control = state.consumerControls?.[chain.output] || {};
-    const reserve = capacity[chain.input] * (control.reserveFraction || 0);
+    const needsProtection = produced[chain.output] * chain.cost >= produced[chain.input] * 0.9 || !!getActiveGoal(state);
+    const reserve = Math.max(capacity[chain.input] * (control.reserveFraction || 0), needsProtection ? Math.min(capacity[chain.input], reserves[chain.input]?.amount || 0) : 0);
     const available = Math.max(0, input.amount + produced[chain.input] - reserve);
     const space = capacity[chain.output] > 0 ? Math.max(0, capacity[chain.output] - output.amount) : Infinity;
     const actual = control.paused ? 0 : Math.min(produced[chain.output], available / chain.cost, space);
@@ -79,6 +122,13 @@ export function calculateEconomy(state, seconds = 1) {
   const net = {};
   const amounts = {};
   const overflow = {};
+  const work = getPublicWorks(state);
+  let construction = 0;
+  if (work?.enabled && !work.complete && state.resources[work.resource]?.unlocked) {
+    const income = Math.max(0, produced[work.resource] - consumed[work.resource]);
+    construction = Math.min(work.cost - work.delivered, income * 0.2);
+    consumed[work.resource] += construction;
+  }
   for (const [id, resource] of Object.entries(state.resources)) {
     const balance = resource.amount + produced[id] - consumed[id];
     const cap = capacity[id] > 0 ? Math.max(capacity[id], resource.amount) : Infinity;
@@ -86,7 +136,7 @@ export function calculateEconomy(state, seconds = 1) {
     overflow[id] = Math.max(0, balance - cap);
     net[id] = (amounts[id] - resource.amount) / dt;
   }
-  return { gross, produced, consumed, capacity, constrained, amounts, overflow, net };
+  return { gross, produced, consumed, capacity, constrained, amounts, overflow, net, reserves, construction };
 }
 
 export function setConsumerControl(state, output, patch) {

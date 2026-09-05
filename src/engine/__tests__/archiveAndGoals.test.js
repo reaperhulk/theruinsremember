@@ -90,6 +90,33 @@ describe('persistent rewards and deliberate automation', () => {
     expect(purchaseUpgrade(state, 'forkQuarry')).toBeNull();
     expect(state.goals).toEqual([]);
   });
+  it('removes incompatible goals and buys the next viable purchase', () => {
+    let state = createInitialState();
+    for (const r of Object.values(state.resources)) r.amount = 10000;
+    state = purchaseUpgrade(state, 'tools');
+    state = queueGoal(queueGoal(state, 'upgrade', 'forkHearth'), 'upgrade', 'housing');
+    state = purchaseUpgrade(state, 'forkQuarry');
+    state = advanceGoal(state);
+    expect(state.upgrades.housing).toBe(true);
+    expect(state.goals).toEqual([]);
+    expect(state.goalNotice).toMatch(/conflicts/);
+  });
+  it('a later queued prerequisite can resolve ahead of its waiting dependent', () => {
+    let state = createInitialState();
+    for (const r of Object.values(state.resources)) r.amount = 10000;
+    state = queueGoal(queueGoal(state, 'upgrade', 'housing'), 'upgrade', 'tools');
+    state = advanceGoal(advanceGoal(state));
+    expect(state.upgrades.housing).toBe(true);
+    expect(state.goals).toEqual([]);
+  });
+  it('cannot queue a fourth law and retires stale commissions after manual choices', () => {
+    let state = { ...createInitialState(), era: 8 };
+    for (const id of ['temporal', 'spatial', 'causal', 'quantum']) state = queueCommission(state, 'law', id);
+    expect(state.commissions).toHaveLength(3);
+    state = { ...state, wovenLaws: { temporal: true, spatial: true, quantum: true } };
+    for (let i = 0; i < 3; i++) state = advanceCommissions(state);
+    expect(state.commissions).toEqual([]);
+  });
   it('signature previews match purchased production without modifying the original', () => {
     const state = createInitialState();
     for (const [id, cost] of Object.entries(getUpgradeCost(state, 'tools'))) state.resources[id].amount = cost;

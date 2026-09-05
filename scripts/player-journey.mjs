@@ -13,15 +13,16 @@ import { selectColonyMandate } from '../src/engine/colonies.js';
 import { selectNetworkPlan } from '../src/engine/starChart.js';
 import { getDysonStats, commissionDysonModule } from '../src/engine/dyson.js';
 import { getSenateStats, enactSenatePolicy } from '../src/engine/senate.js';
-import { getWeavingStats, weaveRealityLaw } from '../src/engine/weaving.js';
-import { getTuningStats, lockCosmicSignal } from '../src/engine/tuning.js';
+import { REALITY_LAWS, getWeaveCost, getWeavingStats, weaveRealityLaw } from '../src/engine/weaving.js';
+import { COSMIC_BANDS, getTuningStats, lockCosmicSignal } from '../src/engine/tuning.js';
 import { getRealityForgeRecipes, forgeRealityKey, getCycleReadiness } from '../src/engine/realityForge.js';
 import { selectNextCycleDoctrine } from '../src/engine/cycles.js';
 import { getPrestigeShop, purchasePrestigeUpgrade, performPrestige } from '../src/engine/prestige.js';
-import { claimRelic, declineRelicOffer } from '../src/engine/relics.js';
+import { getRelicSlotLimit, claimRelic, declineRelicOffer } from '../src/engine/relics.js';
 import { getForgettingStats, placeWarden } from '../src/engine/forgetting.js';
 import { createPersonaProfiles, getPlayerAttention } from './playtest-personas.js';
 import { mulberry32 } from './bot-playtest.js';
+import { createPacingMonitor } from './journey-pacing.mjs';
 import { scenarioOutcome, describeProgressionBlockers, validateSimulationState } from './progression-contract.mjs';
 
 const BUDGETS = { newcomer: 1, engaged: 2, optimizer: 4, background: 2, check_in: 2, offline_returner: 2, completionist: 2, minimalist: 1 };
@@ -72,19 +73,19 @@ export function candidateActions(state, profile, options, rng) {
   }
   if (state.era >= 8 && profile.senateFocus && options.skip !== 'senate') {
     const stats = getSenateStats(state);
-    if (stats.nextAct && stats.cooldown <= 0) {
+    if (stats.nextAct && stats.cooldown <= 0 && canAfford(state, { galacticInfluence: stats.nextActCost })) {
       const faction = stats.nextAct === 'mandate' ? 'merchants' : stats.nextAct === 'coalition' ? 'scholars' : null;
       add(`senate:${stats.nextAct}`, s => enactSenatePolicy(s, stats.nextAct, faction)?.state);
     }
   }
   if (state.era >= 8 && profile.weaving && options.skip !== 'weaving') {
     const stats = getWeavingStats(state);
-    const id = ordered(['temporal', 'causal', 'quantum', 'spatial']).find(id => !stats.laws[id]);
-    if (stats.remaining > 0) add(`law:${id}`, s => weaveRealityLaw(s, id)?.state);
+    const id = ordered(Object.keys(REALITY_LAWS)).find(id => !stats.laws[id]);
+    if (stats.remaining > 0 && stats.cooldown <= 0 && canAfford(state, { realityFragments: getWeaveCost(state) })) add(`law:${id}`, s => weaveRealityLaw(s, id)?.state);
   }
   if (state.era >= 9 && profile.cosmicTuning && options.skip !== 'tuning') {
     const stats = getTuningStats(state);
-    const id = ordered(['stability', 'power', 'constants', 'fracture']).find(id => !stats.locked[id]);
+    const id = ordered(Object.keys(COSMIC_BANDS)).find(id => !stats.locked[id]);
     if (stats.remaining > 0 && stats.cooldown <= 0) add(`signal:${id}`, s => lockCosmicSignal(s, id)?.state);
   }
   if (state.era >= 10) {
@@ -102,7 +103,7 @@ export function candidateActions(state, profile, options, rng) {
     }
   }
   if (state.relicOffer.length && profile.relics !== false) {
-    add('relic', s => s.activeRelics.length < 2 ? claimRelic(s, s.relicOffer[0]) : declineRelicOffer(s));
+    add('relic', s => s.activeRelics.length < getRelicSlotLimit(s) ? claimRelic(s, s.relicOffer[0]) : declineRelicOffer(s));
   }
   if (profile.buyPrestigeUpgrades) {
     const shop = getPrestigeShop(state);
@@ -114,9 +115,11 @@ export function candidateActions(state, profile, options, rng) {
     if (state.prestigeCount >= 2) {
       const research = ordered(['reconstruction', 'expansion', 'transcendence']).find(id => !state.archive.research[id]);
       if (research && state.archive.shards >= 5) add('research-doctrine', s => researchDoctrine(s, research));
-      if (state.archive.shards >= 3 && !state.activeRelics.includes('openCircuit') && state.activeRelics.length < 2) add('craft-relic', s => craftRelic(s, 'openCircuit'));
+      if (state.archive.shards >= 3 && !state.activeRelics.includes('openCircuit') && state.activeRelics.length < getRelicSlotLimit(state)) add('craft-relic', s => craftRelic(s, 'openCircuit'));
     }
-    if (state.prestigeCount >= 3) for (const id of Object.keys(RECONSTRUCTION_PROJECTS)) add(`project:${id}`, s => contributeProject(s, id));
+    if (state.prestigeCount >= 3) for (const [id, project] of Object.entries(RECONSTRUCTION_PROJECTS)) {
+      if (state.era >= project.era && !(state.archive.projects[id] >= 2) && state.archive.contributions[id] !== state.prestigeCount && state.resources[project.resource].amount >= getEffectiveCap(state, project.resource) * 0.25) add(`project:${id}`, s => contributeProject(s, id));
+    }
     if (!state.goals.length) {
       const goal = techs.find(t => t.grantsEra && !canAfford(state, t.cost));
       if (goal) add('queue-research', s => queueGoal(s, 'tech', goal.id));
@@ -149,10 +152,17 @@ export function runPlayerJourney(options = {}) {
   const trace = [];
   const cycleResults = [];
   let invalidState = [];
+  const rejectedCommands = [];
+  const pacing = createPacingMonitor(profile, options);
+  let maxRelics = 0;
   // Setting an exposed initial preference is allowed; owning upgrades is not.
   if (options.manualBuildOut) state = { ...state, autoBuildOut: false };
+  if (options.disableProtection) state = { ...state, protectProgression: false };
   while (elapsed < maxSeconds) {
     const attention = getPlayerAttention(profile, elapsed);
+    pacing.observe(state, elapsed, activeSeconds);
+    if (pacing.failures.length) break;
+    maxRelics = Math.max(maxRelics, state.activeRelics.length);
     if (attention.sessionStart) sessions++;
     if (attention.offline) {
       const phase = elapsed % profile.attention.sessionInterval;
@@ -184,7 +194,10 @@ export function runPlayerJourney(options = {}) {
         for (let probe = 0; probe < candidates.length; probe++) {
           const candidate = candidates[(cursor + probe) % candidates.length];
           const next = candidate.fn(state);
-          if (!next || next === state) continue;
+          if (!next || next === state) {
+            rejectedCommands.push({ elapsed, era: state.era, command: candidate.name });
+            continue;
+          }
           state = next;
           commands++;
           trace.push({ elapsed, era: state.era, command: candidate.name });
@@ -207,12 +220,13 @@ export function runPlayerJourney(options = {}) {
   const outcome = scenarioOutcome(state, { targetEra: 10, prestige: cycles - 1 }, {
     prestiges: state.prestigeCount || 0, collapsed: !!state.forgetting?.collapsed, invalidState,
   });
-  const completed = outcome.completed && cycleResults.length >= cycles;
+  const completed = outcome.completed && cycleResults.length >= cycles && !pacing.failures.length && !rejectedCommands.length;
   return {
     persona, seed, options, completed, elapsedSeconds: elapsed, activeSeconds, offlineSeconds,
+    pacing: pacing.report(), rejectedCommands, maxRelics,
     manualActions: commands, sessions, finalEra: state.era, cycleResults,
     archive: { cycles: state.archive.entries.length, research: Object.keys(state.archive.research), projects: state.archive.projects, crafted: state.archive.relicsCrafted || 0 },
-    failures: completed ? [] : [...outcome.failures, ...(cycleResults.length < cycles ? [`finished ${cycleResults.length}/${cycles} cycles`] : [])],
+    failures: completed ? [] : [...outcome.failures, ...pacing.failures, ...(rejectedCommands.length ? [`${rejectedCommands.length} advertised commands were rejected`] : []), ...(cycleResults.length < cycles ? [`finished ${cycleResults.length}/${cycles} cycles`] : [])],
     blockers: completed ? null : describeProgressionBlockers(state), trace: completed ? undefined : trace,
   };
 }

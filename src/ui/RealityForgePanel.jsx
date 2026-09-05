@@ -1,7 +1,7 @@
 import { useState, memo } from 'react';
 import { formatNumber } from './format.js';
 import { playClick, playUpgrade } from './AudioManager.js';
-import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../engine/realityForge.js';
+import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes, getForgeCharges } from '../engine/realityForge.js';
 import { CYCLE_DOCTRINES, getCycleGoal, selectNextCycleDoctrine } from '../engine/cycles.js';
 
 export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpdate }) {
@@ -11,6 +11,7 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
   const cycle = getCycleReadiness(state);
   const cycleGoal = getCycleGoal(state);
   const totalKeys = Object.values(keys).reduce((s, v) => s + v, 0);
+  const charges = getForgeCharges(state);
 
   const handleForge = (recipe) => {
     playClick();
@@ -25,6 +26,7 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
   return (
     <div className="panel reality-forge-panel">
       <h2>Reality Forge ({totalKeys} keys)</h2>
+      <p>{charges.remaining}/{charges.earned} forge charges available. Each cycle earns four; the Continuity Engine and recursion depth two each earn one more. Each key sacrifices 5% of both stocks, subject to its minimum cost.</p>
       <p className="text-lore" style={{ fontSize: '0.7em', fontStyle: 'italic', color: '#dd88ff', margin: '0 0 4px' }}>
         The forge was here before you arrived. It remembers every key ever made — including the ones you are about to make.
       </p>
@@ -55,12 +57,14 @@ export const RealityForgePanel = memo(function RealityForgePanel({ state, onUpda
       </div>
       <div className="cycle-readiness" aria-label="Cycle readiness">
         <strong>Cycle readiness {cycle.completed}/{cycle.total}</strong>
+        <span>Economic route: supply the Continuity Engine, complete 3 Multiverse discoveries ({cycle.era10Discoveries}/3) or 10 upgrades, and choose your next doctrine.</span>
         {cycle.requirements.map(requirement => (
           <span key={requirement.id} className={requirement.met ? 'ready' : ''}>
             {requirement.label}: {requirement.current}/{requirement.target}
           </span>
         ))}
-        {!cycle.directlyReady && (
+        {cycle.economicallyReady && <span className="ready">Continuity Engine complete: the economic route is ready.</span>}
+        {!cycle.ready && (
           <span className={cycle.fallbackReady ? 'ready' : ''}>
             Passive resonance: {Math.ceil(cycle.fallbackRemaining / 60)}m
           </span>

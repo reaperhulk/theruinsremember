@@ -160,11 +160,16 @@ export function createInitialState() {
     // Routine current-era upgrades buy themselves; decisions never do.
     autoBuildOut: true,
     consumerControls: {},
+    protectProgression: true,
+    publicWorks: {},
+    autoPublicWorks: true,
+    forgeChargesSpent: 0,
+    goalsPaused: false,
     runUpgradePurchases: 0,
     goals: [],
     commissions: [],
     archive: createArchive(),
     plannedPrestigeUpgrades: [],
-    saveVersion: 8,
+    saveVersion: 9,
   };
 }

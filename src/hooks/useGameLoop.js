@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { advanceTime } from '../engine/advanceTime.js';
-import { loadSave, writeSave, parseSave, SAVE_KEY, BACKUP_KEYS, offlineAllowance } from '../engine/saves.js';
+import { loadSave, writeSave, parseSave, SAVE_KEY, RECOVERY_KEYS, offlineAllowance } from '../engine/saves.js';
 
 export function useGameLoop(initialState) {
   const [loaded] = useState(() => ({ ...loadSave(localStorage), loadedAt: Date.now() }));
@@ -12,6 +12,7 @@ export function useGameLoop(initialState) {
   const busy = useRef(false);
   const speedRef = useRef(1);
   const pending = useRef(0);
+  const needsMigration = useRef(!!loaded.needsMigration);
   const initialElapsed = useRef(loaded.state ? Math.max(0, (loaded.loadedAt - loaded.state.lastSaved) / 1000) : 0);
 
   const commit = useCallback(next => {
@@ -20,7 +21,9 @@ export function useGameLoop(initialState) {
   }, []);
   const save = useCallback(() => {
     if (blocked.current || busy.current) return;
-    setSaveWarning(writeSave(localStorage, stateRef.current));
+    const warning = writeSave(localStorage, stateRef.current, Date.now(), needsMigration.current ? 'migration' : null);
+    if (!warning) needsMigration.current = false;
+    setSaveWarning(warning);
   }, []);
   const updateState = useCallback(fn => {
     if (busy.current) return;
@@ -42,6 +45,7 @@ export function useGameLoop(initialState) {
       const seconds = Math.min(elapsed, offlineAllowance(before));
       let current = before;
       setOfflineReport({ processing: true, elapsed: seconds });
+      try {
       // Yield between chunks; every second still runs the same engine. Long
       // returns stay responsive without approximating away purchase boundaries.
       for (let done = 0; done < seconds && !cancelled; done += 300) {
@@ -55,6 +59,13 @@ export function useGameLoop(initialState) {
       save();
       setOfflineReport({ elapsed: seconds, gains: Object.fromEntries(Object.entries(current.resources).filter(([, r]) => r.unlocked).map(([id, r]) => [id, r.amount - (before.resources[id]?.amount || 0)])), era: current.era, prevEra: before.era, eraChanged: current.era > before.era, upgradesGained: Object.keys(current.upgrades).length - Object.keys(before.upgrades).length, achievementsGained: Object.keys(current.achievements).length - Object.keys(before.achievements).length, siegePaused: current.era >= 10 });
       lastFrame = performance.now();
+      } catch {
+        blocked.current = true;
+        setOfflineReport(null);
+        setSaveWarning('Offline progress could not be recovered. Your original save is preserved. Restore a backup or import a save to continue.');
+      } finally {
+        busy.current = false;
+      }
     };
     const startupGap = initialElapsed.current;
     if (startupGap > 10) catchUp(startupGap);
@@ -124,13 +135,13 @@ export function useGameLoop(initialState) {
     return true;
   }, [commit, save]);
   const restoreBackup = useCallback(() => {
-    for (const key of BACKUP_KEYS) {
+    for (const key of RECOVERY_KEYS) {
       try { const text = localStorage.getItem(key); if (text && importSave(text)) return; } catch { /* try the next backup */ }
     }
     setSaveWarning('No valid backup is available. Import a previously exported save.');
   }, [importSave]);
   const resetSave = useCallback(() => {
-    try { for (const key of [SAVE_KEY, ...BACKUP_KEYS, `${SAVE_KEY}-replaced`]) localStorage.removeItem(key); } catch { /* writeSave reports storage failure */ }
+    try { for (const key of [SAVE_KEY, ...RECOVERY_KEYS, `${SAVE_KEY}-replaced`]) localStorage.removeItem(key); } catch { /* writeSave reports storage failure */ }
     blocked.current = false;
     pending.current = 0;
     commit({ ...initialState, lastSaved: Date.now() });

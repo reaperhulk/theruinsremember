@@ -1,4 +1,5 @@
 import { advanceCommissions } from './commissions.js';
+import { advancePublicWorks } from './publicWorks.js';
 import { advanceGoal, preservesGoalReserve } from './goals.js';
 import { recordHistory } from './archive.js';
 import { calculateEconomy } from './economy.js';
@@ -39,6 +40,7 @@ export function tick(state, dt, rng = Math.random, options = {}) {
     totalTicks: state.totalTicks + 1,
     totalTime: state.totalTime + dt,
   };
+  newState = advancePublicWorks(newState, economy);
 
   newState = advanceExpeditionSupplies(newState, dt);
   newState = advanceEchoPressure(newState, dt, rng);

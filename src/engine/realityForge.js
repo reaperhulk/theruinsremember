@@ -1,4 +1,12 @@
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
+import { getPublicWorks } from './publicWorks.js';
+import { techTree } from '../data/tech-tree.js';
+
+export function getForgeCharges(state) {
+  const earned = state.era >= 10 ? 4 + ((state.recursionDepth || 0) >= 2 ? 1 : 0) + (getPublicWorks(state, 10)?.complete ? 1 : 0) : 0;
+  const spent = state.forgeChargesSpent || 0;
+  return { earned, spent, remaining: Math.max(0, earned - spent) };
+}
 
 export const REALITY_KEY_RECIPES = [
   {
@@ -55,11 +63,14 @@ export const CYCLE_FALLBACK_SECONDS = 3600;
 export function getRealityForgeRecipes(state) {
   const fragments = state.resources.realityFragments?.amount || 0;
   const echoes = state.resources.quantumEchoes?.amount || 0;
+  const charges = getForgeCharges(state);
   return REALITY_KEY_RECIPES.map(recipe => ({
     ...recipe,
     count: state.realityKeys?.[recipe.id] || 0,
     isUnlocked: recipe.unlocked(state),
-    affordable: recipe.unlocked(state) && fragments >= recipe.fragments && echoes >= recipe.echoes,
+    fragments: Math.max(recipe.fragments, fragments * 0.05),
+    echoes: Math.max(recipe.echoes, echoes * 0.05),
+    affordable: charges.remaining > 0 && recipe.unlocked(state) && fragments >= recipe.fragments && echoes >= recipe.echoes,
   }));
 }
 
@@ -72,6 +83,7 @@ export function forgeRealityKey(state, recipeId) {
   const echoes = state.resources.quantumEchoes;
   return {
     ...state,
+    forgeChargesSpent: (state.forgeChargesSpent || 0) + 1,
     realityKeys: {
       ...(state.realityKeys || {}),
       [recipe.id]: (state.realityKeys?.[recipe.id] || 0) + 1,
@@ -101,12 +113,18 @@ export function getCycleReadiness(state) {
   const era10Elapsed = state.era >= 10 ? Math.max(0, state.totalTime - (state.eraStartTime || 0)) : 0;
   const completed = requirements.filter(requirement => requirement.met).length;
   const directlyReady = requirements.every(requirement => requirement.met);
+  const economic = getPublicWorks(state, 10);
+  const era10Discoveries = Object.keys(state.tech || {}).filter(id => techTree[id]?.era === 10).length;
+  const economicallyReady = state.era >= 10 && economic.complete && (era10Upgrades >= 10 || era10Discoveries >= 3) && !!state.nextCycleDoctrine;
   const fallbackSeconds = CYCLE_FALLBACK_SECONDS * (1 - completed / requirements.length);
   const fallbackRemaining = Math.max(0, fallbackSeconds - era10Elapsed);
   const fallbackReady = state.era >= 10 && fallbackRemaining === 0 && !!state.nextCycleDoctrine;
 
   return {
-    ready: directlyReady || fallbackReady,
+    ready: directlyReady || economicallyReady || fallbackReady,
+    economicallyReady,
+    era10Discoveries,
+    economic,
     directlyReady,
     fallbackReady,
     fallbackRemaining,

@@ -123,6 +123,7 @@ describe('tick', () => {
 
   it('energy is consumed by electronics production', () => {
     const state = createInitialState();
+    state.protectProgression = false;
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 3, rateMult: 1 };
     // Give enough energy so throttling doesn't kick in
     state.resources.energy = { ...state.resources.energy, amount: 10 };
@@ -227,6 +228,7 @@ describe('tick', () => {
 
   it('fuel is consumed by orbital infra production', () => {
     const state = createInitialState();
+    state.protectProgression = false;
     state.era = 4;
     state.resources.orbitalInfra = { ...state.resources.orbitalInfra, unlocked: true, rateAdd: 2, rateMult: 1 };
     state.resources.rocketFuel = { ...state.resources.rocketFuel, unlocked: true, amount: 100, rateAdd: 0, rateMult: 1, capMult: 1 };
@@ -304,6 +306,7 @@ describe('tick', () => {
 
   it('electronics production throttles when energy is depleted', () => {
     const state = createInitialState();
+    state.protectProgression = false;
     state.resources.electronics = { ...state.resources.electronics, unlocked: true, rateAdd: 100, rateMult: 1 };
     state.resources.energy = { ...state.resources.energy, unlocked: true, amount: 1 };
     // The initial 1 energy and 0.5 produced this second feed electronics.

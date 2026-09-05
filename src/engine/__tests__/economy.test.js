@@ -9,6 +9,7 @@ import { upgrades } from '../../data/upgrades.js';
 describe('player economy contracts', () => {
   it('conserves supply from empty stock, including production in the interval', () => {
     const state = createInitialState();
+    state.protectProgression = false;
     state.resources.labor.rateAdd = 100;
     const economy = calculateEconomy(state);
     expect(economy.produced.food).toBe(1.5);
@@ -28,6 +29,7 @@ describe('player economy contracts', () => {
 
   it('pause and reserves recover a starved resource and can be reversed', () => {
     let state = createInitialState();
+    state.protectProgression = false;
     state.resources.labor.rateAdd = 100;
     state = setConsumerControl(state, 'labor', { paused: true });
     expect(calculateEconomy(state).net.food).toBe(1.5);

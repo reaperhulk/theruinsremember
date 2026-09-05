@@ -26,7 +26,19 @@ describe('reality forge', () => {
 
     expect(after.realityKeys.temporal).toBe(1);
     expect(after.resources.realityFragments.amount).toBe(450);
-    expect(after.resources.quantumEchoes.amount).toBe(480);
+    expect(after.resources.quantumEchoes.amount).toBe(475);
+  });
+  it('has finite charges and spends a meaningful amount even at extreme balances', () => {
+    let state = makeForgeState();
+    state.resources.realityFragments.amount = 1e21;
+    state.resources.quantumEchoes.amount = 1e21;
+    for (let i = 0; i < 4; i++) {
+      const before = state.resources.quantumEchoes.amount;
+      state = forgeRealityKey(state, 'quantum');
+      expect(state.resources.quantumEchoes.amount).toBeLessThan(before);
+    }
+    expect(state.realityKeys.quantum).toBe(4);
+    expect(forgeRealityKey(state, 'quantum')).toBeNull();
   });
 
   it('requires Era 10 depth and a varied key set to close the cycle', () => {
