@@ -3474,3 +3474,16 @@ button:focus-visible, select:focus-visible, summary:focus-visible, input:focus-v
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }
+/* Persistent landmarks and deliberate production choices. */
+.district-skyline { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.district-skyline > div { flex: 1 1 88px; max-width: 140px; display: grid; gap: 3px; font-size: 12px; }
+.district-skyline svg { width: 100%; height: 40px; }
+.district-restored { color: #93d5c3; }
+.district-building { color: #a49271; }
+.district-skyline small { color: #abb5c0; font-size: 10px; }
+.archive-panel fieldset { display: grid; gap: 10px; border: 1px solid #44505d; margin: 14px 0; }
+.archive-panel > label, .goals-panel > label { display: block; margin: 8px 0; }
+.public-works-panel { max-width: 1440px; margin: 8px auto; }
+.public-works-panel progress { width: 100%; height: 8px; accent-color: #93d5c3; }
+.public-works-panel p { font-size: 12px; margin: 6px 0; color: #bbc6cf; }
+.relic-synergy { font-size: 12px; color: #93d5c3; }

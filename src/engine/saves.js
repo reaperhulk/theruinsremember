@@ -3,6 +3,7 @@ import { upgrades } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
 import { RELICS } from '../data/relics.js';
 import { COMMISSION_TYPES } from './commissions.js';
+import { PRODUCTION_ROUTES } from './legacy.js';
 
 export const SAVE_KEY = 'incremental-game-save';
 export const BACKUP_KEYS = [`${SAVE_KEY}-backup-1`, `${SAVE_KEY}-backup-2`];
@@ -30,6 +31,7 @@ export function validateAutomationPlan(plan) {
   arrayEntries(plan.commissions, commission, 'plan commissions');
   arrayEntries(plan.loadout, id => !!RELICS[id], 'plan relics');
   validateControls(plan.consumerControls);
+  if (plan.productionRoute !== undefined && !PRODUCTION_ROUTES[plan.productionRoute]) throw new Error('Invalid plan production route');
   for (const key of ['autoBuildOut', 'protectProgression', 'repeat']) if (plan[key] !== undefined && typeof plan[key] !== 'boolean') throw new Error(`Invalid plan ${key}`);
   return plan;
 }
@@ -49,6 +51,7 @@ export function parseSave(text) {
   for (const key of ['publicWorks', 'realityKeys', 'bestEraTimes', 'dysonModules']) {
     if (saved[key] && !Object.values(saved[key]).every(finite)) throw new Error(`Invalid ${key}`);
   }
+  if (saved.completedPublicWorks && !Object.values(saved.completedPublicWorks).every(v => typeof v === 'boolean')) throw new Error('Invalid completed public works');
   for (const field of ['upgrades', 'tech', 'prestigeUpgrades', 'achievements']) {
     if (saved[field] != null && (typeof saved[field] !== 'object' || Array.isArray(saved[field]))) throw new Error(`Invalid ${field}`);
   }
@@ -63,6 +66,7 @@ export function parseSave(text) {
   arrayEntries(saved.activeEffects, e => object(e) && finite(e.endsAt) && (e.effect === undefined || object(e.effect)) && (e.effects === undefined || Array.isArray(e.effects) && e.effects.every(object)), 'active effects');
   arrayEntries(saved.plannedPrestigeUpgrades, id => typeof id === 'string', 'prestige plan');
   validateControls(saved.consumerControls);
+  if (saved.productionRoute !== undefined && !PRODUCTION_ROUTES[saved.productionRoute]) throw new Error('Invalid production route');
   for (const key of ['autoBuildOut', 'protectProgression', 'goalsPaused']) if (saved[key] !== undefined && typeof saved[key] !== 'boolean') throw new Error(`Invalid ${key}`);
   if (saved.archive !== undefined) {
     const archive = saved.archive;
@@ -73,6 +77,9 @@ export function parseSave(text) {
     arrayEntries(archive.entries, e => object(e) && Number.isInteger(e.cycle) && finite(e.seconds) && Number.isInteger(e.era) && e.era >= 1 && e.era <= 10, 'archive entries');
     arrayEntries(archive.lore, e => typeof e === 'string', 'archive lore');
     if (archive.savedPlan != null) validateAutomationPlan(archive.savedPlan);
+    arrayEntries(archive.lastBuild, goal, 'remembered build');
+    arrayEntries(archive.lastCommissions, commission, 'remembered commissions');
+    if (archive.mappedWorks !== undefined && (!object(archive.mappedWorks) || !Object.values(archive.mappedWorks).every(v => typeof v === 'boolean'))) throw new Error('Invalid mapped works');
   }
   if (saved.forgetting && (!Array.isArray(saved.forgetting.tendrils) || !Array.isArray(saved.forgetting.wardens) || !saved.forgetting.scars || !Number.isFinite(saved.forgetting.meter))) throw new Error('Invalid siege save');
   if (saved.forgetting) {

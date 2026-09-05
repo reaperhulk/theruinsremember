@@ -27,8 +27,11 @@ export function getGoalStatus(state, goal) {
     return d.prerequisites.filter(p => impossible(p, new Set([...seen, id]))).length > (state.prestigeUpgrades?.quantumTunneling ? 1 : 0);
   };
   if (impossible(goal.id)) return 'obsolete';
-  const available = goal.kind === 'upgrade' ? getAvailableUpgrades(state) : getAvailableTech(state);
-  return available.some(d => d.id === goal.id) ? 'ready' : 'waiting';
+  const missing = def.prerequisites.filter(id => !owned[id]).length;
+  if (def.era > state.era || missing > (state.prestigeUpgrades?.quantumTunneling ? 1 : 0)
+    || (def.requireGems || 0) > (state.totalGems || 0) || (def.requireTrades || 0) > (state.totalTrades || 0)
+    || (def.requirePrestige || 0) > (state.prestigeCount || 0)) return 'waiting';
+  return 'ready';
 }
 export function getActiveGoal(state) {
   return (state.goals || []).find(g => getGoalStatus(state, g) === 'ready');

@@ -17,6 +17,7 @@ import { techTree } from '../data/tech-tree.js';
 import { resources as resourceDefs } from '../data/resources.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { getPublicWorks } from './publicWorks.js';
+import { applyRestoredInfrastructure } from './legacy.js';
 
 // Minimum upgrades purchased in the current era before transition is allowed.
 const ERA_MIN_UPGRADES = {
@@ -301,5 +302,5 @@ export function transitionEra(state, newEra) {
     ? { ...state.expedition, eraFinds: 0, supplies: carriedSupplies }
     : state.expedition;
 
-  return { ...state, era: newEra, resources: newResources, expedition, eraStartTime: state.totalTime, bestEraTimes };
+  return applyRestoredInfrastructure({ ...state, era: newEra, resources: newResources, expedition, eraStartTime: state.totalTime, bestEraTimes }, newEra);
 }

@@ -1,4 +1,5 @@
 import { preservesGoalReserve } from './goals.js';
+import { recordBuildChoice } from './blueprints.js';
 import { recordHistory } from './archive.js';
 import { calculateEconomy } from './economy.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
@@ -271,7 +272,7 @@ export function purchaseUpgrade(state, upgradeId) {
   }
 
   if (LORE_UPGRADE_ID_SET.has(upgradeId)) finalState = recordHistory(finalState, [{ isLore: true, message: `${def.name}: ${def.description}` }]);
-  return finalState;
+  return recordBuildChoice(finalState, 'upgrade', upgradeId);
 }
 
 // Buy as many of a repeatable upgrade as affordable. Returns new state or null.

@@ -1,6 +1,7 @@
 const ArchivePanel = lazy(() => import('./ArchivePanel.jsx').then(module => ({ default: module.ArchivePanel })));
 import { GoalsPanel } from './GoalsPanel.jsx';
 import { PublicWorksPanel } from './PublicWorksPanel.jsx';
+import { RestoredDistricts } from './RestoredDistricts.jsx';
 import { serializeSave } from '../engine/saves.js';
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { createInitialState } from '../engine/state.js';
@@ -371,6 +372,7 @@ export function App() {
       <main className={`game-layout ${state.era <= 4 ? 'early-game-layout' : ''}`}>
         <div className="left-column">
           <Suspense fallback={<div className="scene-placeholder">The ruins emerge…</div>}><GameCanvas state={state} onUpdate={updateState} /></Suspense>
+          <RestoredDistricts state={state} />
           <ResourcePanel state={state} onUpdate={updateState} />
           {state.era <= 3 && <ExpeditionPanel state={state} onUpdate={updateState} />}
           {state.era === 4 && <DockingPanel state={state} onUpdate={updateState} />}

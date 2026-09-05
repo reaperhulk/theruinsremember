@@ -1,6 +1,8 @@
 import { parseSave, serializeSave } from '../src/engine/saves.js';
-import { researchDoctrine, craftRelic, contributeProject, RECONSTRUCTION_PROJECTS } from '../src/engine/archive.js';
+import { researchDoctrine, craftRelic, contributeProject, RECONSTRUCTION_PROJECTS, DOCTRINE_RESEARCH, saveAutomationPlan, restoreAutomationPlan, togglePlanRepeat } from '../src/engine/archive.js';
 import { queueGoal } from '../src/engine/goals.js';
+import { selectProductionRoute, hasRelicSynergy } from '../src/engine/legacy.js';
+import { RELIC_IDS } from '../src/data/relics.js';
 import { createInitialState } from '../src/engine/state.js';
 import { advanceTime } from '../src/engine/advanceTime.js';
 import { tick } from '../src/engine/tick.js';
@@ -112,15 +114,27 @@ export function candidateActions(state, profile, options, rng) {
     if (upgrade) add(`memory:${upgrade.id}`, s => purchasePrestigeUpgrade(s, upgrade.id));
   }
   if (options.useNewSystems && profile.buyPrestigeUpgrades) {
+    if (options.collectLegacy && state.archive.research.logistics) {
+      const route = state.prestigeCount % 2 ? 'electrolysis' : 'biospheres';
+      if (state.productionRoute !== route) add('production-route', s => selectProductionRoute(s, route));
+    }
+    if (options.collectLegacy && Object.keys(state.archive.research).length === Object.keys(DOCTRINE_RESEARCH).length && state.archive.shards >= 3 && state.activeRelics.length < getRelicSlotLimit(state)) {
+      const relic = ['openCircuit', 'loomNeedle', ...RELIC_IDS].find(id => !state.activeRelics.includes(id));
+      add('craft-loadout', s => craftRelic(s, relic));
+    }
+    if (options.collectLegacy && state.archive.research.conservation && state.archive.savedPlan && state.activeRelics.length > state.archive.savedPlan.loadout.length) add('save-loadout', saveAutomationPlan);
     if (state.prestigeCount >= 2) {
-      const research = ordered(['reconstruction', 'expansion', 'transcendence']).find(id => !state.archive.research[id]);
-      if (research && state.archive.shards >= 5) add('research-doctrine', s => researchDoctrine(s, research));
-      if (state.archive.shards >= 3 && !state.activeRelics.includes('openCircuit') && state.activeRelics.length < getRelicSlotLimit(state)) add('craft-relic', s => craftRelic(s, 'openCircuit'));
+      const research = ordered(Object.keys(DOCTRINE_RESEARCH)).find(id => !state.archive.research[id] && state.prestigeCount >= (DOCTRINE_RESEARCH[id].unlockAt || 2));
+      if (research && state.archive.shards >= DOCTRINE_RESEARCH[research].cost) add('research-doctrine', s => researchDoctrine(s, research));
+      if (!state.archive.relicsCrafted && state.archive.shards >= 3 && !state.activeRelics.includes('openCircuit') && state.activeRelics.length < getRelicSlotLimit(state)) add('craft-relic', s => craftRelic(s, 'openCircuit'));
     }
     if (state.prestigeCount >= 3) for (const [id, project] of Object.entries(RECONSTRUCTION_PROJECTS)) {
-      if (state.era >= project.era && !(state.archive.projects[id] >= 2) && state.archive.contributions[id] !== state.prestigeCount && state.resources[project.resource].amount >= getEffectiveCap(state, project.resource) * 0.25) add(`project:${id}`, s => contributeProject(s, id));
+      if (state.prestigeCount >= (project.unlockAt || 3) && state.era >= project.era && !(state.archive.projects[id] >= (project.stages || 2)) && state.archive.contributions[id] !== state.prestigeCount && state.resources[project.resource].amount >= getEffectiveCap(state, project.resource) * 0.25) add(`project:${id}`, s => contributeProject(s, id));
     }
-    if (!state.goals.length) {
+    if (state.prestigeCount >= 1 && !state.archive.savedPlan && state.era >= 9) add('save-blueprint', saveAutomationPlan);
+    if (state.archive.savedPlan && !state.archive.savedPlan.repeat) add('repeat-blueprint', togglePlanRepeat);
+    if (state.archive.savedPlan && !state.blueprintActive) add('restore-blueprint', restoreAutomationPlan);
+    if (!state.goals.length && !state.blueprintActive) {
       const goal = techs.find(t => t.grantsEra && !canAfford(state, t.cost));
       if (goal) add('queue-research', s => queueGoal(s, 'tech', goal.id));
     }
@@ -133,6 +147,10 @@ export function candidateActions(state, profile, options, rng) {
   if (options.inefficient && rng() < 0.35) {
     const repeatable = upgrades.find(u => u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
     if (repeatable) actions.unshift({ name: `milestone:${repeatable.id}`, fn: s => buyNextRepeatableMilestone(s, repeatable.id) });
+  }
+  if (options.collectLegacy) {
+    const legacyActions = actions.filter(a => /^(project:|research-doctrine|craft-loadout|save-loadout|production-route)/.test(a.name));
+    if (legacyActions.length) return legacyActions;
   }
   return actions;
 }
@@ -155,6 +173,7 @@ export function runPlayerJourney(options = {}) {
   const rejectedCommands = [];
   const pacing = createPacingMonitor(profile, options);
   let maxRelics = 0;
+  const legacy = { commands: {}, synergySeconds: 0, conservedRelics: 0, replayedChoices: 0, restoredVisits: 0 };
   // Setting an exposed initial preference is allowed; owning upgrades is not.
   if (options.manualBuildOut) state = { ...state, autoBuildOut: false };
   if (options.disableProtection) state = { ...state, protectProgression: false };
@@ -177,10 +196,13 @@ export function runPlayerJourney(options = {}) {
     }
     if (attention.decisionWindow) {
       let budget = BUDGETS[persona];
-      if (getCycleReadiness(state).ready) {
+      const outstandingProjects = options.collectLegacy && Object.entries(RECONSTRUCTION_PROJECTS).some(([id, p]) => state.prestigeCount >= (p.unlockAt || 3) && state.era >= p.era && (state.archive.projects[id] || 0) < (p.stages || 2) && state.archive.contributions[id] !== state.prestigeCount);
+      const affordableLoadout = options.collectLegacy && Object.keys(state.archive.research).length === Object.keys(DOCTRINE_RESEARCH).length && state.archive.shards >= 3 && state.activeRelics.length < getRelicSlotLimit(state);
+      if (getCycleReadiness(state).ready && !outstandingProjects && !affordableLoadout) {
         cycleResults.push({ cycle: (state.prestigeCount || 0) + 1, elapsed, duration: state.totalTime });
         if (cycleResults.length >= cycles) break;
         state = performPrestige(state);
+        legacy.conservedRelics += state.activeRelics.length;
         commands++;
         budget--;
         cursor = 0;
@@ -199,6 +221,7 @@ export function runPlayerJourney(options = {}) {
             continue;
           }
           state = next;
+          legacy.commands[candidate.name] = (legacy.commands[candidate.name] || 0) + 1;
           commands++;
           trace.push({ elapsed, era: state.era, command: candidate.name });
           if (trace.length > 30) trace.shift();
@@ -210,7 +233,12 @@ export function runPlayerJourney(options = {}) {
       }
     }
     if (attention.present) activeSeconds++;
+    const previousEra = state.era;
+    const previousChoices = state.buildHistory.length;
+    if (hasRelicSynergy(state, 'closedCircuit')) legacy.synergySeconds++;
     state = tick(state, 1, rng);
+    if (state.blueprintActive) legacy.replayedChoices += Math.max(0, state.buildHistory.length - previousChoices);
+    if (state.era !== previousEra && (state.era === 2 && state.archive.projects.foundryDistrict >= 3 || state.era === 4 && state.archive.projects.orbitalCradle >= 3)) legacy.restoredVisits++;
     elapsed++;
     if (elapsed % 60 === 0) {
       invalidState = validateSimulationState(state);
@@ -223,7 +251,7 @@ export function runPlayerJourney(options = {}) {
   const completed = outcome.completed && cycleResults.length >= cycles && !pacing.failures.length && !rejectedCommands.length;
   return {
     persona, seed, options, completed, elapsedSeconds: elapsed, activeSeconds, offlineSeconds,
-    pacing: pacing.report(), rejectedCommands, maxRelics,
+    pacing: pacing.report(), rejectedCommands, maxRelics, legacy,
     manualActions: commands, sessions, finalEra: state.era, cycleResults,
     archive: { cycles: state.archive.entries.length, research: Object.keys(state.archive.research), projects: state.archive.projects, crafted: state.archive.relicsCrafted || 0 },
     failures: completed ? [] : [...outcome.failures, ...pacing.failures, ...(rejectedCommands.length ? [`${rejectedCommands.length} advertised commands were rejected`] : []), ...(cycleResults.length < cycles ? [`finished ${cycleResults.length}/${cycles} cycles`] : [])],

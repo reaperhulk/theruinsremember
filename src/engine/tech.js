@@ -1,4 +1,5 @@
 import { preservesGoalReserve } from './goals.js';
+import { recordBuildChoice } from './blueprints.js';
 import { techTree } from '../data/tech-tree.js';
 import { spend } from './resources.js';
 
@@ -51,7 +52,7 @@ export function unlockTech(state, techId) {
     newState = { ...newState, resources: newResources };
   }
 
-  return newState;
+  return recordBuildChoice(newState, 'tech', techId);
 }
 
 // Get the scaled cost for a tech node (with era multiplier applied)

@@ -1,4 +1,6 @@
-import { rememberCycle } from './archive.js';
+import { rememberCycle, restoreAutomationPlan } from './archive.js';
+import { applyRestoredInfrastructure } from './legacy.js';
+import { RELICS } from '../data/relics.js';
 import { getEffectiveCap } from './resources.js';
 import { createInitialState } from './state.js';
 import { prestigeUpgrades, echoUpgrades } from '../data/prestige-upgrades.js';
@@ -483,7 +485,13 @@ export function performPrestige(state) {
       newState.resources[id] = { ...newState.resources[id], amount: Math.max(newState.resources[id].amount, getEffectiveCap(newState, id) * 0.25) };
     }
   }
-  return newState;
+  let restored = newState;
+  for (let era = 2; era <= newState.era; era++) restored = applyRestoredInfrastructure(restored, era);
+  if (restored.archive.research.conservation) {
+    const slots = restored.archive.projects.memoryLibrary >= 4 ? 2 : 1;
+    restored = { ...restored, activeRelics: [...new Set(restored.archive.savedPlan?.loadout || [])].filter(id => RELICS[id]).slice(0, slots) };
+  }
+  return restored.archive.savedPlan?.repeat ? restoreAutomationPlan(restored) : restored;
 }
 
 // Allocate the earned points before applying any starting perk. The same plan

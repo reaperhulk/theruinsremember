@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { candidateActions, runPlayerJourney } from '../../../scripts/player-journey.mjs';
+import { DOCTRINE_RESEARCH, RECONSTRUCTION_PROJECTS } from '../archive.js';
 import { createInitialState } from '../state.js';
 import { createPersonaProfiles } from '../../../scripts/playtest-personas.js';
 import { createPacingMonitor } from '../../../scripts/journey-pacing.mjs';
@@ -48,4 +49,17 @@ describe('fresh-save journeys with bounded legal player commands', { timeout: 30
     expect(result.archive.crafted).toBeGreaterThan(0);
     expect(Object.values(result.archive.projects)).toContain(2);
   });
+  it.each([424242, 42])('uses all legacy unlocks through 22 natural cycles (seed %i)', { timeout: 120000 }, seed => {
+    const result = runPlayerJourney({ persona: 'engaged', seed, cycles: 22, useNewSystems: true, collectLegacy: true, maxSeconds: 10800 });
+    expect(result.completed, JSON.stringify(result.failures)).toBe(true);
+    expect(result.archive.research.sort()).toEqual(Object.keys(DOCTRINE_RESEARCH).sort());
+    for (const [id, project] of Object.entries(RECONSTRUCTION_PROJECTS)) expect(result.archive.projects[id], id).toBe(project.stages || 2);
+    expect(result.maxRelics).toBe(3);
+    expect(result.legacy.synergySeconds).toBeGreaterThan(0);
+    expect(result.legacy.conservedRelics).toBeGreaterThan(0);
+    expect(result.legacy.replayedChoices).toBeGreaterThan(0);
+    expect(result.legacy.restoredVisits).toBeGreaterThan(0);
+    expect(result.legacy.commands['production-route']).toBeGreaterThan(0);
+  });
+
 });

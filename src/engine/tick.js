@@ -1,5 +1,6 @@
 import { advanceCommissions } from './commissions.js';
 import { advancePublicWorks } from './publicWorks.js';
+import { advanceBlueprint } from './blueprints.js';
 import { advanceGoal, preservesGoalReserve } from './goals.js';
 import { recordHistory } from './archive.js';
 import { calculateEconomy } from './economy.js';
@@ -138,6 +139,7 @@ export function tick(state, dt, rng = Math.random, options = {}) {
   }
 
 
+  newState = advanceBlueprint(newState);
   newState = advanceGoal(newState);
   newState = advanceCommissions(newState);
 
@@ -170,7 +172,8 @@ export function tick(state, dt, rng = Math.random, options = {}) {
   // Routine build-out: the current era's non-decision upgrades buy themselves
   // so the Decisions tab holds decisions rather than a queue to flush. Forks,
   // rule changes, resource unlocks and lore fragments are never auto-bought.
-  const buildOutRuns = intervalCrossings(state.totalTime, newState.totalTime, 5);
+  const buildOutInterval = newState.blueprintActive && newState.archive?.research?.blueprints && newState.era <= 3 ? 1 : 5;
+  const buildOutRuns = intervalCrossings(state.totalTime, newState.totalTime, buildOutInterval);
   if (newState.autoBuildOut !== false && buildOutRuns > 0) {
     for (let run = 0; run < buildOutRuns; run++) {
       const result = buyRoutineBuildOut(newState);

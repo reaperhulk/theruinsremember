@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { RELICS } from '../data/relics.js';
 import { claimRelic, declineRelicOffer, ECHO_PRESSURE_TARGET, getRelicSlotLimit } from '../engine/relics.js';
+import { getRelicSynergies } from '../engine/legacy.js';
 
 export const RelicPanel = memo(function RelicPanel({ state, onUpdate }) {
   const active = state.activeRelics || [];
@@ -41,6 +42,7 @@ export const RelicPanel = memo(function RelicPanel({ state, onUpdate }) {
           ))}
         </div>
       )}
+      {getRelicSynergies(state).filter(s => s.active).map(s => <p key={s.id} className="relic-synergy"><strong>{s.name}</strong> · {s.description}</p>)}
 
       {offer.length > 0 && (
         <>

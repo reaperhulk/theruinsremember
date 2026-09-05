@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { DOCTRINE_RESEARCH, RECONSTRUCTION_PROJECTS, researchDoctrine, craftRelic, contributeProject, saveAutomationPlan, restoreAutomationPlan } from '../engine/archive.js';
+import { DOCTRINE_RESEARCH, RECONSTRUCTION_PROJECTS, researchDoctrine, craftRelic, contributeProject, saveAutomationPlan, restoreAutomationPlan, togglePlanRepeat } from '../engine/archive.js';
+import { PRODUCTION_ROUTES, selectProductionRoute, getRelicSynergies } from '../engine/legacy.js';
 import { RELICS } from '../data/relics.js';
 import { getEffectiveCap } from '../engine/resources.js';
 import { getRelicSlotLimit } from '../engine/relics.js';
@@ -13,14 +14,19 @@ export function ArchivePanel({ state, onUpdate }) {
     <h2>The Archive · {archive.shards} memory shards</h2>
     <p>Each completed cycle leaves six shards. Research, projects, and recorded history survive every reset.</p>
     <h3>Remembered plans</h3>
-    <p>Save your current goal queue, operation commissions, consumer reserves, and build-out preference. Restore it when you are ready; future-era orders wait for their era.</p>
+    <p>Save the choices you already made, pending goals, completed operation orders, production route, and relic loadout. Replay pays normal prices and waits for prerequisites; conflicting choices retire automatically.</p>
     <button onClick={() => onUpdate(saveAutomationPlan)}>Save current plan</button>
     <button disabled={!archive.savedPlan} onClick={() => onUpdate(restoreAutomationPlan)}>Restore saved plan</button>
+    {archive.savedPlan && <><p>{(archive.savedPlan.choices || archive.savedPlan.goals || []).length} remembered choices · {archive.savedPlan.commissions?.length || 0} operation orders · {archive.savedPlan.loadout?.length || 0} saved relics</p>
+      <label><input type="checkbox" checked={!!archive.savedPlan.repeat} onChange={() => onUpdate(togglePlanRepeat)} /> Replay this plan automatically after prestige</label></>}
+    {state.blueprintActive && <button onClick={() => onUpdate(s => ({ ...s, blueprintActive: false, goalsPaused: true }))}>Pause blueprint replay</button>}
+    {archive.research.logistics && <fieldset><legend>Production route · change freely</legend>{Object.entries(PRODUCTION_ROUTES).map(([id, route]) => <label key={id}><input type="radio" name="production-route" checked={(state.productionRoute || 'standard') === id} onChange={() => onUpdate(s => selectProductionRoute(s, id))} /> <strong>{route.name}</strong> — {route.description}</label>)}</fieldset>}
+    {archive.research.resonance && <><h3>Relic combinations</h3><div className="archive-cards">{getRelicSynergies(state).map(synergy => <article key={synergy.id}><strong>{synergy.name} · {synergy.active ? 'Active' : 'Equip the pair'}</strong><p>{synergy.relics.map(id => RELICS[id].name).join(' + ')}</p><p>{synergy.description}</p></article>)}</div></>}
     {state.prestigeCount >= 2 ? <>
       <h3>Doctrine research</h3>
       <div className="archive-cards">{Object.entries(DOCTRINE_RESEARCH).map(([id, def]) => <article key={id}>
         <strong>{def.name}</strong><p>{def.description}</p>
-        <button disabled={!!archive.research[id] || archive.shards < def.cost} onClick={() => onUpdate(s => researchDoctrine(s, id))}>{archive.research[id] ? 'Remembered permanently' : `Research · ${def.cost} shards`}</button>
+        <button disabled={!!archive.research[id] || archive.shards < def.cost || state.prestigeCount < (def.unlockAt || 2)} onClick={() => onUpdate(s => researchDoctrine(s, id))}>{archive.research[id] ? 'Remembered permanently' : state.prestigeCount < (def.unlockAt || 2) ? `Unlocks after prestige ${def.unlockAt}` : `Research · ${def.cost} shards`}</button>
       </article>)}</div>
       <h3>Relic workshop</h3>
       <p>Choose an exact relic for three shards. It lasts for this run.</p>
@@ -29,12 +35,14 @@ export function ArchivePanel({ state, onUpdate }) {
     </> : <p>Next prestige unlocks permanent research and the relic workshop.</p>}
     {state.prestigeCount >= 3 ? <>
       <h3>Reconstruction projects</h3>
-      <p>Each project needs contributions from two different cycles. Contributions cost 25% of the indicated resource capacity.</p>
+      <p>Restore landmarks over several civilizations. Each contribution costs 25% of the indicated resource capacity and can be made once per cycle. Completed landmarks remain in the world.</p>
       <div className="archive-cards">{Object.entries(RECONSTRUCTION_PROJECTS).map(([id, project]) => {
         const count = archive.projects[id] || 0;
+        const stages = project.stages || 2;
+        const unlocked = state.prestigeCount >= (project.unlockAt || 3);
         const cost = getEffectiveCap(state, project.resource) * 0.25;
         const contributed = archive.contributions[id] === state.prestigeCount;
-        return <article key={id}><strong>{project.name} · {count}/2 cycles</strong><p>{project.description}</p><button disabled={count >= 2 || contributed || state.era < project.era || state.resources[project.resource].amount < cost} onClick={() => onUpdate(s => contributeProject(s, id))}>{count >= 2 ? 'Reconstructed' : contributed ? 'Continue in your next cycle' : `Era ${project.era}: contribute ${formatNumber(cost)} ${project.resource}`}</button></article>;
+        return <article key={id}><strong>{project.name} · {count}/{stages} cycles</strong><p>{project.description}</p><button disabled={!unlocked || count >= stages || contributed || state.era < project.era || state.resources[project.resource].amount < cost} onClick={() => onUpdate(s => contributeProject(s, id))}>{!unlocked ? `Unlocks after prestige ${project.unlockAt}` : count >= stages ? 'Reconstructed' : contributed ? 'Continue in your next cycle' : `Era ${project.era}: contribute ${formatNumber(cost)} ${project.resource}`}</button></article>;
       })}</div>
     </> : <p>Prestige three unlocks reconstruction projects that span cycles.</p>}
     <h3>Remembered civilizations</h3>

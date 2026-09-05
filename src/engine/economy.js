@@ -16,6 +16,7 @@ import { getAvailableTech } from './tech.js';
 import { getActiveGoal } from './goals.js';
 import { techTree } from '../data/tech-tree.js';
 import { getPublicWorks } from './publicWorks.js';
+import { hasRelicSynergy } from './legacy.js';
 
 export const SUPPLY_CHAINS = [
   { input: 'food', output: 'labor', cost: 1 },
@@ -24,6 +25,17 @@ export const SUPPLY_CHAINS = [
   { input: 'exoticMaterials', output: 'colonies', cost: 0.2 },
   { input: 'stellarForge', output: 'megastructures', cost: 0.3 },
 ];
+export function getSupplyChains(state) {
+  const alternate = !!state.archive?.research?.logistics;
+  const living = hasRelicSynergy(state, 'livingWorlds');
+  const efficient = hasRelicSynergy(state, 'closedCircuit');
+  return SUPPLY_CHAINS.map(chain => {
+    let adjusted = chain;
+    if (alternate && state.productionRoute === 'electrolysis' && chain.output === 'orbitalInfra') adjusted = { ...chain, input: 'energy', cost: 5 };
+    if ((living || alternate && state.productionRoute === 'biospheres') && chain.output === 'colonies') adjusted = { ...chain, input: 'food', cost: living ? 1 : 2 };
+    return efficient ? { ...adjusted, cost: adjusted.cost * 0.5 } : adjusted;
+  });
+}
 
 // Keep the next affordable step within reach before downstream factories use
 // its inputs. Prices use the same era scaling and discounts as purchases.
@@ -49,7 +61,7 @@ export function getProgressionReserves(state) {
   const goal = state.goalsPaused ? null : getActiveGoal(state);
   const pinned = goal && { ...goal, cost: goal.kind === 'tech' ? techTree[goal.id].cost : getUpgradeCost(state, goal.id) };
   const reserves = {};
-  for (const { input, output } of SUPPLY_CHAINS) {
+  for (const { input, output } of getSupplyChains(state)) {
     if (!state.resources[output]?.unlocked) continue;
     const target = pinned?.cost[input] ? choices.find(c => c.kind === pinned.kind && c.id === pinned.id)
       : choices.filter(c => c.cost[input] > 0).sort((a, b) => a.cost[input] - b.cost[input])[0];
@@ -105,14 +117,14 @@ export function calculateEconomy(state, seconds = 1) {
     produced[id] = gross[id] * dt;
     consumed[id] = 0;
   }
-  for (const chain of SUPPLY_CHAINS) {
+  for (const chain of getSupplyChains(state)) {
     const input = state.resources[chain.input];
     const output = state.resources[chain.output];
     if (!input?.unlocked || !output?.unlocked) continue;
     const control = state.consumerControls?.[chain.output] || {};
     const needsProtection = produced[chain.output] * chain.cost >= produced[chain.input] * 0.9 || !!getActiveGoal(state);
     const reserve = Math.max(capacity[chain.input] * (control.reserveFraction || 0), needsProtection ? Math.min(capacity[chain.input], reserves[chain.input]?.amount || 0) : 0);
-    const available = Math.max(0, input.amount + produced[chain.input] - reserve);
+    const available = Math.max(0, input.amount + produced[chain.input] - consumed[chain.input] - reserve);
     const space = capacity[chain.output] > 0 ? Math.max(0, capacity[chain.output] - output.amount) : Infinity;
     const actual = control.paused ? 0 : Math.min(produced[chain.output], available / chain.cost, space);
     constrained[chain.output] = control.paused ? 'paused' : actual + 1e-9 < produced[chain.output] ? (space <= actual ? 'storage' : 'input') : null;
@@ -126,8 +138,11 @@ export function calculateEconomy(state, seconds = 1) {
   let construction = 0;
   if (work?.enabled && !work.complete && state.resources[work.resource]?.unlocked) {
     const income = Math.max(0, produced[work.resource] - consumed[work.resource]);
-    construction = Math.min(work.cost - work.delivered, income * 0.2);
+    const wouldOverflow = Math.max(0, state.resources[work.resource].amount + income - capacity[work.resource]);
+    const reclaimed = state.archive?.research?.salvage || state.archive?.projects?.continuityGarden >= 4 ? Math.min(income, wouldOverflow) : 0;
+    construction = Math.min(work.cost - work.delivered, Math.max(income * 0.2, reclaimed));
     consumed[work.resource] += construction;
+    if (state.archive?.projects?.continuityGarden >= 4 && reclaimed > 0) construction = Math.min(work.cost - work.delivered, construction + reclaimed);
   }
   for (const [id, resource] of Object.entries(state.resources)) {
     const balance = resource.amount + produced[id] - consumed[id];
