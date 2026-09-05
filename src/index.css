@@ -3441,8 +3441,8 @@ canvas:hover {
 .goals-panel select { max-width: 100%; }
 .goals-panel ol, .archive-panel ol { margin: 12px 0 12px 22px; }
 .goals-panel li, .archive-panel li { margin-bottom: 8px; line-height: 1.5; overflow-wrap: anywhere; }
-.goals-panel button, .archive-panel button, .prestige-allocation button, .consumer-controls select { padding: 8px 10px; margin: 4px 4px 4px 0; border: 1px solid #65727f; border-radius: 5px; color: #e2ddd0; background: #242c36; font: inherit; font-size: 12px; cursor: pointer; }
-.goals-panel button:disabled, .archive-panel button:disabled { cursor: default; color: #aeb7c0; background: #1b2028; border-color: #424b55; }
+.goals-panel button, .archive-panel button, .prestige-allocation button, .queue-goal-btn, .consumer-controls select { padding: 8px 10px; margin: 4px 4px 4px 0; border: 1px solid #65727f; border-radius: 5px; color: #e2ddd0; background: #242c36; font: inherit; font-size: 12px; cursor: pointer; }
+.goals-panel button:disabled, .archive-panel button:disabled, .queue-goal-btn:disabled { cursor: default; color: #aeb7c0; background: #1b2028; border-color: #424b55; }
 .archive-panel h3, .prestige-allocation h3 { margin-top: 22px; color: #dfc087; }
 .archive-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); gap: 12px; margin: 14px 0; }
 .archive-cards article { padding: 14px; border: 1px solid #4e535e; border-radius: 8px; background: #1a202b; }

@@ -25,7 +25,7 @@ to main, with the testing harness audited before gameplay changes.
       keyboard access, and reduced-motion support.
 - [x] Add ambient music and independent audio controls.
 - [x] Move automatic visual rewards into simulation and profile/render efficiently.
-- [ ] Complete natural progression and UI journeys, run quality gates, inspect CI.
+- [x] Add required natural progression and UI journeys with diagnostic CI gates.
 
 ## Harness audit
 
@@ -266,6 +266,39 @@ The fixture enters through Begin challenge and verifies painted pixels before
 injecting a threat and testing Warden placement. The offline fixture explicitly
 opts into the siege before testing protection. Lint/build pass; all 16 persona
 results remain identical, with no new stalls or actions while absent.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Final era / ready |
+|---|---|---|---|---|---|---|
+| newcomer | 424242 | 1921 → 1921 | 1921 → 1921 | 139 → 139 | 1 → 1 | 10 / True |
+| engaged | 424242 | 1411 → 1411 | 1411 → 1411 | 163 → 163 | 1 → 1 | 10 / True |
+| optimizer | 424242 | 961 → 961 | 961 → 961 | 239 → 239 | 1 → 1 | 10 / True |
+| background | 424242 | 2041 → 2041 | 511 → 511 | 129 → 129 | 18 → 18 | 10 / True |
+| check_in | 424242 | 4801 → 4801 | 481 → 481 | 138 → 138 | 9 → 9 | 10 / True |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 101 → 101 | 4 → 4 | 5 / False |
+| completionist | 424242 | 1171 → 1171 | 1171 → 1171 | 218 → 218 | 1 → 1 | 10 / True |
+| minimalist | 424242 | 11461 → 11461 | 11461 → 11461 | 92 → 92 | 1 → 1 | 10 / True |
+| newcomer | 42 | 1681 → 1681 | 1681 → 1681 | 137 → 137 | 1 → 1 | 10 / True |
+| engaged | 42 | 1531 → 1531 | 1531 → 1531 | 166 → 166 | 1 → 1 | 10 / True |
+| optimizer | 42 | 961 → 961 | 961 → 961 | 260 → 260 | 1 → 1 | 10 / True |
+| background | 42 | 2041 → 2041 | 511 → 511 | 130 → 130 | 18 → 18 | 10 / True |
+| check_in | 42 | 4801 → 4801 | 481 → 481 | 138 → 138 | 9 → 9 | 10 / True |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | 5 / False |
+| completionist | 42 | 1141 → 1141 | 1141 → 1141 | 209 → 209 | 1 → 1 | 10 / True |
+| minimalist | 42 | 9181 → 9181 | 9181 → 9181 | 89 → 89 | 1 → 1 | 10 / True |
+
+### 8. Visual QA and final validation gate
+
+Inspected captured Era 1 and Era 5 desktop layouts and the mobile Era 5 layout.
+Goal buttons now share the readable control styling instead of browser defaults.
+Production build passes. All before/after persona metrics below are unchanged.
+Both desktop and mobile operation jobs passed on `9c00017`, including entering and
+painting the siege, Warden placement, migration, an active offline siege, all
+operations, layout checks, and three desktop prestige reset fixtures.
+
+The final publication must pass the complete [GitHub Actions workflow](https://github.com/reaperhulk/theruinsremember/actions/workflows/deploy.yml)
+before deployment. The workflow records exact fresh-save browser cycle counts,
+actual gameplay commands, reload results, screenshots and failure state. A green
+fixture test is never substituted for the separate natural journey gate.
 
 | Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Final era / ready |
 |---|---|---|---|---|---|---|
