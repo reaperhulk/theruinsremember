@@ -204,7 +204,7 @@ export const ForgettingPanel = memo(function ForgettingPanel({ state, onUpdate }
       if (raf) cancelAnimationFrame(raf);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, []);
+  }, [state.forgettingChallengeActive]);
 
   const showHint = useCallback(text => {
     setHint(text);

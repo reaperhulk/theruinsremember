@@ -249,3 +249,39 @@ runs desktop/mobile natural journeys and operation fixtures in four independent
 jobs with separate diagnostic artifacts; deployment requires all four plus the
 engine quality job. Final-head browser and deployment results are checked after
 publication.
+
+### 7. Browser-discovered lifecycle and fixture corrections
+
+The final engine CI job on `3686cbb` passed all quality, stress, persona, and
+adversarial gates. The operation browser tests correctly failed. Several checks
+clicked before lazy panels mounted; those now wait for the actual enabled control.
+The fixture clock is paused for deterministic operation assertions, fixtures reset
+their own operation choices, and failures retain state, audits, and screenshots.
+The name-visibility check is scoped to purchase cards, rather than intentionally
+collapsed history entries in Stats. No operation outcome assertion was removed.
+
+Inspection also found a real canvas lifecycle defect: the siege drawing effect
+could run before its canvas existed. It now restarts when the challenge is entered.
+The fixture enters through Begin challenge and verifies painted pixels before
+injecting a threat and testing Warden placement. The offline fixture explicitly
+opts into the siege before testing protection. Lint/build pass; all 16 persona
+results remain identical, with no new stalls or actions while absent.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Final era / ready |
+|---|---|---|---|---|---|---|
+| newcomer | 424242 | 1921 → 1921 | 1921 → 1921 | 139 → 139 | 1 → 1 | 10 / True |
+| engaged | 424242 | 1411 → 1411 | 1411 → 1411 | 163 → 163 | 1 → 1 | 10 / True |
+| optimizer | 424242 | 961 → 961 | 961 → 961 | 239 → 239 | 1 → 1 | 10 / True |
+| background | 424242 | 2041 → 2041 | 511 → 511 | 129 → 129 | 18 → 18 | 10 / True |
+| check_in | 424242 | 4801 → 4801 | 481 → 481 | 138 → 138 | 9 → 9 | 10 / True |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 101 → 101 | 4 → 4 | 5 / False |
+| completionist | 424242 | 1171 → 1171 | 1171 → 1171 | 218 → 218 | 1 → 1 | 10 / True |
+| minimalist | 424242 | 11461 → 11461 | 11461 → 11461 | 92 → 92 | 1 → 1 | 10 / True |
+| newcomer | 42 | 1681 → 1681 | 1681 → 1681 | 137 → 137 | 1 → 1 | 10 / True |
+| engaged | 42 | 1531 → 1531 | 1531 → 1531 | 166 → 166 | 1 → 1 | 10 / True |
+| optimizer | 42 | 961 → 961 | 961 → 961 | 260 → 260 | 1 → 1 | 10 / True |
+| background | 42 | 2041 → 2041 | 511 → 511 | 130 → 130 | 18 → 18 | 10 / True |
+| check_in | 42 | 4801 → 4801 | 481 → 481 | 138 → 138 | 9 → 9 | 10 / True |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | 5 / False |
+| completionist | 42 | 1141 → 1141 | 1141 → 1141 | 209 → 209 | 1 → 1 | 10 / True |
+| minimalist | 42 | 9181 → 9181 | 9181 → 9181 | 89 → 89 | 1 → 1 | 10 / True |

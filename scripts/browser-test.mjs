@@ -20,6 +20,7 @@ const MOBILE = process.argv.includes('--mobile');
 const SCREENSHOTS = process.argv.includes('--screenshots');
 const GAME_URL = process.env.GAME_URL || 'http://localhost:5173';
 const SCREENSHOT_DIR = '/tmp/game-screenshots';
+let diagnosticPage;
 if (SCREENSHOTS) mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
 const managedHeadlessShell = computeExecutablePath({
@@ -132,6 +133,7 @@ async function exercisePersistenceAndAutomation(page) {
       ...state,
       era: 10,
       totalTime,
+      forgettingChallengeActive: true,
       autoBuildOut: false,
       lockedSignals: { stability: true },
       forgetting: {
@@ -202,6 +204,14 @@ async function loadEra10Fixture(page) {
     window.__game.setState(state => ({
       ...state,
       era: 10,
+      forgettingChallengeActive: false,
+      forgetting: null,
+      dysonModules: { frame: 0, collector: 0, forge: 0 },
+      lastDysonCommissionTime: undefined,
+      wovenLaws: {},
+      lastLawWeaveTime: undefined,
+      colonyMandate: undefined,
+      lastColonyMandateTime: undefined,
       lockedSignals: { stability: true },
       dockingSuccesses: 9,
       realityKeys: { temporal: 1, spatial: 1, quantum: 2 },
@@ -295,7 +305,7 @@ async function checkLayout(page) {
     }
 
     // Upgrade name visible
-    const nameDiv = document.querySelector('.upgrade-name');
+    const nameDiv = document.querySelector('.upgrade-row .upgrade-name');
     if (nameDiv) {
       const h = nameDiv.getBoundingClientRect().height;
       if (h < 5) issues.push('Upgrade name invisible');
@@ -366,6 +376,7 @@ async function run() {
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || (existsSync(managedHeadlessShell) ? managedHeadlessShell : undefined),
   });
   const page = await browser.newPage();
+  diagnosticPage = page;
   await page.setViewport(viewport);
 
   // Capture console errors
@@ -422,6 +433,7 @@ async function run() {
   }
 
   await stopPump(page);
+  await page.evaluate(() => window.__game.setSpeed(0));
   const orbitalOperations = await exerciseOrbitalOperations(page);
   const operationFailed = !orbitalOperations.panelVisible || orbitalOperations.missionCount !== 3;
   console.log(`  Orbital operations: ${orbitalOperations.missionCount}/3 mission choices${operationFailed ? ' (FAILED)' : ''}`);
@@ -432,7 +444,7 @@ async function run() {
   await stopPump(page);
   await loadEra10Fixture(page);
   await page.evaluate(() => document.querySelector('#tab-mini')?.click());
-  await new Promise(resolve => setTimeout(resolve, 150));
+  await page.waitForSelector('.reality-forge-panel', { visible: true });
   const operationShell = await page.evaluate(() => ({
     heading: document.querySelector('.operations-heading h2')?.textContent || '',
     archiveOptions: document.querySelectorAll('.operation-archive option').length,
@@ -448,7 +460,10 @@ async function run() {
     return true;
   });
   await new Promise(resolve => setTimeout(resolve, 100));
-  if (dysonMounted) await page.evaluate(() => document.querySelector('.dyson-modules button')?.click());
+  if (dysonMounted) {
+    await page.waitForSelector('.dyson-modules button:not(:disabled)', { visible: true });
+    await page.evaluate(() => document.querySelector('.dyson-modules button:not(:disabled)').click());
+  }
   await new Promise(resolve => setTimeout(resolve, 100));
   const dysonAudit = dysonMounted && await page.evaluate(() => ({
     moduleChoices: document.querySelectorAll('.dyson-modules button').length,
@@ -464,7 +479,10 @@ async function run() {
     return true;
   });
   await new Promise(resolve => setTimeout(resolve, 150));
-  if (tuningMounted) await page.evaluate(() => document.querySelector('.signal-bands button:not([disabled])')?.click());
+  if (tuningMounted) {
+    await page.waitForSelector('.signal-bands button:not(:disabled)', { visible: true });
+    await page.evaluate(() => document.querySelector('.signal-bands button:not(:disabled)').click());
+  }
   await new Promise(resolve => setTimeout(resolve, 100));
   const tuningAudit = tuningMounted && await page.evaluate(() => ({
       visible: !!document.querySelector('.tuning-panel'),
@@ -482,7 +500,10 @@ async function run() {
     return 1;
   });
   await new Promise(resolve => setTimeout(resolve, 100));
-  if (weavingMounted) await page.evaluate(() => document.querySelector('.reality-laws button:not(:disabled)')?.click());
+  if (weavingMounted) {
+    await page.waitForSelector('.reality-laws button:not(:disabled)', { visible: true });
+    await page.evaluate(() => document.querySelector('.reality-laws button:not(:disabled)').click());
+  }
   await new Promise(resolve => setTimeout(resolve, 100));
   const weavingAudit = weavingMounted && await page.evaluate(() => ({
     lawChoices: document.querySelectorAll('.reality-laws button').length,
@@ -498,7 +519,10 @@ async function run() {
     return true;
   });
   await new Promise(resolve => setTimeout(resolve, 100));
-  if (senateMounted) await page.evaluate(() => document.querySelector('.senate-acts button:not([disabled])')?.click());
+  if (senateMounted) {
+    await page.waitForSelector('.senate-acts button:not(:disabled)', { visible: true });
+    await page.evaluate(() => document.querySelector('.senate-acts button:not(:disabled)').click());
+  }
   await new Promise(resolve => setTimeout(resolve, 100));
   const senateAudit = senateMounted && await page.evaluate(() => ({
     factionChoices: document.querySelectorAll('.senate-acts button').length,
@@ -515,6 +539,7 @@ async function run() {
   });
   await new Promise(resolve => setTimeout(resolve, 100));
   if (colonyMounted) {
+    await page.waitForSelector('.colony-mandates button:not(:disabled)', { visible: true });
     await page.evaluate(() => {
       const federation = [...document.querySelectorAll('.colony-mandates button')]
         .find(button => button.textContent.includes('Federation'));
@@ -570,7 +595,10 @@ async function run() {
     return true;
   });
   await new Promise(resolve => setTimeout(resolve, 100));
-  if (chartMounted) await page.evaluate(() => document.querySelector('.network-plans button:not([disabled])')?.click());
+  if (chartMounted) {
+    await page.waitForSelector('.network-plans button:not(:disabled)', { visible: true });
+    await page.evaluate(() => document.querySelector('.network-plans button:not(:disabled)').click());
+  }
   await new Promise(resolve => setTimeout(resolve, 100));
   const chartAudit = chartMounted && await page.evaluate(() => ({
     planChoices: document.querySelectorAll('.network-plans button').length,
@@ -578,6 +606,24 @@ async function run() {
   }));
   const chartFailed = !chartAudit || chartAudit.planChoices !== 3 || !chartAudit.committed;
   console.log(`  Star chart plans: ${chartFailed ? 'FAILED' : '3 plans, one committed'}`);
+  const siegeMounted = await page.evaluate(() => {
+    const select = document.querySelector('.operation-archive select');
+    if (select) {
+      select.value = '';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    return true;
+  }) && await new Promise(resolve => setTimeout(() => resolve(true), 150)) && await page.evaluate(() => {
+    const tab = [...document.querySelectorAll('.operation-modes button')].find(button => /Forgetting/.test(button.textContent));
+    if (!tab) return false;
+    tab.click();
+    return true;
+  });
+  await page.waitForFunction(() => [...document.querySelectorAll('.forgetting-panel button')].some(button => button.textContent === 'Begin challenge'));
+  await page.evaluate(() => [...document.querySelectorAll('.forgetting-panel button')].find(button => button.textContent === 'Begin challenge').click());
+  // Entering through the button must mount and paint the canvas, not merely
+  // set an engine flag. This catches effects that ran before the canvas existed.
+  await page.waitForFunction(() => document.querySelector('.siege-canvas')?.getContext('2d').getImageData(0, 0, 1, 1).data[3] > 0);
   // Isolated siege fixture; full fresh-save journeys run in browser-journey.mjs.
   await page.evaluate(() => {
     window.__game.setState(state => ({
@@ -597,21 +643,11 @@ async function run() {
       },
     }));
   });
-  const siegeMounted = await page.evaluate(() => {
-    const select = document.querySelector('.operation-archive select');
-    if (select) {
-      select.value = '';
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    return true;
-  }) && await new Promise(resolve => setTimeout(() => resolve(true), 150)) && await page.evaluate(() => {
-    const tab = [...document.querySelectorAll('.operation-modes button')].find(button => /Forgetting/.test(button.textContent));
-    if (!tab) return false;
-    tab.click();
-    return true;
-  });
   await new Promise(resolve => setTimeout(resolve, 200));
-  if (siegeMounted) await page.evaluate(() => document.querySelector('.siege-threat-btn')?.click());
+  if (siegeMounted) {
+    await page.waitForSelector('.siege-threat-btn', { visible: true });
+    await page.evaluate(() => document.querySelector('.siege-threat-btn').click());
+  }
   await new Promise(resolve => setTimeout(resolve, 200));
   const siegeAudit = siegeMounted && await page.evaluate(() => ({
     canvas: !!document.querySelector('.siege-canvas'),
@@ -630,6 +666,7 @@ async function run() {
     return true;
   });
   await new Promise(resolve => setTimeout(resolve, 150));
+  await page.waitForSelector('.reality-forge-panel .cycle-readiness', { visible: true });
   const cycleReadyVisible = forgeReady && await page.evaluate(() => (
     !!document.querySelector('.reality-forge-panel .cycle-readiness') &&
     !!document.querySelector('.prestige-btn') &&
@@ -689,7 +726,7 @@ async function run() {
   const tabIssues = [];
   for (const tab of ['tech', 'mini', 'trading', 'prestige', 'stats']) {
     await page.evaluate(tabId => document.querySelector('#tab-' + tabId)?.click(), tab);
-    await new Promise(r => setTimeout(r, 100));
+    await page.waitForSelector(`#tabpanel-${tab} .panel, #tabpanel-${tab} .operations-shell`, { visible: true });
     const tabLayout = await checkLayout(page);
     tabIssues.push(...tabLayout.issues.map(issue => `${tab}: ${issue}`));
   }
@@ -728,8 +765,20 @@ async function run() {
   }
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
   const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || migrationFailed || offlineFailed || automationFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || colonyFailed || tradeRouteFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
+  mkdirSync('test-results', { recursive: true });
+  writeFileSync(`test-results/operations-${MOBILE ? 'mobile' : 'desktop'}.json`, JSON.stringify({ exitCode, persistence, operationShell, dysonAudit, tuningAudit, weavingAudit, senateAudit, colonyAudit, routeAudit, chartAudit, siegeAudit, finalLayout, tabIssues, consoleErrors, state: await page.evaluate(() => window.__game.getState()) }, null, 2));
+  await page.screenshot({ path: `test-results/operations-${MOBILE ? 'mobile' : 'desktop'}.png`, fullPage: true });
   await browser.close();
   process.exit(exitCode);
 }
 
-run().catch(e => { console.error(e); process.exit(1); });
+run().catch(async error => {
+  console.error(error);
+  mkdirSync('test-results', { recursive: true });
+  if (diagnosticPage) {
+    await diagnosticPage.screenshot({ path: 'test-results/operation-error.png', fullPage: true }).catch(() => {});
+    const state = await diagnosticPage.evaluate(() => window.__game?.getState()).catch(() => null);
+    writeFileSync('test-results/operation-error.json', JSON.stringify({ error: error.message, state }, null, 2));
+  }
+  process.exit(1);
+});
