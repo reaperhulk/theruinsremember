@@ -22,7 +22,7 @@ export function summarizePersonaRun(run) {
     sessions: attention.sessions,
     finalEra: status.finalEra,
     targetEra: run.options.targetEra,
-    completed: status.reachedTargetEra,
+    completed: status.completed ?? (status.finalEra >= run.options.targetEra && (run.options.targetEra < 10 || status.cycleReady)),
     cycleReady: status.cycleReady,
     collapsed: status.forgettingCollapsed,
     actionsWhileAway: attention.actionsWhileAway,

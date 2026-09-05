@@ -29,7 +29,9 @@ function giveAndBuy(state, type, id) {
   return unlockTech(withRes, id);
 }
 
-describe('progression integration', () => {
+// These injected fixtures test transition rules only. Natural reachability is
+// enforced by the fresh-save player journeys in scripts/journey-matrix.mjs.
+describe('era transition fixtures', () => {
   it('can progress from Era 1 to Era 2 via upgrades and tech', () => {
     let state = createInitialState();
 
