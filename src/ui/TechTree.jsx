@@ -111,7 +111,6 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
 
   const unlockedSet = new Set(Object.keys(state.tech || {}));
   const hoveredPrereqChain = hoveredTechId ? new Set(getPrereqChain(hoveredTechId, unlockedSet)) : new Set();
-  const hoveredSteps = hoveredTechId ? stepsToBreakthrough(hoveredTechId) : null;
 
   if (available.length === 0) {
     return (
@@ -220,6 +219,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
       <div className="tech-list">
         {available.sort((a, b) => (b.grantsEra ? 1 : 0) - (a.grantsEra ? 1 : 0)).map(tech => {
           const affordable = canAfford(state, tech.cost);
+          const nextSteps = stepsToBreakthrough(tech.id);
           const progress = affordable ? 1 : getAffordProgress(state, tech.cost);
           // Show prerequisite chain info
           const prereqNames = tech.prerequisites
@@ -243,13 +243,10 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
               <div className="tech-name">
                 {tech.name}
                 {tech.grantsEra && <span className="era-gate"> ★ Era {tech.grantsEra}</span>}
-                {hoveredTechId === tech.id && hoveredSteps !== null && (
+                {nextSteps !== null && (
                   <span style={{ fontSize: '0.75em', color: '#cc9900', marginLeft: '6px' }}>
-                    {hoveredSteps === 0 ? '→ Era gate' : `→ breakthrough in ${hoveredSteps} step${hoveredSteps !== 1 ? 's' : ''}`}
+                    {nextSteps === 0 ? '→ Era gate' : `→ breakthrough in ${nextSteps} step${nextSteps !== 1 ? 's' : ''}`}
                   </span>
-                )}
-                {hoveredPrereqChain.has(tech.id) && (
-                  <span style={{ fontSize: '0.7em', color: '#cc9900', marginLeft: '4px' }}>← required</span>
                 )}
               </div>
               <div className="tech-cost"><CostDisplay cost={tech.cost} state={state} /></div>

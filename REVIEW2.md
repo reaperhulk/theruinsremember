@@ -92,3 +92,28 @@ No timing, attention, session, or progression regressions; no collapse or comman
 The final completion-focused 22-cycle journeys take 5,710 seconds / 1,111 commands (seed 424242) and 6,240 seconds / 1,218 commands (seed 42), with all research and projects complete and three relics equipped. The latter is 510 seconds and 107 commands above the preceding deep run: the changed early offers produce a different loadout, and this driver now explicitly completes its chosen relic combination instead of depending on a random offer. This is optional collection work; the ordinary eight-persona comparison above adds no elapsed or attention time, and both deep journeys satisfy the same era and stall limits.
 
 Local validation: 425 tests; all four balance seeds; both ten-prestige stress runs; all 16 bounded two-cycle persona journeys; all 42 adversarial journeys; lint and production build. Browser CI covers desktop and mobile natural two-cycle runs, mid-run reloads, and separate operation/save fixtures. It must pass before deployment.
+
+## Browser controls: final validation follow-up
+
+The new no-effect assertion caught a stale second doctrine command in the browser driver. Each command now reads the current choice before acting. The mobile failure save accepted its pending research through the normal engine API, so the UI path was inspected separately. Technology hints now have stable layout instead of inserting text on hover. Browser clicks center and settle the control, then verify that the pointer hits it; an obscured control still fails the run. The no-effect and pacing assertions remain enabled.
+
+All eight personas are unchanged by this UI/harness correction (same seeds and all metrics below). No additional participation, stalls, collapse, or commands while absent.
+
+| Persona | Seed | Elapsed | Present | Commands | Sessions | Outcome |
+|---|---:|---:|---:|---:|---:|---|
+| newcomer | 424242 | 1121 → 1121 | 1121 → 1121 | 107 → 107 | 1 → 1 | Era 10 → 10; complete |
+| engaged | 424242 | 941 → 941 | 941 → 941 | 127 → 127 | 1 → 1 | Era 10 → 10; complete |
+| optimizer | 424242 | 577 → 577 | 577 → 577 | 222 → 222 | 1 → 1 | Era 10 → 10; complete |
+| background | 424242 | 1441 → 1441 | 361 → 361 | 116 → 116 | 13 → 13 | Era 10 → 10; complete |
+| check_in | 424242 | 3601 → 3601 | 361 → 361 | 109 → 109 | 7 → 7 | Era 10 → 10; complete |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 98 → 98 | 4 → 4 | Era 5 → 5; complete |
+| completionist | 424242 | 666 → 666 | 666 → 666 | 164 → 164 | 1 → 1 | Era 10 → 10; complete |
+| minimalist | 424242 | 3781 → 3781 | 3781 → 3781 | 88 → 88 | 1 → 1 | Era 10 → 10; complete |
+| newcomer | 42 | 1061 → 1061 | 1061 → 1061 | 106 → 106 | 1 → 1 | Era 10 → 10; complete |
+| engaged | 42 | 821 → 821 | 821 → 821 | 127 → 127 | 1 → 1 | Era 10 → 10; complete |
+| optimizer | 42 | 457 → 457 | 457 → 457 | 205 → 205 | 1 → 1 | Era 10 → 10; complete |
+| background | 42 | 1441 → 1441 | 361 → 361 | 114 → 114 | 13 → 13 | Era 10 → 10; complete |
+| check_in | 42 | 3601 → 3601 | 361 → 361 | 109 → 109 | 7 → 7 | Era 10 → 10; complete |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 99 → 99 | 4 → 4 | Era 5 → 5; complete |
+| completionist | 42 | 696 → 696 | 696 → 696 | 157 → 157 | 1 → 1 | Era 10 → 10; complete |
+| minimalist | 42 | 3391 → 3391 | 3391 → 3391 | 86 → 86 | 1 → 1 | Era 10 → 10; complete |

@@ -22,6 +22,16 @@ const settle = () => page.evaluate(() => new Promise(resolve => requestAnimation
 const click = async selector => {
   const handle = await page.$(selector);
   if (!handle || await handle.evaluate(el => el.disabled)) { await handle?.dispose(); return false; }
+  await handle.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'center' }));
+  await settle();
+  await handle.hover();
+  await settle();
+  const target = await handle.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    const hit = document.elementFromPoint((r.left + r.right) / 2, (Math.max(0, r.top) + Math.min(innerHeight, r.bottom)) / 2);
+    return { name: el.textContent.trim().slice(0, 180), hit: hit?.closest('button, a')?.textContent.trim().slice(0, 180), unobscured: !!hit && el.contains(hit) };
+  });
+  if (!target.unobscured) throw new Error(`Control is obscured: ${selector} ${JSON.stringify(target)}`);
   const changesGame = /upgrade-btn|tech-btn|expedition-route|relic-choice|gather-btn|cycle-doctrines|confirm-yes/.test(selector);
   const before = changesGame && await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount]); });
   await handle.click();
@@ -29,7 +39,7 @@ const click = async selector => {
   await settle();
   if (changesGame) {
     const after = await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount]); });
-    if (before === after) throw new Error(`Enabled gameplay control had no effect: ${selector}`);
+    if (before === after) throw new Error(`Enabled gameplay control had no effect: ${selector} ${JSON.stringify(target)}`);
   }
   return true;
 };
@@ -90,9 +100,10 @@ try {
     for (let slot = 0; slot < 2; slot++) {
       let acted = false;
       let command;
-      if (state.era === 10 && !state.nextDoctrine) {
+      const current = await page.evaluate(() => { const s = window.__game.getState(); return { era: s.era, prestigeCount: s.prestigeCount, nextDoctrine: s.nextCycleDoctrine }; });
+      if (current.era === 10 && !current.nextDoctrine) {
         await click('#tab-mini');
-        acted = await click(`.cycle-doctrines button:nth-child(${state.prestigeCount % 3 + 1})`);
+        acted = await click(`.cycle-doctrines button:nth-child(${current.prestigeCount % 3 + 1})`);
         command = 'doctrine';
       }
       if (!acted) {
