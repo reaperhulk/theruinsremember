@@ -44,7 +44,7 @@ export function candidateActions(state, profile, options, rng) {
     const pressure = target && getCostPressure(state, target.cost, economy);
     const storage = pressure?.find(p => p.reason === 'capacity' && state.resources[p.id].amount >= economy.capacity[p.id] * 0.6);
     if (storage) return [{ name: 'expand-storage', fn: s => expandStorage(s, storage.id) }];
-    if (target && pressure.some(p => p.reason === 'production') && (!target.queued || state.protectProgression === false) && (target.queued || state.goals.length < 5)) return [{ name: 'protect-purchase', fn: s => prioritizePurchase(s, target) }];
+    if (target && (state.protectProgression === false || pressure.some(p => p.reason === 'production')) && (!target.queued || state.protectProgression === false) && (target.queued || state.goals.length < 5)) return [{ name: 'protect-purchase', fn: s => prioritizePurchase(s, target) }];
   }
   const add = (name, fn) => actions.push({ name, fn });
   const techs = ordered(getAvailableTech(state)).filter(tech => tech.id !== options.blockedTech);

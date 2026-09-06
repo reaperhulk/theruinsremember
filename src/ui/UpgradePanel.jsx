@@ -236,11 +236,11 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
   const decisions = focusCandidates.filter(isDecisionUpgrade);
   const routine = focusCandidates.filter(upgrade => !isDecisionUpgrade(upgrade));
   const routineWaiting = autoBuildOut ? routine.filter(u => u.era === state.era).length : 0;
-  const byFocus = (a, b) => getFocusScore(state, b) - getFocusScore(state, a);
   const target = getPurchaseTarget(state);
+  const byFocus = (a, b) => Number(b.id === target?.id) - Number(a.id === target?.id) || getFocusScore(state, b) - getFocusScore(state, a);
   const investments = getRecommendedRepeatables(state, target?.cost, filteredAvailable, economy);
   const visibleAvailable = focusMode
-    ? [...investments, ...decisions.sort(byFocus), ...routine.sort(byFocus)].slice(0, 6)
+    ? [...investments, ...decisions, ...routine].sort(byFocus).slice(0, 4)
     : filteredAvailable;
 
   const affordableCount = visibleAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;

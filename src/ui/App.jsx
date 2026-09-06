@@ -1,10 +1,13 @@
+import { getEraObjective } from '../engine/objectives.js';
+import { calculateEconomy } from '../engine/economy.js';
+import { ResourceStrip } from './ResourceStrip.jsx';
 const ArchivePanel = lazy(() => import('./ArchivePanel.jsx').then(module => ({ default: module.ArchivePanel })));
 import { PurchaseGuidance } from './PurchaseGuidance.jsx';
 import { GoalsPanel } from './GoalsPanel.jsx';
 import { PublicWorksPanel } from './PublicWorksPanel.jsx';
 import { RestoredDistricts } from './RestoredDistricts.jsx';
 import { serializeSave } from '../engine/saves.js';
-import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from 'react';
 import { createInitialState } from '../engine/state.js';
 import { useGameLoop } from '../hooks/useGameLoop.js';
 import { ResourcePanel } from './ResourcePanel.jsx';
@@ -25,7 +28,6 @@ const SenatePanel = lazy(() => import('./SenatePanel.jsx').then(module => ({ def
 const RealityForgePanel = lazy(() => import('./RealityForgePanel.jsx').then(module => ({ default: module.RealityForgePanel })));
 import { OperationsPanel } from './OperationsPanel.jsx';
 import { RelicPanel } from './RelicPanel.jsx';
-import { getRelicSlotLimit } from '../engine/relics.js';
 import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
 import { setMuted, playPrestige, setVolumes, setMusicEra, startAmbient, stopAmbient, syncAudioVisibility } from './AudioManager.js';
@@ -43,8 +45,7 @@ import { canAfford, getEffectivePrestige } from '../engine/resources.js';
 import { getAchievementsNearComplete } from '../engine/achievements.js';
 import { formatNumber } from './format.js';
 import { getCycleReadiness } from '../engine/realityForge.js';
-import { getDefaultOperation, getUnlockedOperations } from '../data/operations.js';
-import { getActiveSystems } from '../engine/operations.js';
+import { getDefaultOperation } from '../data/operations.js';
 import { CYCLE_DOCTRINES } from '../engine/cycles.js';
 
 const initialState = createInitialState();
@@ -68,7 +69,7 @@ function getAvailableTabs(era) {
     { id: 'upgrades', label: 'Decisions', sublabel: 'shape the economy', key: '1' },
     { id: 'tech', label: 'Tech', sublabel: 'unlock the next age', key: '2' },
   ];
-  if (era >= 5) tabs.push({ id: 'mini', label: 'Operations', sublabel: 'active systems', key: '3' });
+  tabs.push({ id: 'mini', label: 'Operations', sublabel: 'active systems', key: '3' });
   if (era >= 4) tabs.push({ id: 'trading', label: 'Trading', sublabel: 'reroute surplus', key: '4' });
   tabs.push({ id: 'archive', label: 'Archive', sublabel: 'remembered civilizations', key: '7' });
   tabs.push({ id: 'prestige', label: 'Prestige', sublabel: 'bank the cycle', key: '5' });
@@ -79,6 +80,10 @@ function getAvailableTabs(era) {
 export function App() {
   const { state, updateState, resetSave, offlineReport, dismissOfflineReport, saveWarning, restoreBackup, importSave } = useGameLoop(initialState);
   const [activeTab, setActiveTab] = useState('upgrades');
+  const [mobileSection, setMobileSection] = useState('actions');
+  const objective = useMemo(() => getEraObjective(state), [state]);
+  const economy = useMemo(() => calculateEconomy(state), [state]);
+  const navigate = tab => { setActiveTab(tab); setMobileSection('actions'); };
   const [activeOperation, setActiveOperation] = useState(null);
   const prevEraRef = useRef(state.era);
   const keyboardStateRef = useRef(state);
@@ -88,7 +93,7 @@ export function App() {
   const [shakeClass, setShakeClass] = useState('');
   const prevLoreCountRef = useRef((state.eventLog || []).filter(e => e.isLore).length);
   const [unseenLoreCount, setUnseenLoreCount] = useState(0);
-  const [hintsDismissed, setHintsDismissed] = useState(false);
+  
   const [audioMuted, setAudioMuted] = useState(() => { try { return localStorage.getItem('audioMuted') === 'true'; } catch { return false; } });
   const [audioLevels, setAudioLevels] = useState(() => { try { return JSON.parse(localStorage.getItem('audioLevels')) || { effects: 0.7, music: 0.18 }; } catch { return { effects: 0.7, music: 0.18 }; } });
   const [victoryDismissed, setVictoryDismissed] = useState(false);
@@ -221,8 +226,6 @@ export function App() {
   // Badge counts for tabs
   const affordableUpgrades = getAvailableUpgrades(state).filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
   const affordableTech = getAvailableTech(state).filter(t => canAfford(state, t.cost)).length;
-  const unlockedOperations = getUnlockedOperations(state.era);
-  const activeSystemCount = getActiveSystems(state).length;
 
   // Focus the operation introduced by the current era.
   useEffect(() => {
@@ -248,7 +251,7 @@ export function App() {
   };
 
   return (
-    <div className={`game-container era-${state.era} ${shakeClass}`}>
+    <div className={`game-container era-${state.era} ${shakeClass}`} data-section={mobileSection}>
       <header className="game-header">
         <div className="title-block">
           <h1>The Ruins Remember{state.era > 1 && <span style={{ fontSize: '0.5em', color: '#888', marginLeft: '8px' }}>Era {state.era}: {eraNames[state.era]}</span>}</h1>
@@ -341,46 +344,21 @@ export function App() {
         </div>
       </header>
       {saveWarning && <div className="save-warning" role="alert">{saveWarning} <button onClick={restoreBackup}>Restore backup</button></div>}
-      <div className="control-ribbon">
-        <span className="control-chip">Era {state.era}: {eraNames[state.era]}</span>
-        <span className="control-chip">{affordableUpgrades} options ready</span>
-        <span className="control-chip">{affordableTech} tech options</span>
-        <span className="control-chip">{state.activeRelics?.length || 0}/{getRelicSlotLimit(state)} relics | {Math.floor(state.echoPressure || 0)} pressure</span>
-        {state.era >= ERA_COUNT && (
-          <span className="control-chip">{cycleReadiness.ready ? 'Prestige available' : `Cycle ${cycleReadiness.completed}/${cycleReadiness.total}`}</span>
-        )}
-        {unlockedOperations.length > 0 && <span className="control-chip">{activeSystemCount}/{unlockedOperations.length} operations engaged</span>}
-      </div>
-
+      <EraProgress state={state} objective={objective} onNavigate={navigate} />
+      <ResourceStrip state={state} objective={objective} economy={economy} onUpdate={updateState} />
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
-      {!hintsDismissed && state.totalTime < 60 && Object.keys(state.upgrades).length === 0 && (
-        <div className="keyboard-hints" style={{ textAlign: 'center', fontSize: '0.9em', color: '#c8a850', padding: '6px 0', opacity: Math.max(0.3, 1 - state.totalTime / 60) }}>
-          Gather the resources you need, choose an expedition route, then make a decision in the Decisions tab
-          <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
-        </div>
-      )}
       <EraTransition era={state.era} />
       <Toast state={state} />
-      {state.era > 4 && <EraProgress state={state} />}
-      <PublicWorksPanel state={state} onUpdate={updateState} />
-      {!hintsDismissed && state.totalTime >= 60 && state.totalTime < 180 && Object.keys(state.upgrades || {}).length < 5 && (
-        <div style={{ textAlign: 'center', fontSize: '0.85em', color: '#998866', padding: '4px 0', position: 'relative' }}>
-          Expeditions recover resources and discoveries; discoveries reduce routine build-out
-          <button onClick={() => setHintsDismissed(true)} style={{ cursor: 'pointer', marginLeft: '8px', color: '#888', fontSize: '1.1em', background: 'none', border: 'none', padding: '2px 4px', fontFamily: 'inherit', lineHeight: 1 }} aria-label="Dismiss hints" title="Dismiss hints">&times;</button>
-        </div>
-      )}
-
-      <nav className="mobile-section-links" aria-label="Jump to game section"><a href="#game-actions">Actions</a><a href="#game-resources">Resources and field operations</a></nav>
+      <nav className="mobile-section-links" aria-label="Game section"><button id="section-actions" aria-pressed={mobileSection === 'actions'} onClick={() => setMobileSection('actions')}>Decisions & operations</button><button id="section-world" aria-pressed={mobileSection === 'world'} onClick={() => setMobileSection('world')}>World & resources</button></nav>
       <main className={`game-layout ${state.era <= 4 ? 'early-game-layout' : ''}`}>
         <div className="left-column" id="game-resources">
           <Suspense fallback={<div className="scene-placeholder">The ruins emerge…</div>}><GameCanvas state={state} onUpdate={updateState} /></Suspense>
           <RestoredDistricts state={state} />
           <ResourcePanel state={state} onUpdate={updateState} />
-          {state.era <= 3 && <ExpeditionPanel state={state} onUpdate={updateState} />}
-          {state.era === 4 && <DockingPanel state={state} onUpdate={updateState} />}
+
 
           <RelicPanel state={state} onUpdate={updateState} />
-          {state.era <= 4 && <EraProgress state={state} />}
+
           {(state.eventLog?.length > 0 || state.activeEffects?.length > 0) && (
             <EventLog state={state} />
           )}
@@ -410,7 +388,7 @@ export function App() {
                 <button
                   key={tab.id}
                   className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-                  onClick={() => tab.id === 'stats' ? handleStatsTabClick() : setActiveTab(tab.id)}
+                  onClick={() => { setMobileSection('actions'); tab.id === 'stats' ? handleStatsTabClick() : setActiveTab(tab.id); }}
                   title={`Press ${tab.key}`}
                   role="tab"
                   tabIndex={activeTab === tab.id ? 0 : -1}
@@ -444,12 +422,17 @@ export function App() {
           >
             <Suspense fallback={<div className="panel">Opening the archive…</div>}>
             {activeTab === 'upgrades' && (
-              <><PurchaseGuidance state={state} onUpdate={updateState} /><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel state={state} onUpdate={updateState} /></>
+              <>
+                <div className="chapter-intro"><span className="panel-kicker">{objective.chapter.title}</span><p>{objective.chapter.problem}</p><button onClick={() => navigate('mini')}>{objective.chapter.operation} →</button></div>
+                {state.era === 1 && !state.prestigeCount && <ol className="opening-steps" aria-label="Settlement milestones"><li data-complete={Object.keys(state.upgrades).length > 0}>Restore production</li><li data-complete={(state.expedition?.totalFinds || 0) > 0}>Explore the ruins</li><li data-complete={Object.keys(state.tech).length > 0}>Research metallurgy</li></ol>}
+                <PurchaseGuidance state={state} onUpdate={updateState} /><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel state={state} onUpdate={updateState} />
+              </>
             )}
             {activeTab === 'tech' && (
               <TechTree state={state} onUpdate={updateState} />
             )}
-            {activeTab === 'mini' && (
+            {activeTab === 'mini' && state.era <= 3 && <ExpeditionPanel state={state} onUpdate={updateState} />}
+            {activeTab === 'mini' && state.era >= 4 && (
               <OperationsPanel
                 state={state}
                 activeOperation={activeOperation || getDefaultOperation(state.era)}
@@ -457,6 +440,7 @@ export function App() {
                 renderOperation={renderOperation}
               />
             )}
+            {activeTab === 'mini' && <PublicWorksPanel state={state} onUpdate={updateState} />}
             {activeTab === 'trading' && state.era >= 4 && (
               <TradingPanel state={state} onUpdate={updateState} />
             )}

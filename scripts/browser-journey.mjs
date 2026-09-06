@@ -20,6 +20,11 @@ page.on('console', message => { if (message.type() === 'error') errors.push(mess
 await page.setViewport(mobile ? { width: 375, height: 812, isMobile: true } : { width: 1366, height: 768 });
 const settle = () => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 const click = async selector => {
+  if (mobile) {
+    const section = /relic-choice/.test(selector) ? '#section-world' : '#section-actions';
+    const navigation = await page.$(section);
+    if (navigation) { await navigation.click(); await navigation.dispose(); await settle(); }
+  }
   const handle = await page.$(selector);
   if (!handle || await handle.evaluate(el => el.disabled)) { await handle?.dispose(); return false; }
   await handle.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'center' }));
@@ -112,7 +117,7 @@ try {
         acted = await click(techTurn ? '.tech-btn.affordable:not(:disabled)' : '.upgrade-btn.affordable:not(:disabled)');
         command = techTurn ? 'research' : 'upgrade';
       }
-      if (!acted && state.era <= 3) { acted = await click('.expedition-route:not(:disabled)'); command = 'expedition'; }
+      if (!acted && state.era <= 3) { await click('#tab-mini'); acted = await click('.expedition-route:not(:disabled)'); command = 'expedition'; }
       if (!acted) { acted = await click('.relic-choice button:not(:disabled)'); command = 'relic'; }
       if (!acted && state.era < 4) { acted = await click('.resource-row .gather-btn:not(:disabled)'); command = 'gather'; }
       if (acted) { commands++; trace.push({ elapsed, era: state.era, command }); if (trace.length > 100) trace.shift(); }
