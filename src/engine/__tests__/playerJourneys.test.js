@@ -28,7 +28,7 @@ describe('fresh-save journeys with bounded legal player commands', { timeout: 30
     expect(result.rejectedCommands).toEqual([]);
   });
   it('detects a deliberately unavailable breakthrough despite continuing resource growth', () => {
-    const result = runPlayerJourney({ persona: 'engaged', blockedTech: 'industrialRevolution', maxSeconds: 1200 });
+    const result = runPlayerJourney({ persona: 'engaged', blockedTech: 'industrialRevolution', manualBuildOut: true, maxSeconds: 1200 });
     expect(result.completed).toBe(false);
     expect(result.finalEra).toBe(1);
     expect(result.failures).toContain('final era 1/10');

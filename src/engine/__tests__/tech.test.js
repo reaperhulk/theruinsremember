@@ -106,13 +106,13 @@ describe('tech', () => {
   });
 
   describe('routine research automation', () => {
-    it('recognizes era breakthroughs and exclusive branches as player decisions', () => {
-      expect(isDecisionTech({ grantsEra: 2 })).toBe(true);
+    it('requires decisions only for exclusive research paths', () => {
+      expect(isDecisionTech({ grantsEra: 2 })).toBe(false);
       expect(isDecisionTech({ excludes: 'otherBranch' })).toBe(true);
       expect(isDecisionTech({ id: 'routineResearch' })).toBe(false);
     });
 
-    it('researches affordable prerequisite chains without choosing a breakthrough', () => {
+    it('funds linear research and its breakthrough without departing the era', () => {
       const state = createInitialState();
       for (const [id, resource] of Object.entries(state.resources)) {
         state.resources[id] = { ...resource, unlocked: true, amount: 1e8 };
@@ -122,7 +122,8 @@ describe('tech', () => {
 
       expect(count).toBeGreaterThan(0);
       expect(researched.tech.metallurgy).toBe(true);
-      expect(researched.tech.industrialRevolution).toBeUndefined();
+      expect(researched.tech.industrialRevolution).toBe(true);
+      expect(researched.era).toBe(1);
     });
 
     it('never selects either side of an exclusive research branch', () => {

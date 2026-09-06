@@ -79,7 +79,7 @@ export function saveAutomationPlan(state) {
   const commissions = rememberedCommissionPlan(state);
   return { ...state, archive: { ...state.archive, savedPlan: {
     version: 2, choices, goals: state.goals || [], commissions: commissions.length ? commissions : state.archive.lastCommissions || [],
-    consumerControls: structuredClone(state.consumerControls || {}), autoBuildOut: state.autoBuildOut !== false,
+    consumerControls: structuredClone(state.consumerControls || {}), autoBuildOut: state.autoBuildOut !== false, developmentFocus: state.developmentFocus || 'growth',
     protectProgression: state.protectProgression !== false, productionRoute: state.productionRoute || 'standard',
     repeat: state.archive.savedPlan?.repeat || false, loadout: [...state.activeRelics],
   } } };
@@ -89,7 +89,7 @@ export function restoreAutomationPlan(state) {
   if (!plan || state.prestigeCount < 1) return state;
   try { validateAutomationPlan(plan); } catch { return state; }
   return { ...state, blueprintActive: true, goalsPaused: false, goals: [], commissions: [],
-    consumerControls: structuredClone(plan.consumerControls || {}), autoBuildOut: plan.autoBuildOut !== false,
+    consumerControls: structuredClone(plan.consumerControls || {}), autoBuildOut: plan.autoBuildOut !== false, developmentFocus: plan.developmentFocus || 'growth',
     protectProgression: plan.protectProgression !== false,
     productionRoute: state.archive.research.logistics && PRODUCTION_ROUTES[plan.productionRoute] ? plan.productionRoute : 'standard' };
 }

@@ -166,6 +166,7 @@ export function performPrestige(state) {
     eraReviewMode: state.eraReviewMode,
     autoGather: true,
     autoBuildOut: state.autoBuildOut !== false,
+    developmentFocus: state.developmentFocus || 'growth',
     autoPublicWorks: state.autoPublicWorks !== false,
     protectProgression: state.protectProgression !== false,
     prestigeUpgrades: state.prestigeUpgrades || {},

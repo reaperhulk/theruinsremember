@@ -1,3 +1,4 @@
+import { DevelopmentPolicy } from './Council.jsx';
 import { getEraObjective } from '../engine/objectives.js';
 import { calculateEconomy } from '../engine/economy.js';
 import { ResourceStrip } from './ResourceStrip.jsx';
@@ -39,8 +40,8 @@ import { Toast } from './Toast.jsx';
 import { OfflineReport } from './OfflineReport.jsx';
 import { performPrestige, calculatePrestigeBonus, getPrestigeSummary } from '../engine/prestige.js';
 import { ERA_COUNT, eraNames } from '../engine/eras.js';
-import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
-import { getAvailableTech } from '../engine/tech.js';
+import { isDecisionUpgrade, getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
+import { getAvailableTech, isDecisionTech } from '../engine/tech.js';
 import { DECISIONS } from '../data/decisions.js';
 import { WorldStatus } from './WorldStatus.jsx';
 import { Discoveries } from './Discoveries.jsx';
@@ -240,8 +241,8 @@ export function App() {
   const tabs = getAvailableTabs(state.era);
 
   // Badge counts for tabs
-  const affordableUpgrades = getAvailableUpgrades(state).filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
-  const affordableTech = getAvailableTech(state).filter(t => canAfford(state, t.cost)).length;
+  const affordableUpgrades = getAvailableUpgrades(state).filter(u => isDecisionUpgrade(u) && canAfford(state, getUpgradeCost(state, u.id))).length;
+  const affordableTech = getAvailableTech(state).filter(t => isDecisionTech(t) && canAfford(state, t.cost)).length;
 
   // Bring a new chapter and its world into view at a reviewed transition.
   useEffect(() => {
@@ -452,9 +453,12 @@ export function App() {
             <Suspense fallback={<div className="panel">Opening the archive…</div>}>
             {activeTab === 'upgrades' && (
               <>
-                <Discoveries state={state} onUpdate={updateState} /><div className="chapter-intro"><span className="panel-kicker">{objective.chapter.title}</span><p>{objective.chapter.problem}</p><button onClick={() => navigate('mini')}>{objective.chapter.operation} →</button></div>
-                {state.era === 1 && !state.prestigeCount && <ol className="opening-steps" aria-label="Settlement milestones"><li data-complete={Object.keys(state.upgrades).length > 0}>Restore production</li><li data-complete={(state.expedition?.totalFinds || 0) > 0}>Explore the ruins</li><li data-complete={Object.keys(state.tech).length > 0}>Research metallurgy</li></ol>}
-                <PurchaseGuidance economy={economy} state={state} onUpdate={updateState} /><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel economy={economy} state={state} onUpdate={updateState} />
+                <DevelopmentPolicy state={state} onUpdate={updateState} />
+                <UpgradePanel economy={economy} state={state} onUpdate={updateState} />
+                <PurchaseGuidance economy={economy} state={state} onUpdate={updateState} />
+                <GoalsPanel state={state} onUpdate={updateState} />
+                <Discoveries state={state} onUpdate={updateState} />
+
               </>
             )}
             {activeTab === 'tech' && (

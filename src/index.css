@@ -3640,3 +3640,23 @@ button:focus-visible, [role=button]:focus-visible, a:focus-visible, select:focus
 
 .relic-replacements small { display: block; padding-top: 5px; font-size: 12px; font-weight: normal; line-height: 1.4; }
 .record-note { color: #acbdbf; font-size: 12px; }
+
+/* The council compares incompatible plans; automatic projects live in the catalog. */
+.development-policy p, .council p { font-size: 13px; line-height: 1.5; }
+.policy-options, .council-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 12px 0; }
+.policy-options button { background: #192c37; color: #dbe5e8; border: 1px solid #4c6470; border-radius: 7px; padding: 12px; text-align: left; cursor: pointer; }
+.policy-options button[aria-pressed=true] { background: #294c46; border-color: #a6c596; }
+.policy-options span { display: block; font-size: 12px; line-height: 1.5; margin-top: 6px; }
+.development-policy small { color: #aebfc4; }
+.council-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 18px; }
+.council-heading span, .council summary { font-size: 12px; color: #acbfc5; }
+.council-option { border: 1px solid #48616c; border-radius: 8px; padding: 12px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.council-option.chosen { border-color: #b6c38c; background: #233c35; }
+.council-option h3 { color: #e4c897; font-size: 16px; }
+.council-option ul { padding-left: 18px; font-size: 13px; line-height: 1.6; }
+.council .choice-cost { color: #e2aa92; }
+.council .choice-current { color: #aabdc6; font-size: 12px; }
+.council-choice { margin-top: auto; width: 100%; min-height: 44px; font-size: 13px; }
+.research-catalog-toggle, .expedition-pause { padding: 10px 12px; min-height: 44px; background: #233b45; color: #dce8e9; border: 1px solid #637a81; border-radius: 6px; cursor: pointer; }
+.expedition-route[aria-pressed=true] { opacity: 1; border-color: #b5cc9c; background: #2c4337; }
+@media (max-width:540px) { .council-options { grid-template-columns: 1fr; } .policy-options { gap: 6px; } .policy-options button { padding: 9px; } }

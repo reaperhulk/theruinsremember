@@ -12,13 +12,13 @@ import { advanceColonyMandate } from './colonies.js';
 import { advanceDockingContracts } from './docking.js';
 import { advanceNetworkPlan } from './starChart.js';
 import { checkAchievements } from './achievements.js';
-import { purchaseUpgrade, buyRoutineBuildOut, isDecisionUpgrade, getUpgradeCost } from './upgrades.js';
+import { purchaseUpgrade, isDecisionUpgrade, getUpgradeCost } from './upgrades.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes, runExpedition } from './expeditions.js';
 import { awardCycleGoal } from './cycles.js';
 import { advanceEchoPressure } from './relics.js';
 import { advanceForgetting, pauseForgetting } from './forgetting.js';
-import { researchRoutineTech } from './tech.js';
+import { advanceDevelopment } from './development.js';
 import { advanceTradeRoute } from './trading.js';
 
 function intervalCrossings(startTime, endTime, interval) {
@@ -64,7 +64,9 @@ export function tick(state, dt, rng = Math.random, options = {}) {
     // A lost optional challenge never resets a civilization. The player can
     // retreat, restore the memories, or close the cycle on their own terms.
   }
-  if (newState.era <= 3 && newState.prestigeUpgrades?.autoClicker && newState.expedition?.supplies >= EXPEDITION_MAX_SUPPLIES) {
+  if (newState.era <= 3 && newState.expedition?.routeId && newState.expedition.supplies >= 1) {
+    newState = runExpedition(newState, newState.expedition.routeId, rng).state;
+  } else if (newState.era <= 3 && !newState.expedition?.paused && newState.prestigeUpgrades?.autoClicker && newState.expedition?.supplies >= EXPEDITION_MAX_SUPPLIES) {
     const safeRoute = getExpeditionRoutes(newState.era)[0];
     newState = runExpedition(newState, safeRoute.id, rng).state;
   }
@@ -170,21 +172,10 @@ export function tick(state, dt, rng = Math.random, options = {}) {
     }
   }
 
-  // Routine build-out: the current era's non-decision upgrades buy themselves
-  // so the Decisions tab holds decisions rather than a queue to flush. Forks,
-  // rule changes, resource unlocks and lore fragments are never auto-bought.
+  // The player sets priorities; workshops and labs carry out ordinary growth.
   const buildOutInterval = newState.blueprintActive && newState.archive?.research?.blueprints && newState.era <= 3 ? 1 : 5;
   const buildOutRuns = intervalCrossings(state.totalTime, newState.totalTime, buildOutInterval);
-  if (newState.autoBuildOut !== false && buildOutRuns > 0) {
-    for (let run = 0; run < buildOutRuns; run++) {
-      const result = buyRoutineBuildOut(newState);
-      if (result.count === 0) break;
-      newState = result.state;
-    }
-    if (newState.era >= 2) {
-      newState = researchRoutineTech(newState).state;
-    }
-  }
+  for (let run = 0; run < buildOutRuns; run++) newState = advanceDevelopment(newState);
 
   if (newState.era >= 5) {
     newState = advanceColonyMandate(newState);
@@ -194,9 +185,7 @@ export function tick(state, dt, rng = Math.random, options = {}) {
     newState = advanceTradeRoute(newState, state.totalTime);
   }
 
-  // Auto-gather: manual gathering is a launch-phase activity. Orbital
-  // robotics take over from Era 4; the 3-prestige milestone extends the
-  // automation back to planetfall on later cycles.
+  // Gathering runs with development from the start; manual mode stays optional.
   const autoGatherInterval = newState.era < 4 && !newState.autoGather ? 5 : 20;
   const autoGatherRuns = intervalCrossings(state.totalTime, newState.totalTime, autoGatherInterval);
   if (isGatheringAutomated(newState) && autoGatherRuns > 0) {

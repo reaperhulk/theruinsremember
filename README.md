@@ -24,12 +24,13 @@ Every era now has an authored chapter and two strategic branches with consequenc
 
 The next civilization recognizes your actual choices. Prestige restores a producing settlement and automatic gathering, while the Archive keeps discoveries, read state, plans and landmarks. World view shows inherited structures, constrained production and optional supply routes. Preferences include a ten-era adaptive score and low-power rendering. Offline progress yields between short processing slices, and only one browser tab can own the save at a time.
 
-Implementation details and all eight personas’ before/after measurements are in [the ten-era delivery report](REVIEW3.md).
+Implementation details and all eight personas’ before/after measurements are in [the ten-era delivery report](REVIEW3.md) and [the decision-loop revision](REVIEW4.md).
 
 ## How It Works
 
 - **10 Eras** spanning primitive survival to multiverse exploration
-- **599 upgrades**, including 40 player-controlled signature breakthroughs, production previews, ten doctrine forks, and ×1.5 repeatable milestones every ten levels
+- **599 upgrades**, with automatic construction and research, competing workshop/lab spending priorities, ten paired doctrine choices, production previews, and ×1.5 repeatable milestones every ten levels
+- **Standing expedition assignments**: choose the risk and reward once per early era; the team uses real supplies while you focus elsewhere, including offline
 - **115 tech nodes** including mutually exclusive paths that shape each run differently
 - **Era-focused operations** that evolve from ruin expeditions into orbital missions, colony mandates, star-network directives, Dyson commissions, cycle laws, galactic government, cosmic signal locks, and the Reality Forge
 - **Distinct cycle doctrines** that reshape early, middle, or late eras and award permanent cycle marks for doctrine-specific goals
@@ -44,7 +45,7 @@ Implementation details and all eight personas’ before/after measurements are i
 - **Progression-gated era advancement** — new eras require sufficient upgrade depth, era-local research depth, and the starred breakthrough technology instead of passive waiting
 - **Recoverable resource bottlenecks** — expand storage without prerequisite chains, pause consumers, hold reserves, and queue a goal
 - **Consumption chains** — food feeds labor, energy powers electronics, fuel maintains orbital infrastructure, exotic materials sustain colonies
-- **Automation cascades** — gathering, routine research, earlier eras, repeatable-upgrade milestones, orbital crews, colonies, and reserve routes become self-managing while exclusive choices and breakthroughs remain yours
+- **Automation cascades** — gathering, linear research, construction, repeatable-upgrade milestones, orbital crews, colonies, and reserve routes become self-managing while exclusive choices and chapter departures remain yours
 - **An optional siege against the Forgetting** with protected offline timers and retreat; defeat never forces a reset
 - **A permanent Archive** that preserves narrative history and saved plans after the first prestige; the second opens doctrine research and exact relic crafting, and the third starts reconstruction projects across cycles
 - **Prestige reward planning** that spends newly earned points before starting perks are applied

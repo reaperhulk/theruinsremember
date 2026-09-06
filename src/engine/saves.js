@@ -1,3 +1,5 @@
+import { DEVELOPMENT_FOCI } from './development.js';
+import { getExpeditionRoutes } from './expeditions.js';
 import { DECISIONS } from '../data/decisions.js';
 import { createInitialState, migrateState } from './state.js';
 import { upgrades } from '../data/upgrades.js';
@@ -26,7 +28,8 @@ function validateControls(controls) {
   }
 }
 export function validateAutomationPlan(plan) {
-  if (!object(plan) || Object.keys(plan).some(key => !['goals', 'commissions', 'consumerControls', 'autoBuildOut', 'protectProgression', 'version', 'choices', 'repeat', 'loadout', 'productionRoute'].includes(key))) throw new Error('Invalid automation plan');
+  if (!object(plan) || Object.keys(plan).some(key => !['goals', 'commissions', 'consumerControls', 'autoBuildOut', 'protectProgression', 'version', 'choices', 'repeat', 'loadout', 'productionRoute', 'developmentFocus'].includes(key))) throw new Error('Invalid automation plan');
+  if (plan.developmentFocus !== undefined && !DEVELOPMENT_FOCI[plan.developmentFocus]) throw new Error('Invalid plan development focus');
   arrayEntries(plan.goals, goal, 'plan goals');
   arrayEntries(plan.choices, goal, 'plan choices');
   arrayEntries(plan.commissions, commission, 'plan commissions');
@@ -44,6 +47,9 @@ export function parseSave(text) {
   if ((saved.saveVersion || 0) > createInitialState().saveVersion) throw new Error('This save needs a newer version of the game');
   if (saved.eraReviewMode !== undefined && !['first', 'always', 'automatic'].includes(saved.eraReviewMode)) throw new Error('Invalid chapter transitions');
   if (saved.eraReviewApproved !== undefined && (!Number.isInteger(saved.eraReviewApproved) || saved.eraReviewApproved > 9)) throw new Error('Invalid chapter approval');
+  if (saved.developmentFocus !== undefined && !DEVELOPMENT_FOCI[saved.developmentFocus]) throw new Error('Invalid development focus');
+  if (saved.expedition?.routeId != null && !getExpeditionRoutes(saved.era).some(r => r.id === saved.expedition.routeId)) throw new Error('Invalid expedition route');
+  if (saved.expedition?.paused !== undefined && typeof saved.expedition.paused !== 'boolean') throw new Error('Invalid expedition pause');
   const defaults = createInitialState();
   for (const [key, value] of Object.entries(defaults)) {
     if (saved[key] === undefined) continue;

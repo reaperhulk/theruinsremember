@@ -115,6 +115,7 @@ describe('era transition fixtures', () => {
 
   it('tick advances resources over time', () => {
     let state = createInitialState();
+    state.autoBuildOut = false; // Isolate production from automatic gathering/construction.
     const initialFood = state.resources.food.amount;
 
     // Tick 10 seconds

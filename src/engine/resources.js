@@ -50,11 +50,10 @@ export function spend(state, cost) {
   return { ...state, resources: newResources };
 }
 
-// Gathering is a launch-phase action. Once the player chooses industrial
-// Automation, machines take over; later infrastructure and prestige
-// milestones retain their existing automatic behavior.
+// Development includes gathering from planetfall. Earned industrial and
+// prestige automation also remains available when development is paused.
 export function isGatheringAutomated(state) {
-  return !!state.autoGather || state.era >= 4 || (state.era >= 2 && !!state.upgrades?.automation);
+  return state.autoBuildOut !== false || !!state.autoGather || state.era >= 4 || (state.era >= 2 && !!state.upgrades?.automation);
 }
 
 // Manually gather a resource (clicking). Returns new state.

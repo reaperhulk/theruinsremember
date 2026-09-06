@@ -64,6 +64,22 @@ async function checkNativeScroll(selector, { touch = false } = {}) {
   await settleScroll(selector);
   return { selector, gesture: touch ? 'touch' : 'wheel', gestureScroll, keyboardReachedBottom: true };
 }
+async function clickWithWheel(selector) {
+  const target = await page.$eval(selector, button => {
+    const r = button.getBoundingClientRect(), p = button.closest('.tab-content').getBoundingClientRect();
+    return { x: p.left + p.width / 2, y: p.top + p.height / 2, deltaY: r.top + r.height / 2 - (p.top + p.height / 2) };
+  });
+  await page.mouse.move(target.x, target.y);
+  await page.mouse.wheel({ deltaY: target.deltaY });
+  await settleScroll('.tab-content');
+  const point = await page.$eval(selector, button => {
+    const r = button.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+    return { x, y, reachable: button.contains(document.elementFromPoint(x, y)) };
+  });
+  assert(point.reachable, `Native input cannot reach ${selector}`);
+  await page.mouse.click(point.x, point.y);
+  await settle();
+}
 mkdirSync('test-results', { recursive: true });
 try {
   await page.setViewport({ width: 1366, height: 768, hasTouch: true });
@@ -84,6 +100,8 @@ try {
   await page.waitForFunction(() => !!window.__game);
   await page.evaluate(() => window.__game.setSpeed(0));
   await page.click('h1');
+  await page.click('.catalog-mode button:nth-child(2)');
+  await page.waitForSelector('.queue-goal-btn');
   await checkNativeScroll('.tab-content');
   // Scroll a fresh player's last queued-purchase control into view, then click
   // its visible coordinates. No locator click or programmatic scrolling here.
@@ -103,6 +121,29 @@ try {
   await page.mouse.click(click.x, click.y);
   await page.waitForFunction(() => window.__game.getState().goals.length === 1);
   checks.push({ freshGameScrollAndClick: true });
+  await clickWithWheel('.catalog-mode button:first-child');
+  await clickWithWheel('.policy-options button:nth-child(2)');
+  assert.equal(await page.$eval('.policy-options button:nth-child(2)', el => el.getAttribute('aria-pressed')), 'true');
+  await clickWithWheel('.council-option:first-child .council-choice');
+  await page.waitForFunction(() => window.__game.getState().goals[0]?.id === 'forkHearth');
+  await clickWithWheel('.council-option:nth-child(2) .council-choice');
+  await page.waitForFunction(() => window.__game.getState().goals[0]?.id === 'forkQuarry');
+  assert.equal(await page.evaluate(() => window.__game.getState().goals.some(g => g.id === 'forkHearth')), false);
+  await page.click('#tab-mini');
+  await clickWithWheel('.expedition-route:first-child');
+  await page.waitForFunction(() => {
+    const saved = JSON.parse(localStorage.getItem('incremental-game-save'));
+    return saved.developmentFocus === 'research' && saved.expedition.routeId === 'surveyRidge' && saved.goals[0]?.id === 'forkQuarry';
+  });
+  await page.reload({ waitUntil: 'networkidle0' });
+  await page.waitForFunction(() => !!window.__game);
+  await page.evaluate(() => window.__game.setSpeed(0));
+  const restoredOrders = await page.evaluate(() => {
+    const s = window.__game.getState();
+    return { focus: s.developmentFocus, route: s.expedition.routeId, doctrine: s.goals[0]?.id, chosen: s.upgrades.forkQuarry };
+  });
+  assert.deepEqual(restoredOrders, { focus: 'research', route: 'surveyRidge', doctrine: 'forkQuarry' });
+  checks.push({ nativePolicyAndDoctrineCommitment: true, replacedOpposingCommitment: true, assignmentReload: true });
   const viewports = [[360, 800], [390, 844], [768, 1024], [1366, 768], [1440, 900], [844, 390], [683, 384]];
   for (let era = 1; era <= 10; era++) {
     await page.evaluate(fixture => window.__game.setState(() => fixture), snapshots[`0:${era}`]);
@@ -111,7 +152,7 @@ try {
     for (const [width, height] of viewports) {
       await page.setViewport({ width, height, hasTouch: true, deviceScaleFactor: width === 683 ? 2 : 1 });
       await settle();
-      await page.evaluate(() => { document.querySelector('#section-actions')?.click(); document.querySelector('#tab-upgrades')?.click(); });
+      await page.evaluate(() => { document.querySelector('#section-actions')?.click(); document.querySelector('#tab-upgrades')?.click(); document.querySelector('.catalog-mode button:first-child')?.click(); });
       await settle();
       const layout = await page.evaluate(() => {
         const rect = selector => { const r = document.querySelector(selector)?.getBoundingClientRect(); return r && { top: r.top, bottom: r.bottom, left: r.left, right: r.right, height: r.height }; };

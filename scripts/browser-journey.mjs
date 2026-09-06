@@ -27,8 +27,13 @@ const click = async selector => {
     const navigation = await page.$(section);
     if (navigation) { await navigation.click(); await navigation.dispose(); await settle(); }
   }
-  const handle = await page.$(selector);
-  if (!handle || await handle.evaluate(el => el.disabled)) { await handle?.dispose(); return false; }
+  const candidates = await page.$$(selector);
+  let handle;
+  for (const candidate of candidates) {
+    if (!handle && await candidate.evaluate(el => !el.disabled && el.getClientRects().length > 0)) handle = candidate;
+    else await candidate.dispose();
+  }
+  if (!handle) return false;
   interaction.scrollDistance += await handle.evaluate(el => { const pane = el.closest('.tab-content, .left-column') || document.scrollingElement; const before = pane.scrollTop; el.scrollIntoView({ block: 'center', inline: 'center' }); return Math.abs(pane.scrollTop - before); });
   await settle();
   await handle.hover();
@@ -40,12 +45,12 @@ const click = async selector => {
   });
   if (!target.unobscured) throw new Error(`Control is obscured: ${selector} ${JSON.stringify(target)}`);
   const changesGame = /upgrade-btn|tech-btn|expedition-route|relic-choice|gather-btn|cycle-doctrines|confirm-yes|era-advance-btn/.test(selector);
-  const before = changesGame && await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount, s.eraReviewApproved]); });
+  const before = changesGame && await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount, s.eraReviewApproved, s.expedition.routeId]); });
   await handle.click();
   await handle.dispose();
   await settle();
   if (changesGame) {
-    const after = await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount, s.eraReviewApproved]); });
+    const after = await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount, s.eraReviewApproved, s.expedition.routeId]); });
     const previous = JSON.parse(before), current = JSON.parse(after);
     for (const [id, value] of Object.entries(current[1])) if (previous[1][id] !== value) pacing.recordCommand(`buy:${id}`, { prestigeCount: current[5] }, elapsed);
     if (selector === '.era-advance-btn') pacing.recordCommand('continue-era', { prestigeCount: current[5] }, elapsed);
@@ -122,7 +127,7 @@ try {
         acted = await click(techTurn ? '.tech-btn.affordable:not(:disabled)' : '.upgrade-btn.affordable:not(:disabled)');
         command = techTurn ? 'research' : 'upgrade';
       }
-      if (!acted && state.era <= 3) { await click('#tab-mini'); acted = await click('.expedition-route:not(:disabled)'); command = 'expedition'; }
+      if (!acted && state.era <= 3) { await click('#tab-mini'); acted = await click('.expedition-routes:not(:has([aria-pressed="true"])) .expedition-route:not(:disabled)'); command = 'expedition'; }
       if (!acted) { acted = await click('.relic-choice button:not(:disabled)'); command = 'relic'; }
       if (!acted && state.era < 4) { acted = await click('.resource-row .gather-btn:not(:disabled)'); command = 'gather'; }
       if (acted) { commands++; trace.push({ elapsed, era: state.era, command }); if (trace.length > 100) trace.shift(); }

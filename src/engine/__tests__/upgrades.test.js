@@ -22,11 +22,11 @@ describe('upgrades', () => {
   });
 
   describe('routine build-out', () => {
-    it('classifies forks, rule changes, unlocks and lore as decisions', () => {
+    it('reserves manual decisions for incompatible alternatives', () => {
       expect(isDecisionUpgrade(upgradeDefs.forkHearth)).toBe(true);      // fork
-      expect(isDecisionUpgrade(upgradeDefs.deadStarAtlas)).toBe(true);   // lore
-      expect(isDecisionUpgrade(upgradeDefs.foundry)).toBe(true);         // unlocks steel
-      expect(isDecisionUpgrade(upgradeDefs.tools)).toBe(true);          // routine multiplier
+      expect(isDecisionUpgrade(upgradeDefs.deadStarAtlas)).toBe(false);   // lore
+      expect(isDecisionUpgrade(upgradeDefs.foundry)).toBe(false);         // unlocks steel
+      expect(isDecisionUpgrade(upgradeDefs.tools)).toBe(false);          // routine multiplier
     });
 
     it('leaves decisions to the player while buying routine build-out', () => {
@@ -36,8 +36,7 @@ describe('upgrades', () => {
       state.resources.food.amount = 1e6;
       state.resources.energy.amount = 1e6;
 
-      expect(buyRoutineBuildOut(state).state.upgrades.tools).toBeUndefined();
-      state = purchaseUpgrade(state, 'tools');
+      expect(buyRoutineBuildOut(state).state.upgrades.tools).toBe(true);
       const { state: after, count } = buyRoutineBuildOut(state);
       expect(count).toBeGreaterThan(0);
 

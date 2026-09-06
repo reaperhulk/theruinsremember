@@ -32,7 +32,7 @@ export function HelpOverlay({ onClose }) {
           </div>
           <div className="help-card">
             <strong>Early Survival</strong>
-            <p>Use + buttons for the first resources, then let production take over. During the first three eras, expeditions trade limited supplies for discoveries and targeted rewards.</p>
+            <p>Gathering, construction and ordinary research run automatically. Choose whether workshops or labs spend first, then compare the Council’s competing doctrines. During the first three eras, assign an expedition route once; the team uses replenished supplies until you pause or change its assignment.</p>
           </div>
           <div className="help-card">
             <strong>Read The Warnings</strong>
@@ -40,7 +40,7 @@ export function HelpOverlay({ onClose }) {
           </div>
           <div className="help-card">
             <strong>Era Progression</strong>
-            <p>Era advances require enough upgrades, enough era research, and the starred breakthrough tech. The Run Director tells you what is missing.</p>
+            <p>The chapter meter shows construction and research progress. When ready, review what your civilization discovered and continue. Exclusive choices remain yours; committing early reserves their cost once prerequisites are ready.</p>
           </div>
           <div className="help-card">
             <strong>Operations</strong>

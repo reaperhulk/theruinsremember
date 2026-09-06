@@ -1,3 +1,4 @@
+import { Council } from './Council.jsx';
 import { useState, useCallback, useRef, useMemo, memo } from 'react';
 import { getAvailableTech, unlockTech } from '../engine/tech.js';
 import { canAfford, getEffectiveCap } from '../engine/resources.js';
@@ -92,6 +93,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
   const [hoveredTechId, setHoveredTechId] = useState(null);
   const [showAdvisor, setShowAdvisor] = useState(false);
   const flashTimerRef = useRef(null);
+  const [showCatalog, setShowCatalog] = useState(false);
   const available = getAvailableTech(state);
   const unlocked = Object.keys(state.tech || {});
 
@@ -111,6 +113,12 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
 
   const unlockedSet = new Set(Object.keys(state.tech || {}));
   const hoveredPrereqChain = hoveredTechId ? new Set(getPrereqChain(hoveredTechId, unlockedSet)) : new Set();
+
+  if (state.autoBuildOut !== false && !showCatalog) return <section className="panel tech-panel">
+    <h2>Research direction</h2><p>Labs handle ordinary technologies and era breakthroughs. Choose which exclusive research path they should support.</p>
+    <Council state={state} onUpdate={onUpdate} kind="tech" economy={economy} />
+    <button className="research-catalog-toggle" onClick={() => setShowCatalog(true)}>Inspect all research ({available.length})</button>
+  </section>;
 
   if (available.length === 0) {
     return (
@@ -140,6 +148,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
 
   return (
     <div className="panel tech-panel">
+      <button className="research-catalog-toggle" onClick={() => setShowCatalog(false)}>Back to research choices</button>
       <h2>Technology{available.length > 0 ? ` (${available.length} available)` : ''}{unlockedCount > 0 && (
           <span className="toggle-purchased" onClick={() => setShowUnlocked(!showUnlocked)}>
             {showUnlocked ? ' (hide done)' : `, ${unlockedCount} done`}
@@ -147,7 +156,7 @@ export const TechTree = memo(function TechTree({ state, onUpdate }) {
         )}</h2>
       {state.era >= 2 && state.autoBuildOut !== false && (
         <p className="operation-commitment">
-          Labs handle routine research automatically. Branch choices and era breakthroughs remain yours.
+          Labs handle research and breakthroughs automatically. You choose exclusive branches and when to enter the next chapter.
         </p>
       )}
       {showUnlocked && unlocked.length > 0 && (

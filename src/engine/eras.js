@@ -306,7 +306,7 @@ export function transitionEra(state, newEra) {
 
   const carriedSupplies = Math.max(1, state.expedition?.supplies ?? 1);
   const expedition = state.expedition
-    ? { ...state.expedition, eraFinds: 0, supplies: carriedSupplies }
+    ? { ...state.expedition, eraFinds: 0, supplies: carriedSupplies, routeId: null }
     : state.expedition;
 
   return applyRestoredInfrastructure({ ...state, era: newEra, resources: newResources, expedition, eraStartTime: state.totalTime, bestEraTimes }, newEra);

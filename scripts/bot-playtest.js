@@ -17,7 +17,7 @@ import { getWeaveProductionMultiplier, getWeavingStats, weaveRealityLaw } from '
 import { getTradeRatio, setTradeRoute } from '../src/engine/trading.js';
 import { commissionDysonModule, getDysonStats } from '../src/engine/dyson.js';
 import { getTuningProductionMultiplier, getTuningStats, lockCosmicSignal } from '../src/engine/tuning.js';
-import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
+import { getExpeditionRoutes, selectExpeditionRoute } from '../src/engine/expeditions.js';
 import { getEraReadiness } from '../src/engine/eras.js';
 import { forgeRealityKey, getCycleReadiness, getRealityForgeRecipes } from '../src/engine/realityForge.js';
 import { countSenateActs, enactSenatePolicy, getSenateGovernmentMultiplier, getSenatePctBonuses, getSenateStats } from '../src/engine/senate.js';
@@ -120,10 +120,9 @@ const BALANCE_TARGETS = {
     maxDockingActions: 3,
     maxColonyActions: 1,
     maxTradingActions: 7,
-    // Forty signature breakthroughs now wait for player decisions. Seed 1
-    // takes 135 legacy gather windows and 204s in Era 3; bounded journeys
+    // Automatic development must eliminate gather spam. Bounded journeys
     // separately enforce actual command budgets and final-cycle completion.
-    maxGatherActions: 150,
+    maxGatherActions: 0,
     maxTechnologyActions: 30,
     maxUpgradeActions: 120,
     maxDysonCommissions: 3,
@@ -147,9 +146,11 @@ const BALANCE_TARGETS = {
   // industry and supplied infrastructure are allowed to shorten the run.
   prestige3: { minManualActions: 20, requiredEra: 10, cycleReady: true, minPrestiges: 3 },
   prestige10: { minManualActions: 20, maxTime: 1800, requiredEra: 10, cycleReady: true, minPrestiges: 10 },
-  newcomer: { minTime: 900, maxTime: 7200, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.06, maxActionsWhileAway: 0 },
+  // Automatic research starts at planetfall and standing expeditions continue
+  // between visits. Allow the intentional reduction in command-gated delays.
+  newcomer: { minTime: 840, maxTime: 7200, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.06, maxActionsWhileAway: 0 },
   engaged: { minTime: 600, maxTime: 5400, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.11, maxActionsWhileAway: 0 },
-  background: { minTime: 1200, maxTime: 10800, requiredEra: 10, cycleReady: true, noCollapse: true, minSessions: 4, minAwaySeconds: 300, maxActiveRatio: 0.35, maxActionsWhileAway: 0 },
+  background: { minTime: 900, maxTime: 10800, requiredEra: 10, cycleReady: true, noCollapse: true, minSessions: 4, minAwaySeconds: 300, maxActiveRatio: 0.35, maxActionsWhileAway: 0 },
   check_in: { minTime: 1800, maxTime: 43200, requiredEra: 10, cycleReady: true, noCollapse: true, minSessions: 3, minOfflineSeconds: 600, maxActiveRatio: 0.2, maxActionsWhileAway: 0 },
   offline_returner: { minTime: 28800, maxTime: 57600, requiredEra: 4, noCollapse: true, minSessions: 3, minOfflineSeconds: 28000, maxActiveRatio: 0.05, maxActionsWhileAway: 0 },
   completionist: { minTime: 600, maxTime: 5400, requiredEra: 10, cycleReady: true, noCollapse: true, maxIgnoredOperations: 0, maxDecisionWindowRatio: 0.21, maxActionsWhileAway: 0 },
@@ -170,13 +171,13 @@ function botGather(state, profile, t, rng) {
   return state;
 }
 
-function botExpedition(state, profile, _t, rng) {
+function botExpedition(state, profile, _t, _rng) {
   if (!profile.expeditions || state.era > 3 || (state.expedition?.supplies || 0) < 1) return state;
   const routes = getExpeditionRoutes(state.era);
   const routeIndex = profile.expeditionStrategy === 'deep'
     ? 2
     : profile.expeditionStrategy === 'measured' ? 1 : 0;
-  return runExpedition(state, routes[routeIndex].id, rng).state;
+  return selectExpeditionRoute(state, routes[routeIndex].id);
 }
 
 function botBuyUpgrades(state, profile, t, _rng) {
@@ -209,7 +210,7 @@ function botBuyTech(state, profile, _t, _rng) {
   if (!profile.buyTech) return state;
   const techs = getAvailableTech(state);
   for (const tech of techs) {
-    if (state.era >= 2 && state.autoBuildOut !== false && !isDecisionTech(tech)) continue;
+    if (state.autoBuildOut !== false && !isDecisionTech(tech)) continue;
     if (canAfford(state, tech.cost)) {
       const result = unlockTech(state, tech.id);
       if (result) state = result;
@@ -404,8 +405,9 @@ function botRealityForge(state, profile, t, _rng) {
     state = selectNextCycleDoctrine(state, doctrines[(state.prestigeCount || 0) % doctrines.length]);
   }
   if (!profile.realityForge) return state;
-  // Forge every 30s
-  if (t % 30 !== 0) return state;
+  // Explore the forge at the first affordable decision window; pace later
+  // keys at 30s. A fast economic finish must not skip the first operation.
+  if (state.forgeChargesSpent > 0 && t % 30 !== 0) return state;
 
   const recipes = getRealityForgeRecipes(state)
     .filter(recipe => recipe.affordable)

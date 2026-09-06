@@ -4,6 +4,7 @@ import { purchaseUpgrade } from '../upgrades.js';
 import { queueGoal, advanceGoal } from '../goals.js';
 import { saveAutomationPlan, restoreAutomationPlan, togglePlanRepeat, researchDoctrine, DOCTRINE_RESEARCH } from '../archive.js';
 import { advanceBlueprint } from '../blueprints.js';
+import { advanceDevelopment } from '../development.js';
 import { getSupplyChains, calculateEconomy } from '../economy.js';
 import { selectProductionRoute, hasRelicSynergy } from '../legacy.js';
 import { transitionEra } from '../eras.js';
@@ -25,7 +26,7 @@ describe('new ways to build remembered civilizations', () => {
     state = advanceGoal(advanceBlueprint(state));
     expect(state.upgrades.forkHearth).toBeUndefined();
     for (const r of Object.values(state.resources)) r.amount = 10000;
-    for (let i = 0; i < 5; i++) state = advanceGoal(advanceBlueprint(state));
+    for (let i = 0; i < 5; i++) state = advanceGoal(advanceBlueprint(advanceDevelopment(state)));
     expect(state.upgrades.forkHearth).toBe(true);
     expect(state.resources.materials.amount).toBeLessThan(10000);
     expect(state.upgrades.forkQuarry).toBeUndefined();

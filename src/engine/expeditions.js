@@ -107,6 +107,8 @@ export const EXPEDITION_ROUTES = {
 export function createExpeditionState() {
   return {
     supplies: 2,
+    routeId: null,
+    paused: false,
     supplyProgress: 0,
     eraFinds: 0,
     totalFinds: 0,
@@ -221,4 +223,13 @@ export function runExpedition(state, routeId, rng = Math.random) {
     },
     result,
   };
+}
+
+// A standing order spends real supplies through the same expedition simulation.
+// Selecting a route never grants rewards; pausing and switching are reversible.
+export function selectExpeditionRoute(state, routeId) {
+  if (state.era > 3 || routeId !== null && !getExpeditionRoutes(state.era).some(r => r.id === routeId)) return state;
+  const paused = routeId === null;
+  if (state.expedition.routeId === routeId && !!state.expedition.paused === paused) return state;
+  return { ...state, expedition: { ...state.expedition, routeId, paused } };
 }

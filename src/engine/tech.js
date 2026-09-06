@@ -75,11 +75,11 @@ export function getAvailableTech(state) {
 }
 
 export function isDecisionTech(def) {
-  return !!(def?.excludes || def?.grantsEra);
+  return !!def?.excludes;
 }
 
-// Labs resolve linear research queues, while breakthroughs and exclusive
-// branches always wait for an explicit player decision.
+// Labs fund linear research, including the next age’s breakthrough. The
+// chapter review still controls departure; exclusive branches remain manual.
 export function researchRoutineTech(state) {
   let current = state;
   let count = 0;

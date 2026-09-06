@@ -49,7 +49,7 @@ function startPump(page) {
         }
         else if (p === 'tech') { document.querySelectorAll('button').forEach(b => { if (b.textContent.includes('Research All') && !b.disabled) b.click(); }); document.querySelectorAll('.tech-btn.affordable').forEach(b => b.click()); document.querySelectorAll('.tech-btn.affordable.era-gate-tech').forEach(b => b.click()); }
         else if (p === 'prestige') document.querySelectorAll('.upgrade-btn.affordable').forEach(b => { if (!b.disabled) b.click(); });
-        const expeditionRoutes = [...document.querySelectorAll('.expedition-route:not(:disabled)')];
+        const expeditionRoutes = [...document.querySelectorAll('.expedition-routes:not(:has([aria-pressed="true"])) .expedition-route:not(:disabled)')];
         expeditionRoutes.at(-1)?.click();
         document.querySelectorAll('.gather-btn').forEach(b => b.click());
       }, 10);

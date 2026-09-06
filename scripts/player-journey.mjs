@@ -5,12 +5,13 @@ import { queueGoal } from '../src/engine/goals.js';
 import { selectProductionRoute, hasRelicSynergy } from '../src/engine/legacy.js';
 import { RELIC_IDS } from '../src/data/relics.js';
 import { createInitialState } from '../src/engine/state.js';
+import { setDevelopmentFocus } from '../src/engine/development.js';
 import { advanceTime } from '../src/engine/advanceTime.js';
 import { tick } from '../src/engine/tick.js';
 import { getAvailableUpgrades, getUpgradeCost, purchaseUpgrade, isDecisionUpgrade, buyNextRepeatableMilestone } from '../src/engine/upgrades.js';
 import { getAvailableTech, unlockTech, isDecisionTech } from '../src/engine/tech.js';
 import { gather, canAfford, isGatheringAutomated, getEffectiveCap } from '../src/engine/resources.js';
-import { getExpeditionRoutes, runExpedition } from '../src/engine/expeditions.js';
+import { getExpeditionRoutes, selectExpeditionRoute } from '../src/engine/expeditions.js';
 import { getDockingInfo, attemptDock, selectDockingMission } from '../src/engine/docking.js';
 import { selectColonyMandate } from '../src/engine/colonies.js';
 import { selectNetworkPlan } from '../src/engine/starChart.js';
@@ -51,7 +52,7 @@ export function candidateActions(state, profile, options, rng) {
   const add = (name, fn) => actions.push({ name, fn });
   const techs = ordered(getAvailableTech(state)).filter(tech => tech.id !== options.blockedTech);
   for (const tech of techs) {
-    if (state.autoBuildOut !== false && state.era >= 2 && !isDecisionTech(tech)) continue;
+    if (state.autoBuildOut !== false && !isDecisionTech(tech)) continue;
     if (canAfford(state, tech.cost)) add(`research:${tech.id}`, s => unlockTech(s, tech.id));
   }
   const upgrades = ordered(getAvailableUpgrades(state));
@@ -63,7 +64,7 @@ export function candidateActions(state, profile, options, rng) {
   if (state.era <= 3 && profile.expeditions && options.skip !== 'expedition') {
     const routes = getExpeditionRoutes(state.era);
     const route = routes[profile.expeditionStrategy === 'safe' ? 0 : profile.expeditionStrategy === 'deep' ? 2 : 1];
-    if (state.expedition.supplies >= 1) add(`expedition:${route.id}`, s => runExpedition(s, route.id, rng).state);
+    if (state.expedition.routeId !== route.id) add(`expedition:${route.id}`, s => selectExpeditionRoute(s, route.id));
   }
   if (state.era === 4 && profile.docking && options.skip !== 'docking') {
     const info = getDockingInfo(state);
@@ -176,6 +177,7 @@ export function runPlayerJourney(options = {}) {
   if (!profile) throw new Error(`Unknown persona: ${persona}`);
   const rng = options.badLuck ? () => 0.999999 : mulberry32(seed);
   let state = createInitialState();
+  if (options.developmentFocus) state = setDevelopmentFocus(state, options.developmentFocus);
   let elapsed = 0;
   let commands = 0;
   let activeSeconds = 0;

@@ -105,7 +105,7 @@ export function getCycleReadiness(state) {
   const distinctKeys = keyCounts.filter(count => count > 0).length;
   const requirements = [
     { id: 'era', label: 'Reach the Multiverse', current: Math.min(state.era, 10), target: 10, met: state.era >= 10 },
-    { id: 'upgrades', label: 'Era 10 decisions', current: era10Upgrades, target: 20, met: era10Upgrades >= 20 },
+    { id: 'upgrades', label: 'Era 10 projects', current: era10Upgrades, target: 20, met: era10Upgrades >= 20 },
     { id: 'totalKeys', label: 'Reality keys forged', current: totalKeys, target: 4, met: totalKeys >= 4 },
     { id: 'distinctKeys', label: 'Distinct key types', current: distinctKeys, target: 3, met: distinctKeys >= 3 },
     { id: 'doctrine', label: 'Next-cycle doctrine selected', current: state.nextCycleDoctrine ? 1 : 0, target: 1, met: !!state.nextCycleDoctrine },

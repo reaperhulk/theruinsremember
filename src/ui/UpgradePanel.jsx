@@ -1,3 +1,4 @@
+import { Council } from './Council.jsx';
 import { DECISIONS } from '../data/decisions.js';
 import { UpgradeImpact } from './UpgradeImpact.jsx';
 import { getPurchaseTarget } from '../engine/guidance.js';
@@ -241,7 +242,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate, econom
   const byFocus = (a, b) => Number(b.id === target?.id) - Number(a.id === target?.id) || getFocusScore(state, b) - getFocusScore(state, a);
   const investments = getRecommendedRepeatables(state, target?.cost, filteredAvailable, economy);
   const visibleAvailable = focusMode
-    ? [...investments, ...decisions, ...routine].sort(byFocus).slice(0, 4)
+    ? (autoBuildOut ? [] : [...investments, ...decisions, ...routine].sort(byFocus).slice(0, 4))
     : filteredAvailable;
 
   const affordableCount = visibleAvailable.filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
@@ -267,8 +268,8 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate, econom
   return (
     <div className={`panel upgrade-panel${chainFlash ? ' chain-reaction-flash' : ''}`}>
       <h2>
-        {focusMode ? 'Decisions' : 'Upgrade Catalog'}{visibleAvailable.length > 0 ? ` (${affordableCount}/${visibleAvailable.length})` : ''}
-        {upcoming.length > 0 ? `, ${upcoming.length} soon` : ''}
+        {focusMode ? 'Civilization choices' : 'Upgrade Catalog'}{visibleAvailable.length > 0 ? ` (${affordableCount}/${visibleAvailable.length})` : ''}
+        {!focusMode && upcoming.length > 0 ? `, ${upcoming.length} soon` : ''}
         {purchased.length > 0 && (
           <span
             className="toggle-purchased"
@@ -298,8 +299,8 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate, econom
             </span>
           );
         })()}
-        <span className="upgrade-summary-pill">{affordableCount} affordable now</span>
-        {focusMode && <span className="upgrade-summary-pill">showing {visibleAvailable.length} priorities</span>}
+        {(!focusMode || !autoBuildOut) && <span className="upgrade-summary-pill">{affordableCount} affordable now</span>}
+        {focusMode && !autoBuildOut && <span className="upgrade-summary-pill">showing {visibleAvailable.length} priorities</span>}
         {mechanicCount > 0 && <span className="upgrade-summary-pill">{mechanicCount} mechanic shifts</span>}
         {loreCount > 0 && <span className="upgrade-summary-pill">{loreCount} lore fragments</span>}
         <button
@@ -308,7 +309,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate, econom
           aria-pressed={autoBuildOut}
           title={
             autoBuildOut
-              ? 'Routine upgrades for this era buy themselves. Forks, rule changes, resource unlocks and lore fragments are always left to you.'
+              ? 'Gathering, upgrades and linear research run automatically. Competing doctrines and research branches are always left to you.'
               : 'Every upgrade must be bought by hand, including routine build-out.'
           }
         >
@@ -317,11 +318,12 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate, econom
       </div>
       {focusMode && autoBuildOut && routineWaiting > 0 && (
         <div className="text-hint" style={{ marginBottom: '4px' }}>
-          {routineWaiting} routine upgrade{routineWaiting === 1 ? '' : 's'} queued for build-out — the choices below are yours
+          {routineWaiting} projects awaiting resources — workshops will build them automatically
         </div>
       )}
+      {focusMode && autoBuildOut && <Council state={state} onUpdate={onUpdate} economy={economy} />}
       <div className="catalog-mode" role="group" aria-label="Upgrade display mode">
-        <button className={!showCatalog ? 'active' : ''} onClick={() => setShowCatalog(false)}>Priority decisions</button>
+        <button className={!showCatalog ? 'active' : ''} onClick={() => setShowCatalog(false)}>Council</button>
         <button className={showCatalog ? 'active' : ''} onClick={() => setShowCatalog(true)}>Full catalog ({available.length})</button>
       </div>
       {visibleAvailable.some(u => LORE_UPGRADE_ID_SET.has(u.id)) && (
@@ -642,7 +644,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate, econom
           );
         })()}
       </div>
-      {upcoming.length > 0 && (
+      {!focusMode && upcoming.length > 0 && (
         <div className="upcoming-section">
           <div className="upcoming-header">Coming Soon</div>
           {upcoming.map(u => {

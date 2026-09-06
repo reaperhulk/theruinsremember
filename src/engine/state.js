@@ -160,6 +160,7 @@ export function createInitialState() {
     hiddenUpgrades: {},
     // Routine current-era upgrades buy themselves; decisions never do.
     autoBuildOut: true,
+    developmentFocus: 'growth',
     consumerControls: {},
     protectProgression: true,
     publicWorks: {},
@@ -175,7 +176,7 @@ export function createInitialState() {
     commissions: [],
     archive: createArchive(),
     plannedPrestigeUpgrades: [],
-    saveVersion: 11,
+    saveVersion: 12,
     eraReviewMode: 'first',
     eraReviewApproved: 0,
   };

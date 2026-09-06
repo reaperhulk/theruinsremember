@@ -1,3 +1,4 @@
+import { LORE_UPGRADE_IDS } from '../data/lore.js';
 import { recordDecision } from './memory.js';
 import { preservesGoalReserve } from './goals.js';
 import { recordBuildChoice } from './blueprints.js';
@@ -5,9 +6,9 @@ import { recordHistory } from './archive.js';
 import { calculateEconomy, getCostPressure, getSupplyChains } from './economy.js';
 import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { resources as resourceDefs } from '../data/resources.js';
-import { LORE_UPGRADE_IDS } from '../data/lore.js';
 import { spend, getEffectivePrestige } from './resources.js';
 import { getEraMasteryTier } from './eras.js';
+
 
 const LORE_UPGRADE_ID_SET = new Set(LORE_UPGRADE_IDS);
 
@@ -354,19 +355,10 @@ export function getUpcomingUpgrades(state) {
   }).slice(0, 5); // Show max 5 upcoming
 }
 
-// A decision is an upgrade where the choice itself matters: a doctrine fork
-// that locks out its opposite, an upgrade that changes a rule, one that opens
-// a new resource, or a lore fragment the player should actually read. Anything
-// else is build-out — a confirmation, not a choice. There are 599 upgrades and
-// only about 40 of them are decisions by this definition, which is why buying
-// upgrades felt like flushing a queue.
+// A purchase is a decision only when it closes an alternative. Unlocks,
+// multipliers, mechanics and lore are earned automatically with ordinary costs.
 export function isDecisionUpgrade(def) {
-  if (!def) return false;
-  if (def.exclusiveWith) return true;
-  if (def.mechanic) return true;
-  if (LORE_UPGRADE_ID_SET.has(def.id)) return true;
-  if (SIGNATURE_UPGRADES.has(def.id)) return true;
-  return (def.effects || []).some(effect => effect.type === 'unlock_resource');
+  return !!def?.exclusiveWith;
 }
 
 // Build-out the player has already committed to by enabling automation: the
@@ -431,8 +423,8 @@ export function getPurchasedUpgrades(state) {
   }).filter(Boolean);
 }
 
-// Signature breakthroughs stay in the decision list; their existing large
-// multipliers become deliberate purchases with visible before/after output.
+// Highlight major production milestones in the optional full catalog.
+// These positive upgrades also complete through automatic development.
 export const SIGNATURE_UPGRADES = new Set([
   'tools', 'irrigation', 'basicPower', 'terraceFields',
   'assemblyLines', 'powerGrid', 'microchipFab', 'industrialBoiler',
