@@ -73,11 +73,19 @@ export async function checkMusic(page, browser, checks) {
 
   for (const width of [360, 390, 1366]) {
     await page.setViewport({ width, height: width < 600 ? 844 : 768, hasTouch: true });
-    await page.click('.audio-controls summary');
+    // Chrome can restore an open details element across a reload. Ensure the
+    // intended state: a closed panel has a zero rect and could falsely pass.
+    if (!await page.$eval('.audio-controls', element => element.open)) await page.click('.audio-controls summary');
+    await page.waitForSelector('.preferences-body', { visible: true });
     const panel = await page.$eval('.preferences-body', element => {
       const r = element.getBoundingClientRect();
-      return { left: r.left, right: r.right, bottom: r.bottom, windowWidth: innerWidth, windowHeight: innerHeight };
+      const reachable = [...element.querySelectorAll('input, select, button')].every(control => {
+        const rect = control.getBoundingClientRect();
+        return control.contains(document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2));
+      });
+      return { left: r.left, right: r.right, bottom: r.bottom, width: r.width, height: r.height, reachable, windowWidth: innerWidth, windowHeight: innerHeight };
     });
+    assert(panel.width >= 200 && panel.height >= 200 && panel.reachable, `Music controls must be visible and reachable at ${width}: ${JSON.stringify(panel)}`);
     assert(panel.left >= 0 && panel.right <= panel.windowWidth && panel.bottom <= panel.windowHeight, `Music controls overflow at ${width}: ${JSON.stringify(panel)}`);
     await page.screenshot({ path: `test-results/music-controls-${width}.png` });
     await page.click('.audio-controls summary');
