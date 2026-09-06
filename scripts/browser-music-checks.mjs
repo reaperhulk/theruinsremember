@@ -73,17 +73,20 @@ export async function checkMusic(page, browser, checks) {
 
   for (const width of [360, 390, 1366]) {
     await page.setViewport({ width, height: width < 600 ? 844 : 768, hasTouch: true });
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     // Chrome can restore an open details element across a reload. Ensure the
     // intended state: a closed panel has a zero rect and could falsely pass.
     if (!await page.$eval('.audio-controls', element => element.open)) await page.click('.audio-controls summary');
+    await page.waitForFunction(() => document.querySelector('.audio-controls').open);
     await page.waitForSelector('.preferences-body', { visible: true });
     const panel = await page.$eval('.preferences-body', element => {
       const r = element.getBoundingClientRect();
-      const reachable = [...element.querySelectorAll('input, select, button')].every(control => {
+      const controls = [...element.querySelectorAll('input, select, button')].map(control => {
         const rect = control.getBoundingClientRect();
-        return control.contains(document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2));
+        const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        return { label: control.getAttribute('aria-label'), reachable: control.contains(hit), hit: hit?.outerHTML.slice(0, 180) };
       });
-      return { left: r.left, right: r.right, bottom: r.bottom, width: r.width, height: r.height, reachable, windowWidth: innerWidth, windowHeight: innerHeight };
+      return { left: r.left, right: r.right, bottom: r.bottom, width: r.width, height: r.height, open: element.closest('details').open, reachable: controls.every(control => control.reachable), controls, windowWidth: innerWidth, windowHeight: innerHeight };
     });
     assert(panel.width >= 200 && panel.height >= 200 && panel.reachable, `Music controls must be visible and reachable at ${width}: ${JSON.stringify(panel)}`);
     assert(panel.left >= 0 && panel.right <= panel.windowWidth && panel.bottom <= panel.windowHeight, `Music controls overflow at ${width}: ${JSON.stringify(panel)}`);
