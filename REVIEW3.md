@@ -209,3 +209,26 @@ The required engine persona comparison is unchanged below. This measures progres
 | offline_returner | 42 | 43201 → 43201 | 361 → 361 | 103 → 103 | 4 → 4 | Era 5 → 5 |
 | completionist | 42 | 666 → 666 | 666 → 666 | 165 → 165 | 1 → 1 | Era 10 → 10 |
 | minimalist | 42 | 3181 → 3181 | 3181 → 3181 | 101 → 101 | 1 → 1 | Era 10 → 10 |
+
+### Native scroll test sequencing
+
+The new regression passed the fresh-game wheel-and-click interaction and native wheel/touch checks for both panels at 360 × 800 and 390 × 844. The next viewport failed when reversing an End-key scroll with Home. The test now waits for native scrolling to settle before reversing direction, and logs the active focus and pane geometry on failure. Endpoint, gesture movement and clipping assertions remain intact. This test-only follow-up has the following unchanged persona comparison (times in seconds).
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Outcome before → after |
+|---|---:|---:|---:|---:|---:|---|
+| newcomer | 424242 | 1101 → 1101 | 1101 → 1101 | 116 → 116 | 1 → 1 | Era 10 → 10 |
+| engaged | 424242 | 941 → 941 | 941 → 941 | 134 → 134 | 1 → 1 | Era 10 → 10 |
+| optimizer | 424242 | 571 → 571 | 571 → 571 | 231 → 231 | 1 → 1 | Era 10 → 10 |
+| background | 424242 | 1561 → 1561 | 391 → 391 | 128 → 128 | 14 → 14 | Era 10 → 10 |
+| check_in | 424242 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | Era 5 → 5 |
+| completionist | 424242 | 666 → 666 | 666 → 666 | 173 → 173 | 1 → 1 | Era 10 → 10 |
+| minimalist | 424242 | 3301 → 3301 | 3301 → 3301 | 99 → 99 | 1 → 1 | Era 10 → 10 |
+| newcomer | 42 | 1041 → 1041 | 1041 → 1041 | 112 → 112 | 1 → 1 | Era 10 → 10 |
+| engaged | 42 | 851 → 851 | 851 → 851 | 136 → 136 | 1 → 1 | Era 10 → 10 |
+| optimizer | 42 | 451 → 451 | 451 → 451 | 211 → 211 | 1 → 1 | Era 10 → 10 |
+| background | 42 | 1441 → 1441 | 361 → 361 | 126 → 126 | 13 → 13 | Era 10 → 10 |
+| check_in | 42 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 103 → 103 | 4 → 4 | Era 5 → 5 |
+| completionist | 42 | 666 → 666 | 666 → 666 | 165 → 165 | 1 → 1 | Era 10 → 10 |
+| minimalist | 42 | 3181 → 3181 | 3181 → 3181 | 101 → 101 | 1 → 1 | Era 10 → 10 |

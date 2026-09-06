@@ -16,6 +16,18 @@ const errors = [], checks = [];
 page.on('pageerror', error => errors.push(error.message));
 const url = process.env.GAME_URL || 'http://127.0.0.1:5173';
 const settle = () => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+// Chromium's native wheel/key animations and touch momentum can outlive the
+// first frame that reaches an endpoint. Let input finish before reversing it.
+const settleScroll = selector => page.$eval(selector, el => new Promise(resolve => {
+  let previous = el.scrollTop, stable = 0;
+  const frame = () => {
+    stable = el.scrollTop === previous ? stable + 1 : 0;
+    previous = el.scrollTop;
+    if (stable >= 8) resolve();
+    else requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}));
 // Exercise native input. scrollIntoView/locator clicks can scroll overflow:hidden
 // ancestors and make controls reachable to automation that a player cannot reach.
 async function checkNativeScroll(selector, { touch = false } = {}) {
@@ -29,6 +41,7 @@ async function checkNativeScroll(selector, { touch = false } = {}) {
   await page.focus(selector);
   await page.keyboard.press('Home');
   await page.waitForFunction(s => document.querySelector(s).scrollTop < 2, {}, selector);
+  await settleScroll(selector);
   if (touch) {
     const distance = Math.min(120, geometry.height / 3);
     await page.touchscreen.touchStart(geometry.x, geometry.y + distance / 2);
@@ -39,12 +52,16 @@ async function checkNativeScroll(selector, { touch = false } = {}) {
     await page.mouse.wheel({ deltaY: Math.min(240, geometry.maximum) });
   }
   await page.waitForFunction(s => document.querySelector(s).scrollTop > 0, {}, selector);
+  await settleScroll(selector);
   const gestureScroll = await page.$eval(selector, el => el.scrollTop);
+  await page.focus(selector);
   await page.keyboard.press('End');
   await page.waitForFunction(s => { const el = document.querySelector(s); return el.scrollHeight - el.clientHeight - el.scrollTop < 2; }, {}, selector);
+  await settleScroll(selector);
   assert.equal(await page.$eval('.game-layout', el => el.scrollTop), 0, 'The clipped parent must never scroll');
   await page.keyboard.press('Home');
   await page.waitForFunction(s => document.querySelector(s).scrollTop < 2, {}, selector);
+  await settleScroll(selector);
   return { selector, gesture: touch ? 'touch' : 'wheel', gestureScroll, keyboardReachedBottom: true };
 }
 mkdirSync('test-results', { recursive: true });
@@ -151,6 +168,13 @@ try {
   console.log(`PASS ${checks.length} experience checks: seven viewport sizes, all ten eras, native wheel/touch/keyboard scrolling, fresh-game scroll and click, reduced motion, browser audio, and save ownership.`);
 } catch (error) {
   process.exitCode = 1; console.error(error);
+  console.error(await page.evaluate(() => ({
+    width: innerWidth, height: innerHeight, focus: document.activeElement?.outerHTML.slice(0, 180),
+    panes: ['.game-layout', '.left-column', '.tab-content'].map(selector => {
+      const el = document.querySelector(selector), r = el.getBoundingClientRect();
+      return { selector, top: r.top, bottom: r.bottom, scrollTop: el.scrollTop, clientHeight: el.clientHeight, scrollHeight: el.scrollHeight };
+    }),
+  })));
   if (!page.isClosed()) await page.screenshot({ path: 'test-results/experience-failure.png', fullPage: true });
 } finally {
   writeFileSync('test-results/experience.json', JSON.stringify({ checks, errors }, null, 2));
