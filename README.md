@@ -24,7 +24,7 @@ Every era now has an authored chapter and two strategic branches with consequenc
 
 The next civilization recognizes your actual choices. Prestige restores a producing settlement and automatic gathering, while the Archive keeps discoveries, read state, plans and landmarks. World view shows inherited structures, constrained production and optional supply routes. Preferences include a ten-era adaptive score and low-power rendering. Offline progress yields between short processing slices, and only one browser tab can own the save at a time.
 
-Implementation details and all eight personas’ before/after measurements are in [the ten-era delivery report](REVIEW3.md), [the decision-loop revision](REVIEW4.md), and [the construction and supply-route revision](REVIEW5.md).
+Implementation details and all eight personas’ before/after measurements are in [the ten-era delivery report](REVIEW3.md), [the decision-loop revision](REVIEW4.md), [the construction and supply-route revision](REVIEW5.md), and [the soundtrack revision](REVIEW6.md).
 
 ## How It Works
 
@@ -52,7 +52,8 @@ Implementation details and all eight personas’ before/after measurements are i
 - **A permanent Archive** that preserves narrative history and saved plans after the first prestige; the second opens doctrine research and exact relic crafting, and the third starts reconstruction projects across cycles
 - **Prestige reward planning** that spends newly earned points before starting perks are applied
 - **Validated saves and rotating backups**, current-state export, and visible recovery controls
-- **Era illustrations from Planetfall** and ambient music with independent music/effects controls
+- **An original instrumental soundtrack for all ten eras**: mellow keys, sustained chords, bass, and soft percussion follow your civilization through 32-bar arrangements. Use the header's Music button to play or pause; Preferences shows the current theme and separate music/effects volumes. Playback starts after a click or keypress, pauses in background tabs, and remembers your volume and mute preferences
+- **Era illustrations from Planetfall** with an optional low-power world view
 - **A run-director UI layer** that explains what is blocking the next breakthrough instead of leaving progression hidden in raw numbers
 
 ## The Experiment
@@ -116,6 +117,12 @@ The natural browser journey earns two complete cycles through visible controls,
 including a mid-run reload and a planned prestige reward. It never grants
 resources, writes ownership, or injects an era. Failures preserve the final state,
 command trace, and screenshot in `test-results/`.
+
+`npm run test:browser:experience` also tests music through real browser input,
+including first-click playback, independent volume controls, mute, reload, and
+background recovery. It renders all ten scores through the production Web Audio
+instruments and checks actual PCM levels for silence and clipping. Diagnostics
+include mobile/desktop control screenshots, per-era levels, and a short WAV preview.
 
 The separate operation fixture suite reloads real legacy and offline saves, checks automation controls,
 advances naturally from a fresh run through Era 7, and then validates late-game

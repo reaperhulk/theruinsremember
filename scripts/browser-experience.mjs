@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import assert from 'node:assert/strict';
 import { runPlayerJourney } from './player-journey.mjs';
 import { solveSupplyBoard } from './supply-run-policy.mjs';
+import { installAudioAudit, checkMusic } from './browser-music-checks.mjs';
 const snapshots = {};
 const earned = runPlayerJourney({ persona: 'engaged', seed: 42, cycles: 2, observe: state => { snapshots[`${state.prestigeCount}:${state.era}`] = state; } });
 assert(earned.completed, 'Fixture source must complete two naturally earned cycles');
@@ -84,22 +85,13 @@ async function clickWithWheel(selector) {
 mkdirSync('test-results', { recursive: true });
 try {
   await page.setViewport({ width: 1366, height: 768, hasTouch: true });
-  await page.evaluateOnNewDocument(() => {
-    const Audio = window.AudioContext || window.webkitAudioContext;
-    if (Audio) window.AudioContext = class extends Audio {
-      constructor(...args) { super(...args); window.__audioAudit = { context: this, voices: 0, peak: 0, started: 0 }; }
-      createOscillator() {
-        const node = super.createOscillator(), audit = window.__audioAudit;
-        audit.voices++; audit.started++; audit.peak = Math.max(audit.peak, audit.voices);
-        node.addEventListener('ended', () => audit.voices--); return node;
-      }
-    };
-  });
+  await installAudioAudit(page);
   await page.goto(url, { waitUntil: 'networkidle0' });
   await page.evaluate(() => localStorage.clear());
   await page.reload({ waitUntil: 'networkidle0' });
   await page.waitForFunction(() => !!window.__game);
   await page.evaluate(() => window.__game.setSpeed(0));
+  await checkMusic(page, browser, checks);
   await page.click('h1');
   await page.click('.catalog-mode button:nth-child(2)');
   await page.waitForSelector('.queue-goal-btn');

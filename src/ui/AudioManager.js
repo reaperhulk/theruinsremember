@@ -1,11 +1,32 @@
-import { SCORE, MEMORY_MOTIF } from '../data/score.js';
+import { MEMORY_MOTIF } from '../data/score.js';
+import { createMusicPlayer } from './MusicPlayer.js';
 let audioCtx = null;
 let muted = false;
 let effectsVolume = 0.7;
-let musicVolume = 0.18;
+export const DEFAULT_AUDIO_LEVELS = { effects: 0.7, music: 0.45 };
+let musicVolume = DEFAULT_AUDIO_LEVELS.music;
 let effectsBus;
 let musicBus;
-let ambientTimer;
+let musicPlayer;
+let musicEnabled = true;
+let ambientRequested = false;
+let playbackStatus = 'waiting';
+const musicListeners = new Set();
+export const getMusicStatus = () => playbackStatus;
+export function subscribeMusic(listener) { musicListeners.add(listener); return () => musicListeners.delete(listener); }
+function reportMusic(status) {
+  if (playbackStatus === status) return;
+  playbackStatus = status;
+  for (const listener of musicListeners) listener();
+}
+function syncPlayback() {
+  const wanted = ambientRequested && musicEnabled && !muted && musicVolume > 0 && !document.hidden;
+  if (wanted && audioCtx?.state === 'running' && musicPlayer) { musicPlayer.start(); reportMusic('playing'); }
+  else {
+    musicPlayer?.stop();
+    reportMusic(!musicEnabled || muted || musicVolume === 0 || document.hidden ? 'paused' : 'waiting');
+  }
+}
 let musicEra = 1;
 let musicCycle = 0;
 let musicActivity = 0;
@@ -22,7 +43,6 @@ function voice(ctx, bus, frequency, type, start, length, volume, attack = 0.03) 
   gain.gain.setValueAtTime(0, start); gain.gain.linearRampToValueAtTime(volume, start + attack);
   gain.gain.exponentialRampToValueAtTime(0.0001, start + length);
   osc.start(start); osc.stop(start + length);
-      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
   osc.onended = () => { osc.disconnect(); gain.disconnect(); };
 }
 export function playDiscovery() {
@@ -39,18 +59,24 @@ export function playConstruction() {
 }
 
 function getCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx.addEventListener('statechange', syncPlayback);
+  }
   if (!effectsBus) {
     effectsBus = audioCtx.createGain(); effectsBus.connect(audioCtx.destination);
     musicBus = audioCtx.createGain(); musicBus.connect(audioCtx.destination);
+    musicPlayer = createMusicPlayer(audioCtx, musicBus);
+    musicPlayer.setScene(musicEra, musicCycle, musicActivity);
     setVolumes(effectsVolume, musicVolume);
   }
-  if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+  if (audioCtx.state !== 'running' && audioCtx.state !== 'closed' && !document.hidden) audioCtx.resume().then(syncPlayback).catch(() => reportMusic('waiting'));
   return audioCtx;
 }
 
 export function setMuted(m) { muted = m; setVolumes(effectsVolume, musicVolume); }
 export function isMuted() { return muted; }
+export function setMusicEnabled(enabled) { musicEnabled = enabled; setVolumes(effectsVolume, musicVolume); }
 
 export function playClick() {
   if (!allowCue('click', 100)) return;
@@ -206,34 +232,21 @@ export function setVolumes(effects, music) {
   effectsVolume = Math.max(0, Math.min(1, Number(effects) || 0));
   musicVolume = Math.max(0, Math.min(1, Number(music) || 0));
   if (effectsBus) effectsBus.gain.setTargetAtTime(muted || document.hidden ? 0 : effectsVolume, audioCtx.currentTime, 0.04);
-  if (musicBus) musicBus.gain.setTargetAtTime(muted || document.hidden ? 0 : musicVolume, audioCtx.currentTime, 0.3);
+  if (musicBus) musicBus.gain.setTargetAtTime(muted || !musicEnabled || document.hidden ? 0 : musicVolume, audioCtx.currentTime, 0.12);
+  syncPlayback();
 }
-export function setMusicEra(era, cycle = 0, activity = 0) { musicEra = era; musicCycle = cycle; musicActivity = activity; }
+export function setMusicEra(era, cycle = 0, activity = 0) {
+  musicEra = era; musicCycle = cycle; musicActivity = activity;
+  musicPlayer?.setScene(era, cycle, activity);
+}
 export function startAmbient() {
-  if (ambientTimer) return;
-  let phrase = 0;
-  const chord = () => {
-    if (muted || document.hidden || musicVolume === 0) return;
-    try {
-      const ctx = getCtx();
-      const score = SCORE[musicEra] || SCORE[1];
-      const movement = [1, 1, 0.89, 1.125, 1, 0.75, 0.89, 1][phrase % 8];
-      const root = score.root * movement;
-      for (const ratio of score.voices) voice(ctx, musicBus, root * ratio, score.type, ctx.currentTime, 9, 0.08 / score.voices.length, 2);
-      // The first camp's four-note motif returns in altered register after reset.
-      if (phrase % 3 === 0) for (const [i, note] of MEMORY_MOTIF.entries()) {
-        const semitones = musicCycle >= 2 ? 7 - note : note;
-        voice(ctx, musicBus, root * (musicCycle ? 2 : 1) * 2 ** (semitones / 12), 'sine', ctx.currentTime + 1 + i * 0.7, 2.2, 0.021, 0.2);
-      }
-      const beats = score.pulse + (musicActivity && score.pulse ? 1 : 0);
-      for (let i = 0; i < beats; i++) voice(ctx, musicBus, root / 2, 'triangle', ctx.currentTime + i * 8 / beats, 0.18, 0.012, 0.008);
-      phrase++;
-
-    } catch { /* Audio is optional on devices without a supported output. */ }
-  };
-  chord();
-  ambientTimer = setInterval(chord, 8000);
+  ambientRequested = true;
+  if (!musicEnabled || muted || musicVolume === 0 || document.hidden) return;
+  try { getCtx(); setVolumes(effectsVolume, musicVolume); } catch { reportMusic('unavailable'); }
 }
-export function stopAmbient() { clearInterval(ambientTimer); ambientTimer = null; if (musicBus) musicBus.gain.value = 0; }
+export function stopAmbient() { ambientRequested = false; musicPlayer?.stop(); if (musicBus) musicBus.gain.value = 0; reportMusic('paused'); }
 
-export function syncAudioVisibility() { setVolumes(effectsVolume, musicVolume); }
+export function syncAudioVisibility() {
+  setVolumes(effectsVolume, musicVolume);
+  if (!document.hidden && ambientRequested) startAmbient();
+}

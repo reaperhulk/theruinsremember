@@ -11,7 +11,7 @@ import { GoalsPanel } from './GoalsPanel.jsx';
 import { PublicWorksPanel } from './PublicWorksPanel.jsx';
 import { RestoredDistricts } from './RestoredDistricts.jsx';
 import { serializeSave } from '../engine/saves.js';
-import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, useSyncExternalStore, lazy, Suspense } from 'react';
 import { createInitialState } from '../engine/state.js';
 import { useGameLoop } from '../hooks/useGameLoop.js';
 import { ResourcePanel } from './ResourcePanel.jsx';
@@ -34,7 +34,8 @@ import { OperationsPanel } from './OperationsPanel.jsx';
 import { RelicPanel } from './RelicPanel.jsx';
 import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
-import { setMuted, playPrestige, playDiscovery, playChoice, playConstruction, setVolumes, setMusicEra, startAmbient, stopAmbient, syncAudioVisibility } from './AudioManager.js';
+import { setMuted, playPrestige, playDiscovery, playChoice, playConstruction, setVolumes, setMusicEra, startAmbient, stopAmbient, syncAudioVisibility, setMusicEnabled, getMusicStatus, subscribeMusic, DEFAULT_AUDIO_LEVELS } from './AudioManager.js';
+import { SCORE } from '../data/score.js';
 const StatsPanel = lazy(() => import('./StatsPanel.jsx').then(module => ({ default: module.StatsPanel })));
 import { EventLog } from './EventLog.jsx';
 const PrestigePanel = lazy(() => import('./PrestigePanel.jsx').then(module => ({ default: module.PrestigePanel })));
@@ -104,7 +105,9 @@ export function App() {
   const [unseenLoreCount, setUnseenLoreCount] = useState(0);
 
   const [audioMuted, setAudioMuted] = useState(() => { try { return localStorage.getItem('audioMuted') === 'true'; } catch { return false; } });
-  const [audioLevels, setAudioLevels] = useState(() => { try { return JSON.parse(localStorage.getItem('audioLevels')) || { effects: 0.7, music: 0.18 }; } catch { return { effects: 0.7, music: 0.18 }; } });
+  const [audioLevels, setAudioLevels] = useState(() => { try { return { ...DEFAULT_AUDIO_LEVELS, ...JSON.parse(localStorage.getItem('audioLevels')) }; } catch { return DEFAULT_AUDIO_LEVELS; } });
+  const [musicOn, setMusicOn] = useState(() => { try { return localStorage.getItem('musicEnabled') !== 'false'; } catch { return true; } });
+  const musicStatus = useSyncExternalStore(subscribeMusic, getMusicStatus, getMusicStatus);
   const [victoryDismissed, setVictoryDismissed] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(null);
@@ -138,6 +141,10 @@ export function App() {
     setVolumes(audioLevels.effects, audioLevels.music);
     try { localStorage.setItem('audioLevels', JSON.stringify(audioLevels)); } catch { /* optional preference */ }
   }, [audioLevels]);
+  useEffect(() => {
+    setMusicEnabled(musicOn);
+    try { localStorage.setItem('musicEnabled', String(musicOn)); } catch { /* optional preference */ }
+  }, [musicOn]);
   useEffect(() => { setMusicEra(state.era, state.prestigeCount, state.cycleDoctrine === 'expansion'); }, [state.era, state.prestigeCount, state.cycleDoctrine]);
   const audioHistory = useRef(null);
   useEffect(() => {
@@ -151,7 +158,9 @@ export function App() {
     audioHistory.current = snapshot;
   }, [state.upgrades, state.archive.discoveries, state.prestigeCount]);
   useEffect(() => {
-    const begin = () => { startAmbient(); document.removeEventListener('pointerdown', begin); document.removeEventListener('keydown', begin); };
+    // Keep gesture recovery available after a mobile audio interruption. The
+    // music button handles its own gesture so its first click cannot also pause.
+    const begin = event => { if (!event.target.closest?.('.music-toggle')) startAmbient(); };
     const visibility = syncAudioVisibility;
     document.addEventListener('pointerdown', begin);
     document.addEventListener('keydown', begin);
@@ -295,13 +304,25 @@ export function App() {
             </button>
           )}
           <button className="reset-btn" aria-label="Show help" onClick={() => setShowHelp(h => !h)} title="Help (?)">?</button>
-          <button className="reset-btn" aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'} onClick={() => setAudioMuted(m => !m)} title={audioMuted ? 'Sound OFF' : 'Sound ON'}>
-            {audioMuted ? 'Sound OFF' : 'Sound ON'}
+          <button className="reset-btn music-toggle" aria-label={musicStatus === 'playing' ? 'Pause music' : 'Play music'} aria-pressed={musicStatus === 'playing'} title={`${SCORE[state.era].name} · ${musicStatus === 'playing' ? 'Pause soundtrack' : 'Play soundtrack'}`} onClick={() => {
+            if (musicStatus === 'playing') { setMusicEnabled(false); setMusicOn(false); }
+            else {
+              const volume = audioLevels.music || DEFAULT_AUDIO_LEVELS.music;
+              setAudioMuted(false); setMusicOn(true); setAudioLevels(a => ({ ...a, music: volume }));
+              setMuted(false); setMusicEnabled(true); setVolumes(audioLevels.effects, volume); startAmbient();
+            }
+          }}>
+            {musicStatus === 'playing' ? '♫ Music ON' : !musicOn || audioMuted || audioLevels.music === 0 ? '♫ Music OFF' : '♫ Play music'}
           </button>
           <details className="audio-controls"><summary>Preferences</summary>
+            <div className="preferences-body">
+            <p className="soundtrack-title"><span>Era {state.era} soundtrack</span><strong>{SCORE[state.era].name}</strong></p>
+            <p className="soundtrack-status" role="status">{musicStatus === 'playing' ? 'Playing · music follows your civilization' : musicStatus === 'unavailable' ? 'Audio is unavailable in this browser.' : musicOn && !audioMuted && audioLevels.music > 0 ? 'Press Play music or interact with the settlement to start.' : 'Music paused'}</p>
             <label>World detail <select aria-label="World detail" value={visualQuality} onChange={e => { setVisualQuality(e.target.value); try { localStorage.setItem('visualQuality', e.target.value); } catch { /* optional preference */ } }}><option value="standard">Standard</option><option value="low">Low power</option></select></label>
-            <label>Music <input aria-label="Music volume" type="range" min="0" max="1" step="0.05" value={audioLevels.music} onChange={e => setAudioLevels(a => ({ ...a, music: Number(e.target.value) }))} /></label>
-            <label>Effects <input aria-label="Effects volume" type="range" min="0" max="1" step="0.05" value={audioLevels.effects} onChange={e => setAudioLevels(a => ({ ...a, effects: Number(e.target.value) }))} /></label>
+            <label>Music <input aria-label="Music volume" type="range" min="0" max="1" step="0.05" value={audioLevels.music} onChange={e => setAudioLevels(a => ({ ...a, music: Number(e.target.value) }))} /><output>{Math.round(audioLevels.music * 100)}%</output></label>
+            <label>Effects <input aria-label="Effects volume" type="range" min="0" max="1" step="0.05" value={audioLevels.effects} onChange={e => setAudioLevels(a => ({ ...a, effects: Number(e.target.value) }))} /><output>{Math.round(audioLevels.effects * 100)}%</output></label>
+            <button className="audio-mute-all" aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'} aria-pressed={audioMuted} onClick={() => { setAudioMuted(!audioMuted); setMuted(!audioMuted); if (audioMuted) startAmbient(); }}>{audioMuted ? 'Unmute all audio' : 'Mute all audio'}</button>
+            </div>
           </details>
           <div className="save-menu-wrap" ref={saveMenuRef}>
             <button
