@@ -689,7 +689,11 @@ async function run() {
       })));
       await new Promise(r => setTimeout(r, 100));
     }
-    await page.evaluate(index => document.querySelectorAll('.cycle-doctrines button')[index]?.click(), cycle % doctrineOrder.length);
+    await page.click('#tab-mini');
+    await page.waitForSelector('.cycle-doctrines button', { visible: true });
+    await page.click(`.cycle-doctrines button:nth-child(${cycle % doctrineOrder.length + 1})`);
+    const selectedDoctrine = await page.evaluate(() => window.__game.getState().nextCycleDoctrine);
+    if (selectedDoctrine !== doctrineId) throw new Error(`Doctrine selection failed: ${selectedDoctrine} instead of ${doctrineId}`);
     await new Promise(r => setTimeout(r, 100));
     await page.evaluate(() => document.querySelector('.prestige-btn')?.click());
     await new Promise(r => setTimeout(r, 200));
@@ -769,7 +773,7 @@ async function run() {
   tabIssues.forEach(issue => console.log('  ✗ ' + issue));
   const exitCode = finalLayout.issues.length > 0 || tabIssues.length > 0 || consoleErrors.length > 0 || progressionFailed || migrationFailed || offlineFailed || automationFailed || operationFailed || relicFailed || operationShellFailed || dysonFailed || tuningFailed || weavingFailed || senateFailed || colonyFailed || tradeRouteFailed || chartFailed || siegeFailed || forgeFailed || doctrineCycleFailed ? 1 : 0;
   mkdirSync('test-results', { recursive: true });
-  writeFileSync(`test-results/operations-${MOBILE ? 'mobile' : 'desktop'}.json`, JSON.stringify({ exitCode, persistence, operationShell, dysonAudit, tuningAudit, weavingAudit, senateAudit, colonyAudit, routeAudit, chartAudit, siegeAudit, finalLayout, tabIssues, consoleErrors, state: await page.evaluate(() => window.__game.getState()) }, null, 2));
+  writeFileSync(`test-results/operations-${MOBILE ? 'mobile' : 'desktop'}.json`, JSON.stringify({ exitCode, doctrineCycleFailed, persistence, operationShell, dysonAudit, tuningAudit, weavingAudit, senateAudit, colonyAudit, routeAudit, chartAudit, siegeAudit, finalLayout, tabIssues, consoleErrors, state: await page.evaluate(() => window.__game.getState()) }, null, 2));
   await page.screenshot({ path: `test-results/operations-${MOBILE ? 'mobile' : 'desktop'}.png`, fullPage: true });
   await browser.close();
   process.exit(exitCode);

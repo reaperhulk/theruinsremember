@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { resources as resourceDefs } from '../data/resources.js';
+import { getCostPressure } from '../engine/economy.js';
 import { getEffectiveCap } from '../engine/resources.js';
 import { formatNumber } from './format.js';
 import { playGemFound, playAchievement, playCapWarning } from './AudioManager.js';
@@ -17,7 +18,7 @@ function formatToastText(text, type) {
   return text;
 }
 
-export function Toast({ state }) {
+export function Toast({ state, objective, economy }) {
   const [toasts, setToasts] = useState([]);
   const toastTimerRef = useRef(null);
   const prevEraRef = useRef(state.era);
@@ -34,7 +35,7 @@ export function Toast({ state }) {
     // First upgrade congratulation
     const upgradeCount = Object.keys(state.upgrades || {}).length;
     if (upgradeCount === 1 && prevUpgradeCountRef.current === 0) {
-      newToasts.push({ id: ++idRef.current, text: 'First upgrade! Production doubled.', type: 'milestone' });
+      newToasts.push({ id: ++idRef.current, text: 'First investment completed. Your settlement is taking shape.', type: 'milestone' });
     }
     prevUpgradeCountRef.current = upgradeCount;
 
@@ -65,16 +66,17 @@ export function Toast({ state }) {
       }
     }
 
-    // Resource cap warnings (once per resource per cap level)
+    // Only announce storage that actually blocks the shared purchase objective.
+    const capacityBlockers = new Set(objective?.target ? getCostPressure(state, objective.target.cost, economy).filter(p => p.reason === 'capacity').map(p => p.id) : []);
     for (const [id, r] of Object.entries(state.resources)) {
       if (!r.unlocked) continue;
       const cap = getEffectiveCap(state, id);
-      if (cap > 0 && r.amount >= cap * 0.99) {
+      if (capacityBlockers.has(id) && cap > 0 && r.amount >= cap * 0.99) {
         // Only warn once per cap value — resets when player upgrades the cap
         if (capWarningsRef.current[id] !== cap) {
           capWarningsRef.current[id] = cap;
           const name = resourceDefs[id]?.name || id;
-          newToasts.push({ id: ++idRef.current, text: `${name} storage is full! Buy cap upgrades.`, type: 'milestone' });
+          newToasts.push({ id: ++idRef.current, text: `${name} capacity blocks ${objective.target.name}. Expand storage in World.`, type: 'milestone' });
           playCapWarning();
         }
       }
@@ -117,13 +119,12 @@ export function Toast({ state }) {
     if (newToasts.length > 0) {
       const normalized = newToasts.map(t => ({ ...t, text: formatToastText(t.text, t.type) }));
       setToasts(prev => [...prev, ...normalized].slice(-3));
-      const ids = normalized.map(t => t.id);
       clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => {
-        setToasts(prev => prev.filter(t => !ids.includes(t.id)));
+        setToasts([]);
       }, 4000);
     }
-  }, [state]);
+  }, [state, objective, economy]);
 
   if (toasts.length === 0) return null;
 

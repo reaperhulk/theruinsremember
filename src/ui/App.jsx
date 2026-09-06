@@ -98,7 +98,7 @@ export function App() {
   const [shakeClass, setShakeClass] = useState('');
   const prevLoreCountRef = useRef((state.eventLog || []).filter(e => e.isLore).length);
   const [unseenLoreCount, setUnseenLoreCount] = useState(0);
-  
+
   const [audioMuted, setAudioMuted] = useState(() => { try { return localStorage.getItem('audioMuted') === 'true'; } catch { return false; } });
   const [audioLevels, setAudioLevels] = useState(() => { try { return JSON.parse(localStorage.getItem('audioLevels')) || { effects: 0.7, music: 0.18 }; } catch { return { effects: 0.7, music: 0.18 }; } });
   const [victoryDismissed, setVictoryDismissed] = useState(false);
@@ -376,7 +376,7 @@ export function App() {
       <ResourceStrip state={state} objective={objective} economy={economy} onUpdate={updateState} />
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
       <EraTransition era={state.era} />
-      <Toast state={state} />
+      <Toast objective={objective} economy={economy} state={state} />
       <nav className="mobile-section-links" aria-label="Game section"><button id="section-actions" aria-pressed={mobileSection === 'actions'} onClick={() => setMobileSection('actions')}>Decisions & operations</button><button id="section-world" aria-pressed={mobileSection === 'world'} onClick={() => setMobileSection('world')}>World & resources</button></nav>
       <main className={`game-layout ${state.era <= 4 ? 'early-game-layout' : ''}`}>
         <div className="left-column" id="game-resources">

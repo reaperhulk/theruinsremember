@@ -39,6 +39,7 @@ try {
   for (const era of [1, 4, 7, 10]) {
     await page.evaluate(fixture => window.__game.setState(() => fixture), snapshots[`0:${era}`]);
     await page.waitForFunction(() => !document.querySelector('.era-transition-overlay'));
+    if (era === 10) assert(await page.$eval('.objective-panel progress', el => el.value === el.max), 'Earned economic readiness must show a completed inheritance meter');
     for (const [width, height] of viewports) {
       await page.setViewport({ width, height, deviceScaleFactor: width === 683 ? 2 : 1 });
       await settle();

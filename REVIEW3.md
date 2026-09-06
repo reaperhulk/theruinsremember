@@ -155,3 +155,30 @@ This validation/presentation batch has unchanged persona outcomes and attention 
 | offline_returner | 42 | 43201 → 43201 | 361 → 361 | 103 → 103 | 4 → 4 | Era 5 → 5 |
 | completionist | 42 | 666 → 666 | 666 → 666 | 165 → 165 | 1 → 1 | Era 10 → 10 |
 | minimalist | 42 | 3181 → 3181 | 3181 → 3181 | 101 → 101 | 1 → 1 | Era 10 → 10 |
+
+## Batch 6 — final browser assertions and feedback
+
+All 31 checks using naturally earned scene fixtures passed, including nine recognized choices after prestige, a working starting economy and automatic gathering. Both natural desktop/mobile journeys passed on `2bd4064`. The desktop reset fixture needed to reopen Operations after each new chapter; it now uses visible doctrine buttons and asserts the selected doctrine before every reset.
+
+Screenshot review also corrected two misleading signals: an economically completed cycle now fills the inheritance meter, and full storage only raises a toast when it blocks the shared purchase objective. Toast expiration clears the displayed batch so old warnings cannot remain indefinitely. The first-investment toast no longer claims an arbitrary upgrade always doubles production. A browser assertion covers the completed economic-route meter.
+
+This final batch retains all sixteen persona outcomes with no change in elapsed time, active attention, actions or sessions:
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Outcome before → after |
+|---|---:|---:|---:|---:|---:|---|
+| newcomer | 424242 | 1101 → 1101 | 1101 → 1101 | 116 → 116 | 1 → 1 | Era 10 → 10 |
+| engaged | 424242 | 941 → 941 | 941 → 941 | 134 → 134 | 1 → 1 | Era 10 → 10 |
+| optimizer | 424242 | 571 → 571 | 571 → 571 | 231 → 231 | 1 → 1 | Era 10 → 10 |
+| background | 424242 | 1561 → 1561 | 391 → 391 | 128 → 128 | 14 → 14 | Era 10 → 10 |
+| check_in | 424242 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | Era 5 → 5 |
+| completionist | 424242 | 666 → 666 | 666 → 666 | 173 → 173 | 1 → 1 | Era 10 → 10 |
+| minimalist | 424242 | 3301 → 3301 | 3301 → 3301 | 99 → 99 | 1 → 1 | Era 10 → 10 |
+| newcomer | 42 | 1041 → 1041 | 1041 → 1041 | 112 → 112 | 1 → 1 | Era 10 → 10 |
+| engaged | 42 | 851 → 851 | 851 → 851 | 136 → 136 | 1 → 1 | Era 10 → 10 |
+| optimizer | 42 | 451 → 451 | 451 → 451 | 211 → 211 | 1 → 1 | Era 10 → 10 |
+| background | 42 | 1441 → 1441 | 361 → 361 | 126 → 126 | 13 → 13 | Era 10 → 10 |
+| check_in | 42 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 103 → 103 | 4 → 4 | Era 5 → 5 |
+| completionist | 42 | 666 → 666 | 666 → 666 | 165 → 165 | 1 → 1 | Era 10 → 10 |
+| minimalist | 42 | 3181 → 3181 | 3181 → 3181 | 101 → 101 | 1 → 1 | Era 10 → 10 |

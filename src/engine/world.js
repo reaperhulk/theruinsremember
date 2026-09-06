@@ -1,5 +1,6 @@
 import { DECISIONS, chosenDecisions } from '../data/decisions.js';
 import { CHAPTERS } from '../data/chapters.js';
+import { getCycleReadiness } from './realityForge.js';
 import { getEraReadiness } from './eras.js';
 export function getWorldLandmarks(state) {
   const chosen = chosenDecisions(state);
@@ -14,5 +15,5 @@ export function getWorldLandmarks(state) {
 export function getWorldStatus(state, economy) {
   const readiness = getEraReadiness(state);
   return { readiness, landmarks: getWorldLandmarks(state), blocked: Object.entries(economy.constrained).filter(([, reason]) => reason === 'input' || reason === 'paused'),
-    construction: Math.min(1, readiness.foundationProgress / readiness.minUpgrades) };
+    construction: state.era === 10 && getCycleReadiness(state).ready ? 1 : Math.min(1, readiness.foundationProgress / readiness.minUpgrades) };
 }
