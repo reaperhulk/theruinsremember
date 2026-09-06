@@ -2,7 +2,7 @@ import { recordChapter } from './memory.js';
 import { advanceCommissions } from './commissions.js';
 import { advancePublicWorks } from './publicWorks.js';
 import { advanceBlueprint } from './blueprints.js';
-import { advanceGoal, preservesGoalReserve } from './goals.js';
+import { advanceGoal } from './goals.js';
 import { recordHistory } from './archive.js';
 import { calculateEconomy } from './economy.js';
 import { getEffectiveCap, gather, isGatheringAutomated } from './resources.js';
@@ -12,8 +12,6 @@ import { advanceColonyMandate } from './colonies.js';
 import { advanceDockingContracts } from './docking.js';
 import { advanceNetworkPlan } from './starChart.js';
 import { checkAchievements } from './achievements.js';
-import { purchaseUpgrade, isDecisionUpgrade, getUpgradeCost } from './upgrades.js';
-import { upgrades as upgradeDefs } from '../data/upgrades.js';
 import { advanceExpeditionSupplies, EXPEDITION_MAX_SUPPLIES, getExpeditionRoutes, runExpedition } from './expeditions.js';
 import { awardCycleGoal } from './cycles.js';
 import { advanceEchoPressure } from './relics.js';
@@ -145,32 +143,6 @@ export function tick(state, dt, rng = Math.random, options = {}) {
   newState = advanceBlueprint(newState);
   newState = advanceGoal(newState);
   newState = advanceCommissions(newState);
-
-  // Auto-purchase earlier era upgrades once a second era exists.
-  // Critical for game balance: cross-era costs grow faster than caps,
-  // so upgrades MUST be bought while costs are still affordable.
-  // Buys ALL affordable upgrades from prior eras (not just one) to
-  // prevent deep prerequisite chains from stalling progression.
-  const autoPurchaseRuns = intervalCrossings(state.totalTime, newState.totalTime, 30);
-  if (newState.era >= 2 && autoPurchaseRuns > 0) {
-    const autoPurchaseEra = Math.max(1, newState.era - 1);
-    for (let run = 0; run < autoPurchaseRuns; run++) {
-      for (let pass = 0; pass < 5; pass++) { // multiple passes for chains
-        let boughtAny = false;
-        for (const def of Object.values(upgradeDefs)) {
-          if (def.era > autoPurchaseEra) continue;
-          if (def.repeatable) continue;
-          if (newState.upgrades[def.id]) continue;
-          if (isDecisionUpgrade(def)) continue;
-          if (def.prerequisites.some(p => !newState.upgrades[p])) continue;
-          if (!preservesGoalReserve(newState, getUpgradeCost(newState, def.id))) continue;
-          const result = purchaseUpgrade(newState, def.id);
-          if (result) { newState = result; boughtAny = true; }
-        }
-        if (!boughtAny) break;
-      }
-    }
-  }
 
   // The player sets priorities; workshops and labs carry out ordinary growth.
   const buildOutInterval = newState.blueprintActive && newState.archive?.research?.blueprints && newState.era <= 3 ? 1 : 5;

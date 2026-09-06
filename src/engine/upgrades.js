@@ -131,6 +131,8 @@ function applyEffects(state, effects) {
   return { ...state, resources: newResources };
 }
 
+export { applyEffects as applyUpgradeEffects };
+
 // Scale cost for repeatable upgrades: baseCost * costScale^count
 function getScaledCost(baseCost, costScale, count) {
   const scale = Math.pow(costScale, count);

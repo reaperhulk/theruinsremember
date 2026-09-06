@@ -1,4 +1,7 @@
 import { DevelopmentPolicy } from './Council.jsx';
+import { SupplyRun } from './SupplyRun.jsx';
+import { projects } from '../data/projects.js';
+import { isProjectComplete } from '../engine/projects.js';
 import { getEraObjective } from '../engine/objectives.js';
 import { calculateEconomy } from '../engine/economy.js';
 import { ResourceStrip } from './ResourceStrip.jsx';
@@ -454,6 +457,7 @@ export function App() {
             {activeTab === 'upgrades' && (
               <>
                 <DevelopmentPolicy state={state} onUpdate={updateState} />
+                <SupplyRun state={state} onUpdate={updateState} />
                 <UpgradePanel economy={economy} state={state} onUpdate={updateState} />
                 <PurchaseGuidance economy={economy} state={state} onUpdate={updateState} />
                 <GoalsPanel state={state} onUpdate={updateState} />
@@ -511,7 +515,7 @@ export function App() {
         </div>
       )}
       <footer style={{ textAlign: 'center', fontSize: '0.6em', color: '#444', padding: '8px 0 4px' }}>
-        v1.0 — Era {state.era} | {Object.keys(state.upgrades || {}).length} upgrades | {Object.keys(state.achievements || {}).length} achievements
+        v1.0 — Era {state.era} | {Object.keys(projects).filter(id => isProjectComplete(state, id)).length}/60 projects | {Object.keys(state.achievements || {}).length} achievements
         {(state.prestigeCount || 0) > 0 && ` | Cycle ${state.prestigeCount}`}
         {state.prestigeMultiplier > 1 && ` (x${formatNumber(getEffectivePrestige(state.prestigeMultiplier))})`}
       </footer>

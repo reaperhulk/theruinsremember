@@ -12,7 +12,8 @@ import { getTimedRateMultiplier } from './events.js';
 import { getSenateGovernmentMultiplier, getSenatePctBonuses } from './senate.js';
 import { getTuningProductionMultiplier } from './tuning.js';
 import { getActiveSystems } from './operations.js';
-import { getAvailableUpgrades, getUpgradeCost } from './upgrades.js';
+import { getAvailableUpgrades, getUpgradeCost, isDecisionUpgrade } from './upgrades.js';
+import { getAvailableProjects, getProjectCost } from './projects.js';
 import { getAvailableTech } from './tech.js';
 import { getActiveGoal } from './goals.js';
 import { techTree } from '../data/tech-tree.js';
@@ -51,7 +52,8 @@ function getReserveChoices(state) {
   if (cached && signature.every((v, i) => v === cached.signature[i])) return cached.choices;
   const choices = [
     ...getAvailableTech(state).map(d => ({ kind: 'tech', id: d.id, name: d.name, cost: d.cost })),
-    ...getAvailableUpgrades(state).filter(d => !d.repeatable).map(d => ({ kind: 'upgrade', id: d.id, name: d.name, cost: getUpgradeCost(state, d.id) })),
+    ...getAvailableProjects(state).map(d => ({ kind: 'project', id: d.id, name: d.name, cost: getProjectCost(state, d.id) })),
+    ...getAvailableUpgrades(state).filter(isDecisionUpgrade).map(d => ({ kind: 'upgrade', id: d.id, name: d.name, cost: getUpgradeCost(state, d.id) })),
   ];
   reserveChoiceCache.set(state.upgrades, { signature, choices });
   return choices;
@@ -60,7 +62,7 @@ export function getProgressionReserves(state) {
   if (state.protectProgression === false) return {};
   const choices = getReserveChoices(state);
   const goal = state.goalsPaused ? null : getActiveGoal(state);
-  const pinned = goal && { ...goal, cost: goal.kind === 'tech' ? techTree[goal.id].cost : getUpgradeCost(state, goal.id) };
+  const pinned = goal && { ...goal, cost: goal.kind === 'project' ? getProjectCost(state, goal.id) : goal.kind === 'tech' ? techTree[goal.id].cost : getUpgradeCost(state, goal.id) };
   const reserves = {};
   for (const { input, output } of getSupplyChains(state)) {
     if (!state.resources[output]?.unlocked) continue;

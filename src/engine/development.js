@@ -1,4 +1,4 @@
-import { buyRoutineBuildOut } from './upgrades.js';
+import { buildProjects } from './projects.js';
 import { researchRoutineTech } from './tech.js';
 
 export const DEVELOPMENT_FOCI = {
@@ -13,6 +13,6 @@ export function setDevelopmentFocus(state, focus) {
 export function advanceDevelopment(state) {
   if (state.autoBuildOut === false) return state;
   const stages = state.developmentFocus === 'research'
-    ? [researchRoutineTech, buyRoutineBuildOut] : [buyRoutineBuildOut, researchRoutineTech];
+    ? [researchRoutineTech, buildProjects] : [buildProjects, researchRoutineTech];
   return stages.reduce((current, advance) => advance(current).state, state);
 }

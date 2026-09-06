@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createInitialState } from '../state.js';
 import { getEraObjective } from '../objectives.js';
 import { purchaseUpgrade } from '../upgrades.js';
+import { purchaseProject } from '../projects.js';
 import { unlockTech } from '../tech.js';
 import { queueGoal } from '../goals.js';
 import { CHAPTERS } from '../../data/chapters.js';
@@ -12,8 +13,8 @@ describe('one objective for the current era', () => {
     for (const resource of Object.values(state.resources)) resource.amount = 10000;
     const objective = getEraObjective(state);
     expect(objective.stage).toBe('foundation');
-    expect(objective.target.kind).toBe('upgrade');
-    expect(purchaseUpgrade(state, objective.target.id)).not.toBeNull();
+    expect(objective.target.kind).toBe('project');
+    expect(purchaseProject(state, objective.target.id)).not.toBeNull();
   });
   it('honors a deliberate queued research goal without concealing the blocker', () => {
     const state = queueGoal(createInitialState(), 'tech', 'metallurgy');
@@ -28,7 +29,7 @@ describe('one objective for the current era', () => {
       const objective = getEraObjective(state);
       expect(objective.chapter).toBe(CHAPTERS[era]);
       expect(objective.resources.length).toBeGreaterThan(0);
-      if (objective.target) expect((objective.target.kind === 'tech' ? unlockTech : purchaseUpgrade)(state, objective.target.id)).not.toBeNull();
+      if (objective.target) expect((objective.target.kind === 'project' ? purchaseProject : objective.target.kind === 'tech' ? unlockTech : purchaseUpgrade)(state, objective.target.id)).not.toBeNull();
     }
   });
 });

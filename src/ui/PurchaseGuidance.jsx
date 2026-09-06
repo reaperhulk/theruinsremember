@@ -1,5 +1,6 @@
 import { unlockTech } from '../engine/tech.js';
 import { purchaseUpgrade } from '../engine/upgrades.js';
+import { purchaseProject } from '../engine/projects.js';
 import { playUpgrade } from './AudioManager.js';
 import { getPurchaseTarget, prioritizePurchase } from '../engine/guidance.js';
 import { calculateEconomy, getCostPressure, expandStorage, getSupplyChains, setConsumerControl } from '../engine/economy.js';
@@ -20,7 +21,7 @@ export function PurchaseGuidance({ state, onUpdate, economy: suppliedEconomy }) 
       {p.reason === 'capacity' && <button disabled={state.resources[p.id].amount < economy.capacity[p.id] * 0.6} onClick={() => onUpdate(s => expandStorage(s, p.id))}>Expand storage · {formatNumber(economy.capacity[p.id] * 0.6)} {resources[p.id].name}</button>}
       {p.reason === 'production' && getSupplyChains(state).filter(c => c.input === p.id && state.resources[c.output]?.unlocked).map(c => <button key={c.output} onClick={() => onUpdate(s => setConsumerControl(s, c.output, { paused: !s.consumerControls?.[c.output]?.paused }))}>{state.consumerControls?.[c.output]?.paused ? 'Resume' : 'Pause'} {resources[c.output].name}</button>)}
     </div>)}
-    {!automated && pressure.length === 0 && <button className="primary-purchase" onClick={() => { onUpdate(s => target.kind === 'tech' ? unlockTech(s, target.id) : purchaseUpgrade(s, target.id)); playUpgrade(); }}>{target.kind === 'tech' ? 'Research' : 'Build'} {target.name}</button>}
+    {!automated && pressure.length === 0 && <button className="primary-purchase" onClick={() => { onUpdate(s => (target.kind === 'project' ? purchaseProject : target.kind === 'tech' ? unlockTech : purchaseUpgrade)(s, target.id)); playUpgrade(); }}>{target.kind === 'tech' ? 'Research' : 'Build'} {target.name}</button>}
     {!automated && (!target.queued || state.goalsPaused || state.protectProgression === false) && <button disabled={!target.queued && state.goals.length >= 5} onClick={() => onUpdate(s => prioritizePurchase(s, target))}>Protect and queue this purchase</button>}
     {target.queued && !state.goalsPaused && <small>Automation saves for this purchase; input protection releases as savings permit. Forecast excludes future purchases and event rewards.</small>}
   </section>;

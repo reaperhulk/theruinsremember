@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { getAvailableUpgrades } from '../engine/upgrades.js';
+import { getAvailableUpgrades, isDecisionUpgrade } from '../engine/upgrades.js';
+import { getAvailableProjects } from '../engine/projects.js';
 import { getAvailableTech } from '../engine/tech.js';
 import { queueGoal, removeGoal, getGoalInfo, getGoalStatus, moveGoal } from '../engine/goals.js';
 import { COMMISSION_TYPES, canQueueCommission, queueCommission, removeCommission } from '../engine/commissions.js';
@@ -11,7 +12,7 @@ import { formatTime, formatNumber } from './format.js';
 export function GoalsPanel({ state, onUpdate }) {
   const [selection, setSelection] = useState('');
   const goal = getGoalInfo(state);
-  const options = [...getAvailableTech(state).map(t => ({ value: `tech:${t.id}`, name: t.name })), ...getAvailableUpgrades(state).filter(u => !u.repeatable).map(u => ({ value: `upgrade:${u.id}`, name: u.name }))];
+  const options = [...getAvailableProjects(state).map(p => ({ value: `project:${p.id}`, name: p.name })), ...getAvailableTech(state).map(t => ({ value: `tech:${t.id}`, name: t.name })), ...getAvailableUpgrades(state).filter(isDecisionUpgrade).map(u => ({ value: `upgrade:${u.id}`, name: u.name }))];
   return <details className="panel goals-panel">
     <summary>Next goal{goal ? `: ${goal.name}` : " · plan purchases and reserves"}</summary>
     <p>Queue up to five purchases. Automation saves for the first available goal and buys it when ready.</p>

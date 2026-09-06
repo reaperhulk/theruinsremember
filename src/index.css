@@ -3660,3 +3660,55 @@ button:focus-visible, [role=button]:focus-visible, a:focus-visible, select:focus
 .research-catalog-toggle, .expedition-pause { padding: 10px 12px; min-height: 44px; background: #233b45; color: #dce8e9; border: 1px solid #637a81; border-radius: 6px; cursor: pointer; }
 .expedition-route[aria-pressed=true] { opacity: 1; border-color: #b5cc9c; background: #2c4337; }
 @media (max-width:540px) { .council-options { grid-template-columns: 1fr; } .policy-options { gap: 6px; } .policy-options button { padding: 9px; } }
+
+.projects-heading { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.projects-heading > span { color:#aebdc2; font-size:12px; }
+.projects-panel > p { font-size:13px; line-height:1.5; }
+.project-list { display:grid; gap:14px; margin-top:14px; }
+.construction-project { padding:16px; border:1px solid #4c6470; border-radius:8px; background:#152832; }
+.construction-project.prioritized { border-color:#d8c58f; background:#233c3b; }
+.construction-project.completed { opacity:.75; }
+.construction-project h3 { color:#e4c897; font-size:17px; }
+.construction-project p { margin:10px 0; font-size:13px; line-height:1.5; }
+.project-gains { display:grid; gap:5px; padding:12px 0; }
+.project-gains > div { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; font-size:14px; }
+.project-gains dd { margin:0; color:#aec4c8; }
+.project-gains strong, .project-unlocks { color:#b9dc9b; }
+.project-costs { display:flex; flex-wrap:wrap; gap:6px; }
+.project-costs span { background:#10202a; border:1px solid #50626a; padding:6px; border-radius:4px; font-size:12px; }
+.project-costs .funded { color:#b9dc9b; border-color:#668760; }
+.project-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.project-actions button { flex:1; min-height:44px; min-width:120px; padding:10px; }
+.project-completion { padding:10px; color:#caddaa; background:#25423a; border-radius:6px; }
+.project-doctrine-heading { margin-top:24px; }
+
+.supply-teaser { display:flex; gap:16px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+.supply-teaser > div { flex:1; min-width:190px; }
+.supply-teaser h2 { font-size:17px; }
+.supply-teaser p { font-size:13px; line-height:1.5; margin:8px 0; }
+.supply-open, .supply-close, .supply-reset { min-height:44px; padding:10px 14px; border:1px solid #829777; background:#29483e; color:#f2eacf; border-radius:6px; cursor:pointer; }
+.supply-dialog { position:fixed; inset:0; margin:auto; width:min(900px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); padding:18px; overflow:auto; color:#e8e1ce; border:1px solid #7b9d8e; border-radius:12px; background:#11242b; box-shadow:0 16px 80px #000a; }
+.supply-dialog::backdrop { background:#040d13d9; }
+.supply-dialog-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; }
+.supply-dialog-heading h2 { margin:4px 0; color:#dfc58f; }
+.supply-body { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:22px; }
+.supply-playfield { min-width:0; }
+.supply-board { position:relative; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); width:100%; max-width:360px; aspect-ratio:1; gap:4px; padding:2px; touch-action:none; user-select:none; }
+.supply-cell { position:relative; padding:0; background:#203f46; border:1px solid #446671; border-radius:7px; color:#e5dfc5; cursor:crosshair; min-width:0; font-size:12px; }
+.supply-cell.rubble { background:#19252d; border-color:#253943; }
+.supply-cell svg { width:60%; height:60%; stroke:#99a09a; fill:#47525a; stroke-width:2; }
+.supply-cell.cache svg { fill:#927a38; stroke:#f7d27b; }
+.supply-cell.connected { background:#35635a; border-color:#b4d8ad; }
+.supply-cell > * { position:relative; z-index:2; }
+.supply-cell span { background:#173d35e8; border-radius:4px; padding:4px 2px; }
+.supply-cell:focus-visible { outline:3px solid #f4d888; outline-offset:-3px; z-index:3; }
+.supply-route { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.supply-route polyline { fill:none; stroke:#afdfbc; stroke-width:9; stroke-linecap:round; stroke-linejoin:round; opacity:.85; }
+.supply-meters { display:flex; justify-content:space-between; gap:6px; font-size:12px; margin-top:12px; }
+.supply-instructions h3 { color:#d8c68c; }
+.supply-instructions p { margin:10px 0; line-height:1.5; font-size:14px; }
+.supply-instructions small { display:block; margin-top:12px; color:#a3bdc2; line-height:1.5; }
+.supply-instructions .supply-controls { color:#a9bdc2; font-size:12px; }
+.supply-result ul { color:#b5d9a8; padding-left:20px; line-height:1.8; }
+@media(max-width:600px) { .supply-body { grid-template-columns:1fr; gap:14px; } .supply-dialog-heading { gap:8px; } .supply-dialog-heading h2 { font-size:18px; } .supply-close { max-width:130px; font-size:12px; } .supply-board { max-width:320px; margin:auto; } .supply-dialog { padding:12px; } }
+@media(min-width:601px) and (max-height:600px) { .supply-board { max-width:calc(100dvh - 140px); } .supply-instructions p { font-size:12px; margin:6px 0; } .supply-dialog-heading { margin-bottom:8px; } }

@@ -7,7 +7,7 @@
 import { approveEraAdvance } from '../src/engine/eras.js';
 import { createInitialState } from '../src/engine/state.js';
 import { tick } from '../src/engine/tick.js';
-import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable, isDecisionUpgrade } from '../src/engine/upgrades.js';
+import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyNextRepeatableMilestone, isDecisionUpgrade } from '../src/engine/upgrades.js';
 import { unlockTech, getAvailableTech, isDecisionTech } from '../src/engine/tech.js';
 import { canAfford, gather, getEffectiveRate, getNetRate, isGatheringAutomated } from '../src/engine/resources.js';
 import { attemptDock, getDockingInfo, getTargetZone, selectDockingMission } from '../src/engine/docking.js';
@@ -137,7 +137,9 @@ const BALANCE_TARGETS = {
     // Production-funded routes may finish sooner as industry improves.
     // Upper bounds still reject stalls; fresh-save journeys enforce legal
     // commands, actual purchases, and complete cycles without injected assets.
-    eraRanges: { 2: [1, 240], 3: [1, 300], 4: [1, 240], 5: [1, 180],
+    // Whole digital projects are funded up front; REVIEW5 records the
+    // measured 5m10s upper duration and optional supply-route acceleration.
+    eraRanges: { 2: [1, 240], 3: [1, 300], 4: [1, 330], 5: [1, 180],
       6: [1, 180], 7: [1, 240], 8: [1, 260], 9: [1, 180], 10: [1, 180] },
   },
   // Siege-specific requirements belong to the explicit challenge scenario.
@@ -148,12 +150,12 @@ const BALANCE_TARGETS = {
   prestige10: { minManualActions: 20, maxTime: 1800, requiredEra: 10, cycleReady: true, minPrestiges: 10 },
   // Automatic research starts at planetfall and standing expeditions continue
   // between visits. Allow the intentional reduction in command-gated delays.
-  newcomer: { minTime: 840, maxTime: 7200, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.06, maxActionsWhileAway: 0 },
+  newcomer: { minTime: 780, maxTime: 7200, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.06, maxActionsWhileAway: 0 },
   engaged: { minTime: 600, maxTime: 5400, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.11, maxActionsWhileAway: 0 },
   background: { minTime: 900, maxTime: 10800, requiredEra: 10, cycleReady: true, noCollapse: true, minSessions: 4, minAwaySeconds: 300, maxActiveRatio: 0.35, maxActionsWhileAway: 0 },
   check_in: { minTime: 1800, maxTime: 43200, requiredEra: 10, cycleReady: true, noCollapse: true, minSessions: 3, minOfflineSeconds: 600, maxActiveRatio: 0.2, maxActionsWhileAway: 0 },
   offline_returner: { minTime: 28800, maxTime: 57600, requiredEra: 4, noCollapse: true, minSessions: 3, minOfflineSeconds: 28000, maxActiveRatio: 0.05, maxActionsWhileAway: 0 },
-  completionist: { minTime: 600, maxTime: 5400, requiredEra: 10, cycleReady: true, noCollapse: true, maxIgnoredOperations: 0, maxDecisionWindowRatio: 0.21, maxActionsWhileAway: 0 },
+  completionist: { minTime: 480, maxTime: 5400, requiredEra: 10, cycleReady: true, noCollapse: true, maxIgnoredOperations: 0, maxDecisionWindowRatio: 0.21, maxActionsWhileAway: 0 },
   minimalist: { minManualActions: 20, maxTime: 25200, requiredEra: 10, cycleReady: true, noCollapse: true, maxDecisionWindowRatio: 0.04, maxActionsWhileAway: 0 },
 };
 
@@ -197,10 +199,10 @@ function botBuyUpgrades(state, profile, t, _rng) {
   // finishes the era foundation before spending the bottleneck stockpile.
   if (!getEraReadiness(state).upgradesMet) return state;
   if (t % 15 !== 0) return state;
-  // Then repeatable (buy max)
+  // Match the current visible infrastructure milestone controls.
   for (const upgrade of available) {
-    if (!upgrade.repeatable) continue;
-    const result = buyMaxRepeatable(state, upgrade.id);
+    if (!upgrade.repeatable || upgrade.era !== state.era) continue;
+    const result = buyNextRepeatableMilestone(state, upgrade.id);
     if (result) state = result;
   }
   return state;

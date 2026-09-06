@@ -6,6 +6,9 @@ import { selectProductionRoute, hasRelicSynergy } from '../src/engine/legacy.js'
 import { RELIC_IDS } from '../src/data/relics.js';
 import { createInitialState } from '../src/engine/state.js';
 import { setDevelopmentFocus } from '../src/engine/development.js';
+import { getAvailableProjects, getProjectCost, purchaseProject } from '../src/engine/projects.js';
+import { getSupplyRunTarget, startSupplyRun, submitSupplyRoute } from '../src/engine/supplyRun.js';
+import { solveSupplyBoard } from './supply-run-policy.mjs';
 import { advanceTime } from '../src/engine/advanceTime.js';
 import { tick } from '../src/engine/tick.js';
 import { getAvailableUpgrades, getUpgradeCost, purchaseUpgrade, isDecisionUpgrade, buyNextRepeatableMilestone } from '../src/engine/upgrades.js';
@@ -50,15 +53,27 @@ export function candidateActions(state, profile, options, rng) {
     if (target && (state.protectProgression === false || pressure.some(p => p.reason === 'production')) && (!target.queued || state.protectProgression === false) && (target.queued || state.goals.length < 5)) return [{ name: 'protect-purchase', fn: s => prioritizePurchase(s, target) }];
   }
   const add = (name, fn) => actions.push({ name, fn });
+  if (options.useSupplyRuns) {
+    const run = state.supplyRun;
+    if (run.phase === 'active') {
+      const route = solveSupplyBoard(run);
+      if (route) add('draw-supply-route', s => submitSupplyRoute(s, route));
+    } else if (run.cooldownUntil <= state.totalTime && getSupplyRunTarget(state)) {
+      add('start-supply-run', startSupplyRun);
+    }
+  }
   const techs = ordered(getAvailableTech(state)).filter(tech => tech.id !== options.blockedTech);
   for (const tech of techs) {
     if (state.autoBuildOut !== false && !isDecisionTech(tech)) continue;
     if (canAfford(state, tech.cost)) add(`research:${tech.id}`, s => unlockTech(s, tech.id));
   }
   const upgrades = ordered(getAvailableUpgrades(state));
+  if (state.autoBuildOut === false) for (const project of ordered(getAvailableProjects(state))) {
+    if (canAfford(state, getProjectCost(state, project.id))) add(`project:${project.id}`, s => purchaseProject(s, project.id));
+  }
   for (const upgrade of upgrades) {
     if (upgrade.repeatable) continue;
-    if (state.autoBuildOut !== false && !isDecisionUpgrade(upgrade)) continue;
+    if (!isDecisionUpgrade(upgrade)) continue;
     if (canAfford(state, getUpgradeCost(state, upgrade.id))) add(`buy:${upgrade.id}`, s => purchaseUpgrade(s, upgrade.id));
   }
   if (state.era <= 3 && profile.expeditions && options.skip !== 'expedition') {
@@ -142,7 +157,11 @@ export function candidateActions(state, profile, options, rng) {
     if (state.prestigeCount >= 2) {
       const research = ordered(Object.keys(DOCTRINE_RESEARCH)).find(id => !state.archive.research[id] && state.prestigeCount >= (DOCTRINE_RESEARCH[id].unlockAt || 2));
       if (research && state.archive.shards >= DOCTRINE_RESEARCH[research].cost) add('research-doctrine', s => researchDoctrine(s, research));
-      if (!state.archive.relicsCrafted && state.archive.shards >= 3 && !state.activeRelics.includes('openCircuit') && state.activeRelics.length < getRelicSlotLimit(state)) add('craft-relic', s => craftRelic(s, 'openCircuit'));
+      if (!state.archive.relicsCrafted && state.archive.shards >= 3) {
+        const relic = ['openCircuit', ...RELIC_IDS].find(id => !state.activeRelics.includes(id));
+        const replace = state.activeRelics.length >= getRelicSlotLimit(state) ? state.activeRelics.at(-1) : null;
+        if (relic) add('craft-relic', s => craftRelic(s, relic, replace));
+      }
     }
     if (state.prestigeCount >= 3) for (const [id, project] of Object.entries(RECONSTRUCTION_PROJECTS)) {
       if (state.prestigeCount >= (project.unlockAt || 3) && state.era >= project.era && !(state.archive.projects[id] >= (project.stages || 2)) && state.archive.contributions[id] !== state.prestigeCount && state.resources[project.resource].amount >= getEffectiveCap(state, project.resource) * 0.25) add(`project:${id}`, s => contributeProject(s, id));
@@ -161,7 +180,8 @@ export function candidateActions(state, profile, options, rng) {
     if (lowest) add(`gather:${lowest[0]}`, s => gather(s, lowest[0], 1, rng));
   }
   if (options.inefficient && rng() < 0.35) {
-    const repeatable = upgrades.find(u => u.repeatable && canAfford(state, getUpgradeCost(state, u.id)));
+    // The current construction panel offers only this era's infrastructure.
+    const repeatable = upgrades.find(u => u.repeatable && u.era === state.era && canAfford(state, getUpgradeCost(state, u.id)));
     if (repeatable) actions.unshift({ name: `milestone:${repeatable.id}`, fn: s => buyNextRepeatableMilestone(s, repeatable.id) });
   }
   if (options.collectLegacy) {
@@ -214,7 +234,7 @@ export function runPlayerJourney(options = {}) {
     }
     if (attention.decisionWindow) {
       let budget = BUDGETS[persona];
-      const outstandingProjects = options.collectLegacy && Object.entries(RECONSTRUCTION_PROJECTS).some(([id, p]) => state.prestigeCount >= (p.unlockAt || 3) && state.era >= p.era && (state.archive.projects[id] || 0) < (p.stages || 2) && state.archive.contributions[id] !== state.prestigeCount);
+      const outstandingProjects = options.useNewSystems && Object.entries(RECONSTRUCTION_PROJECTS).some(([id, p]) => state.prestigeCount >= (p.unlockAt || 3) && state.era >= p.era && (state.archive.projects[id] || 0) < (p.stages || 2) && state.archive.contributions[id] !== state.prestigeCount);
       const affordableLoadout = options.collectLegacy && Object.keys(state.archive.research).length === Object.keys(DOCTRINE_RESEARCH).length && state.archive.shards >= 3 && (state.activeRelics.length < getRelicSlotLimit(state) || ['openCircuit', 'loomNeedle'].some(id => !state.activeRelics.includes(id)));
       if (getCycleReadiness(state).ready && !outstandingProjects && !affordableLoadout) {
         cycleResults.push({ cycle: (state.prestigeCount || 0) + 1, elapsed, duration: state.totalTime });

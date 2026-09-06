@@ -35,6 +35,14 @@ export function HelpOverlay({ onClose }) {
             <p>Gathering, construction and ordinary research run automatically. Choose whether workshops or labs spend first, then compare the Council’s competing doctrines. During the first three eras, assign an expedition route once; the team uses replenished supplies until you pause or change its assignment.</p>
           </div>
           <div className="help-card">
+            <strong>Six Projects Per Era</strong>
+            <p>Each project builds a whole capability at once. Compare its production gains and prioritize the one you want next. Previously built works count toward its cost.</p>
+          </div>
+          <div className="help-card">
+            <strong>Recover Construction Supplies</strong>
+            <p>While a project is waiting, draw a route from Camp to Exit around rubble. Reach extra caches within 12 steps to fund 20–40% of its missing supplies. There is no timer or failure penalty; pause whenever you like. Idle construction continues without this activity.</p>
+          </div>
+          <div className="help-card">
             <strong>Read The Warnings</strong>
             <p><strong>FULL</strong> means storage is wasting production. <strong>DRAINING</strong> means one supply chain is starving another.</p>
           </div>

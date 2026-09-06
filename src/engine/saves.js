@@ -4,6 +4,8 @@ import { DECISIONS } from '../data/decisions.js';
 import { createInitialState, migrateState } from './state.js';
 import { upgrades } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
+import { projects } from '../data/projects.js';
+import { isValidSupplyRun } from './supplyRun.js';
 import { RELICS } from '../data/relics.js';
 import { COMMISSION_TYPES } from './commissions.js';
 import { PRODUCTION_ROUTES } from './legacy.js';
@@ -15,7 +17,7 @@ export const RECOVERY_KEYS = [...BACKUP_KEYS, ...CHECKPOINT_KEYS];
 
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const finite = value => Number.isFinite(value) && value >= 0;
-const goal = value => object(value) && (value.kind === 'upgrade' ? !!upgrades[value.id] : value.kind === 'tech' && !!techTree[value.id]);
+const goal = value => object(value) && (value.kind === 'project' ? !!projects[value.id] : value.kind === 'upgrade' ? !!upgrades[value.id] : value.kind === 'tech' && !!techTree[value.id]);
 const commission = value => object(value) && !!COMMISSION_TYPES[value.kind]?.definitions[value.id] && (value.targetLevel === undefined || Number.isSafeInteger(value.targetLevel) && value.targetLevel > 0);
 function arrayEntries(value, test, name) {
   if (value !== undefined && (!Array.isArray(value) || !value.every(test))) throw new Error(`Invalid ${name}`);
@@ -50,6 +52,7 @@ export function parseSave(text) {
   if (saved.developmentFocus !== undefined && !DEVELOPMENT_FOCI[saved.developmentFocus]) throw new Error('Invalid development focus');
   if (saved.expedition?.routeId != null && !getExpeditionRoutes(saved.era).some(r => r.id === saved.expedition.routeId)) throw new Error('Invalid expedition route');
   if (saved.expedition?.paused !== undefined && typeof saved.expedition.paused !== 'boolean') throw new Error('Invalid expedition pause');
+  if (saved.supplyRun !== undefined && !isValidSupplyRun(saved.supplyRun)) throw new Error('Invalid supply route');
   const defaults = createInitialState();
   for (const [key, value] of Object.entries(defaults)) {
     if (saved[key] === undefined) continue;

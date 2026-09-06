@@ -1,6 +1,8 @@
 import { createArchive } from './archive.js';
 import { resources } from '../data/resources.js';
 import { createExpeditionState } from './expeditions.js';
+import { componentProject } from '../data/projects.js';
+import { createSupplyRun } from './supplyRun.js';
 
 // Migrate a saved state to the current schema by merging with fresh defaults
 export function migrateState(saved) {
@@ -43,6 +45,7 @@ export function migrateState(saved) {
   if (!migrated.seenLoreEvents) migrated.seenLoreEvents = {};
   if (migrated.autoBuildOut === undefined) migrated.autoBuildOut = true;
   migrated.expedition = { ...createExpeditionState(), ...(saved.expedition || {}) };
+  migrated.supplyRun = { ...createSupplyRun(), ...(saved.supplyRun || {}) };
   migrated.dockingMissions = { cargo: 0, crew: 0, science: 0, ...(saved.dockingMissions || {}) };
   for (const retiredField of [
     'miningStreak', 'lastMineTime', 'autoMineTimer',
@@ -65,6 +68,13 @@ export function migrateState(saved) {
     migrated.prestigeMultiplier = 1;
   }
   migrated.archive = { ...createArchive(), ...(saved.archive || {}) };
+  const consolidateOrders = orders => (orders || []).map(order => order.kind === 'upgrade' && componentProject[order.id]
+    ? { ...order, kind: 'project', id: componentProject[order.id] } : order)
+    .filter((order, index, all) => all.findIndex(other => other.kind === order.kind && other.id === order.id) === index);
+  migrated.goals = consolidateOrders(migrated.goals);
+  if (migrated.archive.savedPlan) migrated.archive.savedPlan = { ...migrated.archive.savedPlan,
+    goals: consolidateOrders(migrated.archive.savedPlan.goals),
+    ...(migrated.archive.savedPlan.choices ? { choices: consolidateOrders(migrated.archive.savedPlan.choices) } : {}) };
   migrated.eraReviewMode = saved.eraReviewMode || 'automatic';
   migrated.saveVersion = fresh.saveVersion;
   return migrated;
@@ -99,6 +109,7 @@ export function createInitialState() {
     totalGems: 0,       // relic gems recovered by expeditions
     // Expeditions (Eras 1-3)
     expedition: createExpeditionState(),
+    supplyRun: createSupplyRun(),
     // Events system (Era 3+)
     activeEffects: [],  // [{ id, endsAt, description }]
     eventLog: [],       // [{ message, time }] — last 10 events
@@ -176,7 +187,7 @@ export function createInitialState() {
     commissions: [],
     archive: createArchive(),
     plannedPrestigeUpgrades: [],
-    saveVersion: 12,
+    saveVersion: 13,
     eraReviewMode: 'first',
     eraReviewApproved: 0,
   };

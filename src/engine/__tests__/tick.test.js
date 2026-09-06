@@ -282,6 +282,7 @@ describe('tick', () => {
 
   it('hands gathering to industrial automation without waiting for the Space Age', () => {
     const state = createInitialState();
+    state.autoBuildOut = false; // Measure inherited gathering without construction spending.
     state.era = 2;
     state.totalTime = 4;
     state.upgrades = { automation: true };

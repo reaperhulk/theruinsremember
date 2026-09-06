@@ -12,7 +12,7 @@ import { drawDigitalAge } from './scenes/digital.js';
 import { drawDysonEra } from './scenes/dyson.js';
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { gather, getEffectiveCap, getEffectiveRate } from '../engine/resources.js';
-import { countEraUpgrades, getMinUpgradesForEra } from '../engine/eras.js';
+import { countEraProjects } from '../engine/projects.js';
 import { playClick } from './AudioManager.js';
 
 // Every scene below draws in a fixed logical space. The backing store is sized
@@ -1045,8 +1045,8 @@ export function GameCanvas({ state, onUpdate, quality = 'standard' }) {
   }, []);
 
   const era = state.era || 1;
-  const eraUpgrades = countEraUpgrades(state, era);
-  const minNeeded = getMinUpgradesForEra(era);
+  const eraUpgrades = countEraProjects(state, era);
+  const minNeeded = 6;
   const eraProgress = Math.min(eraUpgrades / minNeeded, 1);
 
   return (
@@ -1074,7 +1074,7 @@ export function GameCanvas({ state, onUpdate, quality = 'standard' }) {
           />
         </div>
         <div className="canvas-caption-row">
-          <span className="canvas-era-count">{eraUpgrades}/{minNeeded} era upgrades</span>
+          <span className="canvas-era-count">{eraUpgrades}/{minNeeded} construction projects</span>
           <span className="canvas-whisper">{eraWhispers[era]}</span>
         </div>
       </div>

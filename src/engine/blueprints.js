@@ -1,12 +1,13 @@
 import { upgrades } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
+import { projects } from '../data/projects.js';
 import { queueGoal, getGoalStatus } from './goals.js';
 import { canQueueCommission, queueCommission } from './commissions.js';
 import { isDecisionUpgrade } from './upgrades.js';
 
 export function recordBuildChoice(state, kind, id) {
-  const def = kind === 'upgrade' ? upgrades[id] : techTree[id];
-  if (!def || (kind === 'upgrade' ? !isDecisionUpgrade(def) : !def.grantsEra && !def.excludes)) return state;
+  const def = kind === 'project' ? projects[id] : kind === 'upgrade' ? upgrades[id] : techTree[id];
+  if (!def || kind !== 'project' && (kind === 'upgrade' ? !isDecisionUpgrade(def) : !def.grantsEra && !def.excludes)) return state;
   const history = state.buildHistory || [];
   if (history.some(c => c.kind === kind && c.id === id)) return state;
   return { ...state, buildHistory: [...history, { kind, id }] };

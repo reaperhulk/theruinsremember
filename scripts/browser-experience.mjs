@@ -6,6 +6,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
 import { runPlayerJourney } from './player-journey.mjs';
+import { solveSupplyBoard } from './supply-run-policy.mjs';
 const snapshots = {};
 const earned = runPlayerJourney({ persona: 'engaged', seed: 42, cycles: 2, observe: state => { snapshots[`${state.prestigeCount}:${state.era}`] = state; } });
 assert(earned.completed, 'Fixture source must complete two naturally earned cycles');
@@ -144,6 +145,61 @@ try {
   });
   assert.deepEqual(restoredOrders, { focus: 'research', route: 'surveyRidge', doctrine: 'forkQuarry' });
   checks.push({ nativePolicyAndDoctrineCommitment: true, replacedOpposingCommitment: true, assignmentReload: true });
+  // Earn the first project through the real clock. Reuse this earned waiting
+  // state solely to compare native mouse and touch input on the same puzzle.
+  await page.evaluate(() => window.__game.fastForward(20));
+  const waitingForProject = await page.evaluate(() => window.__game.getState());
+  for (const touch of [false, true]) {
+    await page.evaluate(fixture => window.__game.setState(() => fixture), waitingForProject);
+    await page.setViewport({ width: touch ? 390 : 1366, height: touch ? 844 : 768, hasTouch: true });
+    await settle();
+    if (touch) await page.click('#section-actions');
+    await page.click('#tab-upgrades');
+    await clickWithWheel('.supply-open');
+    await page.waitForSelector('.supply-dialog[open]');
+    const visibleBoard = await page.$$eval('.supply-cell', cells => ({
+      board: cells.map(cell => cell.dataset.blocked === 'true'),
+      caches: cells.filter(cell => cell.dataset.cache === 'true').map(cell => Number(cell.dataset.cell)),
+    }));
+    const route = solveSupplyBoard(visibleBoard);
+    assert(route, 'The visible supply board must have a legal cargo route');
+    await page.click(`[data-cell="${route[1]}"]`);
+    await page.focus(`[data-cell="${route[1]}"]`);
+    await page.keyboard.press(({ 1: 'ArrowRight', '-1': 'ArrowLeft', 5: 'ArrowDown', '-5': 'ArrowUp' })[route[2] - route[1]]);
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(() => window.__game.getState().supplyRun.path.length === 3);
+    await page.click('.supply-close');
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('incremental-game-save')).supplyRun.path.length === 3);
+    await page.reload({ waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => !!window.__game);
+    await page.evaluate(() => window.__game.setSpeed(0));
+    if (touch) await page.click('#section-actions');
+    await page.click('#tab-upgrades');
+    await clickWithWheel('.supply-open');
+    await page.waitForSelector('.supply-dialog[open]');
+    assert.equal(await page.evaluate(() => window.__game.getState().supplyRun.path.length), 3);
+    const points = await page.$$eval('.supply-cell', cells => cells.map(cell => {
+      const r = cell.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      return { x, y, reachable: cell.contains(document.elementFromPoint(x, y)) };
+    }));
+    assert(route.every(index => points[index].reachable), 'Every route square must be reachable inside the dialog');
+    const camp = points[0];
+    if (touch) await page.touchscreen.touchStart(camp.x, camp.y);
+    else { await page.mouse.move(camp.x, camp.y); await page.mouse.down(); }
+    for (const index of route.slice(1)) {
+      const point = points[index];
+      if (touch) await page.touchscreen.touchMove(point.x, point.y);
+      else await page.mouse.move(point.x, point.y, { steps: 4 });
+    }
+    if (touch) await page.touchscreen.touchEnd(); else await page.mouse.up();
+    await page.waitForSelector('.supply-result');
+    const reward = await page.evaluate(() => window.__game.getState().supplyRun.result);
+    assert.equal(reward.caches, 2); assert.equal(reward.fraction, 0.4);
+    assert(Object.values(reward.rewards).some(amount => amount > 0), 'Successful routing must deliver real cargo');
+    await page.screenshot({ path: `test-results/supply-run-${touch ? 'touch' : 'mouse'}.png` });
+    await page.click('.supply-close');
+    checks.push({ supplyRun: touch ? 'touch' : 'mouse', keyboardRoute: true, pausedRouteReload: true, reward });
+  }
   const viewports = [[360, 800], [390, 844], [768, 1024], [1366, 768], [1440, 900], [844, 390], [683, 384]];
   for (let era = 1; era <= 10; era++) {
     await page.evaluate(fixture => window.__game.setState(() => fixture), snapshots[`0:${era}`]);

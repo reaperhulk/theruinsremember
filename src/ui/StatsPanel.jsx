@@ -1,6 +1,8 @@
 import { civilizationRecord } from '../engine/diagnostics.js';
 import { useState, memo } from 'react';
-import { eraNames, countEraUpgrades } from '../engine/eras.js';
+import { eraNames } from '../engine/eras.js';
+import { projects } from '../data/projects.js';
+import { countEraProjects, isProjectComplete } from '../engine/projects.js';
 import { getAchievementList } from '../engine/achievements.js';
 import { getEffectiveRate, getEffectivePrestige } from '../engine/resources.js';
 import { resources as resourceDefs } from '../data/resources.js';
@@ -96,16 +98,16 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
           <span>{formatTime(Math.max(0, (state.totalTime || 0) - (state.eraStartTime || 0)))}</span>
         </div>
         <div className="stat-row">
-          <span>Era Upgrades</span>
-          <span>{countEraUpgrades(state, state.era)}</span>
+          <span>Era Projects</span>
+          <span>{countEraProjects(state, state.era)}/6</span>
         </div>
         <div className="stat-row">
           <span>Unlocked Resources</span>
           <span>{Object.values(state.resources || {}).filter(r => r.unlocked).length}</span>
         </div>
         <div className="stat-row">
-          <span>Upgrades</span>
-          <span>{Object.keys(state.upgrades || {}).length}</span>
+          <span>Construction Projects</span>
+          <span>{Object.keys(projects).filter(id => isProjectComplete(state, id)).length}/60</span>
         </div>
         <div className="stat-row">
           <span>Technologies</span>
@@ -260,7 +262,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
                 return def ? (
                   <div key={id} className="achievement locked" style={{ opacity: 0.4 }}>
                     <span className="achievement-name">? Era {def.era}: ???</span>
-                    <span className="achievement-desc">Purchase lore upgrades to reveal...</span>
+                    <span className="achievement-desc">Complete construction projects to reveal...</span>
                   </div>
                 ) : null;
               })}
@@ -276,7 +278,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
               ))}
               {discoveredLore.length === 0 && loreEvents.length > 0 && (
                 <div style={{ fontSize: '0.7em', color: '#666', marginTop: '4px' }}>
-                  Purchase lore upgrades to uncover the full story...
+                  Complete construction projects to uncover the full story...
                 </div>
               )}
               </div>

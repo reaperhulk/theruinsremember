@@ -24,12 +24,14 @@ Every era now has an authored chapter and two strategic branches with consequenc
 
 The next civilization recognizes your actual choices. Prestige restores a producing settlement and automatic gathering, while the Archive keeps discoveries, read state, plans and landmarks. World view shows inherited structures, constrained production and optional supply routes. Preferences include a ten-era adaptive score and low-power rendering. Offline progress yields between short processing slices, and only one browser tab can own the save at a time.
 
-Implementation details and all eight personas’ before/after measurements are in [the ten-era delivery report](REVIEW3.md) and [the decision-loop revision](REVIEW4.md).
+Implementation details and all eight personas’ before/after measurements are in [the ten-era delivery report](REVIEW3.md), [the decision-loop revision](REVIEW4.md), and [the construction and supply-route revision](REVIEW5.md).
 
 ## How It Works
 
 - **10 Eras** spanning primitive survival to multiverse exploration
-- **599 upgrades**, with automatic construction and research, competing workshop/lab spending priorities, ten paired doctrine choices, production previews, and ×1.5 repeatable milestones every ten levels
+- **60 substantial construction projects — six per era**, replacing 564 small production purchases. Each project adds its combined capability at once, previews the production gain, and can be prioritized or funded automatically. Existing saves retain credit for previously built works
+- **Optional supply-route puzzles in all ten eras**: draw a path around rubble within 12 steps, taking detours for bonus cargo. Success funds 20–40% of a waiting project's missing supplies, subject to storage capacity. Pause/resume at any time; ordinary progress never requires playing
+- **Competing spending priorities and ten paired doctrine choices**, with automatic research, production previews, and optional ×1.5 infrastructure milestones every ten levels
 - **Standing expedition assignments**: choose the risk and reward once per early era; the team uses real supplies while you focus elsewhere, including offline
 - **115 tech nodes** including mutually exclusive paths that shape each run differently
 - **Era-focused operations** that evolve from ruin expeditions into orbital missions, colony mandates, star-network directives, Dyson commissions, cycle laws, galactic government, cosmic signal locks, and the Reality Forge
