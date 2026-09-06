@@ -68,3 +68,28 @@ The balance minimums allow newcomers to finish in 13 minutes (previously 14) and
 - Ten-prestige stress on both seeds and existing 22-cycle legacy-unlock coverage.
 - Required browser workflow: natural desktop/mobile two-cycle journeys, operation/prestige coverage, seven viewport sizes across all ten eras, and native wheel/touch/keyboard scrolling. Supply checks draw with mouse and touch, extend with keyboard, pause, reload, resume, and verify real cargo rewards.
 - Production build and asset budgets. Browser results and deployment status are attached to this commit's GitHub Actions run.
+
+## Supply grid visual correction
+
+Follow-up baseline: `df46bccde1c89bb2bbc221f99ffe0e269dd0ce4d`. Screenshot inspection after the native input checks exposed content-sized grid rows: empty rows were shorter than rows containing cargo icons. The board now defines five equal rows, keeping rendered squares aligned with pointer hit calculation. Browser assertions also require square cells and touch targets of at least 44 pixels at the tested desktop/mobile sizes. This CSS and assertion correction has no game-state or economy changes.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Outcome before → after |
+| --- | ---: | --- | --- | ---: | ---: | --- |
+| newcomer | 424242 | 14m 01s → 14m 01s | 14m 01s → 14m 01s | 50 → 50 | 1 → 1 | Era 10 → 10; target completed |
+| newcomer | 42 | 13m 41s → 13m 41s | 13m 41s → 13m 41s | 49 → 49 | 1 → 1 | Era 10 → 10; target completed |
+| engaged | 424242 | 11m 01s → 11m 01s | 11m 01s → 11m 01s | 50 → 50 | 1 → 1 | Era 10 → 10; target completed |
+| engaged | 42 | 11m 31s → 11m 31s | 11m 31s → 11m 31s | 50 → 50 | 1 → 1 | Era 10 → 10; target completed |
+| optimizer | 424242 | 11m 43s → 11m 43s | 11m 43s → 11m 43s | 51 → 51 | 1 → 1 | Era 10 → 10; target completed |
+| optimizer | 42 | 9m 33s → 9m 33s | 9m 33s → 9m 33s | 52 → 52 | 1 → 1 | Era 10 → 10; target completed |
+| background | 424242 | 18m 01s → 18m 01s | 4m 31s → 4m 31s | 58 → 58 | 10 → 10 | Era 10 → 10; target completed |
+| background | 42 | 18m 01s → 18m 01s | 4m 31s → 4m 31s | 57 → 57 | 10 → 10 | Era 10 → 10; target completed |
+| check_in | 424242 | 40m 31s → 40m 31s | 4m 31s → 4m 31s | 57 → 57 | 5 → 5 | Era 10 → 10; target completed |
+| check_in | 42 | 40m 31s → 40m 31s | 4m 31s → 4m 31s | 58 → 58 | 5 → 5 | Era 10 → 10; target completed |
+| offline_returner | 424242 | 12h 0m 01s → 12h 0m 01s | 6m 01s → 6m 01s | 31 → 31 | 4 → 4 | Era 6 → 6; target completed |
+| offline_returner | 42 | 12h 0m 01s → 12h 0m 01s | 6m 01s → 6m 01s | 30 → 30 | 4 → 4 | Era 6 → 6; target completed |
+| completionist | 424242 | 9m 41s → 9m 41s | 9m 41s → 9m 41s | 51 → 51 | 1 → 1 | Era 10 → 10; target completed |
+| completionist | 42 | 11m 56s → 11m 56s | 11m 56s → 11m 56s | 55 → 55 | 1 → 1 | Era 10 → 10; target completed |
+| minimalist | 424242 | 55m 31s → 55m 31s | 55m 31s → 55m 31s | 45 → 45 | 1 → 1 | Era 10 → 10; target completed |
+| minimalist | 42 | 37m 31s → 37m 31s | 37m 31s → 37m 31s | 44 → 44 | 1 → 1 | Era 10 → 10; target completed |
+
+All sixteen comparisons are unchanged; no new stalls, required participation, siege collapse or absent-player actions.

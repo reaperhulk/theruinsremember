@@ -3693,7 +3693,7 @@ button:focus-visible, [role=button]:focus-visible, a:focus-visible, select:focus
 .supply-dialog-heading h2 { margin:4px 0; color:#dfc58f; }
 .supply-body { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:22px; }
 .supply-playfield { min-width:0; }
-.supply-board { position:relative; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); width:100%; max-width:360px; aspect-ratio:1; gap:4px; padding:2px; touch-action:none; user-select:none; }
+.supply-board { position:relative; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); grid-template-rows:repeat(5,minmax(0,1fr)); width:100%; max-width:360px; aspect-ratio:1; gap:4px; padding:2px; touch-action:none; user-select:none; }
 .supply-cell { position:relative; padding:0; background:#203f46; border:1px solid #446671; border-radius:7px; color:#e5dfc5; cursor:crosshair; min-width:0; font-size:12px; }
 .supply-cell.rubble { background:#19252d; border-color:#253943; }
 .supply-cell svg { width:60%; height:60%; stroke:#99a09a; fill:#47525a; stroke-width:2; }

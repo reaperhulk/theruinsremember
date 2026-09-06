@@ -180,9 +180,10 @@ try {
     assert.equal(await page.evaluate(() => window.__game.getState().supplyRun.path.length), 3);
     const points = await page.$$eval('.supply-cell', cells => cells.map(cell => {
       const r = cell.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-      return { x, y, reachable: cell.contains(document.elementFromPoint(x, y)) };
+      return { x, y, width: r.width, height: r.height, reachable: cell.contains(document.elementFromPoint(x, y)) };
     }));
     assert(route.every(index => points[index].reachable), 'Every route square must be reachable inside the dialog');
+    assert(points.every(point => Math.abs(point.width - point.height) < 1 && point.height >= 44), 'Supply cells must be equal squares with usable touch targets');
     const camp = points[0];
     if (touch) await page.touchscreen.touchStart(camp.x, camp.y);
     else { await page.mouse.move(camp.x, camp.y); await page.mouse.down(); }
