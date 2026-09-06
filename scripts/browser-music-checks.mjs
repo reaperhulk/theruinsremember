@@ -69,7 +69,12 @@ export async function checkMusic(page, browser, checks) {
   await page.waitForFunction(() => window.__audioAudit.rms() < 0.0008, { polling: 100 });
   assert.equal(await page.evaluate(() => window.__audioAudit.started), scheduled, 'Hidden tabs must stop scheduling music');
   await page.bringToFront(); await playing(); await other.close();
-  checks.push({ musicPausesWhenHidden: true, musicResumesWhenVisible: true });
+  // Returning from even a short background visit runs normal catch-up and
+  // presents its report. Acknowledge it before interacting with the header.
+  await page.waitForSelector('.offline-report button', { visible: true });
+  await page.click('.offline-report button');
+  await page.waitForSelector('.offline-overlay', { hidden: true });
+  checks.push({ musicPausesWhenHidden: true, musicResumesWhenVisible: true, returnReportDismissed: true });
 
   for (const width of [360, 390, 1366]) {
     await page.setViewport({ width, height: width < 600 ? 844 : 768, hasTouch: true });
