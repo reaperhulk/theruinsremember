@@ -11,7 +11,9 @@ import { installAudioAudit, checkMusic } from './browser-music-checks.mjs';
 const snapshots = {};
 const earned = runPlayerJourney({ persona: 'engaged', seed: 42, cycles: 2, observe: state => { snapshots[`${state.prestigeCount}:${state.era}`] = state; } });
 assert(earned.completed, 'Fixture source must complete two naturally earned cycles');
-const executable = computeExecutablePath({ browser: Browser.CHROMEHEADLESSSHELL, buildId: PUPPETEER_REVISIONS['chrome-headless-shell'], cacheDir: process.env.PUPPETEER_CACHE_DIR || join(homedir(), '.cache', 'puppeteer'), platform: detectBrowserPlatform() });
+// Full Chrome applies real tab visibility; headless-shell keeps every page
+// visible and cannot exercise background audio or save-owner lifecycle events.
+const executable = computeExecutablePath({ browser: Browser.CHROME, buildId: PUPPETEER_REVISIONS.chrome, cacheDir: process.env.PUPPETEER_CACHE_DIR || join(homedir(), '.cache', 'puppeteer'), platform: detectBrowserPlatform() });
 const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'], executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || (existsSync(executable) ? executable : undefined) });
 const page = await browser.newPage();
 const errors = [], checks = [];

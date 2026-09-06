@@ -61,6 +61,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx puppeteer browsers install chrome-headless-shell
+      - run: npx puppeteer browsers install chrome
+        if: matrix.name == 'experience'
       - name: Start the game server
         run: |
           npm run dev -- --host 127.0.0.1 &

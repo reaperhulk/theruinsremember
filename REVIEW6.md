@@ -34,3 +34,7 @@ The temporary baseline was captured from `a629f28` before this batch. Identical 
 | minimalist | 42 | 2251 → 2251 | 2251 → 2251 | 44 → 44 | 1 → 1 | Era 10, cycle ready → same |
 
 All 16 comparisons are identical in elapsed time, attention, actions, sessions, and progression. There are no new stalls, forced participation, siege collapses, or actions while absent. The offline-returner calibration scenario intentionally reaches Era 6 against its Era 4 target; the separate bounded-journey gate covers its complete cycles. Audio remains optional.
+
+## Browser runner correction
+
+The first CI run passed actual first-click output, pause/resume, volume, mute, and preference reload checks, then timed out waiting for a background tab. The old headless-shell executable does not apply the full browser's tab visibility behavior. The experience suite now installs and uses full Chrome, consistent with [Puppeteer's documented distinction between the two modes](https://pptr.dev/guides/headless-modes). The production audio code and all assertions are retained. This runner-only follow-up uses the verified post-audio snapshot as its baseline; all 16 before/after rows above apply again with identical values.
