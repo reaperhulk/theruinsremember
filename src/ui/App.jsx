@@ -379,7 +379,7 @@ export function App() {
       <Toast objective={objective} economy={economy} state={state} />
       <nav className="mobile-section-links" aria-label="Game section"><button id="section-actions" aria-pressed={mobileSection === 'actions'} onClick={() => setMobileSection('actions')}>Decisions & operations</button><button id="section-world" aria-pressed={mobileSection === 'world'} onClick={() => setMobileSection('world')}>World & resources</button></nav>
       <main className={`game-layout ${state.era <= 4 ? 'early-game-layout' : ''}`}>
-        <div className="left-column" id="game-resources">
+        <div className="left-column" id="game-resources" role="region" aria-label="World and resources" tabIndex={0}>
           <Suspense fallback={<div className="scene-placeholder">The ruins emerge…</div>}><GameCanvas quality={visualQuality} state={state} onUpdate={updateState} /></Suspense>
           <WorldStatus onUpdate={updateState} state={state} economy={economy} onNavigate={navigate} /><RestoredDistricts state={state} />
           <ResourcePanel economy={economy} state={state} onUpdate={updateState} />
@@ -434,6 +434,7 @@ export function App() {
           <div
             className="tab-content"
             role="tabpanel"
+            tabIndex={0}
             id={`tabpanel-${activeTab}`}
             aria-labelledby={`tab-${activeTab}`}
             onTouchStart={e => { touchStartRef.current = e.touches[0].clientX; }}

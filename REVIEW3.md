@@ -182,3 +182,30 @@ This final batch retains all sixteen persona outcomes with no change in elapsed 
 | offline_returner | 42 | 43201 → 43201 | 361 → 361 | 103 → 103 | 4 → 4 | Era 5 → 5 |
 | completionist | 42 | 666 → 666 | 666 → 666 | 165 → 165 | 1 → 1 | Era 10 → 10 |
 | minimalist | 42 | 3181 → 3181 | 3181 → 3181 | 101 → 101 | 1 → 1 | Era 10 → 10 |
+
+## Scroll reachability correction
+
+A live fresh-game reproduction at 1363 × 936 exposed a missed regression: `.early-game-layout` retained `align-items: start`, so its panels grew to their content height behind a clipped parent. A 633-pixel play area contained a 1,674-pixel action column; native wheel input did not move either pane. The old checks asserted that the page fit the viewport but did not bound the scroll panes, and automated `scrollIntoView`/locator clicks could scroll hidden ancestors. Passing those checks did not establish player reachability.
+
+The obsolete alignment is removed. A bounded grid row and explicit stretch keep both panels inside their visible play area, allowing native scrolling. Both panes are also keyboard focusable. The experience suite now checks both pane bounds and native wheel/keyboard scrolling at seven viewport sizes in all ten eras, touch scrolling at 390 × 844, and an actual coordinate click on a fresh-game offscreen queue button reached by wheel input. It never uses programmatic scrolling for these assertions.
+
+The required engine persona comparison is unchanged below. This measures progression policy only; it cannot validate browser interaction. No new engine stalls, absence actions, forced operations or siege collapse occurred. Times are seconds.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Outcome before → after |
+|---|---:|---:|---:|---:|---:|---|
+| newcomer | 424242 | 1101 → 1101 | 1101 → 1101 | 116 → 116 | 1 → 1 | Era 10 → 10 |
+| engaged | 424242 | 941 → 941 | 941 → 941 | 134 → 134 | 1 → 1 | Era 10 → 10 |
+| optimizer | 424242 | 571 → 571 | 571 → 571 | 231 → 231 | 1 → 1 | Era 10 → 10 |
+| background | 424242 | 1561 → 1561 | 391 → 391 | 128 → 128 | 14 → 14 | Era 10 → 10 |
+| check_in | 424242 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | Era 5 → 5 |
+| completionist | 424242 | 666 → 666 | 666 → 666 | 173 → 173 | 1 → 1 | Era 10 → 10 |
+| minimalist | 424242 | 3301 → 3301 | 3301 → 3301 | 99 → 99 | 1 → 1 | Era 10 → 10 |
+| newcomer | 42 | 1041 → 1041 | 1041 → 1041 | 112 → 112 | 1 → 1 | Era 10 → 10 |
+| engaged | 42 | 851 → 851 | 851 → 851 | 136 → 136 | 1 → 1 | Era 10 → 10 |
+| optimizer | 42 | 451 → 451 | 451 → 451 | 211 → 211 | 1 → 1 | Era 10 → 10 |
+| background | 42 | 1441 → 1441 | 361 → 361 | 126 → 126 | 13 → 13 | Era 10 → 10 |
+| check_in | 42 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 103 → 103 | 4 → 4 | Era 5 → 5 |
+| completionist | 42 | 666 → 666 | 666 → 666 | 165 → 165 | 1 → 1 | Era 10 → 10 |
+| minimalist | 42 | 3181 → 3181 | 3181 → 3181 | 101 → 101 | 1 → 1 | Era 10 → 10 |
