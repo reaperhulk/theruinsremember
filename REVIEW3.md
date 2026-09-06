@@ -30,3 +30,32 @@ All sixteen impact results are unchanged. Times are simulated seconds; active me
 | minimalist | 42 | 3391 → 3391 | 3391 → 3391 | 86 → 86 | 1 → 1 | Era 10; target 10; complete |
 
 No progression failures, collapse, timing regressions, or absent-player actions.
+
+## Batch 2 — choices, chapters, and inheritance
+
+All twenty existing forks now have authored future consequences across ten eras, including alternative supply chains, later production, construction efficiency, forge costs/charges, and inheritance. The first civilization offers an earned Continue at each breakthrough; later cycles advance automatically by default. Legacy saves keep automatic transitions. Economic operations remain optional. Interstellar public works cost 650,000 research, down from 1,000,000; previously completed works require 25% fewer supplies next cycle.
+
+The Archive records actual choices with stable discovery IDs, dependencies and persistent read state. Later civilizations recognize those choices. Prestige restores a working settlement (+2 base production and 25% base storage for four early resources), automatic gathering, branch rewards, and an exact branch inheritance preview. Existing prestige perks add to this settlement. Ending text now acknowledges actual unlocks and reconstructed or defended memories.
+
+Validation: 435 unit tests passed, lint/build passed; all sixteen bounded journeys completed two cycles before the additional remembered-public-works discount. First comparison: no stalls, collapses, or actions while absent. Continue adds up to nine intentional decisions; branch changes also affect the subsequent purchase sequence. The one engaged seed taking 30 seconds longer is an intentional first-encounter tradeoff, not a new wait gate. The minimalist improves 3–4 minutes. First-batch CI passed both natural browser journeys and all engine gates; operation fixtures exposed relocated docking navigation and a mobile header overflow, both corrected here.
+
+All values below are seconds or counts; the offline legacy persona targets an earlier era, distinct from the two-cycle journeys.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Outcome before → after |
+|---|---:|---:|---:|---:|---:|---|
+| newcomer | 424242 | 1121 → 1101 | 1121 → 1101 | 107 → 116 | 1 → 1 | Era 10 → 10 |
+| engaged | 424242 | 941 → 941 | 941 → 941 | 127 → 134 | 1 → 1 | Era 10 → 10 |
+| optimizer | 424242 | 577 → 571 | 577 → 571 | 222 → 231 | 1 → 1 | Era 10 → 10 |
+| background | 424242 | 1441 → 1441 | 361 → 361 | 116 → 124 | 13 → 13 | Era 10 → 10 |
+| check_in | 424242 | 3601 → 3601 | 361 → 361 | 109 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 98 → 102 | 4 → 4 | Era 5 → 5 |
+| completionist | 424242 | 666 → 666 | 666 → 666 | 164 → 174 | 1 → 1 | Era 10 → 10 |
+| minimalist | 424242 | 3781 → 3541 | 3781 → 3541 | 88 → 98 | 1 → 1 | Era 10 → 10 |
+| newcomer | 42 | 1061 → 1041 | 1061 → 1041 | 106 → 112 | 1 → 1 | Era 10 → 10 |
+| engaged | 42 | 821 → 851 | 821 → 851 | 127 → 139 | 1 → 1 | Era 10 → 10 |
+| optimizer | 42 | 457 → 451 | 457 → 451 | 205 → 213 | 1 → 1 | Era 10 → 10 |
+| background | 42 | 1441 → 1441 | 361 → 361 | 114 → 126 | 13 → 13 | Era 10 → 10 |
+| check_in | 42 | 3601 → 3601 | 361 → 361 | 109 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 99 → 103 | 4 → 4 | Era 5 → 5 |
+| completionist | 42 | 696 → 666 | 696 → 666 | 157 → 165 | 1 → 1 | Era 10 → 10 |
+| minimalist | 42 | 3391 → 3211 | 3391 → 3211 | 86 → 103 | 1 → 1 | Era 10 → 10 |

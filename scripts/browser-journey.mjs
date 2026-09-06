@@ -69,7 +69,7 @@ try {
       console.log(`Cycle ${state.prestigeCount + 1}, era ${state.era}, ${state.totalTime}s, ${state.upgrades} upgrades`);
       previousEra = state.era;
       await page.waitForFunction(() => !document.querySelector('.era-transition-overlay'), { timeout: 15000 });
-      if ([1, 5, 10].includes(state.era) && !screenshots.has(state.era)) {
+      if ([1, 4, 7, 10].includes(state.era) && !screenshots.has(state.era)) {
         mkdirSync('test-results', { recursive: true });
         await page.screenshot({ path: `test-results/${mobile ? 'mobile' : 'desktop'}-era-${state.era}.png`, fullPage: true });
         screenshots.add(state.era);
@@ -103,10 +103,10 @@ try {
       reloaded = true;
     }
     for (let slot = 0; slot < 2; slot++) {
-      let acted = false;
-      let command;
+      let acted = await click('.era-advance-btn');
+      let command = acted ? 'continue-era' : undefined;
       const current = await page.evaluate(() => { const s = window.__game.getState(); return { era: s.era, prestigeCount: s.prestigeCount, nextDoctrine: s.nextCycleDoctrine }; });
-      if (current.era === 10 && !current.nextDoctrine) {
+      if (!acted && current.era === 10 && !current.nextDoctrine) {
         await click('#tab-mini');
         acted = await click(`.cycle-doctrines button:nth-child(${current.prestigeCount % 3 + 1})`);
         command = 'doctrine';

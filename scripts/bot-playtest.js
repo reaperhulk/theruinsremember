@@ -4,6 +4,7 @@
 // Usage: node scripts/bot-playtest.js [options]
 // Zero external dependencies. Run --help for full usage.
 
+import { approveEraAdvance } from '../src/engine/eras.js';
 import { createInitialState } from '../src/engine/state.js';
 import { tick } from '../src/engine/tick.js';
 import { purchaseUpgrade, getAvailableUpgrades, getUpgradeCost, buyMaxRepeatable, isDecisionUpgrade } from '../src/engine/upgrades.js';
@@ -821,6 +822,7 @@ export function runScenario(opts) {
       applyAction('descend', current => botDescend(current, profileDef, t, rng));
       applyAction('realityForge', current => botRealityForge(current, profileDef, t, rng));
       applyAction('prestigeUpgrade', current => botPrestigeUpgrades(current, profileDef, t, rng));
+      applyAction('continue-era', approveEraAdvance);
     }
 
     // Tick the engine

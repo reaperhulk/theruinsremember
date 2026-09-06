@@ -1,3 +1,4 @@
+import { inheritancePreview } from '../engine/memory.js';
 import { useState } from 'react';
 import { getPrestigeShop, purchasePrestigeUpgrade, getPrestigeSummary, toggleEchoMode, purchaseEchoUpgrade, getEchoShop, resolvePrestigePlan, togglePrestigePlan } from '../engine/prestige.js';
 import { getEffectivePrestige, PRESTIGE_HARD_CAP } from '../engine/resources.js';
@@ -38,6 +39,7 @@ export function PrestigePanel({ state, onUpdate }) {
   const nextDoctrine = CYCLE_DOCTRINES[state.nextCycleDoctrine];
   const cycleGoal = getCycleGoal(state);
 
+  const inheritance = inheritancePreview(state);
   const cycleCount = state.prestigeCount || 0;
   const prestigeLore = cycleCount === 0
     ? 'Something waits at the end of this path. You can feel it pulling.'
@@ -61,6 +63,8 @@ export function PrestigePanel({ state, onUpdate }) {
 
   return (
     <div className="panel prestige-panel">
+      <section className="inheritance-preview" aria-label="Next civilization preview"><h3>What your next civilization inherits</h3><p>A working settlement: +2 base production per second and {Math.round(inheritance.stores * 100)}% base starting storage for food, labor, materials and energy; gathering becomes automatic. Previously completed public works need 25% fewer supplies.</p><p>{inheritance.shards} Archive shards. {inheritance.relic ? `Preserved relic: ${inheritance.relic}.` : ''} {state.archive?.savedPlan?.repeat ? 'Your saved plan will resume, paying normal costs.' : 'Your recorded choices remain available in the Archive.'}</p><p>{inheritance.question}</p><details><summary>{inheritance.choices.length} landmarks you will leave behind</summary>{inheritance.choices.map(d => <p key={d.id}>{d.landmark}: {d.memory}</p>)}</details></section>
+      <label className="era-review-setting">Chapter transitions <select aria-label="Chapter transitions" value={state.eraReviewMode} onChange={e => onUpdate(s => ({ ...s, eraReviewMode: e.target.value }))}><option value="first">Review on the first civilization</option><option value="always">Review every civilization</option><option value="automatic">Advance automatically</option></select></label>
       <h2>Prestige{points > 0 ? ` (${points} pts)` : ''} ({shop.filter(u => u.owned).length}/{shop.length} owned)</h2>
       <p className="text-lore" style={{ margin: '0 0 8px', textAlign: 'center' }}>
         {prestigeLore}

@@ -65,6 +65,7 @@ export function migrateState(saved) {
     migrated.prestigeMultiplier = 1;
   }
   migrated.archive = { ...createArchive(), ...(saved.archive || {}) };
+  migrated.eraReviewMode = saved.eraReviewMode || 'automatic';
   migrated.saveVersion = fresh.saveVersion;
   return migrated;
 }
@@ -174,6 +175,8 @@ export function createInitialState() {
     commissions: [],
     archive: createArchive(),
     plannedPrestigeUpgrades: [],
-    saveVersion: 10,
+    saveVersion: 11,
+    eraReviewMode: 'first',
+    eraReviewApproved: 0,
   };
 }

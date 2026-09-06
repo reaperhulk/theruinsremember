@@ -47,7 +47,7 @@ describe('prestige', () => {
     state.resources.food.amount = 100;
     const after = performPrestige(state);
     expect(after.era).toBe(1);
-    expect(after.resources.food.amount).toBe(0);
+    expect(after.resources.food.amount).toBe(1250);
     // bonus = 1 + 4*0.3 = 2.2, mult = 1 + 2.2 = 3.2 (additive)
     expect(after.prestigeMultiplier).toBeCloseTo(3.2);
   });
@@ -218,7 +218,7 @@ describe('prestige', () => {
       const after = performPrestige(state);
 
       expect(after.prestigeCount).toBe(10);
-      expect(after.resources.labor.amount).toBe(20);
+      expect(after.resources.labor.amount).toBe(1000);
       expect(after.upgrades.forkHearth).toBeUndefined();
       expect(after.upgrades.forkQuarry).toBeUndefined();
     });
@@ -229,8 +229,8 @@ describe('prestige', () => {
       state.resources.food.amount = 1000;
       state.prestigeUpgrades = { quantumMemory: true };
       const after = performPrestige(state);
-      // Starts with 0 + 10% of 1000 = 100
-      expect(after.resources.food.amount).toBe(100);
+      // Restored settlement (1250) plus 10% of the previous 1000.
+      expect(after.resources.food.amount).toBe(1350);
     });
 
     it('Head Start adds 50% of multiplier', () => {
@@ -268,10 +268,10 @@ describe('prestige', () => {
       state.realityKeys = { quantum: 2 };
       const after = performPrestige(state);
 
-      expect(after.resources.food.amount).toBe(50);
-      expect(after.resources.labor.amount).toBe(60);
-      expect(after.resources.materials.amount).toBe(50);
-      expect(after.resources.energy.amount).toBe(50);
+      expect(after.resources.food.amount).toBe(1300);
+      expect(after.resources.labor.amount).toBe(550);
+      expect(after.resources.materials.amount).toBe(1300);
+      expect(after.resources.energy.amount).toBe(1300);
     });
 
     it('Perfect Memory keeps history but replays every decision', () => {

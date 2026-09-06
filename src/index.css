@@ -3614,3 +3614,11 @@ button:focus-visible, [role=button]:focus-visible, a:focus-visible, select:focus
   .objective-panel { padding: 6px 12px; }
   .resource-strip .focus-resource { padding: 4px 8px; }
 }
+
+.choice-consequence, .discoveries article, .inheritance-preview { border-left: 3px solid #bd9a64; background: #211f1a; padding: 12px 16px; margin: 10px 0; color: #ded5be; }
+.discoveries h3, .inheritance-preview h3 { margin: 6px 0; font-size: 17px; }
+.discoveries p, .inheritance-preview p { line-height: 1.5; font-size: 14px; }
+.era-advance-btn { background: #c6aa72; color: #191914; border: 0; padding: 12px; border-radius: 8px; min-height: 44px; font-weight: 700; }
+.era-review-setting { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 0; }
+
+@media (max-width:540px) { .game-header { flex-wrap: wrap; gap: 4px; } .game-header h1 { max-width: none; font-size: 18px; } .header-controls { flex: 1 1 auto; min-width: 0; justify-content: flex-end; flex-wrap: wrap; } .era-advance-btn { max-width: 120px; font-size: 12px; } }

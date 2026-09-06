@@ -1,3 +1,4 @@
+import { recordChapter } from './memory.js';
 import { advanceCommissions } from './commissions.js';
 import { advancePublicWorks } from './publicWorks.js';
 import { advanceBlueprint } from './blueprints.js';
@@ -5,7 +6,7 @@ import { advanceGoal, preservesGoalReserve } from './goals.js';
 import { recordHistory } from './archive.js';
 import { calculateEconomy } from './economy.js';
 import { getEffectiveCap, gather, isGatheringAutomated } from './resources.js';
-import { checkEraTransition, transitionEra } from './eras.js';
+import { checkEraTransition, transitionEra, needsEraReview } from './eras.js';
 import { checkForEvent, expireEffects } from './events.js';
 import { advanceColonyMandate } from './colonies.js';
 import { advanceDockingContracts } from './docking.js';
@@ -28,7 +29,7 @@ function intervalCrossings(startTime, endTime, interval) {
 // Optional rng parameter for deterministic bot/testing runs.
 export function tick(state, dt, rng = Math.random, options = {}) {
   if (dt <= 0) return state; // Guard against negative or zero dt
-  state = expireEffects(state);
+  state = recordChapter(expireEffects(state));
   const economy = calculateEconomy(state, dt);
   const rates = economy.gross;
   const newResources = Object.fromEntries(Object.entries(state.resources).map(([id, resource]) => [
@@ -126,9 +127,9 @@ export function tick(state, dt, rng = Math.random, options = {}) {
 
   // Check for era transition
   const nextEra = checkEraTransition(newState);
-  if (nextEra !== null) {
+  if (nextEra !== null && !needsEraReview(newState)) {
     const eraLabels = { 2: 'Industrialization', 3: 'Digital Age', 4: 'Space Age', 5: 'Solar System', 6: 'Interstellar', 7: 'Dyson Era', 8: 'Galactic', 9: 'Intergalactic', 10: 'Multiverse' };
-    newState = transitionEra(newState, nextEra);
+    newState = recordChapter(transitionEra(newState, nextEra));
     newState = {
       ...newState,
       eventLog: [...(newState.eventLog || []), {

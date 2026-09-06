@@ -41,6 +41,7 @@ import { performPrestige, calculatePrestigeBonus, getPrestigeSummary } from '../
 import { ERA_COUNT, eraNames } from '../engine/eras.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
+import { Discoveries } from './Discoveries.jsx';
 import { canAfford, getEffectivePrestige } from '../engine/resources.js';
 import { getAchievementsNearComplete } from '../engine/achievements.js';
 import { formatNumber } from './format.js';
@@ -344,7 +345,7 @@ export function App() {
         </div>
       </header>
       {saveWarning && <div className="save-warning" role="alert">{saveWarning} <button onClick={restoreBackup}>Restore backup</button></div>}
-      <EraProgress state={state} objective={objective} onNavigate={navigate} />
+      <EraProgress onUpdate={updateState} state={state} objective={objective} onNavigate={navigate} />
       <ResourceStrip state={state} objective={objective} economy={economy} onUpdate={updateState} />
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
       <EraTransition era={state.era} />
@@ -423,7 +424,7 @@ export function App() {
             <Suspense fallback={<div className="panel">Opening the archive…</div>}>
             {activeTab === 'upgrades' && (
               <>
-                <div className="chapter-intro"><span className="panel-kicker">{objective.chapter.title}</span><p>{objective.chapter.problem}</p><button onClick={() => navigate('mini')}>{objective.chapter.operation} →</button></div>
+                <Discoveries state={state} onUpdate={updateState} /><div className="chapter-intro"><span className="panel-kicker">{objective.chapter.title}</span><p>{objective.chapter.problem}</p><button onClick={() => navigate('mini')}>{objective.chapter.operation} →</button></div>
                 {state.era === 1 && !state.prestigeCount && <ol className="opening-steps" aria-label="Settlement milestones"><li data-complete={Object.keys(state.upgrades).length > 0}>Restore production</li><li data-complete={(state.expedition?.totalFinds || 0) > 0}>Explore the ruins</li><li data-complete={Object.keys(state.tech).length > 0}>Research metallurgy</li></ol>}
                 <PurchaseGuidance state={state} onUpdate={updateState} /><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel state={state} onUpdate={updateState} />
               </>

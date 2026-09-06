@@ -1,3 +1,4 @@
+import { approveEraAdvance, needsEraReview, checkEraTransition } from '../src/engine/eras.js';
 import { parseSave, serializeSave } from '../src/engine/saves.js';
 import { researchDoctrine, craftRelic, contributeProject, RECONSTRUCTION_PROJECTS, DOCTRINE_RESEARCH, saveAutomationPlan, restoreAutomationPlan, togglePlanRepeat } from '../src/engine/archive.js';
 import { queueGoal } from '../src/engine/goals.js';
@@ -34,6 +35,7 @@ const BUDGETS = { newcomer: 1, engaged: 2, optimizer: 4, background: 2, check_in
 // Each returned transition is ONE visible player command. No giveAll, direct
 // ownership writes, hidden prerequisite bypass, or batch of exclusive choices.
 export function candidateActions(state, profile, options, rng) {
+  if (needsEraReview(state) && checkEraTransition(state)) return [{ name: 'continue-era', fn: approveEraAdvance }];
   const reverse = options.branch === 'reverse';
   const rank = value => [...`${options.seed || 424242}:${state.prestigeCount}:${value.id || value}`].reduce((hash, c) => Math.imul(hash ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261);
   const ordered = values => options.branch === 'random' ? [...values].sort((a, b) => rank(a) - rank(b)) : reverse ? [...values].reverse() : values;

@@ -5,7 +5,7 @@ import { purchaseUpgrade, getUpgradeCost } from '../upgrades.js';
 import { unlockTech, getTechCost } from '../tech.js';
 import { upgrades as upgradeDefs } from '../../data/upgrades.js';
 import { techTree } from '../../data/tech-tree.js';
-import { getMinUpgradesForEra } from '../eras.js';
+import { getMinUpgradesForEra, approveEraAdvance } from '../eras.js';
 
 // Helper: give enough resources to buy something, then buy it
 function giveAndBuy(state, type, id) {
@@ -48,7 +48,7 @@ describe('era transition fixtures', () => {
     state = giveAndBuy(state, 'tech', 'industrialRevolution');
 
     // Tick once to trigger the progression-based transition check
-    state = tick(state, 0.1);
+    state = tick(approveEraAdvance(state), 0.1);
     expect(state.era).toBe(2);
   });
 
@@ -77,7 +77,7 @@ describe('era transition fixtures', () => {
     state = giveAndBuy(state, 'tech', 'massProduction');
     state = giveAndBuy(state, 'tech', 'digitalRevolution');
 
-    state = tick(state, 0.1);
+    state = tick(approveEraAdvance(state), 0.1);
     expect(state.era).toBe(3);
 
     // Digital Age resources should be unlocked
@@ -109,7 +109,7 @@ describe('era transition fixtures', () => {
     state = giveAndBuy(state, 'tech', 'neuralInterfaces');
     state = giveAndBuy(state, 'tech', 'spaceProgram');
 
-    state = tick(state, 0.1);
+    state = tick(approveEraAdvance(state), 0.1);
     expect(state.era).toBe(4);
   });
 

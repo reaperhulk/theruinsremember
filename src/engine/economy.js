@@ -1,3 +1,4 @@
+import { decisionMultiplier } from '../data/decisions.js';
 import { resources as definitions } from '../data/resources.js';
 import { getEffectivePrestige, getEffectiveCap } from './resources.js';
 import { getCycleProductionMultiplier } from './cycles.js';
@@ -31,8 +32,8 @@ export function getSupplyChains(state) {
   const efficient = hasRelicSynergy(state, 'closedCircuit');
   return SUPPLY_CHAINS.map(chain => {
     let adjusted = chain;
-    if (alternate && state.productionRoute === 'electrolysis' && chain.output === 'orbitalInfra') adjusted = { ...chain, input: 'energy', cost: 5 };
-    if ((living || alternate && state.productionRoute === 'biospheres') && chain.output === 'colonies') adjusted = { ...chain, input: 'food', cost: living ? 1 : 2 };
+    if ((state.upgrades?.forkElectrify || alternate && state.productionRoute === 'electrolysis') && chain.output === 'orbitalInfra') adjusted = { ...chain, input: 'energy', cost: 5 };
+    if ((living || state.upgrades?.forkHearth || alternate && state.productionRoute === 'biospheres') && chain.output === 'colonies') adjusted = { ...chain, input: 'food', cost: living ? 1 : 2 };
     return efficient ? { ...adjusted, cost: adjusted.cost * 0.5 } : adjusted;
   });
 }
@@ -105,8 +106,8 @@ export function calculateEconomy(state, seconds = 1) {
     const base = (definitions[id]?.baseRate || 0) + resource.rateAdd;
     let rate = resource.unlocked ? base * resource.rateMult * common
       * getRelicProductionMultiplier(state, id) * getWeaveProductionMultiplier(state, id)
-      * getRepeatableMilestoneMultiplier(state, id) + (colonies[id] || 0) + (routes[id] || 0) : 0;
-    rate *= getTimedRateMultiplier(state, id);
+      * getRepeatableMilestoneMultiplier(state, id) + (colonies[id] || 0) + (routes[id] || 0) * (state.upgrades?.forkOpenNet ? 1.25 : 1) : 0;
+    rate *= getTimedRateMultiplier(state, id) * decisionMultiplier(state, id);
     // Supplied infrastructure carries the old economy into its new scale.
     // It helps the economic route fund cross-era inputs without operations.
     if (definitions[id]?.era < state.era && getPublicWorks(state)?.complete) rate *= 5;

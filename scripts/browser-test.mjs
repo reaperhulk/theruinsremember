@@ -38,6 +38,7 @@ function startPump(page) {
     const phases = ['upgrades', 'tech', 'prestige', 'upgrades', 'tech', 'upgrades'];
     window.__pump = setInterval(() => {
       for (let i = 0; i < 5; i++) window.__game.fastForward(10);
+      document.querySelector('.era-advance-btn')?.click();
       const p = phases[phase++ % phases.length];
       document.querySelector('#tab-' + p)?.click();
       setTimeout(() => {
@@ -243,6 +244,8 @@ async function exerciseOrbitalOperations(page) {
     }));
   });
   await new Promise(resolve => setTimeout(resolve, 300));
+  await page.evaluate(() => { document.querySelector('#section-actions')?.click(); document.querySelector('#tab-mini')?.click(); });
+  await page.waitForSelector('.docking-panel');
   return page.evaluate(() => {
     const missions = [...document.querySelectorAll('.docking-missions button')];
     missions[1]?.click();

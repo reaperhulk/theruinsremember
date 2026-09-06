@@ -1,3 +1,4 @@
+import { Discoveries } from './Discoveries.jsx';
 import { useState } from 'react';
 import { DOCTRINE_RESEARCH, RECONSTRUCTION_PROJECTS, researchDoctrine, craftRelic, contributeProject, saveAutomationPlan, restoreAutomationPlan, togglePlanRepeat } from '../engine/archive.js';
 import { PRODUCTION_ROUTES, selectProductionRoute, getRelicSynergies } from '../engine/legacy.js';
@@ -9,11 +10,11 @@ import { formatNumber, formatTime } from './format.js';
 export function ArchivePanel({ state, onUpdate }) {
   const [replace, setReplace] = useState('');
   const archive = state.archive;
-  if (state.prestigeCount < 1) return <section className="panel"><h2>The Archive</h2><p>Your first prestige preserves the history of this civilization and unlocks saved automation plans. The second opens doctrine research and relic crafting. The third begins reconstruction across multiple cycles.</p></section>;
+  if (state.prestigeCount < 1) return <section className="panel"><h2>The Archive</h2><Discoveries state={state} onUpdate={onUpdate} all /><p>Your first prestige preserves the history of this civilization and unlocks saved automation plans. The second opens doctrine research and relic crafting. The third begins reconstruction across multiple cycles.</p></section>;
   return <section className="panel archive-panel">
     <h2>The Archive · {archive.shards} memory shards</h2>
-    <p>Each completed cycle leaves six shards. Research, projects, and recorded history survive every reset.</p>
-    <h3>Remembered plans</h3>
+    <p>Each completed cycle leaves at least six shards; late-era choices can preserve more. Research, projects, and recorded history survive every reset.</p>
+    <Discoveries state={state} onUpdate={onUpdate} all /><h3>Remembered plans</h3>
     <p>Save the choices you already made, pending goals, completed operation orders, production route, and relic loadout. Replay pays normal prices and waits for prerequisites; conflicting choices retire automatically.</p>
     <button onClick={() => onUpdate(saveAutomationPlan)}>Save current plan</button>
     <button disabled={!archive.savedPlan} onClick={() => onUpdate(restoreAutomationPlan)}>Restore saved plan</button>

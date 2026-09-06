@@ -1,3 +1,4 @@
+import { DECISIONS } from '../data/decisions.js';
 import { createInitialState, migrateState } from './state.js';
 import { upgrades } from '../data/upgrades.js';
 import { techTree } from '../data/tech-tree.js';
@@ -41,6 +42,8 @@ export function parseSave(text) {
   if (!saved || Array.isArray(saved) || !Number.isInteger(saved.era) || saved.era < 1 || saved.era > 10 ||
       !saved.resources || typeof saved.resources !== 'object' || Array.isArray(saved.resources)) throw new Error('Invalid game save');
   if ((saved.saveVersion || 0) > createInitialState().saveVersion) throw new Error('This save needs a newer version of the game');
+  if (saved.eraReviewMode !== undefined && !['first', 'always', 'automatic'].includes(saved.eraReviewMode)) throw new Error('Invalid chapter transitions');
+  if (saved.eraReviewApproved !== undefined && (!Number.isInteger(saved.eraReviewApproved) || saved.eraReviewApproved > 9)) throw new Error('Invalid chapter approval');
   const defaults = createInitialState();
   for (const [key, value] of Object.entries(defaults)) {
     if (saved[key] === undefined) continue;
@@ -77,6 +80,8 @@ export function parseSave(text) {
     arrayEntries(archive.entries, e => object(e) && Number.isInteger(e.cycle) && finite(e.seconds) && Number.isInteger(e.era) && e.era >= 1 && e.era <= 10, 'archive entries');
     arrayEntries(archive.lore, e => typeof e === 'string', 'archive lore');
     if (archive.savedPlan != null) validateAutomationPlan(archive.savedPlan);
+    arrayEntries(archive.lastChoices, id => !!DECISIONS[id], 'remembered choices');
+    if (archive.discoveries !== undefined && (!object(archive.discoveries) || !Object.values(archive.discoveries).every(d => object(d) && typeof d.title === 'string' && typeof d.text === 'string' && typeof d.read === 'boolean' && Number.isInteger(d.era) && d.era >= 1 && d.era <= 10 && Number.isInteger(d.cycle) && d.cycle > 0 && (d.requires == null || typeof d.requires === 'string')))) throw new Error('Invalid discoveries');
     arrayEntries(archive.lastBuild, goal, 'remembered build');
     arrayEntries(archive.lastCommissions, commission, 'remembered commissions');
     if (archive.mappedWorks !== undefined && (!object(archive.mappedWorks) || !Object.values(archive.mappedWorks).every(v => typeof v === 'boolean'))) throw new Error('Invalid mapped works');

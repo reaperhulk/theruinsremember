@@ -3,7 +3,7 @@ import { getPublicWorks } from './publicWorks.js';
 import { techTree } from '../data/tech-tree.js';
 
 export function getForgeCharges(state) {
-  const earned = state.era >= 10 ? 4 + ((state.recursionDepth || 0) >= 2 ? 1 : 0) + (getPublicWorks(state, 10)?.complete ? 1 : 0) : 0;
+  const earned = state.era >= 10 ? 4 + (state.upgrades?.forkInfluenceWeb ? 1 : 0) + ((state.recursionDepth || 0) >= 2 ? 1 : 0) + (getPublicWorks(state, 10)?.complete ? 1 : 0) : 0;
   const spent = state.forgeChargesSpent || 0;
   return { earned, spent, remaining: Math.max(0, earned - spent) };
 }
@@ -68,8 +68,8 @@ export function getRealityForgeRecipes(state) {
     ...recipe,
     count: state.realityKeys?.[recipe.id] || 0,
     isUnlocked: recipe.unlocked(state),
-    fragments: Math.max(recipe.fragments, fragments * 0.05),
-    echoes: Math.max(recipe.echoes, echoes * 0.05),
+    fragments: Math.max(recipe.fragments, fragments * (state.upgrades?.forkMatterWorks ? 0.03 : 0.05)),
+    echoes: Math.max(recipe.echoes, echoes * (state.upgrades?.forkMatterWorks ? 0.03 : 0.05)),
     affordable: charges.remaining > 0 && recipe.unlocked(state) && fragments >= recipe.fragments && echoes >= recipe.echoes,
   }));
 }

@@ -5,7 +5,7 @@ import { hasRelicSynergy } from './legacy.js';
 export const PUBLIC_WORKS = {
   4: { name: 'Orbital Supply Fleet', resource: 'research', cost: 25000 },
   5: { name: 'Settlement Foundries', resource: 'research', cost: 200000 },
-  6: { name: 'Interstellar Survey Array', resource: 'research', cost: 1000000 },
+  6: { name: 'Interstellar Survey Array', resource: 'research', cost: 650000 },
   7: { name: 'Autonomous Sphere Architects', resource: 'research', cost: 5000000 },
   8: { name: 'Galactic Reconstruction Charter', resource: 'research', cost: 50000000 },
   9: { name: 'Cosmic Calibration Array', resource: 'cosmicPower', cost: 50000 },
@@ -14,8 +14,8 @@ export const PUBLIC_WORKS = {
 export function getPublicWorks(state, era = state.era) {
   const def = PUBLIC_WORKS[era];
   if (!def) return null;
-  const cost = def.cost * (hasRelicSynergy(state, 'wayfinder') ? 0.5 : 1)
-    * (state.archive?.research?.continuity && state.archive?.mappedWorks?.[era] ? 0.5 : 1);
+  const cost = def.cost * (state.upgrades?.forkArchive ? 0.8 : 1) * (era >= 8 && state.upgrades?.forkMegaGuilds ? 0.8 : 1) * (hasRelicSynergy(state, 'wayfinder') ? 0.5 : 1)
+    * (state.archive?.mappedWorks?.[era] ? (state.archive?.research?.continuity ? 0.5 : 0.75) : 1);
   const delivered = state.completedPublicWorks?.[era] ? cost : state.publicWorks?.[era] || 0;
   return { ...def, cost, delivered, progress: Math.min(1, delivered / cost), complete: delivered >= cost,
     enabled: state.autoPublicWorks !== false };

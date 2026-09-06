@@ -274,6 +274,13 @@ export function checkEraTransition(state) {
   return nextEra;
 }
 
+export function needsEraReview(state) {
+  return state.era < 10 && state.eraReviewApproved !== state.era && (state.eraReviewMode === 'always' || state.eraReviewMode === 'first' && !state.prestigeCount);
+}
+export function approveEraAdvance(state) {
+  return needsEraReview(state) && checkEraTransition(state) ? { ...state, eraReviewApproved: state.era } : state;
+}
+
 // Transition to a new era. Unlocks resources for that era.
 export function transitionEra(state, newEra) {
   if (newEra <= state.era) return state;

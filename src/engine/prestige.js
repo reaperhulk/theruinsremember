@@ -1,3 +1,5 @@
+import { getRelicSlotLimit } from './relics.js';
+import { inheritancePreview, recordChapter } from './memory.js';
 import { rememberCycle, restoreAutomationPlan } from './archive.js';
 import { applyRestoredInfrastructure } from './legacy.js';
 import { RELICS } from '../data/relics.js';
@@ -161,6 +163,8 @@ export function performPrestige(state) {
     prestigeCount: (state.prestigeCount || 0) + 1,
     prestigePoints: state.prestigePoints || 0,
     archive: rememberCycle(state),
+    eraReviewMode: state.eraReviewMode,
+    autoGather: true,
     autoBuildOut: state.autoBuildOut !== false,
     autoPublicWorks: state.autoPublicWorks !== false,
     protectProgression: state.protectProgression !== false,
@@ -176,6 +180,13 @@ export function performPrestige(state) {
     cycleGoalRewarded: false,
     cycleMarks: state.cycleMarks || 0,
   };
+
+  // Every reset restores a working settlement, independently of shop choices.
+  const inheritance = inheritancePreview(state);
+  for (const id of ['food', 'labor', 'materials', 'energy']) {
+    const r = newState.resources[id];
+    newState.resources[id] = { ...r, rateAdd: r.rateAdd + 2, amount: Math.max(r.amount, getEffectiveCap(newState, id) * inheritance.stores) };
+  }
 
   // Fast Start: auto-purchase era 1 upgrades
   if (hasPrestigeUpgrade(state, 'fastStart')) {
@@ -491,6 +502,8 @@ export function performPrestige(state) {
     const slots = restored.archive.projects.memoryLibrary >= 4 ? 2 : 1;
     restored = { ...restored, activeRelics: [...new Set(restored.archive.savedPlan?.loadout || [])].filter(id => RELICS[id]).slice(0, slots) };
   }
+  if (inheritance.relic && !restored.activeRelics.includes(inheritance.relic)) restored = { ...restored, activeRelics: [...restored.activeRelics, inheritance.relic].slice(0, getRelicSlotLimit(restored)) };
+  restored = recordChapter(restored);
   return restored.archive.savedPlan?.repeat ? restoreAutomationPlan(restored) : restored;
 }
 

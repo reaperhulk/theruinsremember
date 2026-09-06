@@ -1,3 +1,4 @@
+import { inheritancePreview } from './memory.js';
 import { RELICS } from '../data/relics.js';
 import { getEffectiveCap } from './resources.js';
 import { claimRelic } from './relics.js';
@@ -27,7 +28,7 @@ export const RECONSTRUCTION_PROJECTS = {
   continuityGarden: { name: 'Continuity Garden', unlockAt: 12, stages: 4, era: 10, resource: 'quantumEchoes', description: 'Reclaim overflow for public works. Each reclaimed unit supplies two units of construction; the normal 20% allocation continues.' },
 };
 export function createArchive() {
-  return { entries: [], lore: [], shards: 0, research: {}, projects: {}, contributions: {}, savedPlan: null, mappedWorks: {}, lastBuild: [], lastCommissions: [] };
+  return { entries: [], lore: [], shards: 0, research: {}, projects: {}, contributions: {}, savedPlan: null, mappedWorks: {}, lastBuild: [], lastCommissions: [], discoveries: {}, lastChoices: [] };
 }
 export function rememberCycle(state) {
   const previous = { ...createArchive(), ...state.archive };
@@ -36,7 +37,7 @@ export function rememberCycle(state) {
   const lore = [...new Set([...previous.lore, ...(state.eventLog || []).filter(e => e.isLore).map(e => e.message)])];
   const mappedWorks = { ...previous.mappedWorks };
   for (const era of Object.keys(state.publicWorks || {})) if (getPublicWorks(state, Number(era))?.complete) mappedWorks[era] = true;
-  return { ...previous, entries, lore, shards: previous.shards + 6, mappedWorks,
+  return { ...previous, entries, lore, shards: previous.shards + inheritancePreview(state).shards, lastChoices: inheritancePreview(state).choices.map(d => d.id), mappedWorks,
     lastBuild: state.buildHistory || [], lastCommissions: rememberedCommissionPlan(state) };
 }
 export function recordHistory(state, entries) {

@@ -1,3 +1,4 @@
+import { DECISIONS } from '../data/decisions.js';
 import { UpgradeImpact } from './UpgradeImpact.jsx';
 import { getPurchaseTarget } from '../engine/guidance.js';
 import { queueGoal } from '../engine/goals.js';
@@ -534,6 +535,7 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
                   </div>
                 );
               })()}
+              {DECISIONS[upgrade.id] && <p className="choice-consequence"><strong>Later consequence:</strong> {DECISIONS[upgrade.id].consequence}</p>}
               {upgrade.exclusiveWith && (
                 <div className="text-hint" style={{ color: '#e0a0a0' }}>
                   Choosing this permanently locks out {upgradeDefs[upgrade.exclusiveWith]?.name || upgrade.exclusiveWith} this cycle.

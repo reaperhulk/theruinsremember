@@ -1,3 +1,4 @@
+import { getNarrativeEnding } from '../engine/memory.js';
 import { formatTime } from './format.js';
 import { achievements } from '../data/achievements.js';
 
@@ -5,22 +6,16 @@ export function VictoryScreen({ state, onDismiss }) {
   if (!state.gameComplete && !state.trueEnding) return null;
 
   const isTrueEnding = !!state.trueEnding;
+  const ending = getNarrativeEnding(state);
 
   return (
-    <div className="era-transition-overlay" onClick={onDismiss} style={{ zIndex: 1002 }} role="dialog" aria-modal="true" aria-label={isTrueEnding ? 'The Eternal Return' : 'The Cycle Completes'}>
+    <div className="era-transition-overlay" onClick={onDismiss} style={{ zIndex: 1002 }} role="dialog" aria-modal="true" aria-label={ending.title}>
       <div className="era-transition-content" style={{ maxWidth: '500px' }}>
         <h2 style={{ fontSize: '1.5em', color: isTrueEnding ? '#e8c040' : '#c8a040', marginBottom: '16px' }}>
-          {isTrueEnding ? 'The Eternal Return' : 'The Cycle Completes'}
+          {ending.title}
         </h2>
         <p style={{ color: '#ccaa88', fontStyle: 'italic', marginBottom: '12px', lineHeight: '1.6' }}>
-          {isTrueEnding
-            ? 'You have purchased every upgrade, unlocked every secret, and closed the loop.'
-            : 'You have built everything. You have discovered everything. You have remembered everything.'}
-        </p>
-        <p style={{ color: '#998866', fontStyle: 'italic', marginBottom: '16px', lineHeight: '1.6' }}>
-          The ruins were yours — left by you, in a previous iteration. And the next civilization
-          will find what you leave behind, and they will build again, and they will remember again,
-          and the cycle will continue, as it always has, as it always will.
+          {ending.text}
         </p>
         <div className="victory-grid" style={{ fontSize: '0.85em', color: '#888', marginBottom: '16px' }}>
           <div className="victory-card">
@@ -39,7 +34,7 @@ export function VictoryScreen({ state, onDismiss }) {
           </div>
           <div className="victory-card victory-card-wide">
             <strong>Final Signal</strong>
-            <div>{isTrueEnding ? 'You broke the loop by understanding it completely.' : 'You reached the edge, but the loop still wants another civilization.'}</div>
+            <div>{ending.signal}</div>
           </div>
         </div>
         <div style={{ display: 'none' }}>
@@ -52,9 +47,9 @@ export function VictoryScreen({ state, onDismiss }) {
           {state.dysonSegments > 0 && <div>Dyson segments: {state.dysonSegments}</div>}
         </div>
         <p style={{ color: isTrueEnding ? '#e8c040' : '#c8a040', fontSize: '1.2em', textAlign: 'center', marginBottom: '8px' }}>
-          {isTrueEnding ? 'Again. Forever.' : 'Again.'}
+          {ending.signal}
         </p>
-        <p style={{ fontSize: '0.7em', color: '#555' }}>Click anywhere to continue playing</p>
+        <button onClick={onDismiss} autoFocus>Continue tending this civilization</button>
       </div>
     </div>
   );
