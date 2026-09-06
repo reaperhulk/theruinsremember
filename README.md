@@ -18,6 +18,14 @@ Across 10 eras — from Planetfall through Industrialization, the Digital Age, t
 
 Prestige isn't just a mechanic. It's the cycle itself.
 
+## What your civilization leaves behind
+
+Every era now has an authored chapter and two strategic branches with consequences for later production, operations or inheritance. A shared objective keeps the next useful action visible on desktop and mobile. Your first civilization waits for **Continue** at each earned breakthrough; transition preferences are available in Prestige.
+
+The next civilization recognizes your actual choices. Prestige restores a producing settlement and automatic gathering, while the Archive keeps discoveries, read state, plans and landmarks. World view shows inherited structures, constrained production and optional supply routes. Preferences include a ten-era adaptive score and low-power rendering. Offline progress yields between short processing slices, and only one browser tab can own the save at a time.
+
+Implementation details and all eight personas’ before/after measurements are in [the ten-era delivery report](REVIEW3.md).
+
 ## How It Works
 
 - **10 Eras** spanning primitive survival to multiverse exploration

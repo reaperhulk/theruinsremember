@@ -5,6 +5,10 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
+import { runPlayerJourney } from './player-journey.mjs';
+const snapshots = {};
+const earned = runPlayerJourney({ persona: 'engaged', seed: 42, cycles: 2, observe: state => { snapshots[`${state.prestigeCount}:${state.era}`] = state; } });
+assert(earned.completed, 'Fixture source must complete two naturally earned cycles');
 const executable = computeExecutablePath({ browser: Browser.CHROMEHEADLESSSHELL, buildId: PUPPETEER_REVISIONS['chrome-headless-shell'], cacheDir: process.env.PUPPETEER_CACHE_DIR || join(homedir(), '.cache', 'puppeteer'), platform: detectBrowserPlatform() });
 const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'], executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || (existsSync(executable) ? executable : undefined) });
 const page = await browser.newPage();
@@ -31,10 +35,9 @@ try {
   await page.waitForFunction(() => !!window.__game);
   await page.evaluate(() => window.__game.setSpeed(0));
   await page.click('h1');
-  const initial = await page.evaluate(() => window.__game.getState());
   const viewports = [[360, 800], [390, 844], [768, 1024], [1366, 768], [1440, 900], [844, 390], [683, 384]];
   for (const era of [1, 4, 7, 10]) {
-    await page.evaluate(({ initial, era }) => window.__game.setState(() => ({ ...initial, era, autoBuildOut: false, upgrades: era === 1 ? {} : { forkHearth: true, forkArchive: true }, archive: { ...initial.archive, lastChoices: ['forkQuarry'] } })), { initial, era });
+    await page.evaluate(fixture => window.__game.setState(() => fixture), snapshots[`0:${era}`]);
     await page.waitForFunction(() => !document.querySelector('.era-transition-overlay'));
     for (const [width, height] of viewports) {
       await page.setViewport({ width, height, deviceScaleFactor: width === 683 ? 2 : 1 });
@@ -53,6 +56,14 @@ try {
       if ([390, 1366].includes(width)) await page.screenshot({ path: `test-results/experience-era-${era}-${width}.png` });
     }
   }
+  await page.evaluate(fixture => window.__game.setState(() => fixture), snapshots['1:1']);
+  await page.setViewport({ width: 390, height: 844 }); await settle();
+  await page.screenshot({ path: 'test-results/experience-after-prestige.png' });
+  const inherited = await page.evaluate(() => { const s = window.__game.getState(); return { choices: s.archive.lastChoices.length, autoGather: s.autoGather, production: s.resources.materials.rateAdd }; });
+  assert(inherited.choices > 0 && inherited.autoGather && inherited.production > 0);
+  checks.push({ inherited });
+  await page.evaluate(fixture => window.__game.setState(() => fixture), snapshots['0:10']);
+  await page.waitForFunction(() => !document.querySelector('.era-transition-overlay'));
   await page.setViewport({ width: 390, height: 844 });
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
   await page.click('#section-world'); await page.waitForSelector('.world-status', { visible: true });
@@ -73,7 +84,7 @@ try {
   assert.equal(await other.evaluate(() => !!window.__game), false);
   await other.click('#tab-mini');
   await other.waitForSelector('.cycle-doctrines button');
-  await other.click('.cycle-doctrines button');
+  await other.click('.cycle-doctrines button:not(.active)');
   assert.equal(await other.evaluate(() => JSON.parse(localStorage.getItem('incremental-game-save')).nextCycleDoctrine), saved);
   await page.close();
   await other.reload({ waitUntil: 'networkidle0' });

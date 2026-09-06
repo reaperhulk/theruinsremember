@@ -194,6 +194,7 @@ export function runPlayerJourney(options = {}) {
   if (options.disableProtection) state = { ...state, protectProgression: false };
   while (elapsed < maxSeconds) {
     const attention = getPlayerAttention(profile, elapsed);
+    options.observe?.(state); // Read-only snapshots for the separate UI fixture suite.
     pacing.observe(state, elapsed, activeSeconds);
     if (pacing.failures.length) break;
     maxRelics = Math.max(maxRelics, state.activeRelics.length);

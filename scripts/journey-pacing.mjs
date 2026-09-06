@@ -20,7 +20,7 @@ export function createPacingMonitor(profile, options = {}) {
   let signature = '';
   let lastProgressActive = 0;
   let longestGap = 0;
-  const intentional = { firstStrategicChoiceSeconds: {}, strategicChoices: 0, routineCommands: 0, chapterReviews: 0, discoveriesAcknowledged: 0 };
+  const intentional = { firstStrategicChoiceElapsedSeconds: {}, strategicChoices: 0, routineCommands: 0, chapterReviews: 0, discoveriesAcknowledged: 0 };
   let automaticPurchases = 0, previousPurchases = 0, manualSinceObservation = 0;
   return {
     failures,
@@ -31,7 +31,7 @@ export function createPacingMonitor(profile, options = {}) {
         if (!isDecisionUpgrade(upgrades[id])) intentional.routineCommands++;
         if (DECISIONS[id]) {
           intentional.strategicChoices++;
-          intentional.firstStrategicChoiceSeconds[state.prestigeCount + 1] ??= elapsed;
+          intentional.firstStrategicChoiceElapsedSeconds[state.prestigeCount + 1] ??= elapsed;
         }
       }
       if (name === 'continue-era') intentional.chapterReviews++;

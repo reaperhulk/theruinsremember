@@ -39,13 +39,16 @@ const click = async selector => {
     return { name: el.textContent.trim().slice(0, 180), hit: hit?.closest('button, a')?.textContent.trim().slice(0, 180), unobscured: !!hit && el.contains(hit) };
   });
   if (!target.unobscured) throw new Error(`Control is obscured: ${selector} ${JSON.stringify(target)}`);
-  const changesGame = /upgrade-btn|tech-btn|expedition-route|relic-choice|gather-btn|cycle-doctrines|confirm-yes/.test(selector);
-  const before = changesGame && await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount]); });
+  const changesGame = /upgrade-btn|tech-btn|expedition-route|relic-choice|gather-btn|cycle-doctrines|confirm-yes|era-advance-btn/.test(selector);
+  const before = changesGame && await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount, s.eraReviewApproved]); });
   await handle.click();
   await handle.dispose();
   await settle();
   if (changesGame) {
-    const after = await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount]); });
+    const after = await page.evaluate(() => { const s = window.__game.getState(); return JSON.stringify([s.resources, s.upgrades, s.tech, s.activeRelics, s.nextCycleDoctrine, s.prestigeCount, s.eraReviewApproved]); });
+    const previous = JSON.parse(before), current = JSON.parse(after);
+    for (const [id, value] of Object.entries(current[1])) if (previous[1][id] !== value) pacing.recordCommand(`buy:${id}`, { prestigeCount: current[5] }, elapsed);
+    if (selector === '.era-advance-btn') pacing.recordCommand('continue-era', { prestigeCount: current[5] }, elapsed);
     if (before === after) throw new Error(`Enabled gameplay control had no effect: ${selector} ${JSON.stringify(target)}`);
   }
   return true;

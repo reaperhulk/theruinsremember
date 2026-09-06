@@ -90,6 +90,7 @@ export function App() {
   const navigate = tab => { setActiveTab(tab); setMobileSection('actions'); };
   const [activeOperation, setActiveOperation] = useState(null);
   const prevEraRef = useRef(state.era);
+  const chapterCycleRef = useRef(state.prestigeCount);
   const keyboardStateRef = useRef(state);
   useEffect(() => {
     keyboardStateRef.current = state;
@@ -242,13 +243,24 @@ export function App() {
   const affordableUpgrades = getAvailableUpgrades(state).filter(u => canAfford(state, getUpgradeCost(state, u.id))).length;
   const affordableTech = getAvailableTech(state).filter(t => canAfford(state, t.cost)).length;
 
-  // Focus the operation introduced by the current era.
+  // Bring a new chapter and its world into view at a reviewed transition.
   useEffect(() => {
-    if (state.era !== prevEraRef.current) {
+    const newCycle = state.prestigeCount !== chapterCycleRef.current;
+    if (state.era !== prevEraRef.current || newCycle) {
       setActiveOperation(getDefaultOperation(state.era));
+      if (newCycle || state.eraReviewMode === 'always' || state.eraReviewMode === 'first' && !state.prestigeCount) {
+        setActiveTab('upgrades');
+        setMobileSection('actions');
+      }
       prevEraRef.current = state.era;
+      chapterCycleRef.current = state.prestigeCount;
+      const frame = requestAnimationFrame(() => {
+        document.getElementById('game-resources')?.scrollTo({ top: 0 });
+        document.querySelector('.tab-content')?.scrollTo({ top: 0 });
+      });
+      return () => cancelAnimationFrame(frame);
     }
-  }, [state.era]);
+  }, [state.era, state.prestigeCount, state.eraReviewMode]);
 
   const renderOperation = operationId => {
     const operationComponents = {

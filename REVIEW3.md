@@ -119,3 +119,39 @@ The engine quality gate, all 16 two-cycle journeys, all adversarial journeys, an
 | minimalist | 42 | 3181 → 3181 | 3181 → 3181 | 101 → 101 | 1 → 1 | Era 10 → 10 |
 
 Human comprehension, listening fatigue and response latency on physical mobile devices remain unmeasured. No human playtesting was used as a stopping gate. Automated completion is evidence of reachability, not a claim that those human-experience targets have been measured.
+
+## Batch 5 — final experience evidence
+
+The browser fixture suite now draws its representative states from a naturally earned two-cycle engine journey, including the civilization after prestige. Browser purchase telemetry records manual purchases explicitly, so those purchases cannot be mislabeled as automation. First-choice timestamps are labeled as elapsed time across the journey. Screenshot inspection also found that scrolling to an old relic could leave the new era’s world out of view; reviewed transitions and new civilizations now bring the chapter and world back into view.
+
+Commit `6a12e82` passed the 30-check experience suite (seven viewports, four eras, keyboard, reduced motion, audio startup, exclusive save ownership and reload after closing the owner). Audio reached 13 concurrent voices, with no JavaScript errors. Its desktop natural browser journey completed two cycles in 4,320 simulated seconds with 291 gameplay commands and a successful mid-run reload. The harness itself made 954 tab navigation commands and scrolled 43,769 pixels; those are automation-policy measurements, not human effort estimates. All engine, adversarial and stress gates passed.
+
+A focused Node benchmark used legally progressed states, five samples per era and the same 300-second workload. Values are medians, in milliseconds. A slice may exceed its six-millisecond budget when finishing one indivisible engine tick. This does not establish latency on physical phones.
+
+| Era | One 300-second block | Peak budgeted slice |
+|---|---:|---:|
+| 1 | 15.6 | 6.1 |
+| 4 | 56.6 | 6.4 |
+| 7 | 145.3 | 8.3 |
+| 10 | 116.6 | 11.6 |
+
+This validation/presentation batch has unchanged persona outcomes and attention requirements:
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Outcome before → after |
+|---|---:|---:|---:|---:|---:|---|
+| newcomer | 424242 | 1101 → 1101 | 1101 → 1101 | 116 → 116 | 1 → 1 | Era 10 → 10 |
+| engaged | 424242 | 941 → 941 | 941 → 941 | 134 → 134 | 1 → 1 | Era 10 → 10 |
+| optimizer | 424242 | 571 → 571 | 571 → 571 | 231 → 231 | 1 → 1 | Era 10 → 10 |
+| background | 424242 | 1561 → 1561 | 391 → 391 | 128 → 128 | 14 → 14 | Era 10 → 10 |
+| check_in | 424242 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | Era 5 → 5 |
+| completionist | 424242 | 666 → 666 | 666 → 666 | 173 → 173 | 1 → 1 | Era 10 → 10 |
+| minimalist | 424242 | 3301 → 3301 | 3301 → 3301 | 99 → 99 | 1 → 1 | Era 10 → 10 |
+| newcomer | 42 | 1041 → 1041 | 1041 → 1041 | 112 → 112 | 1 → 1 | Era 10 → 10 |
+| engaged | 42 | 851 → 851 | 851 → 851 | 136 → 136 | 1 → 1 | Era 10 → 10 |
+| optimizer | 42 | 451 → 451 | 451 → 451 | 211 → 211 | 1 → 1 | Era 10 → 10 |
+| background | 42 | 1441 → 1441 | 361 → 361 | 126 → 126 | 13 → 13 | Era 10 → 10 |
+| check_in | 42 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 103 → 103 | 4 → 4 | Era 5 → 5 |
+| completionist | 42 | 666 → 666 | 666 → 666 | 165 → 165 | 1 → 1 | Era 10 → 10 |
+| minimalist | 42 | 3181 → 3181 | 3181 → 3181 | 101 → 101 | 1 → 1 | Era 10 → 10 |
