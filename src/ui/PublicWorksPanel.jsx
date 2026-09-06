@@ -3,10 +3,10 @@ import { calculateEconomy } from '../engine/economy.js';
 import { resources } from '../data/resources.js';
 import { formatNumber, formatTime } from './format.js';
 
-export function PublicWorksPanel({ state, onUpdate }) {
+export function PublicWorksPanel({ state, onUpdate, economy: suppliedEconomy }) {
   const work = getPublicWorks(state);
   if (!work) return null;
-  const income = calculateEconomy(state).construction;
+  const income = (suppliedEconomy || calculateEconomy(state)).construction;
   return <section className="panel public-works-panel" aria-label="Economic route">
     <strong>{work.name} · {Math.floor(work.progress * 100)}%</strong>
     <progress value={work.delivered} max={work.cost} aria-label={`${work.name} supplied`} />

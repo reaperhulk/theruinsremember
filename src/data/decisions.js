@@ -1,9 +1,9 @@
 // Each fork keeps its immediate upgrade effects and changes a later system.
 // Effects here are consumed by the economy, construction, and inheritance engines.
 export const DECISIONS = {
-  forkHearth: { era: 1, landmark: 'The sheltered hearth', consequence: 'Future colonies can live on food: 2 food per colony instead of exotic materials.', route: 'biospheres', memory: 'You kept the first settlement alive. The hearth is still warm.' },
+  forkHearth: { era: 1, landmark: 'The sheltered hearth', consequence: 'Unlock the Living colonies supply route: 2 food per colony instead of exotic materials. Select it in the World view.', route: 'biospheres', memory: 'You kept the first settlement alive. The hearth is still warm.' },
   forkQuarry: { era: 1, landmark: 'The open quarry', consequence: 'From the Industrial era, steel production gains 25%.', resource: 'steel', from: 2, memory: 'Your quarry became the foundation of the next city.' },
-  forkElectrify: { era: 2, landmark: 'The living grid', consequence: 'Orbital infrastructure can use 5 energy instead of 0.5 rocket fuel.', route: 'electrolysis', memory: 'The cables you buried still carry a faint current.' },
+  forkElectrify: { era: 2, landmark: 'The living grid', consequence: 'Unlock the Electric launch supply route: 5 energy instead of 0.5 rocket fuel. Select it in the World view.', route: 'electrolysis', memory: 'The cables you buried still carry a faint current.' },
   forkWorkforce: { era: 2, landmark: 'The workers’ hall', consequence: 'From the Solar era, colony production gains 25%.', resource: 'colonies', from: 5, memory: 'A hall survives, its walls covered with workers’ names.' },
   forkOpenNet: { era: 3, landmark: 'The open beacon', consequence: 'Future star routes deliver 25% more resources.', routes: true, memory: 'You shared the signal. Distant settlements remember the invitation.' },
   forkArchive: { era: 3, landmark: 'The buried library', consequence: 'Future public works need 20% fewer contributions.', works: true, memory: 'You preserved the records. Their diagrams shorten the rebuilding.' },

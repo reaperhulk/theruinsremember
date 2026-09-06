@@ -1,3 +1,6 @@
+import { canAfford } from '../engine/resources.js';
+import { purchaseUpgrade } from '../engine/upgrades.js';
+import { unlockTech } from '../engine/tech.js';
 import { getEraObjective } from '../engine/objectives.js';
 import { eraNames, approveEraAdvance, needsEraReview } from '../engine/eras.js';
 
@@ -6,7 +9,7 @@ export function EraProgress({ state, objective = getEraObjective(state), onNavig
   return <section className="panel era-panel objective-panel" aria-label="Current objective" style={{ '--chapter-color': chapter.color }}>
     <div className="objective-heading"><span className="panel-kicker">{state.prestigeCount ? `Civilization ${state.prestigeCount + 1}` : 'Your first civilization'} · {eraNames[state.era]}</span><span className="chapter-index">{String(state.era).padStart(2, '0')} / 10</span></div>
     <div className="objective-main"><div><h2>{objective.title}</h2><p className="era-hint">{objective.detail}</p></div>
-      {objective.stage === 'ready' && needsEraReview(state) && onUpdate ? <button className="era-advance-btn" onClick={() => onUpdate(approveEraAdvance)}>Continue to {eraNames[state.era + 1]} →</button> : onNavigate && <button className="objective-link" onClick={() => onNavigate(objective.destination)}>{objective.stage === 'ready' && state.era === 10 ? 'Review inheritance' : objective.destination === 'mini' ? 'Open operation' : objective.destination === 'tech' ? 'Open research' : 'Open decisions'} <span aria-hidden="true">↗</span></button>}
+      {objective.stage === 'ready' && needsEraReview(state) && onUpdate ? <button className="era-advance-btn" onClick={() => onUpdate(approveEraAdvance)}>Continue to {eraNames[state.era + 1]} →</button> : objective.target && !objective.target.queued && onUpdate && canAfford(state, objective.target.cost) ? <button className="objective-purchase" onClick={() => onUpdate(s => (objective.target.kind === 'tech' ? unlockTech : purchaseUpgrade)(s, objective.target.id))}>{objective.target.kind === 'tech' ? 'Research' : 'Build'} {objective.target.name}</button> : onNavigate && <button className="objective-link" onClick={() => onNavigate(objective.destination)}>{objective.stage === 'ready' && state.era === 10 ? 'Review inheritance' : objective.destination === 'mini' ? 'Open operation' : objective.destination === 'tech' ? 'Open research' : 'Open decisions'} <span aria-hidden="true">↗</span></button>}
     </div>
     <div className="objective-meters">
       <label>{cycle ? 'Inheritance' : 'Foundation'} <span>{cycle ? `${cycle.completed}/${cycle.total}` : `${Math.min(readiness.foundationProgress, readiness.minUpgrades)}/${readiness.minUpgrades}`}</span><progress aria-label={cycle ? 'Cycle readiness' : 'Era foundation progress'} value={cycle ? cycle.completed : Math.min(readiness.foundationProgress, readiness.minUpgrades)} max={cycle ? cycle.total : readiness.minUpgrades} /></label>

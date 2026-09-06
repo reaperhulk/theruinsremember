@@ -239,6 +239,7 @@ export function runPlayerJourney(options = {}) {
           legacy.commands[candidate.name] = (legacy.commands[candidate.name] || 0) + 1;
           commands++;
           trace.push({ elapsed, era: state.era, command: candidate.name });
+          pacing.recordCommand(candidate.name, state, elapsed);
           if (trace.length > 30) trace.shift();
           cursor = (cursor + probe + 1) % candidates.length;
           acted = true;

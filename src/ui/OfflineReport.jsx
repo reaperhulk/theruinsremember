@@ -27,7 +27,7 @@ export function OfflineReport({ report, onDismiss }) {
     return (
       <div className="offline-overlay">
         <div className="offline-report">
-          <h2>Processing Offline Progress...</h2>
+          <h2>Remembering your time away</h2><progress aria-label="Offline progress processed" value={report.processed || 0} max={report.elapsed} /><p>{Math.floor((report.processed || 0) / report.elapsed * 100)}% restored</p>
           <p className="offline-time" style={{ textAlign: 'center', color: '#aaa' }}>Calculating {formatTime(report.elapsed)} of production...</p>
         </div>
       </div>

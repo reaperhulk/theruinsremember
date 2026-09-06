@@ -32,8 +32,8 @@ export function getSupplyChains(state) {
   const efficient = hasRelicSynergy(state, 'closedCircuit');
   return SUPPLY_CHAINS.map(chain => {
     let adjusted = chain;
-    if ((state.upgrades?.forkElectrify || alternate && state.productionRoute === 'electrolysis') && chain.output === 'orbitalInfra') adjusted = { ...chain, input: 'energy', cost: 5 };
-    if ((living || state.upgrades?.forkHearth || alternate && state.productionRoute === 'biospheres') && chain.output === 'colonies') adjusted = { ...chain, input: 'food', cost: living ? 1 : 2 };
+    if (((state.upgrades?.forkElectrify || alternate) && state.productionRoute === 'electrolysis') && chain.output === 'orbitalInfra') adjusted = { ...chain, input: 'energy', cost: 5 };
+    if ((living || (state.upgrades?.forkHearth || alternate) && state.productionRoute === 'biospheres') && chain.output === 'colonies') adjusted = { ...chain, input: 'food', cost: living ? 1 : 2 };
     return efficient ? { ...adjusted, cost: adjusted.cost * 0.5 } : adjusted;
   });
 }

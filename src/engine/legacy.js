@@ -5,8 +5,11 @@ export const PRODUCTION_ROUTES = {
   electrolysis: { name: 'Electric launch network', description: 'Orbital infrastructure uses 5 Energy instead of 0.5 Rocket Fuel per unit. Fuel stays available for purchases.' },
   biospheres: { name: 'Living colonies', description: 'Colonies use 2 Food instead of 0.2 Exotic Materials per unit. Exotic materials stay available for construction.' },
 };
+export function availableProductionRoutes(state) {
+  return Object.keys(PRODUCTION_ROUTES).filter(id => id === 'standard' || state.archive?.research?.logistics || id === 'biospheres' && state.upgrades?.forkHearth || id === 'electrolysis' && state.upgrades?.forkElectrify);
+}
 export function selectProductionRoute(state, id) {
-  if (!PRODUCTION_ROUTES[id] || id !== 'standard' && !state.archive?.research?.logistics) return state;
+  if (!availableProductionRoutes(state).includes(id) || state.productionRoute === id) return state;
   return { ...state, productionRoute: id };
 }
 export const RELIC_SYNERGIES = [

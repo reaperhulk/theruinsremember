@@ -107,8 +107,8 @@ function getAffordProgress(state, cost) {
   return totalNeeded > 0 ? totalHave / totalNeeded : 0;
 }
 
-export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate }) {
-  const economy = useMemo(() => calculateEconomy(state), [state]);
+export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate, economy: suppliedEconomy }) {
+  const economy = useMemo(() => suppliedEconomy || calculateEconomy(state), [state, suppliedEconomy]);
   const [showPurchased, setShowPurchased] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);

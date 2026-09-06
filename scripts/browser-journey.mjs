@@ -19,7 +19,9 @@ page.on('pageerror', error => errors.push(error.message));
 page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
 await page.setViewport(mobile ? { width: 375, height: 812, isMobile: true } : { width: 1366, height: 768 });
 const settle = () => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+const interaction = { navigationCommands: 0, scrollDistance: 0 };
 const click = async selector => {
+  if (selector.startsWith('#tab-') || selector.startsWith('#section-')) interaction.navigationCommands++;
   if (mobile) {
     const section = /relic-choice/.test(selector) ? '#section-world' : '#section-actions';
     const navigation = await page.$(section);
@@ -27,7 +29,7 @@ const click = async selector => {
   }
   const handle = await page.$(selector);
   if (!handle || await handle.evaluate(el => el.disabled)) { await handle?.dispose(); return false; }
-  await handle.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'center' }));
+  interaction.scrollDistance += await handle.evaluate(el => { const pane = el.closest('.tab-content, .left-column') || document.scrollingElement; const before = pane.scrollTop; el.scrollIntoView({ block: 'center', inline: 'center' }); return Math.abs(pane.scrollTop - before); });
   await settle();
   await handle.hover();
   await settle();
@@ -129,12 +131,12 @@ try {
   if (cycles !== requestedCycles) throw new Error(`Only ${cycles}/${requestedCycles} cycles complete`);
   if (errors.length) throw new Error(errors.join('\n'));
   mkdirSync('test-results', { recursive: true });
-  writeFileSync(`test-results/journey-${mobile ? 'mobile' : 'desktop'}-success.json`, JSON.stringify({ cycles, elapsed, commands, reloaded, errors, pacing: pacing.report() }, null, 2));
+  writeFileSync(`test-results/journey-${mobile ? 'mobile' : 'desktop'}-success.json`, JSON.stringify({ interaction, cycles, elapsed, commands, reloaded, errors, pacing: pacing.report() }, null, 2));
   console.log(`PASS ${mobile ? 'mobile' : 'desktop'}: ${cycles} natural cycles, ${elapsed}s, ${commands} gameplay commands, mid-run reload preserved progress.`);
 } catch (error) {
   mkdirSync('test-results', { recursive: true });
   await page.screenshot({ path: `test-results/journey-${mobile ? 'mobile' : 'desktop'}.png`, fullPage: true });
-  writeFileSync('test-results/browser-journey.json', JSON.stringify({ error: error.message, elapsed, cycles, commands, errors, trace, state: await page.evaluate(() => window.__game?.getState()) }, null, 2));
+  writeFileSync('test-results/browser-journey.json', JSON.stringify({ interaction, error: error.message, elapsed, cycles, commands, errors, trace, state: await page.evaluate(() => window.__game?.getState()) }, null, 2));
   process.exitCode = 1;
   console.error(error);
 } finally { await browser.close(); }

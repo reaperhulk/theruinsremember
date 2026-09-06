@@ -7,7 +7,7 @@ import { getColonyBonus } from '../engine/colonies.js';
 import { getRouteBonus } from '../engine/starChart.js';
 import { formatNumber, formatTime } from './format.js';
 
-export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
+export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate, economy: suppliedEconomy }) {
   const [collapsed, setCollapsed] = useState({});
   const [autoCollapse] = useState(true);
   const [floats, setFloats] = useState([]);
@@ -16,7 +16,7 @@ export const ResourcePanel = memo(function ResourcePanel({ state, onUpdate }) {
   const [newResources, setNewResources] = useState(new Set());
   const prevRatesRef = useRef({});
   const [boostedResources, setBoostedResources] = useState(new Set());
-  const economy = useMemo(() => calculateEconomy(state), [state]);
+  const economy = useMemo(() => suppliedEconomy || calculateEconomy(state), [state, suppliedEconomy]);
   const chains = getSupplyChains(state);
   const gatheringAutomated = isGatheringAutomated(state);
 

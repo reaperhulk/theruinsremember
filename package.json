@@ -19,7 +19,9 @@
     "test:browser:mobile": "node scripts/browser-test.mjs --mobile",
     "test:journeys": "node scripts/journey-matrix.mjs",
     "test:journeys:adversarial": "node scripts/journey-matrix.mjs --personas engaged,minimalist --adversarial",
-    "test:quality": "npm run lint && npm run test:unit && npm run test:balance && npm run test:impact && npm run build"
+    "test:quality": "npm run lint && npm run test:unit && npm run test:balance && npm run test:impact && npm run build && npm run test:assets",
+    "test:browser:experience": "node scripts/browser-experience.mjs",
+    "test:assets": "node scripts/asset-budget.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

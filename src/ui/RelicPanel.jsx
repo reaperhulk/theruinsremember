@@ -61,6 +61,9 @@ export const RelicPanel = memo(function RelicPanel({ state, onUpdate }) {
                     {active.map(activeId => (
                       <button key={activeId} onClick={() => onUpdate(current => claimRelic(current, id, activeId))}>
                         Replace {RELICS[activeId].name}
+                        <small className="replacement-cost">Lose: {RELICS[activeId].description}</small>
+                        {getRelicSynergies({ ...state, activeRelics: [...active.filter(value => value !== activeId), id] }).filter(s => s.active && !getRelicSynergies(state).find(old => old.id === s.id)?.active).map(s => <small key={s.id}>Gain combination: {s.name} · {s.description}</small>)}
+                        {getRelicSynergies(state).filter(s => s.active && !getRelicSynergies({ ...state, activeRelics: [...active.filter(value => value !== activeId), id] }).find(next => next.id === s.id)?.active).map(s => <small key={s.id}>Lose combination: {s.name}</small>)}
                       </button>
                     ))}
                   </div>

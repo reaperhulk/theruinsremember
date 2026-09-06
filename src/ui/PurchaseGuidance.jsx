@@ -6,10 +6,10 @@ import { calculateEconomy, getCostPressure, expandStorage, getSupplyChains, setC
 import { resources } from '../data/resources.js';
 import { formatNumber, formatTime } from './format.js';
 
-export function PurchaseGuidance({ state, onUpdate }) {
+export function PurchaseGuidance({ state, onUpdate, economy: suppliedEconomy }) {
   const target = getPurchaseTarget(state);
   if (!target) return null;
-  const economy = calculateEconomy(state);
+  const economy = suppliedEconomy || calculateEconomy(state);
   const pressure = getCostPressure(state, target.cost, economy);
   return <section className="panel purchase-guidance" aria-label="Purchase guidance">
     <strong>{target.queued ? 'Queued goal' : 'Next purchase'}: {target.name}</strong>

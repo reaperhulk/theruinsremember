@@ -9,6 +9,7 @@ import { upgrades } from '../../data/upgrades.js';
 import { recordDecision, recordChapter, markDiscoveryRead, inheritancePreview, getNarrativeEnding } from '../memory.js';
 import { performPrestige } from '../prestige.js';
 import { calculateEconomy, getSupplyChains } from '../economy.js';
+import { selectProductionRoute } from '../legacy.js';
 import { getPublicWorks } from '../publicWorks.js';
 import { getForgeCharges, getRealityForgeRecipes } from '../realityForge.js';
 import { parseSave, serializeSave } from '../saves.js';
@@ -38,8 +39,11 @@ describe('chapter decisions and inheritance', () => {
   });
   it('makes preservation and extraction produce different economies', () => {
     const base = transitionEra(createInitialState(), 5);
-    const hearth = { ...base, upgrades: { forkHearth: true } };
+    const hearth = { ...base, upgrades: { forkHearth: true }, productionRoute: 'biospheres' };
     const quarry = { ...base, upgrades: { forkQuarry: true } };
+    expect(selectProductionRoute(base, 'biospheres')).toBe(base);
+    expect(getSupplyChains({ ...hearth, productionRoute: 'standard' }).find(c => c.output === 'colonies').input).toBe('exoticMaterials');
+    expect(selectProductionRoute({ ...hearth, productionRoute: 'standard' }, 'biospheres').productionRoute).toBe('biospheres');
     expect(getSupplyChains(hearth).find(c => c.output === 'colonies').input).toBe('food');
     expect(getSupplyChains(quarry).find(c => c.output === 'colonies').input).toBe('exoticMaterials');
     const industrial = transitionEra(createInitialState(), 2);

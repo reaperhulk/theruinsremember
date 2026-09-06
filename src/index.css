@@ -3622,3 +3622,19 @@ button:focus-visible, [role=button]:focus-visible, a:focus-visible, select:focus
 .era-review-setting { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 0; }
 
 @media (max-width:540px) { .game-header { flex-wrap: wrap; gap: 4px; } .game-header h1 { max-width: none; font-size: 18px; } .header-controls { flex: 1 1 auto; min-width: 0; justify-content: flex-end; flex-wrap: wrap; } .era-advance-btn { max-width: 120px; font-size: 12px; } }
+
+.world-status p { font-size: 13px; line-height: 1.5; }
+.world-status progress { display: block; width: 100%; height: 6px; margin: 8px 0; accent-color: #b89b66; }
+.world-status label { font-size: 12px; }
+.world-status summary { padding: 12px 0; cursor: pointer; }
+.world-status li { padding: 8px 0; font-size: 13px; }
+.world-status li span { display: block; color: #a7b9bb; font-size: 12px; }
+.world-constraint { color: #ecc395; }
+.world-status button, .discoveries button, .objective-purchase { padding: 10px 12px; min-height: 44px; border: 1px solid #69877f; border-radius: 6px; background: #294b44; color: #ede6d3; cursor: pointer; }
+.objective-purchase { flex: 0 0 auto; max-width: 220px; font-size: 13px; }
+.audio-controls[open] { z-index: 60; }
+@media (max-width:540px) { .objective-purchase { max-width: 110px; font-size: 11px; } }
+@media (max-height:550px) and (orientation:landscape) { .game-header h1 { font-size: 17px; } .objective-heading, .objective-meters, .objective-main p, .header-omen { display: none; } .objective-panel { padding: 4px 10px; } .objective-main h2 { font-size: 16px; } .resource-strip .focus-resource { padding: 2px 6px; } .game-container { gap: 3px; } .mobile-section-links button { min-height: 36px; padding: 5px; } }
+
+.relic-replacements small { display: block; padding-top: 5px; font-size: 12px; font-weight: normal; line-height: 1.4; }
+.record-note { color: #acbdbf; font-size: 12px; }

@@ -16,6 +16,7 @@ if (seeds.some(seed => !Number.isSafeInteger(seed)) || personas.some(id => !PERS
 const profiles = createPersonaProfiles();
 const operationFlags = { expedition: 'expeditions', docking: 'docking', colonies: 'colonies', starChart: 'starChart', dyson: 'dysonAssembly', senate: 'senateFocus', weaving: 'weaving', tuning: 'cosmicTuning', realityForge: 'realityForge' };
 let failures = 0;
+const reports = [];
 for (const seed of seeds) {
   for (const persona of personas) {
     for (const variant of variants) {
@@ -23,6 +24,7 @@ for (const seed of seeds) {
       // identical journey for a disabled operation adds no coverage.
       if (variant.skip && !profiles[persona][operationFlags[variant.skip]]) continue;
       const report = runPlayerJourney({ persona, seed, cycles, ...variant });
+      reports.push(report);
       console.log(`${report.completed ? 'PASS' : 'FAIL'} ${persona} seed=${seed} cycles=${report.cycleResults.length}/${cycles} era=${report.finalEra} elapsed=${report.elapsedSeconds}s attention=${report.activeSeconds}s commands=${report.manualActions} ${JSON.stringify(variant)}`);
       if (!report.completed) {
         failures++;
@@ -34,4 +36,6 @@ for (const seed of seeds) {
     }
   }
 }
+mkdirSync('test-results', { recursive: true });
+writeFileSync(`test-results/${process.argv.includes('--adversarial') ? 'adversarial' : 'journey'}-summary.json`, JSON.stringify(reports.map(report => ({ ...report, trace: undefined })), null, 2));
 if (failures) process.exitCode = 1;

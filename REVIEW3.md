@@ -59,3 +59,36 @@ All values below are seconds or counts; the offline legacy persona targets an ea
 | offline_returner | 42 | 43201 → 43201 | 361 → 361 | 99 → 103 | 4 → 4 | Era 5 → 5 |
 | completionist | 42 | 696 → 666 | 696 → 666 | 157 → 165 | 1 → 1 | Era 10 → 10 |
 | minimalist | 42 | 3391 → 3211 | 3391 → 3211 | 86 → 103 | 1 → 1 | Era 10 → 10 |
+
+## Batch 3 — a visible, responsive remembered world
+
+The canvas is split into ten named scene modules and shared rendering services. Actual branch choices appear as solid current landmarks or outlined inherited landmarks, with an accessible HTML ledger. World status reports construction and constrained supplies. Low-power rendering, elapsed-time particles, cached star geometry and shared economy previews reduce repeated work. Recommended affordable purchases are available directly in the persistent objective. Relic replacements show the effects and combinations lost or gained.
+
+Ten score arrangements share a recurring memory motif; later civilizations change its register and shape. Discovery, commitment and construction cues have separate identities and rate limits. Web Audio voices disconnect when finished; both buses respect mute and hidden tabs.
+
+Foreground acceleration and offline catch-up use a six-millisecond slice budget while preserving one-second engine ordering. Offline progress is visible between yields. Web Locks give one tab ownership of simulation and saves; a storage-change guard catches older clients. Backups/import validation remain intact.
+
+Experience diagnostics separate strategic choices, routine commands, chapter reviews and automatic purchases. Browser journeys record navigation and scrolling; a new fixture suite covers 360×800, 390×844, 768×1024, 1366×768, 1440×900, landscape 844×390 and a 683×384 zoom-equivalent viewport in Eras 1, 4, 7 and 10. It also checks keyboard navigation, reduced motion, audio startup and competing tabs. A local civilization-record export is available in Stats. Production asset limits are now checked in CI (1.2 MB JavaScript, 100 KB CSS, 350 KB combined gzip). Measured build before the small relic presentation addition: 1,013,631 JS bytes, 62,176 CSS bytes and 295,107 gzip bytes.
+
+Validation: 437 unit tests passed, including differential catch-up tests in four eras and cancellation. Lint, build and asset checks passed. The previous commit passed all four existing browser jobs. Its adversarial manual-build/minimalist seed 42 found an energy-starvation issue caused by automatically rerouting orbital supplies. Forks now unlock explicit, reversible route selections in World. That failing two-cycle case now passes without changing its budget or the checked-in baseline.
+
+Persona impact: all sixteen progression and absence invariants pass. The route correction costs background seed 424242 one extra session (+120 elapsed seconds, +30 active seconds, +4 actions); keeping resource-routing consent avoids the demonstrated manual-build stall. The minimalist improves another 30–240 seconds. No forced operations, siege collapses or actions during absences were introduced.
+
+| Persona | Seed | Elapsed before → after | Active before → after | Actions before → after | Sessions before → after | Outcome before → after |
+|---|---:|---:|---:|---:|---:|---|
+| newcomer | 424242 | 1101 → 1101 | 1101 → 1101 | 116 → 116 | 1 → 1 | Era 10 → 10 |
+| engaged | 424242 | 941 → 941 | 941 → 941 | 134 → 134 | 1 → 1 | Era 10 → 10 |
+| optimizer | 424242 | 571 → 571 | 571 → 571 | 231 → 231 | 1 → 1 | Era 10 → 10 |
+| background | 424242 | 1441 → 1561 | 361 → 391 | 124 → 128 | 13 → 14 | Era 10 → 10 |
+| check_in | 424242 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 424242 | 43201 → 43201 | 361 → 361 | 102 → 102 | 4 → 4 | Era 5 → 5 |
+| completionist | 424242 | 666 → 666 | 666 → 666 | 174 → 173 | 1 → 1 | Era 10 → 10 |
+| minimalist | 424242 | 3541 → 3301 | 3541 → 3301 | 98 → 99 | 1 → 1 | Era 10 → 10 |
+| newcomer | 42 | 1041 → 1041 | 1041 → 1041 | 112 → 112 | 1 → 1 | Era 10 → 10 |
+| engaged | 42 | 851 → 851 | 851 → 851 | 139 → 136 | 1 → 1 | Era 10 → 10 |
+| optimizer | 42 | 451 → 451 | 451 → 451 | 213 → 211 | 1 → 1 | Era 10 → 10 |
+| background | 42 | 1441 → 1441 | 361 → 361 | 126 → 126 | 13 → 13 | Era 10 → 10 |
+| check_in | 42 | 3601 → 3601 | 361 → 361 | 118 → 118 | 7 → 7 | Era 10 → 10 |
+| offline_returner | 42 | 43201 → 43201 | 361 → 361 | 103 → 103 | 4 → 4 | Era 5 → 5 |
+| completionist | 42 | 666 → 666 | 666 → 666 | 165 → 165 | 1 → 1 | Era 10 → 10 |
+| minimalist | 42 | 3211 → 3181 | 3211 → 3181 | 103 → 101 | 1 → 1 | Era 10 → 10 |

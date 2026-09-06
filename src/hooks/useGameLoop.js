@@ -1,8 +1,13 @@
+import { advanceBudgeted, advanceSlice } from '../engine/advanceBudgeted.js';
+import { useSaveOwnership } from './useSaveOwnership.js';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { advanceTime } from '../engine/advanceTime.js';
 import { loadSave, writeSave, parseSave, SAVE_KEY, RECOVERY_KEYS, offlineAllowance } from '../engine/saves.js';
 
 export function useGameLoop(initialState) {
+  const ownership = useSaveOwnership();
+  const ownsRef = useRef(false);
+  useEffect(() => { ownsRef.current = ownership.owned; }, [ownership.owned]);
   const [loaded] = useState(() => ({ ...loadSave(localStorage), loadedAt: Date.now() }));
   const [state, setState] = useState(loaded.state || initialState);
   const [saveWarning, setSaveWarning] = useState(loaded.warning);
@@ -20,19 +25,20 @@ export function useGameLoop(initialState) {
     setState(next);
   }, []);
   const save = useCallback(() => {
-    if (blocked.current || busy.current) return;
+    if (!ownsRef.current || blocked.current || busy.current) return;
     const warning = writeSave(localStorage, stateRef.current, Date.now(), needsMigration.current ? 'migration' : null);
     if (!warning) needsMigration.current = false;
     setSaveWarning(warning);
   }, []);
   const updateState = useCallback(fn => {
-    if (busy.current) return;
+    if (!ownsRef.current || blocked.current || busy.current) return;
     const previous = stateRef.current;
     const next = fn(previous) || previous;
     if (next !== previous) { commit(next); save(); }
   }, [commit, save]);
 
   useEffect(() => {
+    if (!ownership.owned) return;
     let cancelled = false;
     let raf;
     let lastFrame = performance.now();
@@ -46,13 +52,12 @@ export function useGameLoop(initialState) {
       let current = before;
       setOfflineReport({ processing: true, elapsed: seconds });
       try {
-      // Yield between chunks; every second still runs the same engine. Long
-      // returns stay responsive without approximating away purchase boundaries.
-      for (let done = 0; done < seconds && !cancelled; done += 300) {
-        current = advanceTime(current, Math.min(300, seconds - done), Math.random, 1, { pauseForgetting: true });
-        await new Promise(resolve => setTimeout(resolve, 0));
-      }
-      if (cancelled) return;
+      const result = await advanceBudgeted(current, seconds, {
+        options: { pauseForgetting: true }, cancelled: () => cancelled || blocked.current,
+        onProgress: done => setOfflineReport({ processing: true, elapsed: seconds, processed: done }),
+      });
+      if (result.cancelled) { if (!cancelled) setOfflineReport(null); return; }
+      current = result.state;
       commit(current);
       initialElapsed.current = 0;
         busy.current = false;
@@ -79,8 +84,9 @@ export function useGameLoop(initialState) {
         // fast-forward and saved-game catch-up agree on event/purchase timing.
         if (pending.current >= 1 && now - lastRender >= 100) {
           const seconds = Math.min(60, Math.floor(pending.current));
-          pending.current -= seconds;
-          commit(advanceTime(stateRef.current, seconds));
+          const result = advanceSlice(stateRef.current, seconds);
+          pending.current -= result.done;
+          commit(result.state);
           lastRender = now;
         }
       }
@@ -96,6 +102,12 @@ export function useGameLoop(initialState) {
         catchUp(gap);
       }
     };
+    const foreignSave = event => {
+      if (event.storageArea !== localStorage || (event.key !== SAVE_KEY && event.key !== null)) return;
+      blocked.current = true;
+      setSaveWarning('A different tab changed this civilization. Reload to use its latest save; this tab has stopped saving.');
+    };
+    window.addEventListener('storage', foreignSave);
     const timer = setInterval(save, 15000);
     document.addEventListener('visibilitychange', visibility);
     window.addEventListener('pagehide', save);
@@ -115,14 +127,16 @@ export function useGameLoop(initialState) {
       cancelAnimationFrame(raf);
       clearInterval(timer);
       document.removeEventListener('visibilitychange', visibility);
+      window.removeEventListener('storage', foreignSave);
       window.removeEventListener('pagehide', save);
       window.removeEventListener('beforeunload', save);
       delete window.__game;
       if (!wasBusy) save();
     };
-  }, [commit, save, updateState]);
+  }, [commit, save, updateState, ownership.owned]);
 
   const importSave = useCallback(text => {
+    if (!ownsRef.current || busy.current) return false;
     const next = parseSave(text);
     try {
       const previous = localStorage.getItem(SAVE_KEY);
@@ -141,6 +155,7 @@ export function useGameLoop(initialState) {
     setSaveWarning('No valid backup is available. Import a previously exported save.');
   }, [importSave]);
   const resetSave = useCallback(() => {
+    if (!ownsRef.current || busy.current) return;
     try { for (const key of [SAVE_KEY, ...RECOVERY_KEYS, `${SAVE_KEY}-replaced`]) localStorage.removeItem(key); } catch { /* writeSave reports storage failure */ }
     blocked.current = false;
     pending.current = 0;
@@ -148,5 +163,5 @@ export function useGameLoop(initialState) {
     save();
   }, [initialState, commit, save]);
   const dismissOfflineReport = useCallback(() => setOfflineReport(null), []);
-  return { state, updateState, resetSave, offlineReport, dismissOfflineReport, saveWarning, restoreBackup, importSave };
+  return { state, updateState, resetSave, offlineReport, dismissOfflineReport, saveWarning: ownership.warning || saveWarning, isSaveOwner: ownership.owned, restoreBackup, importSave };
 }

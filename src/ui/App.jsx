@@ -30,7 +30,7 @@ import { OperationsPanel } from './OperationsPanel.jsx';
 import { RelicPanel } from './RelicPanel.jsx';
 import { VictoryScreen } from './VictoryScreen.jsx';
 import { HelpOverlay } from './HelpOverlay.jsx';
-import { setMuted, playPrestige, setVolumes, setMusicEra, startAmbient, stopAmbient, syncAudioVisibility } from './AudioManager.js';
+import { setMuted, playPrestige, playDiscovery, playChoice, playConstruction, setVolumes, setMusicEra, startAmbient, stopAmbient, syncAudioVisibility } from './AudioManager.js';
 const StatsPanel = lazy(() => import('./StatsPanel.jsx').then(module => ({ default: module.StatsPanel })));
 import { EventLog } from './EventLog.jsx';
 const PrestigePanel = lazy(() => import('./PrestigePanel.jsx').then(module => ({ default: module.PrestigePanel })));
@@ -41,6 +41,8 @@ import { performPrestige, calculatePrestigeBonus, getPrestigeSummary } from '../
 import { ERA_COUNT, eraNames } from '../engine/eras.js';
 import { getAvailableUpgrades, getUpgradeCost } from '../engine/upgrades.js';
 import { getAvailableTech } from '../engine/tech.js';
+import { DECISIONS } from '../data/decisions.js';
+import { WorldStatus } from './WorldStatus.jsx';
 import { Discoveries } from './Discoveries.jsx';
 import { canAfford, getEffectivePrestige } from '../engine/resources.js';
 import { getAchievementsNearComplete } from '../engine/achievements.js';
@@ -79,8 +81,9 @@ function getAvailableTabs(era) {
 }
 
 export function App() {
-  const { state, updateState, resetSave, offlineReport, dismissOfflineReport, saveWarning, restoreBackup, importSave } = useGameLoop(initialState);
+  const { state, updateState, resetSave, offlineReport, dismissOfflineReport, saveWarning, isSaveOwner, restoreBackup, importSave } = useGameLoop(initialState);
   const [activeTab, setActiveTab] = useState('upgrades');
+  const [visualQuality, setVisualQuality] = useState(() => { try { return localStorage.getItem('visualQuality') || 'standard'; } catch { return 'standard'; } });
   const [mobileSection, setMobileSection] = useState('actions');
   const objective = useMemo(() => getEraObjective(state), [state]);
   const economy = useMemo(() => calculateEconomy(state), [state]);
@@ -130,7 +133,18 @@ export function App() {
     setVolumes(audioLevels.effects, audioLevels.music);
     try { localStorage.setItem('audioLevels', JSON.stringify(audioLevels)); } catch { /* optional preference */ }
   }, [audioLevels]);
-  useEffect(() => { setMusicEra(state.era); }, [state.era]);
+  useEffect(() => { setMusicEra(state.era, state.prestigeCount, state.cycleDoctrine === 'expansion'); }, [state.era, state.prestigeCount, state.cycleDoctrine]);
+  const audioHistory = useRef(null);
+  useEffect(() => {
+    const snapshot = { cycle: state.prestigeCount, choices: Object.keys(DECISIONS).filter(id => state.upgrades[id]).length, discoveries: Object.keys(state.archive.discoveries || {}).length, construction: Object.keys(state.upgrades).length };
+    const previous = audioHistory.current;
+    if (previous && previous.cycle === snapshot.cycle) {
+      if (snapshot.choices > previous.choices) playChoice();
+      else if (snapshot.discoveries > previous.discoveries) playDiscovery();
+      else if (snapshot.construction - previous.construction >= 5) playConstruction();
+    }
+    audioHistory.current = snapshot;
+  }, [state.upgrades, state.archive.discoveries, state.prestigeCount]);
   useEffect(() => {
     const begin = () => { startAmbient(); document.removeEventListener('pointerdown', begin); document.removeEventListener('keydown', begin); };
     const visibility = syncAudioVisibility;
@@ -268,7 +282,8 @@ export function App() {
           <button className="reset-btn" aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'} onClick={() => setAudioMuted(m => !m)} title={audioMuted ? 'Sound OFF' : 'Sound ON'}>
             {audioMuted ? 'Sound OFF' : 'Sound ON'}
           </button>
-          <details className="audio-controls"><summary>Audio mix</summary>
+          <details className="audio-controls"><summary>Preferences</summary>
+            <label>World detail <select aria-label="World detail" value={visualQuality} onChange={e => { setVisualQuality(e.target.value); try { localStorage.setItem('visualQuality', e.target.value); } catch { /* optional preference */ } }}><option value="standard">Standard</option><option value="low">Low power</option></select></label>
             <label>Music <input aria-label="Music volume" type="range" min="0" max="1" step="0.05" value={audioLevels.music} onChange={e => setAudioLevels(a => ({ ...a, music: Number(e.target.value) }))} /></label>
             <label>Effects <input aria-label="Effects volume" type="range" min="0" max="1" step="0.05" value={audioLevels.effects} onChange={e => setAudioLevels(a => ({ ...a, effects: Number(e.target.value) }))} /></label>
           </details>
@@ -344,7 +359,7 @@ export function App() {
           </div>
         </div>
       </header>
-      {saveWarning && <div className="save-warning" role="alert">{saveWarning} <button onClick={restoreBackup}>Restore backup</button></div>}
+      {saveWarning && <div className="save-warning" role="alert">{saveWarning} <button onClick={() => window.location.reload()}>Reload latest save</button>{isSaveOwner && <button onClick={restoreBackup}>Restore backup</button>}</div>}
       <EraProgress onUpdate={updateState} state={state} objective={objective} onNavigate={navigate} />
       <ResourceStrip state={state} objective={objective} economy={economy} onUpdate={updateState} />
       <OfflineReport report={offlineReport} onDismiss={dismissOfflineReport} />
@@ -353,9 +368,9 @@ export function App() {
       <nav className="mobile-section-links" aria-label="Game section"><button id="section-actions" aria-pressed={mobileSection === 'actions'} onClick={() => setMobileSection('actions')}>Decisions & operations</button><button id="section-world" aria-pressed={mobileSection === 'world'} onClick={() => setMobileSection('world')}>World & resources</button></nav>
       <main className={`game-layout ${state.era <= 4 ? 'early-game-layout' : ''}`}>
         <div className="left-column" id="game-resources">
-          <Suspense fallback={<div className="scene-placeholder">The ruins emerge…</div>}><GameCanvas state={state} onUpdate={updateState} /></Suspense>
-          <RestoredDistricts state={state} />
-          <ResourcePanel state={state} onUpdate={updateState} />
+          <Suspense fallback={<div className="scene-placeholder">The ruins emerge…</div>}><GameCanvas quality={visualQuality} state={state} onUpdate={updateState} /></Suspense>
+          <WorldStatus onUpdate={updateState} state={state} economy={economy} onNavigate={navigate} /><RestoredDistricts state={state} />
+          <ResourcePanel economy={economy} state={state} onUpdate={updateState} />
 
 
           <RelicPanel state={state} onUpdate={updateState} />
@@ -426,7 +441,7 @@ export function App() {
               <>
                 <Discoveries state={state} onUpdate={updateState} /><div className="chapter-intro"><span className="panel-kicker">{objective.chapter.title}</span><p>{objective.chapter.problem}</p><button onClick={() => navigate('mini')}>{objective.chapter.operation} →</button></div>
                 {state.era === 1 && !state.prestigeCount && <ol className="opening-steps" aria-label="Settlement milestones"><li data-complete={Object.keys(state.upgrades).length > 0}>Restore production</li><li data-complete={(state.expedition?.totalFinds || 0) > 0}>Explore the ruins</li><li data-complete={Object.keys(state.tech).length > 0}>Research metallurgy</li></ol>}
-                <PurchaseGuidance state={state} onUpdate={updateState} /><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel state={state} onUpdate={updateState} />
+                <PurchaseGuidance economy={economy} state={state} onUpdate={updateState} /><GoalsPanel state={state} onUpdate={updateState} /><UpgradePanel economy={economy} state={state} onUpdate={updateState} />
               </>
             )}
             {activeTab === 'tech' && (
@@ -441,7 +456,7 @@ export function App() {
                 renderOperation={renderOperation}
               />
             )}
-            {activeTab === 'mini' && <PublicWorksPanel state={state} onUpdate={updateState} />}
+            {activeTab === 'mini' && <PublicWorksPanel economy={economy} state={state} onUpdate={updateState} />}
             {activeTab === 'trading' && state.era >= 4 && (
               <TradingPanel state={state} onUpdate={updateState} />
             )}

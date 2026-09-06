@@ -1,3 +1,4 @@
+import { civilizationRecord } from '../engine/diagnostics.js';
 import { useState, memo } from 'react';
 import { eraNames, countEraUpgrades } from '../engine/eras.js';
 import { getAchievementList } from '../engine/achievements.js';
@@ -80,6 +81,7 @@ export const StatsPanel = memo(function StatsPanel({ state }) {
   return (
     <div className="panel stats-panel">
       <h2>Statistics ({earnedCount} achievements)</h2>
+      <button className="record-export" onClick={() => { const url = URL.createObjectURL(new Blob([JSON.stringify(civilizationRecord(state), null, 2)], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = 'civilization-record.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }}>Download civilization record</button><p className="record-note">A local record of your choices, acknowledged discoveries, and completed civilizations.</p>
       <div className="stats-grid">
         <div className="stat-row">
           <span>Current Era</span>

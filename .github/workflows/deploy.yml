@@ -43,6 +43,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: experience
+            command: node scripts/browser-experience.mjs
           - name: desktop-journey
             command: node scripts/browser-journey.mjs
           - name: mobile-journey

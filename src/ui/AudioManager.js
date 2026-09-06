@@ -1,3 +1,4 @@
+import { SCORE, MEMORY_MOTIF } from '../data/score.js';
 let audioCtx = null;
 let muted = false;
 let effectsVolume = 0.7;
@@ -6,6 +7,36 @@ let effectsBus;
 let musicBus;
 let ambientTimer;
 let musicEra = 1;
+let musicCycle = 0;
+let musicActivity = 0;
+const cueTimes = new Map();
+function allowCue(id, interval) {
+  if (muted || document.hidden || effectsVolume === 0) return false;
+  const now = performance.now();
+  if (now - (cueTimes.get(id) ?? -Infinity) < interval) return false;
+  cueTimes.set(id, now); return true;
+}
+function voice(ctx, bus, frequency, type, start, length, volume, attack = 0.03) {
+  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  osc.type = type; osc.frequency.value = frequency; osc.connect(gain); gain.connect(bus);
+  gain.gain.setValueAtTime(0, start); gain.gain.linearRampToValueAtTime(volume, start + attack);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + length);
+  osc.start(start); osc.stop(start + length);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+  osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+}
+export function playDiscovery() {
+  if (!allowCue('discovery', 3500)) return;
+  try { const ctx = getCtx(); for (const [i, note] of MEMORY_MOTIF.entries()) voice(ctx, effectsBus, 220 * 2 ** (note / 12), 'sine', ctx.currentTime + i * 0.18, 0.65, 0.035); } catch { /* optional output */ }
+}
+export function playChoice() {
+  if (!allowCue('choice', 2000)) return;
+  try { const ctx = getCtx(); [147, 220, 294].forEach((f, i) => voice(ctx, effectsBus, f, 'triangle', ctx.currentTime + i * 0.12, 0.8, 0.025)); } catch { /* optional output */ }
+}
+export function playConstruction() {
+  if (!allowCue('construction', 12000)) return;
+  try { const ctx = getCtx(); voice(ctx, effectsBus, 165, 'sine', ctx.currentTime, 0.4, 0.018); } catch { /* optional output */ }
+}
 
 function getCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -22,7 +53,7 @@ export function setMuted(m) { muted = m; setVolumes(effectsVolume, musicVolume);
 export function isMuted() { return muted; }
 
 export function playClick() {
-  if (muted) return;
+  if (!allowCue('click', 100)) return;
   try {
     const ctx = getCtx();
     const osc = ctx.createOscillator();
@@ -35,11 +66,12 @@ export function playClick() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
     osc.start();
     osc.stop(ctx.currentTime + 0.1);
+    osc.onended = () => { osc.disconnect(); gain.disconnect(); };
   } catch { /* audio may be unavailable */ }
 }
 
 export function playUpgrade() {
-  if (muted) return;
+  if (!allowCue('upgrade', 300)) return;
   try {
     const ctx = getCtx();
     const osc = ctx.createOscillator();
@@ -53,11 +85,12 @@ export function playUpgrade() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
     osc.start();
     osc.stop(ctx.currentTime + 0.2);
+    osc.onended = () => { osc.disconnect(); gain.disconnect(); };
   } catch { /* audio may be unavailable */ }
 }
 
 export function playEraTransition() {
-  if (muted) return;
+  if (!allowCue('eratransition', 2500)) return;
   try {
     const ctx = getCtx();
     [400, 500, 600, 800].forEach((freq, i) => {
@@ -71,12 +104,13 @@ export function playEraTransition() {
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.3);
       osc.start(ctx.currentTime + i * 0.15);
       osc.stop(ctx.currentTime + i * 0.15 + 0.3);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
     });
   } catch { /* audio may be unavailable */ }
 }
 
 export function playGemFound() {
-  if (muted) return;
+  if (!allowCue('gemfound', 1800)) return;
   try {
     const ctx = getCtx();
     // Sparkle: quick ascending cluster of high tones
@@ -91,12 +125,13 @@ export function playGemFound() {
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.05 + 0.15);
       osc.start(ctx.currentTime + i * 0.05);
       osc.stop(ctx.currentTime + i * 0.05 + 0.15);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
     });
   } catch { /* audio may be unavailable */ }
 }
 
 export function playAchievement() {
-  if (muted) return;
+  if (!allowCue('achievement', 2500)) return;
   try {
     const ctx = getCtx();
     // Fanfare: rising arpeggio C4-E4-G4-C5
@@ -111,12 +146,13 @@ export function playAchievement() {
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.3);
       osc.start(ctx.currentTime + i * 0.08);
       osc.stop(ctx.currentTime + i * 0.08 + 0.3);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
     });
   } catch { /* audio may be unavailable */ }
 }
 
 export function playCapWarning() {
-  if (muted) return;
+  if (!allowCue('capwarning', 30000)) return;
   try {
     const ctx = getCtx();
     // Low rumble: sawtooth at ~65 Hz with slow fade
@@ -131,11 +167,12 @@ export function playCapWarning() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
     osc.start();
     osc.stop(ctx.currentTime + 0.6);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
   } catch { /* audio may be unavailable */ }
 }
 
 export function playPrestige() {
-  if (muted) return;
+  if (!allowCue('prestige', 2500)) return;
   try {
     const ctx = getCtx();
     // Orchestral swell: two staggered chord waves
@@ -158,6 +195,7 @@ export function playPrestige() {
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.7);
         osc.start(ctx.currentTime + t);
         osc.stop(ctx.currentTime + t + 0.7);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
       }
       t += 0.25;
     }
@@ -167,10 +205,10 @@ export function playPrestige() {
 export function setVolumes(effects, music) {
   effectsVolume = Math.max(0, Math.min(1, Number(effects) || 0));
   musicVolume = Math.max(0, Math.min(1, Number(music) || 0));
-  if (effectsBus) effectsBus.gain.value = muted ? 0 : effectsVolume;
-  if (musicBus) musicBus.gain.value = muted || document.hidden ? 0 : musicVolume;
+  if (effectsBus) effectsBus.gain.setTargetAtTime(muted || document.hidden ? 0 : effectsVolume, audioCtx.currentTime, 0.04);
+  if (musicBus) musicBus.gain.setTargetAtTime(muted || document.hidden ? 0 : musicVolume, audioCtx.currentTime, 0.3);
 }
-export function setMusicEra(era) { musicEra = era; }
+export function setMusicEra(era, cycle = 0, activity = 0) { musicEra = era; musicCycle = cycle; musicActivity = activity; }
 export function startAmbient() {
   if (ambientTimer) return;
   let phrase = 0;
@@ -178,20 +216,19 @@ export function startAmbient() {
     if (muted || document.hidden || musicVolume === 0) return;
     try {
       const ctx = getCtx();
-      const roots = musicEra <= 3 ? [110, 130.81, 98, 110] : musicEra <= 7 ? [130.81, 146.83, 110, 98] : [98, 123.47, 146.83, 110];
-      const root = roots[phrase++ % roots.length];
-      for (const ratio of [1, 1.5, musicEra >= 8 ? 2.25 : 2]) {
-        const oscillator = ctx.createOscillator();
-        const envelope = ctx.createGain();
-        oscillator.type = 'sine';
-        oscillator.frequency.value = root * ratio;
-        oscillator.connect(envelope); envelope.connect(musicBus);
-        envelope.gain.setValueAtTime(0, ctx.currentTime);
-        envelope.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 2);
-        envelope.gain.linearRampToValueAtTime(0, ctx.currentTime + 9);
-        oscillator.start(); oscillator.stop(ctx.currentTime + 9);
-        oscillator.onended = () => { oscillator.disconnect(); envelope.disconnect(); };
+      const score = SCORE[musicEra] || SCORE[1];
+      const movement = [1, 1, 0.89, 1.125, 1, 0.75, 0.89, 1][phrase % 8];
+      const root = score.root * movement;
+      for (const ratio of score.voices) voice(ctx, musicBus, root * ratio, score.type, ctx.currentTime, 9, 0.08 / score.voices.length, 2);
+      // The first camp's four-note motif returns in altered register after reset.
+      if (phrase % 3 === 0) for (const [i, note] of MEMORY_MOTIF.entries()) {
+        const semitones = musicCycle >= 2 ? 7 - note : note;
+        voice(ctx, musicBus, root * (musicCycle ? 2 : 1) * 2 ** (semitones / 12), 'sine', ctx.currentTime + 1 + i * 0.7, 2.2, 0.021, 0.2);
       }
+      const beats = score.pulse + (musicActivity && score.pulse ? 1 : 0);
+      for (let i = 0; i < beats; i++) voice(ctx, musicBus, root / 2, 'triangle', ctx.currentTime + i * 8 / beats, 0.18, 0.012, 0.008);
+      phrase++;
+
     } catch { /* Audio is optional on devices without a supported output. */ }
   };
   chord();
