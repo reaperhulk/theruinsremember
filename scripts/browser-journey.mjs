@@ -21,7 +21,7 @@ await page.setViewport(mobile ? { width: 375, height: 812, isMobile: true } : { 
 const settle = () => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 const interaction = { navigationCommands: 0, scrollDistance: 0 };
 const click = async selector => {
-  if (selector.startsWith('#tab-') || selector.startsWith('#section-')) interaction.navigationCommands++;
+  if (selector.startsWith('#tab-') || selector.startsWith('#section-') || selector.endsWith('summary')) interaction.navigationCommands++;
   if (mobile) {
     const section = /relic-choice/.test(selector) ? '#section-world' : '#section-actions';
     const navigation = await page.$(section);
@@ -30,7 +30,9 @@ const click = async selector => {
   const candidates = await page.$$(selector);
   let handle;
   for (const candidate of candidates) {
-    if (!handle && await candidate.evaluate(el => !el.disabled && el.getClientRects().length > 0)) handle = candidate;
+    // Chromium may retain layout boxes for descendants of closed details.
+    // Open the disclosure through its visible summary before choosing inside.
+    if (!handle && await candidate.evaluate(el => !el.disabled && el.getClientRects().length > 0 && (el.matches('summary') || !el.closest('details:not([open])')))) handle = candidate;
     else await candidate.dispose();
   }
   if (!handle) return false;
@@ -124,7 +126,9 @@ try {
       if (!acted) {
         const techTurn = (elapsed / 10 + slot) % 2 === 0;
         await click(techTurn ? '#tab-tech' : '#tab-upgrades');
-        acted = await click(techTurn ? '.tech-btn.affordable:not(:disabled)' : '.upgrade-btn.affordable:not(:disabled)');
+        const choiceSelector = techTurn ? '.tech-btn.affordable:not(:disabled)' : '.upgrade-btn.affordable:not(:disabled)';
+        acted = await click(choiceSelector);
+        if (!acted && await click('.council details:not([open]) > summary')) acted = await click(choiceSelector);
         command = techTurn ? 'research' : 'upgrade';
       }
       if (!acted && state.era <= 3) { await click('#tab-mini'); acted = await click('.expedition-routes:not(:has([aria-pressed="true"])) .expedition-route:not(:disabled)'); command = 'expedition'; }

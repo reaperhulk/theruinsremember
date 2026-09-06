@@ -474,10 +474,10 @@ export const UpgradePanel = memo(function UpgradePanel({ state, onUpdate, econom
         </div>
       )}
       <div className="upgrade-list">
-        {visibleAvailable.length === 0 && upcoming.length === 0 && (
+        {(!focusMode || !autoBuildOut) && visibleAvailable.length === 0 && upcoming.length === 0 && (
           <p className="empty-message">No upgrades available — explore the Tech Tree for new paths, or buy prerequisite upgrades to unlock more</p>
         )}
-        {visibleAvailable.length === 0 && upcoming.length > 0 && (
+        {(!focusMode || !autoBuildOut) && visibleAvailable.length === 0 && upcoming.length > 0 && (
           <p className="empty-message">Buy prerequisites to unlock {upcoming.length} upcoming upgrade{upcoming.length > 1 ? 's' : ''}</p>
         )}
         {(() => { const firstAffordableId = Object.keys(state.upgrades).length === 0 ? visibleAvailable.filter(u => !u.repeatable).find(u => canAfford(state, getUpgradeCost(state, u.id)))?.id : null; return visibleAvailable.filter(u => !u.repeatable).map(upgrade => {
