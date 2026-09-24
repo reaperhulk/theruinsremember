@@ -7,7 +7,7 @@ for (const name of files) {
   totals[name.endsWith('.js') ? 'javascript' : 'css'] += bytes.length;
   totals.gzip += gzipSync(bytes).length;
 }
-// Measured after the ten-era redesign; leave room for small authored additions.
-const limits = { javascript: 1200000, css: 100000, gzip: 350000 };
+// Measured after the clicker rebuild; leave room for small authored additions.
+const limits = { javascript: 450000, css: 30000, gzip: 150000 };
 for (const key of Object.keys(limits)) if (totals[key] > limits[key]) throw new Error(`${key}: ${totals[key]} bytes exceeds ${limits[key]}`);
 console.log(`Asset budgets pass: ${JSON.stringify(totals)} bytes`);

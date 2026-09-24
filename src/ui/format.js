@@ -44,3 +44,9 @@ export function formatTime(seconds) {
   }
   return `${h}h ${m}m`;
 }
+
+// Whole amounts (salvage, prices, memories): no decimals below a thousand.
+export function formatAmount(n) {
+  if (!Number.isFinite(n)) return formatNumber(n);
+  return Math.abs(n) < 1000 ? String(Math.floor(n)) : formatNumber(n);
+}

@@ -26,33 +26,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:quality
-      - run: npm run test:balance:stress
-      - run: npm run test:journeys
-      - run: npm run test:journeys:adversarial
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: engine-progression-diagnostics
-          path: test-results/
-          if-no-files-found: ignore
 
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: experience
-            command: node scripts/browser-experience.mjs
-          - name: desktop-journey
-            command: node scripts/browser-journey.mjs
-          - name: mobile-journey
-            command: node scripts/browser-journey.mjs --mobile
-          - name: desktop-operations
-            command: node scripts/browser-test.mjs --prestige 3
-          - name: mobile-operations
-            command: node scripts/browser-test.mjs --mobile
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -61,8 +38,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx puppeteer browsers install chrome-headless-shell
-      - run: npx puppeteer browsers install chrome
-        if: matrix.name == 'experience'
       - name: Start the game server
         run: |
           npm run dev -- --host 127.0.0.1 &
@@ -73,11 +48,11 @@ jobs:
             sleep 1
           done
           exit 1
-      - run: ${{ matrix.command }}
+      - run: node scripts/browser-smoke.mjs --screenshots
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ${{ matrix.name }}-diagnostics
+          name: browser-diagnostics
           path: test-results/
           if-no-files-found: ignore
 

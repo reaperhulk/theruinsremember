@@ -1,176 +1,67 @@
-# The Ruins Remember — Incremental Game
+# The Ruins Remember — Clicker
+
+A cookie-clicker-style incremental. One currency (salvage), dug by hand and
+produced by stackable buildings across ten eras; echoes are the golden-cookie
+moments; letting the cycle turn is prestige.
 
 ## Project Structure
-- `src/engine/` — Pure game logic (tick, resources, upgrades, tech, operations, cycles). No browser deps.
-- `src/ui/` — React components (App, panels, canvas).
-- `src/hooks/` — React hooks including `useGameLoop.js` (the main game loop).
-- `src/data/` — Static data definitions (upgrades, tech, resources, prestige).
-- `scripts/` — CLI tools (bot-playtest, browser-harness).
+- `src/game/` — Pure game logic and data. No browser dependencies.
+  - `data.js` — buildings, upgrades, echoes, memory lessons, achievements
+  - `engine.js` — `tick`, `click`, purchases, echoes, offline time, the cycle
+  - `save.js` — validated saves, backup, export/import, original-game welcome
+  - `lore.js` — chapters and ruins-ticker text for every era
+- `src/ui/` — React components, the canvas era scenes (`scenes/`), music and sound.
+- `scripts/pacing.mjs` + `scripts/sim/` — persona simulator, pacing contract, before/after impact.
+- `scripts/browser-smoke.mjs` — real-input browser test on desktop, tablet and phone.
 
-## Mandatory Before/After Persona Impact
+## Design rules
+- The player is the engine at the start: nothing is bought or dug automatically.
+  Buildings are the automation, and players buy them.
+- Buildings cost `COST_SCALE` (1.15×) more per purchase. Newer buildings pay back
+  more slowly than older ones (a unit test checks this).
+- Clicking stays relevant through click-share upgrades (1% of production per click each).
+- Nothing can be lost to absence. Offline time only produces (at the offline
+  efficiency), never shows echoes, and never turns the cycle.
+- Keep the engine pure and deterministic: every function takes an `rng` where randomness matters.
 
-Every change to this repository MUST present before/after results for all eight
-personas (`newcomer`, `engaged`, `optimizer`, `background`, `check_in`,
-`offline_returner`, `completionist`, and `minimalist`) using identical seeds. This
-includes gameplay, progression, economy, balancing, automation, player interactions,
-prestige, saves, offline behavior, tests, and documentation.
+## Checking changes
 
-Before changing the game, capture a temporary baseline:
+Run what matches what you changed. `npm run test:quality` (lint, unit tests,
+pacing contract, build, asset budget) runs in CI on every push, plus the browser smoke test.
+
+| Change | Required |
+| --- | --- |
+| Economy, balance, pacing, echoes, offline, the cycle (`src/game/data.js`, `src/game/engine.js`) | `npm run test:quality`, and a before/after persona comparison in the commit message |
+| Other engine or save changes | `npm run test:unit` |
+| UI | `npm run lint`, `npm run build`, and `npm run test:browser` with the dev server running |
+| Docs, tests, scripts only | Nothing extra |
+
+Before/after persona comparison (identical seeds and attention schedules):
 
 ```bash
-npm run test:impact -- --capture /tmp/theruinsremember-personas-before.json
+node scripts/pacing.mjs --capture /tmp/pacing-before.json   # before the change
+node scripts/pacing.mjs --baseline /tmp/pacing-before.json  # after the change
 ```
 
-After the change, run the direct comparison:
-
-```bash
-npm run test:impact -- --baseline /tmp/theruinsremember-personas-before.json
-```
-
-Present the before → after elapsed time, active attention time, manual action count,
-session count, and progression outcome for every persona. Explicitly identify and
-justify regressions, new stalls, forced participation, siege collapse, or impossible
-actions while absent. `npm run test:quality` also compares every persona against the
-checked-in `scripts/baseline-results.json`. Do not update that baseline to hide a
-regression; refresh it only when the intentional impact has been reviewed and accepted.
+Report the milestone time, active attention, manual actions, sessions and
+outcome for each persona, and explain any regression. Change the pacing contract
+in `scripts/pacing.mjs` only on purpose, and say why in the commit.
 
 ## Dev Commands
-- `npm run dev` — Start Vite dev server (default: http://localhost:5173)
-- `npm run test` — Run Vitest unit tests in watch mode
-- `npm run test:unit` — Run the complete Vitest unit and regression suite once
-- `npm run test:balance` — Run eight personas plus siege/prestige scenarios across four deterministic seeds
-- `npm run test:journeys` — Every bounded persona, both seeds, two naturally earned cycles
-- `npm run test:journeys:adversarial` — Alternate branches, bad luck, inefficient spending, manual build-out, and skipped operations
-- `npm run test:browser:journey` — Two full cycles through visible browser controls with no injected progression
-- `npm run test:balance:stress` — Exercise ten prestige cycles across two seeds
-- `npm run test:personas` — Run eight attention-aware player personas across two seeds
-- `npm run test:impact` — Present before/after timing, attention, actions, sessions, and progression for every persona
-- `npm run test:quality` — Run lint, unit tests, the persona balance matrix, required impact report, and production build
-- `npm run build` — Production build to dist/
+- `npm run dev` — Vite dev server (http://localhost:5173)
+- `npm run test` / `npm run test:unit` — Vitest (watch / once)
+- `npm run test:pacing` — eight personas × two seeds against the pacing contract
+- `node scripts/pacing.mjs --persona check_in --horizon 720` — long-horizon run (hours)
+- `npm run test:browser` — browser smoke test (needs the dev server; `PUPPETEER_EXECUTABLE_PATH` to use another Chrome)
+- `npm run build` — production build to `dist/`
 
-## Architecture
-The engine is **pure and deterministic**: `tick(state, dt, rng, options)` → new state. All game logic lives in `src/engine/`. The React layer in `src/hooks/useGameLoop.js` drives the loop via `requestAnimationFrame`, with fixed one-second simulation steps. Offline catch-up uses `advanceTime(state, seconds, rng, maxStep, { pauseForgetting: true })` so an unattended final siege cannot erase progress or force prestige.
+## Personas (`scripts/sim/personas.js`)
+`newcomer`, `engaged`, `optimizer`, `background`, `check_in`, `offline_returner`,
+`completionist`, `minimalist`. Each has a click rate, a decision interval, an
+echo-catch chance, and a session pattern (tab open or closed while away). The
+simulated player acts only during its attention windows and uses only the
+public engine API.
 
-## Browser Testing with Puppeteer
-
-### Automated Browser Test
-```bash
-# Start dev server first: npm run dev -- --host 127.0.0.1
-node scripts/browser-test.mjs                    # Full desktop gameplay/layout journey
-node scripts/browser-test.mjs --prestige 3       # Include three prestige cycles
-node scripts/browser-test.mjs --mobile           # Mobile viewport (375x812)
-node scripts/browser-test.mjs --screenshots      # Save screenshots to /tmp/game-screenshots/
-```
-
-The natural journey in `scripts/browser-journey.mjs` earns two complete cycles
-through visible UI controls, verifies a mid-run reload, and plans a prestige reward.
-It must never use resource grants, era fixtures, or direct engine purchases.
-
-The separate Puppeteer fixture test first reloads actual legacy and three-hour-offline saves, validates
-automation toggling, and drives a fresh game naturally through Era 7. Isolated late-game
-fixtures then cover the operation archive, relics, orbital crew training, colony mandates,
-standing trade routes, star-network directives, Dyson commissions, government acts,
-Reality Laws, Signal Locks, the Forgetting siege, all three cycle doctrines, every main
-tab, and prestige. It exits nonzero for progression misses, console errors, failed
-save/operation checks, or layout/viewport overflow.
-
-### Manual Browser Testing (inject harness)
-1. Start the dev server: `npm run dev`
-2. Open http://localhost:5173 in Chrome
-3. Open DevTools Console and paste contents of `scripts/browser-harness.js`
-4. Use `__harness.setSpeed(50)` and `JSON.stringify(__harness.snapshot())`
-
-### Speed Control
-`window.__game.setSpeed(n)` scales the dt passed to the engine each frame:
-- `1` = normal (real-time)
-- `10` = 10x speed
-- `50`–`100` = good for rapid testing (higher values work but UI updates are throttled to ~10 FPS so visual feedback caps out)
-- `0` = paused
-
-The speed multiplier scales accumulated elapsed time. Simulation uses one-second steps at every speed; each render update processes at most 60 seconds and retains any remainder. Hidden tabs receive bounded catch-up when visible again.
-
-### Instant Time Skip
-For even faster testing, `__harness.fastForward(seconds)` or `__game.fastForward(seconds)` advances the engine in bounded one-second simulation steps. This preserves periodic automation, event, and achievement checks.
-
-### Key Harness Functions
-```js
-__harness.setSpeed(n)          // Set speed multiplier
-__harness.pause() / .resume()  // Pause/resume
-__harness.snapshot()           // Compact progress summary
-__harness.resources()          // Current resource amounts
-__harness.fastForward(secs)    // Instant time skip
-__harness.giveAll(amount)      // Set all unlocked resources to amount
-__harness.waitForEra(n)        // Promise — resolves when era >= n
-__harness.waitUntil(fn)        // Promise — resolves when fn(state) is true
-__harness.monitor(ms)          // Log snapshots every ms (returns stop fn)
-__harness.hardReset()          // Clear save + reload page
-```
-
-### Direct State Access
-```js
-__game.getState()              // Full game state object
-__game.setState(fn)            // Apply state transform: fn(prev) → next
-__game.getSpeed()              // Current speed multiplier
-```
-
-### Common Test Patterns
-
-**Watch the game progress at high speed:**
-```js
-__harness.setSpeed(50);
-// Then periodically call: JSON.stringify(__harness.snapshot())
-```
-
-**Skip to a specific era to test late-game content:**
-```js
-__harness.giveAll(10000);
-__harness.fastForward(3600);
-JSON.stringify(__harness.snapshot());
-```
-
-**Test a specific upgrade's effect:**
-```js
-// Get state before
-const before = JSON.stringify(__harness.resources());
-// Fast forward
-__harness.fastForward(60);
-const after = JSON.stringify(__harness.resources());
-// Compare before/after
-```
-
-**Wait for a condition then inspect:**
-```js
-await __harness.waitUntil(s => s.resources.energy?.amount > 100);
-JSON.stringify(__harness.snapshot());
-```
-
-## Headless Bot Testing
-For pure engine testing without a browser:
-```bash
-node scripts/balance-matrix.mjs --seeds 424242,1,42,1337
-node scripts/bot-playtest.js --scenario newcomer,engaged,optimizer,background,check_in,offline_returner,completionist,minimalist --seed 424242 --quiet --assert-balance
-node scripts/bot-playtest.js --scenario check_in --seed 42 --json
-node scripts/bot-playtest.js --profile optimizer --max-time 14400 --target-era 10
-node scripts/bot-playtest.js --scenario optimizer --json > results.json
-node scripts/bot-playtest.js --scenario optimizer --compare results.json  # Regression detection
-```
-
-The eight personas in `scripts/playtest-personas.js` separately model decision intervals,
-active sessions, background absences, and closed-game offline gaps; manual actions can
-occur only during an actual decision window. JSON results expose attention telemetry
-and `completionStatus.cumulativeTime` across prestige resets. Superseded legacy bot
-profiles are intentionally unavailable.
-
-## Game Engine API (key exports)
-- `tick(state, dt, rng, options)` — Advance game state by dt seconds
-- `advanceTime(state, seconds, rng, maxStep, options)` — Advance safely through bounded simulation steps
-- `purchaseUpgrade(state, id)` / `getAvailableUpgrades(state)` / `getUpgradeCost(state, id)`
-- `buyNextRepeatableMilestone(state, id)` — Buy repeatable levels up to the next meaningful milestone
-- `unlockTech(state, id)` / `getAvailableTech(state)`
-- `canAfford(state, cost)` / `spend(state, cost)` / `gather(state, resourceId)`
-- `runExpedition(state, routeId)` — Resolve an early-era expedition
-- `getCycleGoal(state)` / `selectNextCycleDoctrine(state, id)` — Cycle strategy
-- `advanceEchoPressure(state, dt)` / `claimRelic(state, id)` — Run-only relic acquisition
-- `attemptDock(state, position)` — Resolve a finite orbital contract attempt
-- `performPrestige(state)` — Reset with prestige bonuses
-- `createInitialState()` — Fresh game state
+## Browser access
+`window.__game` exposes `getState()`, `setState(fn)`, `fastForward(seconds)`,
+`setSpeed(n)` and `getSpeed()` for manual testing in DevTools.

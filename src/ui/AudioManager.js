@@ -1,4 +1,4 @@
-import { MEMORY_MOTIF } from '../data/score.js';
+import { MEMORY_MOTIF } from './score.js';
 import { createMusicPlayer } from './MusicPlayer.js';
 let audioCtx = null;
 let muted = false;

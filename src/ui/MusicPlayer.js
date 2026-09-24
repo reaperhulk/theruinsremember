@@ -1,4 +1,4 @@
-import { SCORE, scoreBar } from '../data/score.js';
+import { SCORE, scoreBar } from './score.js';
 
 const frequency = midi => 440 * 2 ** ((midi - 69) / 12);
 
