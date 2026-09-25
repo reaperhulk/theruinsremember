@@ -104,6 +104,34 @@ async function play(name, viewport) {
   await s.shot('journal');
   check(await s.overflow() <= 0, `${name}: page scrolls horizontally by ${await s.overflow()}px`);
 
+  // Rapid clicking and double- or triple-clicking text never selects it, and zoom is locked.
+  for (const selector of ['.salvage', '.ticker', '.tab-body', '.building-name', '.dig-target']) {
+    const box = await (await page.$(selector))?.boundingBox();
+    if (!box) continue;
+    const y = box.y + Math.min(10, box.height / 2);
+    await page.mouse.click(box.x + box.width / 2, y, { count: 3 });
+    let selected = await page.evaluate(() => window.getSelection().toString());
+    check(selected === '', `${name}: triple-clicking ${selector} selected "${selected.slice(0, 60)}"`);
+    // Dragging across it, as a finger or mouse does when a press slips.
+    await page.mouse.move(box.x + 2, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width - 2, y, { steps: 8 });
+    await page.mouse.up();
+    selected = await page.evaluate(() => window.getSelection().toString());
+    check(selected === '', `${name}: dragging across ${selector} selected "${selected.slice(0, 60)}"`);
+  }
+  const saveBoxSelectable = await page.evaluate(() => {
+    const box = document.createElement('textarea');
+    document.body.append(box);
+    const style = getComputedStyle(box);
+    const ok = (style.userSelect || style.webkitUserSelect) === 'text';
+    box.remove();
+    return ok;
+  });
+  check(saveBoxSelectable, `${name}: the save text box cannot be selected`);
+  const viewportMeta = await page.$eval('meta[name=viewport]', el => el.content);
+  check(/user-scalable=no/.test(viewportMeta) && /maximum-scale=1/.test(viewportMeta), `${name}: zoom is not locked (${viewportMeta})`);
+
   // Progress survives a reload.
   await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
   const saved = await s.state();
