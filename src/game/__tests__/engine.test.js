@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ACHIEVEMENTS, BUILDINGS, ERA_THRESHOLDS, UPGRADES } from '../data.js';
+import { ACHIEVEMENTS, ARCHIVE_RATE, BUILDINGS, ERA_THRESHOLDS, UPGRADES } from '../data.js';
 import {
   advanceOffline, buyBuilding, buyMemoryUpgrade, buyUpgrade, catchEcho, click, createState,
   getAvailableUpgrades, getBaseSps, getBuildingCost, getClickValue, getGlobalMultiplier, getMaxAffordable, getNextMemoryAt,
-  getPendingMemories, getSps, isBuildingRevealed, tick, turnCycle,
+  getAvailableMemories, getPendingMemories, getSpentMemories, getSps, getUpgradeCost, isBuildingRevealed, tick, turnCycle,
 } from '../engine.js';
 
 const rng = (...values) => { let i = 0; return () => values[i++ % values.length]; };
@@ -170,10 +170,11 @@ describe('time away', () => {
 
 describe('the cycle', () => {
   it('turns lifetime salvage into memories and keeps what the ruins remember', () => {
-    let state = rich(createState(0), 8e12);
+    // Memories are the cube root of lifetime salvage over MEMORY_DIVISOR (1e11).
+    let state = rich(createState(0), 8e11);
     state = buyBuilding(state, 'camp', 10);
     expect(getPendingMemories(state)).toBe(2);
-    expect(getNextMemoryAt(state)).toBe(27e12);
+    expect(getNextMemoryAt(state)).toBe(27e11);
     const next = turnCycle(state);
     expect(next.memories).toBe(2);
     expect(next.cycles).toBe(1);
@@ -188,12 +189,52 @@ describe('the cycle', () => {
     let state = { ...createState(0), memories: 10, buildings: { camp: 1 } };
     expect(getBaseSps(state)).toBeCloseTo(1.1);
     state = buyMemoryUpgrade(state, 'starterKit');
-    expect(state.spentMemories).toBe(3);
+    expect(getSpentMemories(state)).toBe(3);
+    expect(getAvailableMemories(state)).toBe(7);
     // Spending memories never lowers their production bonus.
     expect(getBaseSps({ ...state, achievements: {} })).toBeCloseTo(1.1);
     expect(buyMemoryUpgrade(state, 'starterKit')).toBe(state);
-    expect(buyMemoryUpgrade({ ...createState(0), memories: 100 }, 'starterCamp').memoryUpgrades.starterCamp).toBeUndefined();
+    expect(buyMemoryUpgrade(state, 'lingeringEcho')).toBe(state);
     const next = turnCycle(state);
-    expect(next.buildings).toEqual({ scavenger: 10 });
+    expect(next.buildings).toEqual({ scavenger: 10, camp: 10, foundry: 5 });
+  });
+
+  it('lessons change how a cycle plays', () => {
+    const base = { ...createState(0), buildings: { camp: 10 }, memories: 100000 };
+    const learn = (...ids) => ({ ...base, memoryUpgrades: Object.fromEntries(ids.map(id => [id, true])) });
+    // Remembered Hands: double clicks plus a share of production.
+    expect(getClickValue(learn('rememberedHands'))).toBeCloseTo(2 + getSps(base) * 0.01);
+    // Discounts on buildings and on building upgrades.
+    expect(getBuildingCost(learn('ancestralDiscount'), 'camp')).toBe(Math.ceil(100 * 1.15 ** 10 * 0.9));
+    expect(getUpgradeCost(learn('rememberedBlueprints'), 'camp:1')).toBe(500);
+    expect(getUpgradeCost(learn('rememberedBlueprints'), 'callousedHands')).toBe(100);
+    expect(getUpgradeCost(learn('thePattern', 'rememberedBlueprints'), 'camp:1')).toBe(375);
+    // Deeper memories and resonance raise what memories and achievements are worth.
+    const noAch = s => ({ ...s, achievements: {} });
+    expect(getGlobalMultiplier(noAch(learn('deepMemory'))) / getGlobalMultiplier(noAch(base))).toBeCloseTo(1501 / 1001);
+    expect(getGlobalMultiplier(noAch(learn('deeperMemory'))) / getGlobalMultiplier(noAch(base))).toBeCloseTo(2001 / 1001);
+    const achieved = { ...base, achievements: Object.fromEntries(ACHIEVEMENTS.slice(0, 50).map(a => [a.id, true])) };
+    expect(getGlobalMultiplier({ ...achieved, memoryUpgrades: { resonance: true } }) / getGlobalMultiplier(achieved)).toBeCloseTo(2 / 1.5);
+    expect(getGlobalMultiplier(learn('unbrokenChain')) / getGlobalMultiplier(base)).toBeCloseTo(1.5);
+    // Inheritance: a cycle starts with 1% of what the last one recovered.
+    const inherited = turnCycle({ ...learn('inheritance'), runEarned: 5e12, totalEarned: 5e12 });
+    expect(inherited.salvage).toBe(5e10);
+    expect(inherited.runEarned).toBe(5e10);
+    expect(inherited.era).toBeGreaterThan(1);
+  });
+});
+
+describe('archivists', () => {
+  it('multiply production by achievements and wait for enough of them', () => {
+    const achievements = n => Object.fromEntries(ACHIEVEMENTS.slice(0, n).map(a => [a.id, true]));
+    let state = rich({ ...createState(0), era: 3, achievements: achievements(14) });
+    expect(getAvailableUpgrades(state).some(u => u.id === 'archivist:3')).toBe(false);
+    state = { ...state, achievements: achievements(40) };
+    expect(getAvailableUpgrades(state).some(u => u.id === 'archivist:3')).toBe(true);
+    state = buyUpgrade(state, 'archivist:3');
+    expect(state.upgrades['archivist:3']).toBe(true);
+    const { 'archivist:3': _, ...without } = state.upgrades;
+    const count = Object.keys(state.achievements).length;
+    expect(getGlobalMultiplier(state) / getGlobalMultiplier({ ...state, upgrades: without })).toBeCloseTo(1 + ARCHIVE_RATE * count);
   });
 });

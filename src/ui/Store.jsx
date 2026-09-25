@@ -7,7 +7,7 @@ import {
 import { formatAmount, formatNumber } from './format.js';
 
 const MODES = [1, 10, 100, 'max'];
-const UPGRADE_GLYPHS = { building: '⚒', clickDouble: '✋', clickShare: '✋', global: '✦', echo: '◌' };
+const UPGRADE_GLYPHS = { building: '⚒', clickDouble: '✋', clickShare: '✋', global: '✦', archive: '❖', echo: '◌' };
 
 function upgradeEra(upgrade) {
   return upgrade.kind === 'building' ? BUILDING_BY_ID[upgrade.building].era : upgrade.era || 1;

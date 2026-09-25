@@ -1,6 +1,6 @@
 // Saving, loading, and carrying players over from the original game.
 import { MESSAGES } from './lore.js';
-import { ACHIEVEMENT_BY_ID, BUILDING_BY_ID, ECHO_EFFECTS, MEMORY_UPGRADE_BY_ID, UPGRADE_BY_ID } from './data.js';
+import { ACHIEVEMENT_BY_ID, BUILDING_BY_ID, ECHO_EFFECTS, MEMORY_UPGRADES, MEMORY_UPGRADE_BY_ID, UPGRADE_BY_ID } from './data.js';
 import { SAVE_VERSION, createState, getEraForEarned } from './engine.js';
 
 export const SAVE_KEY = 'the-ruins-remember-save';
@@ -23,13 +23,12 @@ export function parseSave(text) {
   if (!isObject(saved) || saved.version !== SAVE_VERSION) throw new Error('Not a save for this version of the game');
   const fresh = createState(saved.lastSaved);
   const state = { ...fresh };
-  for (const key of ['salvage', 'runEarned', 'totalEarned', 'clicks', 'clickEarned', 'echoesCaught', 'memories', 'bonusMemories', 'spentMemories', 'cycles', 'runTime', 'totalTime', 'lastSaved']) {
+  for (const key of ['salvage', 'runEarned', 'totalEarned', 'clicks', 'clickEarned', 'echoesCaught', 'memories', 'bonusMemories', 'cycles', 'runTime', 'totalTime', 'lastSaved']) {
     if (saved[key] === undefined) continue;
     if (!amount(saved[key])) throw new Error(`Invalid ${key}`);
     state[key] = saved[key];
   }
   if (state.runEarned > state.totalEarned) throw new Error('Invalid earnings');
-  if (state.spentMemories > state.memories + state.bonusMemories) throw new Error('Invalid memories');
   state.buildings = {};
   if (isObject(saved.buildings)) {
     for (const [id, n] of Object.entries(saved.buildings)) {
@@ -40,7 +39,16 @@ export function parseSave(text) {
   }
   state.upgrades = flags(saved.upgrades, UPGRADE_BY_ID);
   state.achievements = flags(saved.achievements, ACHIEVEMENT_BY_ID);
-  state.memoryUpgrades = flags(saved.memoryUpgrades, MEMORY_UPGRADE_BY_ID);
+  // Keep the cheapest lessons that the memories can pay for; retired lessons
+  // and any whose price rose beyond what was earned are refunded.
+  const owned = flags(saved.memoryUpgrades, MEMORY_UPGRADE_BY_ID);
+  let budget = state.memories + state.bonusMemories;
+  state.memoryUpgrades = {};
+  for (const lesson of MEMORY_UPGRADES) {
+    if (!owned[lesson.id] || lesson.cost > budget || (lesson.requires && !state.memoryUpgrades[lesson.requires])) continue;
+    state.memoryUpgrades[lesson.id] = true;
+    budget -= lesson.cost;
+  }
   state.era = Math.max(getEraForEarned(state.runEarned), Number.isInteger(saved.era) ? Math.min(10, Math.max(1, saved.era)) : 1);
   state.highestEra = Math.max(state.era, Number.isInteger(saved.highestEra) ? Math.min(10, saved.highestEra) : 1);
   state.buffs = Array.isArray(saved.buffs)

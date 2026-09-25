@@ -2,8 +2,8 @@
 // same object when nothing changed); nothing here touches the browser.
 import {
   ACHIEVEMENTS, BUILDINGS, BUILDING_BY_ID, COST_SCALE, ECHO_EFFECTS, ECHO_LIFETIME,
-  ECHO_SPAWN_MAX, ECHO_SPAWN_MIN, ERA_COUNT, ERA_THRESHOLDS, MEMORY_DIVISOR,
-  MEMORY_UPGRADE_BY_ID, UPGRADES, UPGRADE_BY_ID,
+  ARCHIVE_RATE, ECHO_SPAWN_MAX, ECHO_SPAWN_MIN, ERA_COUNT, ERA_THRESHOLDS, MEMORY_DIVISOR,
+  MEMORY_UPGRADES, MEMORY_UPGRADE_BY_ID, UPGRADES, UPGRADE_BY_ID,
 } from './data.js';
 import { MESSAGES } from './lore.js';
 
@@ -27,7 +27,6 @@ export function createState(now = Date.now()) {
     echoesCaught: 0,
     memories: 0,
     bonusMemories: 0,
-    spentMemories: 0,
     memoryUpgrades: {},
     cycles: 0,
     // The message left for the next civilization, chosen at the ending.
@@ -42,12 +41,15 @@ export function createState(now = Date.now()) {
 // A fresh cycle keeps everything the ruins remember and nothing else.
 function startCycle(state) {
   const fresh = createState(state.lastSaved);
-  const buildings = {};
-  if (state.memoryUpgrades.starterKit) buildings.scavenger = 10;
-  if (state.memoryUpgrades.starterCamp) buildings.camp = 5;
+  const buildings = state.memoryUpgrades.starterKit ? { scavenger: 10, camp: 10, foundry: 5 } : {};
+  // Inherited salvage counts as recovered this cycle, so it reveals eras and
+  // buildings, but it was already counted toward memories once.
+  const inherited = state.memoryUpgrades.inheritance ? Math.floor(state.runEarned * 0.01) : 0;
   return {
     ...fresh,
     buildings,
+    salvage: inherited,
+    runEarned: inherited,
     totalEarned: state.totalEarned,
     clicks: state.clicks,
     clickEarned: state.clickEarned,
@@ -56,7 +58,6 @@ function startCycle(state) {
     echoesCaught: state.echoesCaught,
     memories: state.memories,
     bonusMemories: state.bonusMemories,
-    spentMemories: state.spentMemories,
     memoryUpgrades: state.memoryUpgrades,
     cycles: state.cycles,
     message: state.message,
@@ -75,8 +76,14 @@ export function getTotalMemories(state) {
   return state.memories + state.bonusMemories;
 }
 
+// Spent memories are always the price of the lessons owned, so changing or
+// retiring a lesson refunds it automatically.
+export function getSpentMemories(state) {
+  return MEMORY_UPGRADES.reduce((sum, u) => sum + (state.memoryUpgrades[u.id] ? u.cost : 0), 0);
+}
+
 export function getAvailableMemories(state) {
-  return getTotalMemories(state) - state.spentMemories;
+  return Math.max(0, getTotalMemories(state) - getSpentMemories(state));
 }
 
 // Everything the owned upgrades contribute, computed once per upgrade set.
@@ -84,12 +91,13 @@ const upgradeEffectCache = new WeakMap();
 function upgradeEffects(upgrades) {
   let effects = upgradeEffectCache.get(upgrades);
   if (effects) return effects;
-  effects = { tiers: {}, global: 1, clickDoublers: 0, clickShares: 0 };
+  effects = { tiers: {}, global: 1, archivists: 0, clickDoublers: 0, clickShares: 0 };
   for (const id of Object.keys(upgrades)) {
     const upgrade = UPGRADE_BY_ID[id];
     if (!upgrade) continue;
     if (upgrade.kind === 'building') effects.tiers[upgrade.building] = (effects.tiers[upgrade.building] || 0) + 1;
     else if (upgrade.kind === 'global') effects.global *= upgrade.value;
+    else if (upgrade.kind === 'archive') effects.archivists++;
     else if (upgrade.kind === 'clickDouble') effects.clickDoublers++;
     else if (upgrade.kind === 'clickShare') effects.clickShares++;
   }
@@ -98,10 +106,23 @@ function upgradeEffects(upgrades) {
 }
 
 // Permanent and run-long multipliers on all production, excluding echo buffs.
+export function getMemoryBonus(state) {
+  const m = state.memoryUpgrades;
+  return m.deeperMemory ? 0.02 : m.deepMemory ? 0.015 : 0.01;
+}
+
+export function getAchievementBonus(state) {
+  return state.memoryUpgrades.resonance ? 0.02 : 0.01;
+}
+
 export function getGlobalMultiplier(state) {
   const achievements = Object.keys(state.achievements).length;
-  return (1 + 0.01 * getTotalMemories(state)) * (1 + 0.01 * achievements) * upgradeEffects(state.upgrades).global
-    * (state.memoryUpgrades.unbrokenChain ? 1.25 : 1);
+  const { global, archivists } = upgradeEffects(state.upgrades);
+  return (1 + getMemoryBonus(state) * getTotalMemories(state))
+    * (1 + getAchievementBonus(state) * achievements)
+    * (1 + ARCHIVE_RATE * achievements) ** archivists
+    * global
+    * (state.memoryUpgrades.unbrokenChain ? 1.5 : 1);
 }
 
 export function getBuildingMultiplier(state, buildingId) {
@@ -134,8 +155,9 @@ export function getSps(state) {
 
 export function getClickValue(state) {
   const { clickDoublers, clickShares } = upgradeEffects(state.upgrades);
-  const base = 2 ** clickDoublers * (state.memoryUpgrades.rememberedHands ? 2 : 1);
-  return (base + getSps(state) * 0.01 * clickShares) * buffMultiplier(state.buffs, 'click');
+  const hands = state.memoryUpgrades.rememberedHands;
+  const base = 2 ** clickDoublers * (hands ? 2 : 1);
+  return (base + getSps(state) * 0.01 * (clickShares + (hands ? 1 : 0))) * buffMultiplier(state.buffs, 'click');
 }
 
 export function getStats(state) {
@@ -151,7 +173,7 @@ export function getStats(state) {
 // --- Buildings -------------------------------------------------------------
 
 function buildingDiscount(state) {
-  return state.memoryUpgrades.ancestralDiscount ? 0.95 : 1;
+  return state.memoryUpgrades.ancestralDiscount ? 0.9 : 1;
 }
 
 // Total price of the next `amount` buildings of one kind.
@@ -193,7 +215,8 @@ export function buyBuilding(state, buildingId, amount = 1) {
 export function getUpgradeCost(state, upgradeId) {
   const upgrade = UPGRADE_BY_ID[upgradeId];
   if (!upgrade) return Infinity;
-  return Math.ceil(upgrade.cost * (state.memoryUpgrades.thePattern ? 0.9 : 1));
+  const m = state.memoryUpgrades;
+  return Math.ceil(upgrade.cost * (m.thePattern ? 0.75 : 1) * (m.rememberedBlueprints && upgrade.kind === 'building' ? 0.5 : 1));
 }
 
 export function isUpgradeUnlocked(state, upgradeId) {
@@ -205,6 +228,7 @@ export function isUpgradeUnlocked(state, upgradeId) {
   if (r.earned && state.runEarned < r.earned) return false;
   if (r.era && state.era < r.era) return false;
   if (r.echoes && state.echoesCaught < r.echoes) return false;
+  if (r.achievements && Object.keys(state.achievements).length < r.achievements) return false;
   return true;
 }
 
@@ -408,7 +432,7 @@ export function buyMemoryUpgrade(state, id) {
   if (!isMemoryUpgradeAvailable(state, id)) return state;
   const upgrade = MEMORY_UPGRADE_BY_ID[id];
   if (getAvailableMemories(state) < upgrade.cost) return state;
-  return refresh({ ...state, spentMemories: state.spentMemories + upgrade.cost, memoryUpgrades: { ...state.memoryUpgrades, [id]: true } });
+  return refresh({ ...state, memoryUpgrades: { ...state.memoryUpgrades, [id]: true } });
 }
 
 // --- The ending ------------------------------------------------------------

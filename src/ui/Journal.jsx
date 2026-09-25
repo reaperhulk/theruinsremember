@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ACHIEVEMENTS, ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_COUNT, ERA_NAMES, ERA_THRESHOLDS, MEMORY_UPGRADES, UPGRADES } from '../game/data.js';
 import {
   getAvailableMemories, getBuildingCount, getClickValue, getGlobalMultiplier, getNextMemoryAt,
-  canLeaveMessage, getOfflineEfficiency, getPendingMemories, getSps, getTotalMemories, isMemoryUpgradeAvailable,
+  canLeaveMessage, getAchievementBonus, getMemoryBonus, getOfflineEfficiency, getPendingMemories, getSps, getTotalMemories, isMemoryUpgradeAvailable,
 } from '../game/engine.js';
 import { CHAPTERS, MESSAGES } from '../game/lore.js';
 import { formatAmount, formatNumber, formatTime } from './format.js';
@@ -69,9 +69,9 @@ function Cycle({ state, onTurn, onBuyMemory }) {
   const total = getTotalMemories(state);
   return (
     <div className="cycle">
-      <p>Every civilization reaches this point. When you let the cycle turn, your buildings, upgrades and salvage return to the ruins. What you recovered becomes <strong>memories</strong>. Each memory adds 1% to all production, forever, and can also be spent once on the lessons below.</p>
+      <p>Every civilization reaches this point. When you let the cycle turn, your buildings, upgrades and salvage return to the ruins. What you recovered becomes <strong>memories</strong>. Each memory adds {Math.round(getMemoryBonus(state) * 1000) / 10}% to all production, forever, and can also be spent once on the lessons below. Spending memories never lowers that bonus.</p>
       <dl className="stat-list">
-        <dt>Memories</dt><dd>{formatAmount(total)} (+{formatAmount(total)}% production)</dd>
+        <dt>Memories</dt><dd>{formatAmount(total)} (+{formatAmount(total * getMemoryBonus(state) * 100)}% production)</dd>
         <dt>Unspent</dt><dd>{formatAmount(getAvailableMemories(state))}</dd>
         <dt>Turning now gives</dt><dd>{formatAmount(pending)}</dd>
         <dt>Next memory at</dt><dd>{formatAmount(getNextMemoryAt(state))} total salvage ({formatAmount(state.totalEarned)} so far)</dd>
@@ -114,7 +114,7 @@ function Achievements({ state }) {
   const earned = Object.keys(state.achievements).length;
   return (
     <div>
-      <p>{earned} of {ACHIEVEMENTS.length} achievements. Each adds 1% to all production.</p>
+      <p>{earned} of {ACHIEVEMENTS.length} achievements. Each adds {Math.round(getAchievementBonus(state) * 100)}% to all production, and Archivist improvements multiply production further for every achievement.</p>
       <ul className="achievement-grid">
         {ACHIEVEMENTS.map(a => {
           const has = !!state.achievements[a.id];

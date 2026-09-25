@@ -82,10 +82,10 @@ function spendMemories(state, counters) {
 // the run has had time to matter.
 function shouldTurnCycle(state) {
   const pending = getPendingMemories(state);
-  return pending >= Math.max(5, getTotalMemories(state)) && state.runTime >= 1800;
+  return pending >= Math.max(10, getTotalMemories(state)) && state.runTime >= 1800;
 }
 
-export function simulate(persona, { seed = 1, horizon = persona.horizon } = {}) {
+export function simulate(persona, { seed = 1, horizon = persona.horizon, onCycle } = {}) {
   const rng = seededRng(seed);
   let state = createState(0);
   const counters = { actions: 0, clicks: 0, purchases: 0, echoes: 0, cycles: 0, sessions: 0, active: 0, longestWait: 0 };
@@ -121,6 +121,7 @@ export function simulate(persona, { seed = 1, horizon = persona.horizon } = {}) 
         // Longest stretch of attention spent with nothing worth buying.
         counters.longestWait = Math.max(counters.longestWait, counters.active - lastPurchaseActive);
         if (shouldTurnCycle(state)) {
+          onCycle?.({ time, state });
           state = spendMemories(turnCycle(state), counters);
           cycleTimes.push(time);
           counters.cycles++;

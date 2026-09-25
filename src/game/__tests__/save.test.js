@@ -48,3 +48,14 @@ describe('saves', () => {
     expect(loadSave(memoryStorage()).state).toBeNull();
   });
 });
+
+describe('lesson refunds', () => {
+  it('refund retired lessons and any the memories can no longer pay for', () => {
+    const saved = { ...createState(0), memories: 12, memoryUpgrades: { patientRuins: true, starterKit: true, starterCamp: true, lingeringEcho: true }, spentMemories: 40 };
+    const loaded = parseSave(JSON.stringify(saved));
+    // starterCamp is retired and Lingering Glimmer now costs more than was
+    // earned (and needs Glimmer Sense); both are refunded.
+    expect(loaded.memoryUpgrades).toEqual({ patientRuins: true, starterKit: true });
+    expect(loaded.spentMemories).toBeUndefined();
+  });
+});

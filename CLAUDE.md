@@ -52,6 +52,7 @@ in `scripts/pacing.mjs` only on purpose, and say why in the commit.
 - `npm run test` / `npm run test:unit` — Vitest (watch / once)
 - `npm run test:pacing` — eight personas × two seeds against the pacing contract
 - `node scripts/pacing.mjs --persona check_in --horizon 720` — long-horizon run (hours)
+- `node scripts/growth-trace.mjs engaged` — production, multipliers and memories every 30 minutes of one run
 - `npm run test:browser` — browser smoke test (needs the dev server; `PUPPETEER_EXECUTABLE_PATH` to use another Chrome)
 - `npm run build` — production build to `dist/`
 
