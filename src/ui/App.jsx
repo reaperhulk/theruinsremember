@@ -222,7 +222,7 @@ export function App() {
       {game.welcome != null && (
         <Modal title="The ruins remember you" onClose={game.dismissWelcome}>
           <p>The Ruins Remember has been rebuilt as a clicker. Dig by hand, build, and let the cycle turn.</p>
-          <p>Your earlier civilization is not forgotten: you begin with <strong>{game.welcome} memories</strong>, each adding 1% to all production.</p>
+          <p>Your earlier civilization is not forgotten: you begin with <strong>{game.welcome} memories</strong>, which multiply all production. Spend them on lessons in The Cycle tab.</p>
         </Modal>
       )}
       {game.away && !game.welcome && (

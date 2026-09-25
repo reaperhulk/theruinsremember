@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ACHIEVEMENTS, ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_COUNT, ERA_NAMES, ERA_THRESHOLDS, MEMORY_UPGRADES, UPGRADES } from '../game/data.js';
 import {
   getAvailableMemories, getBuildingCount, getClickValue, getGlobalMultiplier, getNextMemoryAt,
-  canLeaveMessage, getAchievementBonus, getMemoryBonus, getOfflineEfficiency, getPendingMemories, getSps, getTotalMemories, isMemoryUpgradeAvailable,
+  canLeaveMessage, getAchievementBonus, getMemoryMultiplier, getOfflineEfficiency, getPendingMemories, getSps, getTotalMemories, isMemoryUpgradeAvailable,
 } from '../game/engine.js';
 import { CHAPTERS, MESSAGES } from '../game/lore.js';
 import { formatAmount, formatNumber, formatTime } from './format.js';
@@ -69,11 +69,11 @@ function Cycle({ state, onTurn, onBuyMemory }) {
   const total = getTotalMemories(state);
   return (
     <div className="cycle">
-      <p>Every civilization reaches this point. When you let the cycle turn, your buildings, upgrades and salvage return to the ruins. What you recovered becomes <strong>memories</strong>. Each memory adds {Math.round(getMemoryBonus(state) * 1000) / 10}% to all production, forever, and can also be spent once on the lessons below. Spending memories never lowers that bonus.</p>
+      <p>Every civilization reaches this point. When you let the cycle turn, your buildings, upgrades and salvage return to the ruins. What you recovered becomes <strong>memories</strong>. They multiply all production, forever: the first few count the most. They can also be spent once on the lessons below, and spending them never lowers that bonus.</p>
       <dl className="stat-list">
-        <dt>Memories</dt><dd>{formatAmount(total)} (+{formatAmount(total * getMemoryBonus(state) * 100)}% production)</dd>
+        <dt>Memories</dt><dd>{formatAmount(total)} (production ×{formatNumber(getMemoryMultiplier(state))})</dd>
         <dt>Unspent</dt><dd>{formatAmount(getAvailableMemories(state))}</dd>
-        <dt>Turning now gives</dt><dd>{formatAmount(pending)}</dd>
+        <dt>Turning now gives</dt><dd>{formatAmount(pending)}{pending > 0 ? ` (production ×${formatNumber(getMemoryMultiplier(state))} → ×${formatNumber(getMemoryMultiplier(state, total + pending))})` : ''}</dd>
         <dt>Next memory at</dt><dd>{formatAmount(getNextMemoryAt(state))} total salvage ({formatAmount(state.totalEarned)} so far)</dd>
       </dl>
       {confirming ? (

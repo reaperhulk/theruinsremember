@@ -187,12 +187,13 @@ describe('the cycle', () => {
 
   it('memories raise production and pay for lessons', () => {
     let state = { ...createState(0), memories: 10, buildings: { camp: 1 } };
-    expect(getBaseSps(state)).toBeCloseTo(1.1);
+    // Memories multiply production by 1 + 0.5·√memories.
+    expect(getBaseSps(state)).toBeCloseTo(1 + 0.5 * Math.sqrt(10));
     state = buyMemoryUpgrade(state, 'starterKit');
     expect(getSpentMemories(state)).toBe(3);
     expect(getAvailableMemories(state)).toBe(7);
     // Spending memories never lowers their production bonus.
-    expect(getBaseSps({ ...state, achievements: {} })).toBeCloseTo(1.1);
+    expect(getBaseSps({ ...state, achievements: {} })).toBeCloseTo(1 + 0.5 * Math.sqrt(10));
     expect(buyMemoryUpgrade(state, 'starterKit')).toBe(state);
     expect(buyMemoryUpgrade(state, 'lingeringEcho')).toBe(state);
     const next = turnCycle(state);
@@ -211,13 +212,15 @@ describe('the cycle', () => {
     expect(getUpgradeCost(learn('thePattern', 'rememberedBlueprints'), 'camp:1')).toBe(375);
     // Deeper memories and resonance raise what memories and achievements are worth.
     const noAch = s => ({ ...s, achievements: {} });
-    expect(getGlobalMultiplier(noAch(learn('deepMemory'))) / getGlobalMultiplier(noAch(base))).toBeCloseTo(1501 / 1001);
-    expect(getGlobalMultiplier(noAch(learn('deeperMemory'))) / getGlobalMultiplier(noAch(base))).toBeCloseTo(2001 / 1001);
+    const root = Math.sqrt(100000);
+    expect(getGlobalMultiplier(noAch(learn('deepMemory'))) / getGlobalMultiplier(noAch(base))).toBeCloseTo((1 + 0.75 * root) / (1 + 0.5 * root));
+    expect(getGlobalMultiplier(noAch(learn('deeperMemory'))) / getGlobalMultiplier(noAch(base))).toBeCloseTo((1 + root) / (1 + 0.5 * root));
     const achieved = { ...base, achievements: Object.fromEntries(ACHIEVEMENTS.slice(0, 50).map(a => [a.id, true])) };
     expect(getGlobalMultiplier({ ...achieved, memoryUpgrades: { resonance: true } }) / getGlobalMultiplier(achieved)).toBeCloseTo(2 / 1.5);
     expect(getGlobalMultiplier(learn('unbrokenChain')) / getGlobalMultiplier(base)).toBeCloseTo(1.5);
-    // Inheritance: a cycle starts with 1% of what the last one recovered.
-    const inherited = turnCycle({ ...learn('inheritance'), runEarned: 5e12, totalEarned: 5e12 });
+    // Head Start and Inheritance: a cycle starts with 0.1% or 1% of what the last one recovered.
+    expect(turnCycle({ ...learn('headStart'), runEarned: 5e12, totalEarned: 5e12 }).salvage).toBe(5e9);
+    const inherited = turnCycle({ ...learn('headStart', 'inheritance'), runEarned: 5e12, totalEarned: 5e12 });
     expect(inherited.salvage).toBe(5e10);
     expect(inherited.runEarned).toBe(5e10);
     expect(inherited.era).toBeGreaterThan(1);

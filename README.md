@@ -25,7 +25,7 @@ Prestige isn't just a mechanic. It's the cycle itself.
 - **Improve.** About 200 upgrades: doublers for each building, click upgrades that add a share of production to every dig, and chronicle upgrades for each era.
 - **Catch glimmers.** Every few minutes a memory glimmers in the ruins. Catch it for a cache of salvage, seventy-seven seconds of ×7 production, or thirteen seconds of ×777 digging.
 - **Reach new eras.** Each era is revealed by how much this civilization has recovered, with its own chapter, scene, music and discoveries.
-- **Let the cycle turn.** Everything returns to the ruins, and what you recovered becomes memories: +1% production each, forever, and spendable on permanent lessons such as starting buildings and better offline production.
+- **Let the cycle turn.** Everything returns to the ruins, and what you recovered becomes memories. They multiply all production forever (ten memories already make you about 2.6× faster), and buy permanent lessons such as a head start, starting buildings and better offline production. The cycle screen shows how much faster you'll be before you commit.
 - **Remember.** After the first cycle the ruins become personal: the camp is where you left it, and the notes are in your handwriting. Build the Echo of Yourself to learn the final truth and choose the message the next civilization will find carved into the ruins.
 - **Achievements.** 156 of them, each worth +1% production.
 

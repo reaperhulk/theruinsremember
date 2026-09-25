@@ -44,7 +44,7 @@ function startCycle(state) {
   const buildings = state.memoryUpgrades.starterKit ? { scavenger: 10, camp: 10, foundry: 5 } : {};
   // Inherited salvage counts as recovered this cycle, so it reveals eras and
   // buildings, but it was already counted toward memories once.
-  const inherited = state.memoryUpgrades.inheritance ? Math.floor(state.runEarned * 0.01) : 0;
+  const inherited = Math.floor(state.runEarned * getInheritanceRate(state));
   return {
     ...fresh,
     buildings,
@@ -106,9 +106,22 @@ function upgradeEffects(upgrades) {
 }
 
 // Permanent and run-long multipliers on all production, excluding echo buffs.
-export function getMemoryBonus(state) {
+// Memories multiply production by 1 + k·√memories. The square root makes the
+// first few memories count for a lot (10 memories ≈ ×2.6) without letting
+// later cycles run away.
+export function getMemoryStrength(state) {
   const m = state.memoryUpgrades;
-  return m.deeperMemory ? 0.02 : m.deepMemory ? 0.015 : 0.01;
+  return m.deeperMemory ? 1 : m.deepMemory ? 0.75 : 0.5;
+}
+
+export function getMemoryMultiplier(state, memories = getTotalMemories(state)) {
+  return 1 + getMemoryStrength(state) * Math.sqrt(memories);
+}
+
+// Share of the last cycle's recovered salvage a new cycle starts with.
+export function getInheritanceRate(state) {
+  const m = state.memoryUpgrades;
+  return m.inheritance ? 0.01 : m.headStart ? 0.001 : 0;
 }
 
 export function getAchievementBonus(state) {
@@ -118,7 +131,7 @@ export function getAchievementBonus(state) {
 export function getGlobalMultiplier(state) {
   const achievements = Object.keys(state.achievements).length;
   const { global, archivists } = upgradeEffects(state.upgrades);
-  return (1 + getMemoryBonus(state) * getTotalMemories(state))
+  return getMemoryMultiplier(state)
     * (1 + getAchievementBonus(state) * achievements)
     * (1 + ARCHIVE_RATE * achievements) ** archivists
     * global

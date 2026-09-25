@@ -38,10 +38,10 @@ export const BUILDINGS = [
   { id: 'stellarForge', era: 7, name: 'Stellar Forge', plural: 'Stellar Forges', cost: 2.1e15, sps: 2.9e9, description: 'Smelts the ruins of whole systems.' },
   { id: 'hyperlane', era: 8, name: 'Hyperlane', plural: 'Hyperlanes', cost: 2.6e16, sps: 2.1e10, description: 'Joins a galaxy of ruins into one excavation.' },
   { id: 'galacticArchive', era: 8, name: 'Galactic Archive', plural: 'Galactic Archives', cost: 3.1e17, sps: 1.5e11, description: 'Every delegate brings a different version of the same history.' },
-  { id: 'voidBridge', era: 9, name: 'Void Bridge', plural: 'Void Bridges', cost: 7.1e19, sps: 1.1e12, description: 'Spans the dark between galaxies. The far end is already built.' },
-  { id: 'cosmicLoom', era: 9, name: 'Cosmic Loom', plural: 'Cosmic Looms', cost: 1.2e22, sps: 8.3e12, description: 'Reweaves the background radiation into a map of your civilization.' },
-  { id: 'realityEngine', era: 10, name: 'Reality Engine', plural: 'Reality Engines', cost: 1.9e24, sps: 6.4e13, description: 'Salvages the universes next door.' },
-  { id: 'echo', era: 10, name: 'Echo of Yourself', plural: 'Echoes of Yourself', cost: 5.4e26, sps: 5.1e14, description: 'You were the ruins all along. Now you can help.' },
+  { id: 'voidBridge', era: 9, name: 'Void Bridge', plural: 'Void Bridges', cost: 7.1e21, sps: 1.1e12, description: 'Spans the dark between galaxies. The far end is already built.' },
+  { id: 'cosmicLoom', era: 9, name: 'Cosmic Loom', plural: 'Cosmic Looms', cost: 1.2e24, sps: 8.3e12, description: 'Reweaves the background radiation into a map of your civilization.' },
+  { id: 'realityEngine', era: 10, name: 'Reality Engine', plural: 'Reality Engines', cost: 1.9e26, sps: 6.4e13, description: 'Salvages the universes next door.' },
+  { id: 'echo', era: 10, name: 'Echo of Yourself', plural: 'Echoes of Yourself', cost: 5.4e28, sps: 5.1e14, description: 'You were the ruins all along. Now you can help.' },
 ];
 export const BUILDING_BY_ID = Object.fromEntries(BUILDINGS.map(b => [b.id, b]));
 
@@ -179,8 +179,9 @@ export const ECHO_SPAWN_MIN = 300;
 export const ECHO_SPAWN_MAX = 900;
 export const ECHO_LIFETIME = 13;
 
-// Letting the cycle turn converts lifetime salvage into memories. Each memory
-// adds 1% to all production forever and can also be spent once below.
+// Letting the cycle turn converts lifetime salvage into memories. Memories
+// multiply all production (see getMemoryMultiplier) and can also be spent
+// once on the lessons below.
 export const MEMORY_DIVISOR = 1e11;
 
 // Lessons are bought with memories and kept forever. Spending memories never
@@ -188,19 +189,20 @@ export const MEMORY_DIVISOR = 1e11;
 export const MEMORY_UPGRADES = [
   { id: 'patientRuins', name: 'Patient Ruins', cost: 1, description: 'While you are away, the ruins keep producing at 25% instead of 10%.' },
   { id: 'starterKit', name: 'Starter Kit', cost: 3, description: 'Each cycle begins with 10 Scavengers, 10 Salvage Camps and 5 Foundries.' },
-  { id: 'rememberedHands', name: 'Remembered Hands', cost: 5, description: 'Clicking is twice as effective, and every click also recovers 1% of your salvage per second.' },
+  { id: 'headStart', name: 'Head Start', cost: 5, description: 'Each cycle begins with 0.1% of the salvage your last cycle recovered, so the opening eras fly by.' },
+  { id: 'rememberedHands', name: 'Remembered Hands', cost: 8, description: 'Clicking is twice as effective, and every click also recovers 1% of your salvage per second.' },
   { id: 'echoSense', name: 'Glimmer Sense', cost: 10, description: 'Glimmers appear 50% more often.' },
   { id: 'ancestralDiscount', name: 'Ancestral Discount', cost: 25, description: 'Buildings cost 10% less.' },
   { id: 'rememberedBlueprints', name: 'Remembered Blueprints', cost: 50, description: 'Building upgrades cost half as much.' },
   { id: 'lingeringEcho', name: 'Lingering Glimmer', cost: 100, description: 'Glimmer effects last 50% longer.', requires: 'echoSense' },
   { id: 'ruinsWait', name: 'The Ruins Wait', cost: 150, description: 'While you are away, production continues at 50%.', requires: 'patientRuins' },
-  { id: 'deepMemory', name: 'Deep Memory', cost: 300, description: 'Each memory adds 1.5% to production instead of 1%.' },
+  { id: 'deepMemory', name: 'Deep Memory', cost: 300, description: 'Memories are 50% more powerful.' },
   { id: 'thePattern', name: 'The Pattern', cost: 500, description: 'All upgrades cost 25% less.', requires: 'ancestralDiscount' },
   { id: 'resonance', name: 'Resonance', cost: 1000, description: 'Each achievement adds 2% to production instead of 1%.' },
   { id: 'unbrokenChain', name: 'Unbroken Chain', cost: 2000, description: 'All production +50%.' },
-  { id: 'inheritance', name: 'Inheritance', cost: 5000, description: 'Each cycle begins with 1% of the salvage your last cycle recovered.' },
+  { id: 'inheritance', name: 'Inheritance', cost: 2000, description: 'Each cycle begins with 1% of the salvage your last cycle recovered instead of 0.1%.', requires: 'headStart' },
   { id: 'nothingIsLost', name: 'Nothing Is Lost', cost: 7500, description: 'While you are away, production continues at full strength.', requires: 'ruinsWait' },
-  { id: 'deeperMemory', name: 'Deeper Memory', cost: 25000, description: 'Each memory adds 2% to production.', requires: 'deepMemory' },
+  { id: 'deeperMemory', name: 'Deeper Memory', cost: 25000, description: 'Memories are twice as powerful as they began.', requires: 'deepMemory' },
 ];
 export const MEMORY_UPGRADE_BY_ID = Object.fromEntries(MEMORY_UPGRADES.map(u => [u.id, u]));
 

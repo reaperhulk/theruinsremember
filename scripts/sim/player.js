@@ -2,7 +2,7 @@
 // its persona's attention windows.
 import {
   buyBuilding, buyMemoryUpgrade, buyUpgrade, catchEcho, click, createState, getAvailableMemories,
-  getAvailableUpgrades, getBaseSps, getBuildingCost, getClickValue, getPendingMemories,
+  getAvailableUpgrades, getBaseSps, getBuildingCost, getClickValue, getMemoryMultiplier, getPendingMemories,
   getTotalMemories, getUpgradeCost, isBuildingRevealed, isMemoryUpgradeAvailable, tick, advanceOffline, turnCycle,
 } from '../../src/game/engine.js';
 import { BUILDINGS, MEMORY_UPGRADES } from '../../src/game/data.js';
@@ -78,11 +78,13 @@ function spendMemories(state, counters) {
   return state;
 }
 
-// Turn the cycle once it would at least double what the ruins remember, and
-// the run has had time to matter.
+// Turn the cycle once it would at least double production (what the cycle
+// screen previews), is worth at least 10 memories, and the run has had time
+// to matter.
 function shouldTurnCycle(state) {
   const pending = getPendingMemories(state);
-  return pending >= Math.max(10, getTotalMemories(state)) && state.runTime >= 1800;
+  const total = getTotalMemories(state);
+  return pending >= 10 && state.runTime >= 1800 && getMemoryMultiplier(state, total + pending) >= 2 * getMemoryMultiplier(state, total);
 }
 
 export function simulate(persona, { seed = 1, horizon = persona.horizon, onCycle } = {}) {
@@ -92,11 +94,19 @@ export function simulate(persona, { seed = 1, horizon = persona.horizon, onCycle
   let lastPurchaseActive = 0;
   const eraTimes = { 1: 0 };
   const cycleTimes = [];
+  // How long each new run takes to recover what the previous run ended with,
+  // as a fraction of that previous run's length.
+  const recoveries = [];
+  let chase = null;
   let time = 0;
   let clickCarry = 0;
   let nextDecision = 0;
   const sessions = persona.sessions;
   const record = () => {
+    if (chase && state.runEarned >= chase.target) {
+      recoveries.push((time - chase.start) / chase.length);
+      chase = null;
+    }
     for (let era = 2; era <= 10; era++) if (eraTimes[era] === undefined && state.highestEra >= era) eraTimes[era] = time;
   };
   const activeStep = seconds => {
@@ -122,6 +132,7 @@ export function simulate(persona, { seed = 1, horizon = persona.horizon, onCycle
         counters.longestWait = Math.max(counters.longestWait, counters.active - lastPurchaseActive);
         if (shouldTurnCycle(state)) {
           onCycle?.({ time, state });
+          chase = { target: state.runEarned, length: time - (cycleTimes.at(-1) ?? 0), start: time };
           state = spendMemories(turnCycle(state), counters);
           cycleTimes.push(time);
           counters.cycles++;
@@ -149,6 +160,7 @@ export function simulate(persona, { seed = 1, horizon = persona.horizon, onCycle
     horizon,
     eraTimes,
     cycleTimes,
+    recoveries,
     finalEra: state.era,
     highestEra: state.highestEra,
     memories: getTotalMemories(state),

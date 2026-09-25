@@ -23,16 +23,20 @@ const fmt = s => s === undefined || s === null ? '—' : s < 3600 ? `${Math.floo
 const results = [];
 for (const id of ids) for (const seed of seeds) results.push({ persona: id, seed, ...simulate(PERSONAS[id], { seed, ...(horizon ? { horizon } : {}) }) });
 
+// Turning the cycle must pay off: the next run gets back to where the last
+// one ended in at most 40% of the time the last run took.
+const firstRecovery = r => r.cycles ? [[r.recoveries[0] !== undefined && r.recoveries[0] <= 0.4, `recovers its first cycle's progress in at most 40% of the time (took ${r.recoveries[0]?.toFixed(2) ?? 'forever'})`]] : [];
+
 // What each persona must experience. Times are in seconds of wall-clock play.
 const MIN = 60, HOUR = 3600, DAY = 86400;
 const CONTRACT = {
   newcomer: r => [[r.eraTimes[2] <= 5 * MIN, 'reaches Industrialization within 5 minutes'], [r.eraTimes[3] <= 30 * MIN, 'reaches the Digital Age within 30 minutes'], [r.eraTimes[4] <= 1 * HOUR, 'reaches the Space Age within an hour']],
-  engaged: r => [[r.eraTimes[2] <= 3 * MIN, 'reaches Industrialization within 3 minutes'], [r.eraTimes[4] <= 1 * HOUR, 'reaches the Space Age within an hour'], [r.cycleTimes[0] >= 2 * HOUR && r.cycleTimes[0] <= 8 * HOUR, 'first turns the cycle after 2–8 hours'], [r.eraTimes[5] <= 2 * HOUR, 'reaches the Solar System within 2 hours']],
-  optimizer: r => [[r.cycleTimes[0] >= 2 * HOUR && r.cycleTimes[0] <= 7 * HOUR, 'first turns the cycle after 2–7 hours'], [r.eraTimes[6] <= 5 * HOUR, 'reaches Interstellar within 5 hours']],
+  engaged: r => [...firstRecovery(r), [r.eraTimes[2] <= 3 * MIN, 'reaches Industrialization within 3 minutes'], [r.eraTimes[4] <= 1 * HOUR, 'reaches the Space Age within an hour'], [r.cycleTimes[0] >= 2 * HOUR && r.cycleTimes[0] <= 8 * HOUR, 'first turns the cycle after 2–8 hours'], [r.eraTimes[5] <= 2 * HOUR, 'reaches the Solar System within 2 hours']],
+  optimizer: r => [...firstRecovery(r), [r.cycleTimes[0] >= 2 * HOUR && r.cycleTimes[0] <= 7 * HOUR, 'first turns the cycle after 2–7 hours'], [r.eraTimes[6] <= 5 * HOUR, 'reaches Interstellar within 5 hours']],
   background: r => [[r.eraTimes[3] <= 45 * MIN, 'reaches the Digital Age within 45 minutes'], [r.eraTimes[5] <= 4 * HOUR, 'reaches the Solar System within 4 hours']],
   check_in: r => [[r.eraTimes[4] <= 6 * HOUR, 'reaches the Space Age within 6 hours'], [r.eraTimes[6] <= 1 * DAY, 'reaches Interstellar within a day']],
   offline_returner: r => [[r.eraTimes[3] <= 12 * HOUR, 'reaches the Digital Age within 12 hours'], [r.eraTimes[5] <= 2 * DAY, 'reaches the Solar System within 2 days']],
-  completionist: r => [[r.cycleTimes[0] <= 8 * HOUR, 'turns the cycle within 8 hours'], [r.echoes >= 50, 'catches at least 50 echoes']],
+  completionist: r => [[r.cycleTimes[0] <= 8 * HOUR, 'turns the cycle within 8 hours'], [r.echoes >= 50, 'catches at least 50 echoes'], ...firstRecovery(r)],
   minimalist: r => [[r.eraTimes[4] <= 3 * HOUR, 'reaches the Space Age within 3 hours without clicking much'], [r.eraTimes[5] <= 8 * HOUR, 'reaches the Solar System within 8 hours']],
 };
 // Clicking must matter: an engaged player is well ahead of a minimalist.
@@ -58,10 +62,10 @@ const summary = r => ({
 
 if (args.includes('--json')) console.log(JSON.stringify(results, null, 2));
 else if (!value('--baseline')) {
-  console.log('persona           seed horizon  era2  era3  era4  era5  era6  era7  era8  era9 era10  1st cycle cycles  mem   clicks  buys echoes');
+  console.log('persona           seed horizon  era2  era3  era4  era5  era6  era7  era8  era9 era10  1st cycle cycles  mem   clicks  buys echoes  recovery');
   for (const r of results) {
     const eras = [2, 3, 4, 5, 6, 7, 8, 9, 10].map(e => fmt(r.eraTimes[e]).padStart(5)).join(' ');
-    console.log(`${r.persona.padEnd(17)} ${String(r.seed).padStart(4)} ${fmt(r.horizon).padStart(7)} ${eras} ${fmt(r.cycleTimes[0]).padStart(10)} ${String(r.cycles).padStart(6)} ${String(r.memories).padStart(4)} ${String(r.clicks).padStart(8)} ${String(r.purchases).padStart(5)} ${String(r.echoes).padStart(6)}`);
+    console.log(`${r.persona.padEnd(17)} ${String(r.seed).padStart(4)} ${fmt(r.horizon).padStart(7)} ${eras} ${fmt(r.cycleTimes[0]).padStart(10)} ${String(r.cycles).padStart(6)} ${String(r.memories).padStart(4)} ${String(r.clicks).padStart(8)} ${String(r.purchases).padStart(5)} ${String(r.echoes).padStart(6)}  ${r.recoveries.slice(0, 3).map(x => x.toFixed(2)).join(' ') || '—'}`);
   }
 }
 
