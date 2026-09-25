@@ -68,8 +68,13 @@ async function play(name, viewport) {
   // Buy an upgrade by clicking its tile (touch needs a second tap).
   await page.evaluate(() => window.__game.setState(s => ({ ...s, salvage: s.salvage + 200, runEarned: s.runEarned + 200, totalEarned: s.totalEarned + 200 })));
   const tile = await page.waitForSelector('.upgrade-tile.affordable');
-  await tile.click();
-  if (mobile) await tile.click().catch(() => {});
+  if (viewport.hasTouch) {
+    // The first tap only shows what the improvement does.
+    await tile.tap();
+    const detail = await page.$eval('.upgrade-detail', el => el.textContent);
+    check(Object.keys((await s.state()).upgrades).length === 0 && /salvage/.test(detail), `${name}: the first tap bought the improvement instead of showing it (${detail})`);
+    await tile.tap();
+  } else await tile.click();
   state = await s.state();
   check(Object.keys(state.upgrades).length >= 1, `${name}: no upgrade was bought from the tile`);
 

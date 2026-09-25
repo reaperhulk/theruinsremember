@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { BUILDINGS, BUILDING_BY_ID, ERA_NAMES } from '../game/data.js';
 import {
   getAvailableUpgrades, getBuildingCost, getBuildingUnitSps, getMaxAffordable, getSps,
@@ -16,6 +16,10 @@ function upgradeEra(upgrade) {
 function Upgrades({ state, onBuy }) {
   const [selected, setSelected] = useState(null);
   const [showAll, setShowAll] = useState(false);
+  // How the current press began. Taps also fire hover and focus before the
+  // click, and Safari's click events carry no pointer type, so decide at
+  // pointerdown whether this is a first tap (show it) or a second (buy it).
+  const press = useRef(null);
   const available = getAvailableUpgrades(state);
   if (!available.length) return <p className="store-empty">Keep digging. Improvements appear as the ruins give up their secrets.</p>;
   const shown = showAll ? available : available.slice(0, 12);
@@ -30,12 +34,14 @@ function Upgrades({ state, onBuy }) {
             <button key={upgrade.id} type="button" role="listitem"
               className={`upgrade-tile era-${upgradeEra(upgrade)}${affordable ? ' affordable' : ''}${selected === upgrade.id ? ' selected' : ''}`}
               aria-label={`${upgrade.name}: ${upgrade.description} Costs ${formatAmount(cost)}.`}
-              onMouseEnter={() => setSelected(upgrade.id)}
+              onPointerDown={event => { press.current = { id: upgrade.id, touch: event.pointerType !== 'mouse', wasSelected: selected === upgrade.id }; }}
+              onPointerEnter={event => { if (event.pointerType === 'mouse') setSelected(upgrade.id); }}
               onFocus={() => setSelected(upgrade.id)}
-              onClick={event => {
+              onClick={() => {
+                const tap = press.current?.id === upgrade.id ? press.current : null;
+                press.current = null;
                 // Touch: the first tap shows what it does, the second buys it.
-                const touch = event.nativeEvent.pointerType === 'touch';
-                if (touch && selected !== upgrade.id) { setSelected(upgrade.id); return; }
+                if (tap?.touch && !tap.wasSelected) { setSelected(upgrade.id); return; }
                 if (affordable) { onBuy(upgrade.id); setSelected(null); } else setSelected(upgrade.id);
               }}>
               <span className="glyph" aria-hidden="true">{UPGRADE_GLYPHS[upgrade.kind]}</span>
@@ -53,9 +59,13 @@ function Upgrades({ state, onBuy }) {
           <>
             <strong>{focus.name}</strong>
             <span>{focus.description}</span>
-            <span className={getUpgradeCost(state, focus.id) <= state.salvage ? 'cost ok' : 'cost'}>{formatAmount(getUpgradeCost(state, focus.id))} salvage</span>
+            <span className="detail-buy">
+              <span className={getUpgradeCost(state, focus.id) <= state.salvage ? 'cost ok' : 'cost'}>{formatAmount(getUpgradeCost(state, focus.id))} salvage</span>
+              <button type="button" className="primary" disabled={getUpgradeCost(state, focus.id) > state.salvage}
+                onClick={() => { onBuy(focus.id); setSelected(null); }}>Buy</button>
+            </span>
           </>
-        ) : <span className="muted">Hover or tap an improvement to see it. Click to buy.</span>}
+        ) : <span className="muted">Hover or tap an improvement to see what it does. Click it, or tap it twice, to buy.</span>}
       </div>
     </div>
   );

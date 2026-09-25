@@ -177,6 +177,8 @@ button.danger { border-color: var(--danger); color: var(--danger); }
 .upgrade-tile.affordable { opacity: 1; background: color-mix(in srgb, var(--tile) 22%, var(--panel-2)); }
 .upgrade-tile.selected { outline: 2px solid var(--text); outline-offset: 1px; }
 .upgrade-detail { min-height: 4.2em; margin-top: 0.4rem; font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.1rem; }
+.detail-buy { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.detail-buy button { padding: 0.25em 1em; }
 .upgrade-detail .cost { color: var(--danger); font-variant-numeric: tabular-nums; }
 .upgrade-detail .cost.ok { color: var(--good); }
 
