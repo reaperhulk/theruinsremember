@@ -8,7 +8,7 @@ import { CHAPTERS, DISCOVERIES } from '../game/lore.js';
 import { SCORE } from './score.js';
 import {
   getMusicStatus, playAchievement, playClick, playEraTransition, playGemFound, playPrestige, playUpgrade,
-  setMusicEnabled, setMusicEra, setVolumes, startAmbient, subscribeMusic, syncAudioVisibility,
+  setMusicEnabled, setMusicEra, setVolumes, startAmbient, subscribeMusic, syncAudioVisibility, unlockAudio,
 } from './AudioManager.js';
 import { RuinsCanvas } from './RuinsCanvas.jsx';
 import { Store } from './Store.jsx';
@@ -132,14 +132,14 @@ export function App() {
   }, [settings.effectsVolume, settings.musicVolume, settings.music]);
   useEffect(() => { setMusicEra(state.era, state.cycles, 0); }, [state.era, state.cycles]);
   useEffect(() => {
-    // Browsers only allow sound after the player interacts with the page.
-    const begin = () => startAmbient();
-    window.addEventListener('pointerdown', begin, { once: true });
-    window.addEventListener('keydown', begin, { once: true });
+    // Browsers only allow sound after the player interacts with the page, and
+    // Safari only counts some events as that interaction. Keep listening: iOS
+    // suspends audio again whenever the page goes to the background.
+    const gestures = ['pointerup', 'touchend', 'click', 'keydown'];
+    for (const type of gestures) window.addEventListener(type, unlockAudio, { capture: true, passive: true });
     document.addEventListener('visibilitychange', syncAudioVisibility);
     return () => {
-      window.removeEventListener('pointerdown', begin);
-      window.removeEventListener('keydown', begin);
+      for (const type of gestures) window.removeEventListener(type, unlockAudio, { capture: true });
       document.removeEventListener('visibilitychange', syncAudioVisibility);
     };
   }, []);

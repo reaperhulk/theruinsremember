@@ -76,7 +76,15 @@ function getCtx() {
 
 export function setMuted(m) { muted = m; setVolumes(effectsVolume, musicVolume); }
 export function isMuted() { return muted; }
-export function setMusicEnabled(enabled) { musicEnabled = enabled; setVolumes(effectsVolume, musicVolume); }
+export function setMusicEnabled(enabled) { musicEnabled = enabled; updateAudioSession(); setVolumes(effectsVolume, musicVolume); }
+// On iOS, Web Audio follows the ringer switch unless the page asks for a
+// playback session (Safari 16.4+). Only claim it while music is wanted, so
+// sound effects alone never interrupt the player's own audio.
+function updateAudioSession() {
+  try {
+    if (navigator.audioSession) navigator.audioSession.type = musicEnabled && !muted && musicVolume > 0 ? 'playback' : 'ambient';
+  } catch { /* older browsers have no audio session API */ }
+}
 
 export function playClick() {
   if (!allowCue('click', 100)) return;
@@ -243,6 +251,26 @@ export function startAmbient() {
   ambientRequested = true;
   if (!musicEnabled || muted || musicVolume === 0 || document.hidden) return;
   try { getCtx(); setVolumes(effectsVolume, musicVolume); } catch { reportMusic('unavailable'); }
+}
+// Must be called synchronously from a user gesture. Safari only lets audio
+// start from certain gestures (click, touchend, keydown — not pointerdown or
+// touchstart), and on iOS it suspends or interrupts the context again after
+// the app is backgrounded, so callers keep calling this on every gesture.
+export function unlockAudio() {
+  ambientRequested = true;
+  if (document.hidden) return;
+  updateAudioSession();
+  if (audioCtx?.state === 'running') { syncPlayback(); return; }
+  try {
+    const ctx = getCtx();
+    // Starting a buffer inside the gesture is what finally unlocks output on
+    // older iOS releases; resume() alone is not always enough.
+    const source = ctx.createBufferSource();
+    source.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+    source.connect(ctx.destination);
+    source.start(0);
+    setVolumes(effectsVolume, musicVolume);
+  } catch { reportMusic('unavailable'); }
 }
 export function stopAmbient() { ambientRequested = false; musicPlayer?.stop(); if (musicBus) musicBus.gain.value = 0; reportMusic('paused'); }
 
