@@ -159,11 +159,43 @@ async function legacy() {
   await t.close();
 }
 
+// The story beats: the first turn of the cycle, then the ending and its message.
+async function story() {
+  const s = await session('story', { width: 1280, height: 800 });
+  const { page } = s;
+  const byText = async (selector, text) => (await page.$$(`xpath/.//${selector}[contains(., "${text}")]`))[0];
+  await page.evaluate(() => window.__game.setState(st => ({ ...st, totalEarned: 8e12, runEarned: 8e12 })));
+  await (await byText('button[@role="tab"]', 'The Cycle')).click();
+  await (await byText('button', 'Let the cycle turn')).click();
+  await (await byText('div[@class="confirm"]//button', 'Let the cycle turn')).click();
+  await page.waitForSelector('.modal.story');
+  const first = await page.$eval('.modal.story', el => el.textContent);
+  check(/The cycle turns/.test(first), `story: first cycle showed "${first.slice(0, 80)}"`);
+  await s.shot('first-cycle');
+  await page.click('.modal.story > button');
+  check(!(await page.$('.modal')), 'story: first cycle story did not close');
+
+  await page.evaluate(() => window.__game.setState(st => ({ ...st, era: 10, runEarned: 1e22, totalEarned: 1e22, buildings: { ...st.buildings, echo: 1 } })));
+  await page.waitForSelector('.message-choices');
+  const ending = await page.$eval('.modal.story', el => el.textContent);
+  check(/The final truth/.test(ending) && /choose what it says/.test(ending), 'story: the ending did not appear');
+  await s.shot('ending');
+  await (await byText('div[@class="message-choices"]/button', 'Guide them')).click();
+  check((await s.state()).message === 'guide', 'story: choosing a message did not record it');
+  check(!(await page.$('.modal')), 'story: the ending stayed open after choosing');
+  await (await byText('button[@role="tab"]', 'Chronicle')).click();
+  const card = await page.$eval('.message-card', el => el.textContent);
+  check(/Everything you need is already buried here/.test(card), `story: chronicle shows "${card}"`);
+  check(s.errors.length === 0, `story: console errors: ${s.errors.join(' | ')}`);
+  await s.close();
+}
+
 try {
   await play('desktop', { width: 1366, height: 768 });
   await play('tablet', { width: 900, height: 1100, isMobile: true, hasTouch: true });
   await play('phone', { width: 375, height: 812, isMobile: true, hasTouch: true });
   await legacy();
+  await story();
 } catch (error) {
   failures.push(`crashed: ${error.stack}`);
 }
@@ -172,4 +204,4 @@ if (failures.length) {
   console.error(`Browser smoke test failed:\n- ${failures.join('\n- ')}`);
   process.exit(1);
 }
-console.log('Browser smoke test passed on desktop, tablet and phone, plus the legacy welcome.');
+console.log('Browser smoke test passed on desktop, tablet and phone, plus the legacy welcome and the story.');

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { ACHIEVEMENTS, ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_COUNT, ERA_NAMES, ERA_THRESHOLDS, MEMORY_UPGRADES, UPGRADES } from '../game/data.js';
 import {
   getAvailableMemories, getBuildingCount, getClickValue, getGlobalMultiplier, getNextMemoryAt,
-  getOfflineEfficiency, getPendingMemories, getSps, getTotalMemories, isMemoryUpgradeAvailable,
+  canLeaveMessage, getOfflineEfficiency, getPendingMemories, getSps, getTotalMemories, isMemoryUpgradeAvailable,
 } from '../game/engine.js';
-import { CHAPTERS } from '../game/lore.js';
+import { CHAPTERS, MESSAGES } from '../game/lore.js';
 import { formatAmount, formatNumber, formatTime } from './format.js';
 
 const TABS = [
@@ -19,14 +19,15 @@ function logText(entry) {
   switch (entry.kind) {
     case 'era': return `Era ${entry.era}: ${ERA_NAMES[entry.era]}. ${CHAPTERS[entry.era].title}.`;
     case 'achievement': return `Achievement: ${ACHIEVEMENT_BY_ID[entry.id]?.name ?? entry.id}.`;
-    case 'echo': return entry.effect === 'cache' ? `Echo caught: a cache of ${formatAmount(entry.amount)} salvage.` : `Echo caught: ${ECHO_EFFECTS[entry.effect]?.name}. ${ECHO_EFFECTS[entry.effect]?.description}`;
+    case 'echo': return entry.effect === 'cache' ? `Glimmer caught: a cache of ${formatAmount(entry.amount)} salvage.` : `Glimmer caught: ${ECHO_EFFECTS[entry.effect]?.name}. ${ECHO_EFFECTS[entry.effect]?.description}`;
     case 'cycle': return `The cycle turned (${entry.cycle}). ${entry.memories} memor${entry.memories === 1 ? 'y' : 'ies'} carried forward.`;
+    case 'message': return `You left a message for the next civilization: “${MESSAGES[entry.id]?.text}”`;
     case 'legacy': return `The ruins remember your earlier civilization: ${entry.memories} memories carried forward.`;
     default: return '';
   }
 }
 
-function Chronicle({ state }) {
+function Chronicle({ state, onRewriteMessage }) {
   const nextEra = state.era < ERA_COUNT ? state.era + 1 : null;
   const target = nextEra ? ERA_THRESHOLDS[nextEra] : null;
   const progress = target ? Math.min(1, Math.log10(1 + state.runEarned) / Math.log10(1 + target)) : 1;
@@ -44,8 +45,15 @@ function Chronicle({ state }) {
             </div>
             <small>{ERA_NAMES[nextEra]} is revealed after {formatAmount(target)} salvage this cycle ({formatAmount(state.runEarned)} so far).</small>
           </div>
-        ) : <small>You have reached the last era. The ruins are yours.</small>}
+        ) : <small>{state.message ? 'You have reached the last era. The ruins are yours.' : 'Build the Echo of Yourself to choose what the ruins will say.'}</small>}
       </article>
+      {state.message && (
+        <article className="message-card">
+          <p className="eyebrow">Your message to the next civilization</p>
+          <p>“{MESSAGES[state.message].text}”</p>
+          {canLeaveMessage(state) && <button type="button" onClick={onRewriteMessage}>Rewrite it</button>}
+        </article>
+      )}
       <h3 className="log-heading">Recent</h3>
       <ol className="log" reversed>
         {[...state.log].reverse().slice(0, 25).map((entry, i) => <li key={`${entry.time}-${i}`}>{logText(entry)}</li>)}
@@ -128,7 +136,7 @@ function Stats({ state }) {
     ['Buildings', getBuildingCount(state).toLocaleString('en-US')],
     ['Improvements', `${Object.keys(state.upgrades).length} of ${UPGRADES.length}`],
     ['Production multiplier', `×${getGlobalMultiplier(state).toFixed(2)}`],
-    ['Echoes caught', state.echoesCaught.toLocaleString('en-US')],
+    ['Glimmers caught', state.echoesCaught.toLocaleString('en-US')],
     ['Cycles', state.cycles.toLocaleString('en-US')],
     ['Highest era', `${state.highestEra} · ${ERA_NAMES[state.highestEra]}`],
     ['While away', `${Math.round(getOfflineEfficiency(state) * 100)}% production`],
@@ -172,7 +180,7 @@ function Options({ audio, settings, onSettings, onExport, onImport, onReset }) {
   );
 }
 
-export function Journal({ state, tab, onTab, onTurn, onBuyMemory, ...options }) {
+export function Journal({ state, tab, onTab, onTurn, onBuyMemory, onRewriteMessage, ...options }) {
   const pending = getPendingMemories(state);
   return (
     <section className="journal" aria-label="Journal">
@@ -184,7 +192,7 @@ export function Journal({ state, tab, onTab, onTurn, onBuyMemory, ...options }) 
         ))}
       </div>
       <div className="tab-body" role="tabpanel">
-        {tab === 'chronicle' && <Chronicle state={state} />}
+        {tab === 'chronicle' && <Chronicle state={state} onRewriteMessage={onRewriteMessage} />}
         {tab === 'cycle' && <Cycle state={state} onTurn={onTurn} onBuyMemory={onBuyMemory} />}
         {tab === 'achievements' && <Achievements state={state} />}
         {tab === 'stats' && <Stats state={state} />}

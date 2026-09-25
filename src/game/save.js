@@ -1,4 +1,5 @@
 // Saving, loading, and carrying players over from the original game.
+import { MESSAGES } from './lore.js';
 import { ACHIEVEMENT_BY_ID, BUILDING_BY_ID, ECHO_EFFECTS, MEMORY_UPGRADE_BY_ID, UPGRADE_BY_ID } from './data.js';
 import { SAVE_VERSION, createState, getEraForEarned } from './engine.js';
 
@@ -48,6 +49,7 @@ export function parseSave(text) {
     : [];
   const timer = saved.echo?.timer;
   state.echo = { timer: amount(timer) ? timer : fresh.echo.timer, active: null };
+  state.message = MESSAGES[saved.message] ? saved.message : null;
   state.log = Array.isArray(saved.log) ? saved.log.filter(isObject).slice(-40) : [];
   return state;
 }

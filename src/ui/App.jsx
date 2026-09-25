@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_NAMES } from '../game/data.js';
 import {
-  buyBuilding, buyMemoryUpgrade, buyUpgrade, catchEcho, click, getClickValue, getSps, turnCycle,
+  buyBuilding, buyMemoryUpgrade, buyUpgrade, canLeaveMessage, catchEcho, click, getClickValue, getSps, leaveMessage, turnCycle,
 } from '../game/engine.js';
 import { exportSave } from '../game/save.js';
-import { CHAPTERS, DISCOVERIES } from '../game/lore.js';
+import { CHAPTERS, DISCOVERIES, MESSAGES, STORY, pickDiscovery } from '../game/lore.js';
 import { SCORE } from './score.js';
 import {
   getMusicStatus, playAchievement, playClick, playEraTransition, playGemFound, playPrestige, playUpgrade,
@@ -34,19 +34,14 @@ function useSettings() {
 }
 
 // A slow ticker of things found in the ruins, from every era reached so far.
-function Ticker({ era }) {
+function Ticker({ era, cycles, message }) {
   const [line, setLine] = useState(() => DISCOVERIES[1][0]);
   useEffect(() => {
-    const pick = () => {
-      const pool = Object.entries(DISCOVERIES).filter(([e]) => Number(e) <= era);
-      const recent = pool.filter(([e]) => Number(e) === era);
-      const [, lines] = Math.random() < 0.6 && recent.length ? recent[0] : pool[Math.floor(Math.random() * pool.length)];
-      setLine(lines[Math.floor(Math.random() * lines.length)]);
-    };
+    const pick = () => setLine(pickDiscovery({ era, cycles, message }));
     pick();
     const timer = setInterval(pick, 20000);
     return () => clearInterval(timer);
-  }, [era]);
+  }, [era, cycles, message]);
   return <p className="ticker" aria-live="off">{line}</p>;
 }
 
@@ -77,12 +72,36 @@ function Toasts({ toasts }) {
   );
 }
 
-function Modal({ title, children, onClose, action = 'Continue' }) {
+// A chapter of the story: the first cycle, and the ending with its choice.
+function StoryModal({ story, children, onClose, action }) {
+  return (
+    <Modal title={story.title} onClose={onClose} action={action} className="story">
+      {story.paragraphs.map(text => <p key={text}>{text}</p>)}
+      {children}
+    </Modal>
+  );
+}
+
+function EndingChoice({ current, onChoose }) {
+  return (
+    <div className="message-choices" role="group" aria-label="Your message">
+      {Object.entries(MESSAGES).map(([id, message]) => (
+        <button key={id} type="button" className={current === id ? 'chosen' : ''} aria-pressed={current === id} onClick={() => onChoose(id)}>
+          <strong>{message.label}</strong>
+          <span>“{message.text}”</span>
+          <small>{message.description}</small>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Modal({ title, children, onClose, action = 'Continue', className = '' }) {
   const ref = useRef(null);
   useEffect(() => { ref.current?.focus(); }, []);
   return (
     <div className="modal-backdrop" role="presentation">
-      <div className="modal" role="dialog" aria-modal="true" aria-label={title}>
+      <div className={`modal ${className}`} role="dialog" aria-modal="true" aria-label={title}>
         <h2>{title}</h2>
         {children}
         <button ref={ref} type="button" className="primary" onClick={onClose}>{action}</button>
@@ -99,6 +118,8 @@ export function App() {
   const [mobileView, setMobileView] = useState('store');
   const [toasts, setToasts] = useState([]);
   const toastId = useRef(0);
+  const [story, setStory] = useState(null);
+  const [endingDeferred, setEndingDeferred] = useState(false);
   const seenLog = useRef(state.log.length ? state.log[state.log.length - 1] : null);
   const musicStatus = useSyncExternalStore(subscribeMusic, getMusicStatus);
 
@@ -119,6 +140,8 @@ export function App() {
         const chapter = CHAPTERS[entry.era];
         toast('era', `Era ${entry.era}: ${ERA_NAMES[entry.era]}`, `${chapter.title}. ${chapter.discovery}`);
         playEraTransition();
+      } else if (entry.kind === 'cycle' && entry.cycle === 1) {
+        setStory('firstCycle');
       } else if (entry.kind === 'achievement') {
         toast('achievement', 'Achievement', ACHIEVEMENT_BY_ID[entry.id]?.name);
         playAchievement();
@@ -182,7 +205,7 @@ export function App() {
           </div>
           <RuinsCanvas state={state} clickValue={clickValue} showNumbers={settings.numbers} onDig={dig} onCatchEcho={catchTheEcho} lowPower={settings.lowPower} />
           <Buffs buffs={state.buffs} />
-          <Ticker era={state.era} />
+          <Ticker era={state.era} cycles={state.cycles} message={state.message} />
         </section>
         <nav className="mobile-nav" aria-label="Sections">
           {[['store', 'Store'], ['journal', 'Journal']].map(([id, label]) => (
@@ -192,7 +215,8 @@ export function App() {
         <Store state={state} onBuyBuilding={onBuyBuilding} onBuyUpgrade={onBuyUpgrade} />
         <Journal state={state} tab={tab} onTab={setTab} onTurn={onTurn} onBuyMemory={onBuyMemory}
           audio={{ status: musicStatus, theme: musicTheme }} settings={settings} onSettings={changeSettings}
-          onExport={() => exportSave(state)} onImport={game.importText} onReset={game.reset} />
+          onExport={() => exportSave(state)} onImport={game.importText} onReset={game.reset}
+          onRewriteMessage={() => setStory('ending')} />
       </main>
       <Toasts toasts={toasts} />
       {game.welcome != null && (
@@ -206,6 +230,21 @@ export function App() {
           <p>For {formatTime(game.away.seconds)} the ruins kept working and recovered <strong>{formatAmount(game.away.earned)} salvage</strong>.</p>
           {game.away.eraAfter > game.away.eraBefore && <p>Your civilization reached the {ERA_NAMES[game.away.eraAfter]} era.</p>}
         </Modal>
+      )}
+      {story === 'firstCycle' && !game.welcome && (
+        <StoryModal story={STORY.firstCycle} onClose={() => setStory(null)}>
+          <p className="muted">Spend your memories in The Cycle tab of the journal.</p>
+        </StoryModal>
+      )}
+      {!game.welcome && !game.away && (story === 'ending' || (canLeaveMessage(state) && !state.message && !endingDeferred && !story)) && (
+        <StoryModal story={STORY.ending} action={state.message ? 'Keep it' : 'Not yet'}
+          onClose={() => { setStory(null); setEndingDeferred(true); }}>
+          <EndingChoice current={state.message} onChoose={id => {
+            update(s => leaveMessage(s, id));
+            setStory(null);
+            toast('era', 'Your message', `“${MESSAGES[id].text}” The next civilization will find it in the ruins.`);
+          }} />
+        </StoryModal>
       )}
     </div>
   );

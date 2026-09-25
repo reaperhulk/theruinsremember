@@ -5,6 +5,7 @@ import {
   ECHO_SPAWN_MAX, ECHO_SPAWN_MIN, ERA_COUNT, ERA_THRESHOLDS, MEMORY_DIVISOR,
   MEMORY_UPGRADE_BY_ID, UPGRADES, UPGRADE_BY_ID,
 } from './data.js';
+import { MESSAGES } from './lore.js';
 
 export const SAVE_VERSION = 1;
 
@@ -29,6 +30,8 @@ export function createState(now = Date.now()) {
     spentMemories: 0,
     memoryUpgrades: {},
     cycles: 0,
+    // The message left for the next civilization, chosen at the ending.
+    message: null,
     runTime: 0,
     totalTime: 0,
     log: [],
@@ -56,6 +59,7 @@ function startCycle(state) {
     spentMemories: state.spentMemories,
     memoryUpgrades: state.memoryUpgrades,
     cycles: state.cycles,
+    message: state.message,
     totalTime: state.totalTime,
     log: state.log,
   };
@@ -405,4 +409,17 @@ export function buyMemoryUpgrade(state, id) {
   const upgrade = MEMORY_UPGRADE_BY_ID[id];
   if (getAvailableMemories(state) < upgrade.cost) return state;
   return refresh({ ...state, spentMemories: state.spentMemories + upgrade.cost, memoryUpgrades: { ...state.memoryUpgrades, [id]: true } });
+}
+
+// --- The ending ------------------------------------------------------------
+
+// Owning an Echo of Yourself lets you choose (or rewrite) the message the
+// ruins will carry into every later cycle.
+export function canLeaveMessage(state) {
+  return (state.buildings.echo || 0) > 0;
+}
+
+export function leaveMessage(state, id) {
+  if (!MESSAGES[id] || !canLeaveMessage(state) || state.message === id) return state;
+  return addLog({ ...state, message: id }, { kind: 'message', id });
 }

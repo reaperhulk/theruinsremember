@@ -96,9 +96,9 @@ const CHRONICLE_NAMES = {
 };
 
 const ECHO_UPGRADES = [
-  { id: 'faintResonance', name: 'Faint Resonance', cost: 777777, echoes: 7, description: 'Echoes appear twice as often and linger twice as long.' },
-  { id: 'clearResonance', name: 'Clear Resonance', cost: 77777777, echoes: 27, description: 'Echoes appear twice as often and linger twice as long.' },
-  { id: 'lastingEcho', name: 'Lasting Echo', cost: 7.7e9, echoes: 77, description: 'Echo effects last twice as long.' },
+  { id: 'faintResonance', name: 'Faint Resonance', cost: 777777, echoes: 7, description: 'Glimmers appear twice as often and linger twice as long.' },
+  { id: 'clearResonance', name: 'Clear Resonance', cost: 77777777, echoes: 27, description: 'Glimmers appear twice as often and linger twice as long.' },
+  { id: 'lastingEcho', name: 'Lasting Glimmer', cost: 7.7e9, echoes: 77, description: 'Glimmer effects last twice as long.' },
 ];
 
 function buildUpgrades() {
@@ -144,7 +144,9 @@ function buildUpgrades() {
 export const UPGRADES = buildUpgrades();
 export const UPGRADE_BY_ID = Object.fromEntries(UPGRADES.map(u => [u.id, u]));
 
-// Echoes are the ruins' golden moments. Click one before it fades.
+// Glimmers are the ruins' golden moments: a memory surfacing for a few
+// seconds. Click one before it fades. (Internally they are still `echo`, so
+// saves and ids stay stable.)
 export const ECHO_EFFECTS = {
   cache: { name: 'Recovered Cache', weight: 45, description: 'A sealed cache of salvage.' },
   remembrance: { name: 'Remembrance', weight: 45, duration: 77, production: 7, description: 'Production ×7 for 77 seconds.' },
@@ -161,10 +163,10 @@ export const MEMORY_DIVISOR = 1e12;
 export const MEMORY_UPGRADES = [
   { id: 'patientRuins', name: 'Patient Ruins', cost: 1, description: 'While you are away, the ruins keep producing at 25% instead of 10%.' },
   { id: 'starterKit', name: 'Starter Kit', cost: 3, description: 'Each cycle begins with 10 Scavengers.' },
-  { id: 'echoSense', name: 'Echo Sense', cost: 5, description: 'Echoes appear 50% more often.' },
+  { id: 'echoSense', name: 'Glimmer Sense', cost: 5, description: 'Glimmers appear 50% more often.' },
   { id: 'starterCamp', name: 'Starter Camp', cost: 9, description: 'Each cycle begins with 5 Salvage Camps.', requires: 'starterKit' },
   { id: 'rememberedHands', name: 'Remembered Hands', cost: 15, description: 'Clicking is twice as effective.' },
-  { id: 'lingeringEcho', name: 'Lingering Echo', cost: 25, description: 'Echo effects last 50% longer.', requires: 'echoSense' },
+  { id: 'lingeringEcho', name: 'Lingering Glimmer', cost: 25, description: 'Glimmer effects last 50% longer.', requires: 'echoSense' },
   { id: 'ancestralDiscount', name: 'Ancestral Discount', cost: 27, description: 'Buildings cost 5% less.' },
   { id: 'ruinsWait', name: 'The Ruins Wait', cost: 50, description: 'While you are away, production continues at 50%.', requires: 'patientRuins' },
   { id: 'thePattern', name: 'The Pattern', cost: 100, description: 'Upgrades cost 10% less.', requires: 'ancestralDiscount' },
@@ -196,8 +198,8 @@ function buildAchievements() {
     if (era === '1') continue;
     list.push({ id: `era:${era}`, name, description: `Reach the ${name} era.`, test: s => s.highestEra >= Number(era) });
   }
-  for (const [count, name] of [[1, 'Heard It'], [7, 'Listening'], [27, 'Attuned'], [77, 'Resonant'], [777, 'One With the Echo']]) {
-    list.push({ id: `echoes:${count}`, name, description: `Catch ${count} echo${count === 1 ? '' : 'es'}.`, test: s => s.echoesCaught >= count });
+  for (const [count, name] of [[1, 'Caught the Light'], [7, 'Listening'], [27, 'Attuned'], [77, 'Resonant'], [777, 'Nothing Escapes You']]) {
+    list.push({ id: `echoes:${count}`, name, description: `Catch ${count} glimmer${count === 1 ? '' : 's'}.`, test: s => s.echoesCaught >= count });
   }
   for (const [count, name] of [[1, 'The Cycle Turns'], [5, 'Again'], [10, 'And Again'], [25, 'The Loop']]) {
     list.push({ id: `cycles:${count}`, name, description: `Let the cycle turn ${count} time${count === 1 ? '' : 's'}.`, test: s => s.cycles >= count });

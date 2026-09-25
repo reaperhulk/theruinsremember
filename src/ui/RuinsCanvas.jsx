@@ -150,7 +150,7 @@ export function RuinsCanvas({ state, clickValue, showNumbers, onDig, onCatchEcho
       ))}
       {echo && (
         <button type="button" className="echo-orb" style={{ left: `${echo.x * 100}%`, top: `${echo.y * 100}%` }}
-          aria-label="Catch the echo" onClick={onCatchEcho}>
+          aria-label="Catch the glimmer" onClick={onCatchEcho}>
           <span aria-hidden="true" />
         </button>
       )}

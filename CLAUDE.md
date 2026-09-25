@@ -1,13 +1,13 @@
 # The Ruins Remember — Clicker
 
 A cookie-clicker-style incremental. One currency (salvage), dug by hand and
-produced by stackable buildings across ten eras; echoes are the golden-cookie
-moments; letting the cycle turn is prestige.
+produced by stackable buildings across ten eras; glimmers (internally `echo`) are the
+golden-cookie moments; letting the cycle turn is prestige.
 
 ## Project Structure
 - `src/game/` — Pure game logic and data. No browser dependencies.
-  - `data.js` — buildings, upgrades, echoes, memory lessons, achievements
-  - `engine.js` — `tick`, `click`, purchases, echoes, offline time, the cycle
+  - `data.js` — buildings, upgrades, glimmers, memory lessons, achievements
+  - `engine.js` — `tick`, `click`, purchases, glimmers, offline time, the cycle
   - `save.js` — validated saves, backup, export/import, original-game welcome
   - `lore.js` — chapters and ruins-ticker text for every era
 - `src/ui/` — React components, the canvas era scenes (`scenes/`), music and sound.
@@ -21,7 +21,7 @@ moments; letting the cycle turn is prestige.
   more slowly than older ones (a unit test checks this).
 - Clicking stays relevant through click-share upgrades (1% of production per click each).
 - Nothing can be lost to absence. Offline time only produces (at the offline
-  efficiency), never shows echoes, and never turns the cycle.
+  efficiency), never shows glimmers, and never turns the cycle.
 - Keep the engine pure and deterministic: every function takes an `rng` where randomness matters.
 
 ## Checking changes
@@ -31,7 +31,7 @@ pacing contract, build, asset budget) runs in CI on every push, plus the browser
 
 | Change | Required |
 | --- | --- |
-| Economy, balance, pacing, echoes, offline, the cycle (`src/game/data.js`, `src/game/engine.js`) | `npm run test:quality`, and a before/after persona comparison in the commit message |
+| Economy, balance, pacing, glimmers, offline, the cycle (`src/game/data.js`, `src/game/engine.js`) | `npm run test:quality`, and a before/after persona comparison in the commit message |
 | Other engine or save changes | `npm run test:unit` |
 | UI | `npm run lint`, `npm run build`, and `npm run test:browser` with the dev server running |
 | Docs, tests, scripts only | Nothing extra |
@@ -57,8 +57,8 @@ in `scripts/pacing.mjs` only on purpose, and say why in the commit.
 
 ## Personas (`scripts/sim/personas.js`)
 `newcomer`, `engaged`, `optimizer`, `background`, `check_in`, `offline_returner`,
-`completionist`, `minimalist`. Each has a click rate, a decision interval, an
-echo-catch chance, and a session pattern (tab open or closed while away). The
+`completionist`, `minimalist`. Each has a click rate, a decision interval, a
+glimmer-catch chance, and a session pattern (tab open or closed while away). The
 simulated player acts only during its attention windows and uses only the
 public engine API.
 

@@ -1,5 +1,7 @@
-// Story text recovered from the original event and chapter data. Each era has
-// an authored chapter and a pool of discoveries shown in the ruins ticker.
+// The story. Each era has an authored chapter and a pool of discoveries for
+// the ruins ticker. After the first cycle the ruins become personal: cycle
+// discoveries join the ticker, and after the ending the message you chose is
+// found carved into later civilizations' ruins.
 
 export const CHAPTERS = {
   "1": {
@@ -66,7 +68,7 @@ export const CHAPTERS = {
 
 export const DISCOVERIES = {
   "1": [
-    "While clearing rubble from the crash site, you find a sealed cache of supplies — someone left these here deliberately.",
+    "While clearing rubble from the crash site, you find a sealed crate already stencilled with your colony's name. Someone packed it for you, long ago.",
     "Scavengers find metal shards in the crash debris — too precise, too old. These aren't from your ship.",
     "Digging a latrine, a settler hits stone — cut stone, laid in perfect rows, under millennia of soil.",
     "The comms array picks up a repeating signal from deep underground. It matches no known encoding.",
@@ -98,7 +100,7 @@ export const DISCOVERIES = {
     "The inventors arrive with prototypes that fit together — designed independently, in different workshops, as if working from the same forgotten blueprint.",
     "The river floods along channels carved by precursor agriculture — irrigating fields that were tilled in a previous age, now ready to yield again.",
     "The masterwork matches a design found sealed in the deepest ruin — the artisan swears she invented it, but her hands knew the shape before she did.",
-    "The granary was full before you opened it — sealed since the last cycle, preserved by methods you cannot name.",
+    "The granary you dig out is stocked with seed for crops you haven't brought to this world yet — sealed since the last cycle, preserved by methods you cannot name.",
     "Foundries across the continent achieve yields that match precursor metallurgical records — techniques rediscovered through instinct rather than instruction.",
     "Every booth at the fair displays a different component of the same device — a machine that none of them planned, but all of them built parts of.",
     "The boiler detonates along a fracture line that reveals a precursor geothermal tap — steam from a source that was drilled a civilization ago.",
@@ -120,7 +122,7 @@ export const DISCOVERIES = {
     "The ancient assembly line stretches into darkness. Your engineers walk it in silence. Every station, every conveyor, every safety rail — it's their factory. The one they designed last month. Built ten thousand years ago.",
     "The workers discover techniques etched into the factory floor — efficiency patterns from a previous era's production line.",
     "The breakthrough was found in a sealed precursor database — the answer to a question that recurs every cycle, at exactly this point.",
-    "A power surge from the buried grid destroys stored electronics! The old systems are unstable.",
+    "A buried grid hums to life beneath the workshop floor. The breaker labels are in your handwriting.",
     "Your scavenger teams report the ruins seem to WANT to be found. Supplies appear where you need them, as if placed there moments before you arrived."
   ],
   "3": [
@@ -164,7 +166,7 @@ export const DISCOVERIES = {
     "The recovered hardware boots to a login screen. Behind it: processes still running, subroutines tending data gardens for an absent user. When you query the system, it asks for a password. Your lead programmer's birthday works.",
     "Ancient databases cascade open in sequence, each one referencing the next — a chain letter from the precursors, each message containing the key to the next vault.",
     "Something shifts beneath the ruins — a structure deeper than any you built. The tremors feel deliberate, like a lock turning.",
-    "Ancient malware activates in the recovered systems! Data and software corrupted.",
+    "Ancient code wakes in the recovered systems and politely asks for its administrator — by your name.",
     "The ruins respond to your overclock pulses. For a moment, buried machines pulse in sync — a heartbeat from a civilization that never truly stopped."
   ],
   "4": [
@@ -202,7 +204,7 @@ export const DISCOVERIES = {
     "The orbital debris field isn't natural. Spectral analysis reveals hull plating, reactor shielding, and something that might have been a window. It's arranged in a perfect Keplerian graveyard orbit — parked, not crashed.",
     "The equatorial ridge isn't geological. It's the anchor point of a space elevator, the cable long since severed, the counterweight still orbiting as a captured asteroid. Your engineers had chosen the same site for theirs.",
     "The derelict drifts in L2. Its cockpit seats adjust to human proportions. Its controls fall naturally under human hands. On the captain's console, scratched into the metal with something sharp: a tally. Four hundred and twelve marks.",
-    "A solar flare bathes the colony in energy — but sensitive electronics are damaged.",
+    "A solar flare washes over the orbital harbor. The old shielding was angled for exactly this storm.",
     "The asteroid was on a rendezvous trajectory — its orbit adjusted millennia ago to arrive at this exact window.",
     "The fuel lines rupture along seams that match ancient fault lines — the planet's geology shifting on a schedule older than your civilization. The earth remembers what flows here."
   ],
@@ -459,3 +461,108 @@ export const DISCOVERIES = {
     "The reality key fits a lock that doesn't exist yet. When you forge it, the lock appears — as if reality was waiting for permission to change."
   ]
 };
+
+// Seen only once the cycle has turned: the ruins stop being someone else's.
+export const CYCLE_DISCOVERIES = {
+  1: [
+    'The scavengers find a camp exactly where you would have put one. The tarp is patched the way you patch things.',
+    'Under the crash site: another crash site. Under that one, another. The hull numbers count down.',
+    'A survivor hands you a digging tool worn smooth in the shape of your grip.',
+  ],
+  2: [
+    'The foundry molds already hold a cast of your first ingot, down to the flaw you haven\u2019t made yet.',
+    'The rail yard\u2019s oldest timetable lists stops you named last cycle.',
+    'Maintenance notes in your handwriting. Under them, older notes in your handwriting. Under those, older still.',
+  ],
+  3: [
+    'The network recognizes your login before you type it. Last login: one cycle ago.',
+    'The neural lab\u2019s training data includes your memories. The model asks how the last cycle ended.',
+    'A folder on the oldest server is titled \u201cFor next time.\u201d It is full of your own advice. You didn\u2019t follow most of it.',
+  ],
+  4: [
+    'The empty docking berth bears your ship\u2019s name, and the scratches from the last time you docked.',
+    'The debris ring is thicker than last cycle. Some of it is the station you built.',
+    'Orbital crews find their own names on the station duty roster, dated one cycle ago.',
+  ],
+  5: [
+    'Each colony is built on the hearth of an older colony, and the older colony was yours.',
+    'The asteroid miners break into a tunnel lit by lamps they remember hanging.',
+    'A colonist plants a garden and finds, a spade\u2019s depth down, the garden she planted last time.',
+  ],
+  6: [
+    'The warp gate\u2019s destination log is full. Every entry is a place you went last cycle.',
+    'The seed ship\u2019s cryo pods are labelled with your crew\u2019s names. Some of them are still warm.',
+    'The beacons answer in the order you planned to visit them, because this time you remember the plan.',
+  ],
+  7: [
+    'The handprint in the collector fits you exactly. So does the one beside it, and the one beside that.',
+    'The stellar forge\u2019s log opens mid-sentence, finishing a thought you started last cycle.',
+    'The swarm builds itself around the scaffolding of the swarm before.',
+  ],
+  8: [
+    'The archive\u2019s newest entry describes your last cycle. So does its oldest.',
+    'Every delegate brings a different version of the same history. This time you know which one is true.',
+    'The empty senate seats have a new nameplate. It reads \u201cAgain,\u201d in your handwriting.',
+  ],
+  9: [
+    'Last cycle\u2019s route is drawn across the cosmic background in fading light.',
+    'The far end of the void bridge was built by you. From here you can see your own tool marks.',
+    'The loom\u2019s pattern has one more thread than last time. It is yours.',
+  ],
+  10: [
+    'The universes next door are running the same cycle, a few steps behind. You could warn them.',
+    'Your echo waits in the ruins, patient. It has done this before. So have you.',
+    'The ruins don\u2019t feel old anymore. They feel like home.',
+  ],
+};
+
+// The message the first Echo of Yourself lets you leave for the next arrivals.
+export const MESSAGES = {
+  warn: { label: 'Warn them', text: 'Do not build what we built. It ends the same way.', description: 'Tell the next civilization where this road leads.' },
+  welcome: { label: 'Welcome them', text: 'You are not the first. You are not alone. Keep digging.', description: 'Tell them someone was here, and someone cared.' },
+  guide: { label: 'Guide them', text: 'Everything you need is already buried here. We left it for you.', description: 'Tell them the ruins are a gift, not a warning.' },
+};
+
+// Where later civilizations find your message. {message} is replaced.
+export const MESSAGE_DISCOVERIES = {
+  1: 'Carved into the first foundation stone, in your own handwriting: \u201c{message}\u201d',
+  3: 'Every recovered server boots to the same line of text: \u201c{message}\u201d',
+  4: 'Scratched beside the tally marks on the derelict\u2019s console: \u201c{message}\u201d',
+  6: 'The warp beacons repeat one transmission, older than the stars around them: \u201c{message}\u201d',
+  8: 'Engraved above the empty senate seats, in every language at once: \u201c{message}\u201d',
+  10: 'In every nearby universe, the ruins say the same thing: \u201c{message}\u201d',
+};
+
+export const STORY = {
+  firstCycle: {
+    title: 'The cycle turns',
+    paragraphs: [
+      'Your civilization returns to the ruins it grew from. The buildings sink, the salvage scatters, and the next survivors crash-land on the same world.',
+      'This time, something is different. You remember. The foundations are yours. The handwriting is yours. And the ruins remember too: each cycle, they give back a little more.',
+    ],
+  },
+  ending: {
+    title: 'The final truth',
+    paragraphs: [
+      'You build the Echo of Yourself, and it turns to look at you. It has your face, your hands, your handwriting. It has been here the whole time: in the foundations, in the maintenance notes, on the empty berth.',
+      'The ruins were never someone else\u2019s. They were yours, left for you, by you. Every civilization reaches this point, and every civilization leaves a message for the next.',
+      'This time, you can choose what it says.',
+    ],
+  },
+};
+
+// One line for the ruins ticker. Mostly the current era; after the first
+// cycle the personal lines join in, and once a message has been left, later
+// civilizations keep finding it.
+export function pickDiscovery({ era, cycles = 0, message = null }, rng = Math.random) {
+  const pick = lines => lines[Math.floor(rng() * lines.length)];
+  const roll = rng();
+  const carved = Object.entries(MESSAGE_DISCOVERIES).filter(([e]) => Number(e) <= era);
+  if (message && MESSAGES[message] && carved.length && roll < 0.15) {
+    return pick(carved)[1].replace('{message}', MESSAGES[message].text);
+  }
+  if (cycles > 0 && roll < 0.4) return pick(CYCLE_DISCOVERIES[era]);
+  if (roll < 0.75) return pick(DISCOVERIES[era]);
+  const earlier = Object.entries(DISCOVERIES).filter(([e]) => Number(e) <= era);
+  return pick(pick(earlier)[1]);
+}
