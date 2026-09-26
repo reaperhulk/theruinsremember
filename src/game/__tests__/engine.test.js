@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { ACHIEVEMENTS, ARCHIVE_RATE, BUILDINGS, ERA_THRESHOLDS, UPGRADES } from '../data.js';
+import { ACHIEVEMENTS, ARCHIVE_RATE, BUILDINGS, EARLY_TIER_BONUS, ERA_THRESHOLDS, TIER_BONUS, UPGRADES, tierBonus } from '../data.js';
 import {
   advanceOffline, buyBuilding, buyMemoryUpgrade, buyUpgrade, catchEcho, click, createState,
-  getAvailableUpgrades, getBaseSps, getBuildingCost, getClickValue, getGlobalMultiplier, getMaxAffordable, getNextMemoryAt,
+  getAvailableUpgrades, getBaseSps, getBuildingCost, getBuildingMultiplier, getClickValue, getGlobalMultiplier, getMaxAffordable, getNextMemoryAt,
   getAvailableMemories, getPendingMemories, getSpentMemories, getSps, getUpgradeCost, isBuildingRevealed, tick, turnCycle,
 } from '../engine.js';
 
@@ -90,15 +90,39 @@ describe('buildings', () => {
 });
 
 describe('upgrades', () => {
-  it('appear when their condition is met and double their building', () => {
+  it('appear when their condition is met and boost their building', () => {
     let state = rich(createState(0));
     expect(getAvailableUpgrades(state).some(u => u.id === 'scavenger:1')).toBe(false);
     state = buyBuilding(state, 'scavenger');
     expect(getAvailableUpgrades(state).some(u => u.id === 'scavenger:1')).toBe(true);
-    const before = getBaseSps(state);
+    expect(getBuildingMultiplier(state, 'scavenger')).toBe(1);
     state = buyUpgrade(state, 'scavenger:1');
-    expect(getBaseSps(state)).toBeCloseTo(before * 2);
+    expect(getBuildingMultiplier(state, 'scavenger')).toBeCloseTo(EARLY_TIER_BONUS);
+    expect(tierBonus(BUILDINGS.find(b => b.id === 'serverFarm'))).toBe(TIER_BONUS);
     expect(buyUpgrade(state, 'scavenger:1')).toBe(state);
+  });
+
+  it('come every few purchases of a building, priced like several more of it', () => {
+    const tiers = UPGRADES.filter(u => u.kind === 'building' && u.building === 'camp');
+    const owned = tiers.map(u => u.requires.owned);
+    expect(owned.slice(0, 11)).toEqual([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]);
+    for (const tier of tiers) expect(tier.cost).toBe(Math.ceil(100 * 10 * 1.15 ** tier.requires.owned));
+  });
+
+  it('discoveries appear each time a cycle doubles its salvage and tell the story', () => {
+    const discoveries = UPGRADES.filter(u => u.kind === 'discovery');
+    expect(discoveries.length).toBeGreaterThan(80);
+    expect(new Set(discoveries.map(u => u.text)).size).toBe(discoveries.length);
+    for (let i = 1; i < discoveries.length; i++) expect(discoveries[i].requires.earned).toBe(discoveries[i - 1].requires.earned * 2);
+    const first = discoveries[0];
+    let state = { ...createState(0), salvage: 1e6, runEarned: first.requires.earned - 1, totalEarned: 1e6 };
+    expect(getAvailableUpgrades(state).some(u => u.id === first.id)).toBe(false);
+    state = { ...state, runEarned: first.requires.earned };
+    expect(getAvailableUpgrades(state).some(u => u.id === first.id)).toBe(true);
+    const before = getGlobalMultiplier({ ...state, achievements: {} });
+    state = buyUpgrade(state, first.id);
+    expect(state.log.find(entry => entry.kind === 'discovery')).toMatchObject({ id: first.id });
+    expect(getGlobalMultiplier({ ...state, achievements: {} }) / before).toBeCloseTo(first.value);
   });
 
   it('have unique ids and positive prices', () => {
@@ -220,9 +244,10 @@ describe('the cycle', () => {
     expect(getClickValue(learn('rememberedHands'))).toBeCloseTo(2 + getSps(base) * 0.01);
     // Discounts on buildings and on building upgrades.
     expect(getBuildingCost(learn('ancestralDiscount'), 'camp')).toBe(Math.ceil(100 * 1.15 ** 10 * 0.9));
-    expect(getUpgradeCost(learn('rememberedBlueprints'), 'camp:1')).toBe(500);
+    const tier = getUpgradeCost(base, 'camp:1');
+    expect(getUpgradeCost(learn('rememberedBlueprints'), 'camp:1')).toBe(Math.ceil(tier * 0.5));
     expect(getUpgradeCost(learn('rememberedBlueprints'), 'callousedHands')).toBe(100);
-    expect(getUpgradeCost(learn('thePattern', 'rememberedBlueprints'), 'camp:1')).toBe(375);
+    expect(getUpgradeCost(learn('thePattern', 'rememberedBlueprints'), 'camp:1')).toBe(Math.ceil(tier * 0.375));
     // Deeper memories and resonance raise what memories and achievements are worth.
     const noAch = s => ({ ...s, achievements: {} });
     const root = Math.sqrt(100000);

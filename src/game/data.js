@@ -1,3 +1,5 @@
+import { DISCOVERY_UPGRADES } from './lore.js';
+
 // Static definitions for the clicker. Everything is priced in one currency,
 // salvage, recovered from the ruins by hand and by the things you build.
 
@@ -38,10 +40,10 @@ export const BUILDINGS = [
   { id: 'stellarForge', era: 7, name: 'Stellar Forge', plural: 'Stellar Forges', cost: 2.1e15, sps: 2.9e9, description: 'Smelts the ruins of whole systems.' },
   { id: 'hyperlane', era: 8, name: 'Hyperlane', plural: 'Hyperlanes', cost: 2.6e16, sps: 2.1e10, description: 'Joins a galaxy of ruins into one excavation.' },
   { id: 'galacticArchive', era: 8, name: 'Galactic Archive', plural: 'Galactic Archives', cost: 3.1e17, sps: 1.5e11, description: 'Every delegate brings a different version of the same history.' },
-  { id: 'voidBridge', era: 9, name: 'Void Bridge', plural: 'Void Bridges', cost: 7.1e21, sps: 1.1e12, description: 'Spans the dark between galaxies. The far end is already built.' },
-  { id: 'cosmicLoom', era: 9, name: 'Cosmic Loom', plural: 'Cosmic Looms', cost: 1.2e24, sps: 8.3e12, description: 'Reweaves the background radiation into a map of your civilization.' },
-  { id: 'realityEngine', era: 10, name: 'Reality Engine', plural: 'Reality Engines', cost: 1.9e26, sps: 6.4e13, description: 'Salvages the universes next door.' },
-  { id: 'echo', era: 10, name: 'Echo of Yourself', plural: 'Echoes of Yourself', cost: 5.4e28, sps: 5.1e14, description: 'You were the ruins all along. Now you can help.' },
+  { id: 'voidBridge', era: 9, name: 'Void Bridge', plural: 'Void Bridges', cost: 1.5e19, sps: 1.1e12, description: 'Spans the dark between galaxies. The far end is already built.' },
+  { id: 'cosmicLoom', era: 9, name: 'Cosmic Loom', plural: 'Cosmic Looms', cost: 8e20, sps: 8.3e12, description: 'Reweaves the background radiation into a map of your civilization.' },
+  { id: 'realityEngine', era: 10, name: 'Reality Engine', plural: 'Reality Engines', cost: 4e22, sps: 6.4e13, description: 'Salvages the universes next door.' },
+  { id: 'echo', era: 10, name: 'Echo of Yourself', plural: 'Echoes of Yourself', cost: 2e24, sps: 5.1e14, description: 'You were the ruins all along. Now you can help.' },
 ];
 export const BUILDING_BY_ID = Object.fromEntries(BUILDINGS.map(b => [b.id, b]));
 
@@ -52,16 +54,35 @@ export const ERA_THRESHOLDS = Object.fromEntries(
 ERA_THRESHOLDS[1] = 0;
 
 // Each tier doubles one building's output. Owning enough of it reveals the
-// upgrade; its price is a fixed multiple of the building's base cost.
+// upgrade. Tiers come every few purchases through the counts a run actually
+// reaches, and each costs about TIER_PRICE of that building at that count.
+const TIER_PRICE = 10;
+export const TIER_BONUS = 1.2;
+// The opening buildings (Eras 1–2) get bigger steps so the first minutes move quickly.
+export const EARLY_TIER_BONUS = 1.5;
+export const tierBonus = building => (building.era <= 2 ? EARLY_TIER_BONUS : TIER_BONUS);
 const TIERS = [
-  { owned: 1, price: 10, name: 'Improvised Tools' },
-  { owned: 5, price: 50, name: 'Salvaged Blueprints' },
-  { owned: 25, price: 500, name: 'Ancestral Methods' },
-  { owned: 50, price: 5e4, name: 'Echoed Designs' },
-  { owned: 100, price: 5e6, name: 'Remembered Mastery' },
-  { owned: 150, price: 5e8, name: 'Perfect Recall' },
-  { owned: 200, price: 5e10, name: 'The Pattern Holds' },
-  { owned: 250, price: 5e13, name: 'Inevitable' },
+  { owned: 1, name: 'Improvised Tools' },
+  { owned: 5, name: 'Salvaged Blueprints' },
+  { owned: 10, name: 'Shared Tricks' },
+  { owned: 15, name: 'Better Handles' },
+  { owned: 20, name: 'Ancestral Methods' },
+  { owned: 25, name: 'Steady Hands' },
+  { owned: 30, name: 'Echoed Designs' },
+  { owned: 35, name: 'Found Schematics' },
+  { owned: 40, name: 'Practiced Crews' },
+  { owned: 45, name: 'Night Shifts' },
+  { owned: 50, name: 'Remembered Mastery' },
+  { owned: 60, name: 'Old Habits' },
+  { owned: 70, name: 'Second Nature' },
+  { owned: 80, name: 'Worn Grooves' },
+  { owned: 90, name: 'Perfect Recall' },
+  { owned: 100, name: 'The Pattern Holds' },
+  { owned: 125, name: 'Muscle of Ages' },
+  { owned: 150, name: 'Old as the Stars' },
+  { owned: 175, name: 'Always Built' },
+  { owned: 200, name: 'Built Before' },
+  { owned: 250, name: 'Inevitable' },
 ];
 
 const CLICK_DOUBLERS = [
@@ -95,6 +116,10 @@ const CHRONICLE_NAMES = {
   10: ['Parallel Notes', 'The Message', 'What We Leave Behind'],
 };
 
+// A discovery appears each time a cycle's recovered salvage doubles.
+const DISCOVERY_VALUE = 1.02;
+const DISCOVERY_PRICE = 0.25;
+
 // Chronicle upgrades per era, in order.
 const CHRONICLE_VALUES = [1.1, 1.15, 1.2];
 
@@ -121,8 +146,8 @@ function buildUpgrades() {
         kind: 'building',
         building: building.id,
         name: `${building.plural}: ${tier.name}`,
-        cost: building.cost * tier.price,
-        description: `${building.plural} are twice as efficient.`,
+        cost: Math.ceil(building.cost * TIER_PRICE * COST_SCALE ** tier.owned),
+        description: `${building.plural} produce ${Math.round((tierBonus(building) - 1) * 100)}% more.`,
         requires: { building: building.id, owned: tier.owned },
       });
     }
@@ -156,6 +181,19 @@ function buildUpgrades() {
       cost: base * 20,
       description: `All production +${ARCHIVE_RATE * 100}% for every achievement you have.`,
       requires: { era: Number(era), achievements: Number(era) * 5 },
+    });
+  }
+  for (const discovery of DISCOVERY_UPGRADES) {
+    list.push({
+      id: `discovery:${discovery.doubling}`,
+      kind: 'discovery',
+      era: Object.keys(ERA_THRESHOLDS).map(Number).filter(era => ERA_THRESHOLDS[era] <= 2 ** discovery.doubling).pop(),
+      value: DISCOVERY_VALUE,
+      name: discovery.name,
+      text: discovery.text,
+      cost: Math.ceil(2 ** discovery.doubling * DISCOVERY_PRICE),
+      description: `All production +${Math.round((DISCOVERY_VALUE - 1) * 100)}%.`,
+      requires: { earned: 2 ** discovery.doubling },
     });
   }
   for (const upgrade of ECHO_UPGRADES) {

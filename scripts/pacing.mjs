@@ -27,16 +27,26 @@ for (const id of ids) for (const seed of seeds) results.push({ persona: id, seed
 // one ended in at most 40% of the time the last run took.
 const firstRecovery = r => r.cycles ? [[r.recoveries[0] !== undefined && r.recoveries[0] <= 0.4, `recovers its first cycle's progress in at most 40% of the time (took ${r.recoveries[0]?.toFixed(2) ?? 'forever'})`]] : [];
 
+// Active players always have something to do: in the first 8 hours, never
+// more than 20 minutes without anything new (a building, upgrade or
+// discovery), or 15 without anything worth buying (the simulated player also
+// saves up on purpose). Measured worst cases are 18 and 12 minutes; before
+// tiers every five buildings and discoveries they were 25-84 and 12-18.
+const keepsBusy = r => [
+  [r.gaps.novelty <= 20 * 60, `never waits more than 20 minutes for something new (waited ${Math.round(r.gaps.novelty / 60)}m)`],
+  [r.gaps.purchase <= 15 * 60, `never waits more than 15 minutes for something worth buying (waited ${Math.round(r.gaps.purchase / 60)}m)`],
+];
+
 // What each persona must experience. Times are in seconds of wall-clock play.
 const MIN = 60, HOUR = 3600, DAY = 86400;
 const CONTRACT = {
   newcomer: r => [[r.eraTimes[2] <= 5 * MIN, 'reaches Industrialization within 5 minutes'], [r.eraTimes[3] <= 30 * MIN, 'reaches the Digital Age within 30 minutes'], [r.eraTimes[4] <= 1 * HOUR, 'reaches the Space Age within an hour']],
-  engaged: r => [...firstRecovery(r), [r.eraTimes[2] <= 3 * MIN, 'reaches Industrialization within 3 minutes'], [r.eraTimes[4] <= 1 * HOUR, 'reaches the Space Age within an hour'], [r.cycleTimes[0] >= 2 * HOUR && r.cycleTimes[0] <= 8 * HOUR, 'first turns the cycle after 2–8 hours'], [r.eraTimes[5] <= 2 * HOUR, 'reaches the Solar System within 2 hours']],
-  optimizer: r => [...firstRecovery(r), [r.cycleTimes[0] >= 2 * HOUR && r.cycleTimes[0] <= 7 * HOUR, 'first turns the cycle after 2–7 hours'], [r.eraTimes[6] <= 5 * HOUR, 'reaches Interstellar within 5 hours']],
+  engaged: r => [...firstRecovery(r), ...keepsBusy(r), [r.eraTimes[2] <= 3 * MIN, 'reaches Industrialization within 3 minutes'], [r.eraTimes[4] <= 1 * HOUR, 'reaches the Space Age within an hour'], [r.cycleTimes[0] >= 2 * HOUR && r.cycleTimes[0] <= 8 * HOUR, 'first turns the cycle after 2–8 hours'], [r.eraTimes[5] <= 2 * HOUR, 'reaches the Solar System within 2 hours']],
+  optimizer: r => [...firstRecovery(r), ...keepsBusy(r), [r.cycleTimes[0] >= 2 * HOUR && r.cycleTimes[0] <= 7 * HOUR, 'first turns the cycle after 2–7 hours'], [r.eraTimes[6] <= 5 * HOUR, 'reaches Interstellar within 5 hours']],
   background: r => [[r.eraTimes[3] <= 45 * MIN, 'reaches the Digital Age within 45 minutes'], [r.eraTimes[5] <= 4 * HOUR, 'reaches the Solar System within 4 hours']],
   check_in: r => [[r.eraTimes[4] <= 6 * HOUR, 'reaches the Space Age within 6 hours'], [r.eraTimes[6] <= 1 * DAY, 'reaches Interstellar within a day']],
   offline_returner: r => [[r.eraTimes[3] <= 12 * HOUR, 'reaches the Digital Age within 12 hours'], [r.eraTimes[5] <= 2 * DAY, 'reaches the Solar System within 2 days']],
-  completionist: r => [[r.cycleTimes[0] <= 8 * HOUR, 'turns the cycle within 8 hours'], [r.echoes >= 50, 'catches at least 50 echoes'], ...firstRecovery(r)],
+  completionist: r => [[r.cycleTimes[0] <= 8 * HOUR, 'turns the cycle within 8 hours'], [r.echoes >= 50, 'catches at least 50 echoes'], ...firstRecovery(r), ...keepsBusy(r)],
   minimalist: r => [[r.eraTimes[4] <= 3 * HOUR, 'reaches the Space Age within 3 hours without clicking much'], [r.eraTimes[5] <= 8 * HOUR, 'reaches the Solar System within 8 hours']],
 };
 // Clicking must matter: an engaged player is well ahead of a minimalist.
@@ -62,10 +72,10 @@ const summary = r => ({
 
 if (args.includes('--json')) console.log(JSON.stringify(results, null, 2));
 else if (!value('--baseline')) {
-  console.log('persona           seed horizon  era2  era3  era4  era5  era6  era7  era8  era9 era10  1st cycle cycles  mem   clicks  buys echoes  recovery');
+  console.log('persona           seed horizon  era2  era3  era4  era5  era6  era7  era8  era9 era10  1st cycle cycles  mem   clicks  buys echoes  recovery  new/buy gap');
   for (const r of results) {
     const eras = [2, 3, 4, 5, 6, 7, 8, 9, 10].map(e => fmt(r.eraTimes[e]).padStart(5)).join(' ');
-    console.log(`${r.persona.padEnd(17)} ${String(r.seed).padStart(4)} ${fmt(r.horizon).padStart(7)} ${eras} ${fmt(r.cycleTimes[0]).padStart(10)} ${String(r.cycles).padStart(6)} ${String(r.memories).padStart(4)} ${String(r.clicks).padStart(8)} ${String(r.purchases).padStart(5)} ${String(r.echoes).padStart(6)}  ${r.recoveries.slice(0, 3).map(x => x.toFixed(2)).join(' ') || '—'}`);
+    console.log(`${r.persona.padEnd(17)} ${String(r.seed).padStart(4)} ${fmt(r.horizon).padStart(7)} ${eras} ${fmt(r.cycleTimes[0]).padStart(10)} ${String(r.cycles).padStart(6)} ${String(r.memories).padStart(4)} ${String(r.clicks).padStart(8)} ${String(r.purchases).padStart(5)} ${String(r.echoes).padStart(6)}  ${(r.recoveries.slice(0, 3).map(x => x.toFixed(2)).join(' ') || '—').padEnd(14)}  ${Math.round(r.gaps.novelty / 60)}m/${Math.round(r.gaps.purchase / 60)}m`);
   }
 }
 

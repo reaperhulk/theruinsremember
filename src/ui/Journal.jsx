@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ACHIEVEMENTS, ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_COUNT, ERA_NAMES, ERA_THRESHOLDS, MEMORY_UPGRADES, UPGRADES } from '../game/data.js';
+import { ACHIEVEMENTS, ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_COUNT, ERA_NAMES, ERA_THRESHOLDS, MEMORY_UPGRADES, UPGRADES, UPGRADE_BY_ID } from '../game/data.js';
 import {
   getAvailableMemories, getBuildingCount, getClickValue, getGlobalMultiplier, getNextMemoryAt,
   canLeaveMessage, getAchievementBonus, getMemoryMultiplier, getOfflineEfficiency, getPendingMemories, getSps, getTotalMemories, isMemoryUpgradeAvailable,
@@ -21,6 +21,7 @@ function logText(entry) {
     case 'achievement': return `Achievement: ${ACHIEVEMENT_BY_ID[entry.id]?.name ?? entry.id}.`;
     case 'echo': return entry.effect === 'cache' ? `Glimmer caught: a cache of ${formatAmount(entry.amount)} salvage.` : `Glimmer caught: ${ECHO_EFFECTS[entry.effect]?.name}. ${ECHO_EFFECTS[entry.effect]?.description}`;
     case 'cycle': return `The cycle turned (${entry.cycle}). ${entry.memories} memor${entry.memories === 1 ? 'y' : 'ies'} carried forward.`;
+    case 'discovery': return `Discovery: ${UPGRADE_BY_ID[entry.id]?.name}. ${UPGRADE_BY_ID[entry.id]?.text ?? ''}`;
     case 'message': return `You left a message for the next civilization: “${MESSAGES[entry.id]?.text}”`;
     case 'legacy': return `The ruins remember your earlier civilization: ${entry.memories} memories carried forward.`;
     default: return '';

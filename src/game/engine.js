@@ -2,7 +2,7 @@
 // same object when nothing changed); nothing here touches the browser.
 import {
   ACHIEVEMENTS, BUILDINGS, BUILDING_BY_ID, COST_SCALE, ECHO_EFFECTS, ECHO_LIFETIME,
-  ARCHIVE_RATE, ECHO_SPAWN_MAX, ECHO_SPAWN_MIN, ERA_COUNT, ERA_THRESHOLDS, MEMORY_DIVISOR,
+  ARCHIVE_RATE, tierBonus, ECHO_SPAWN_MAX, ECHO_SPAWN_MIN, ERA_COUNT, ERA_THRESHOLDS, MEMORY_DIVISOR,
   MEMORY_UPGRADES, MEMORY_UPGRADE_BY_ID, UPGRADES, UPGRADE_BY_ID,
 } from './data.js';
 import { MESSAGES } from './lore.js';
@@ -96,7 +96,7 @@ function upgradeEffects(upgrades) {
     const upgrade = UPGRADE_BY_ID[id];
     if (!upgrade) continue;
     if (upgrade.kind === 'building') effects.tiers[upgrade.building] = (effects.tiers[upgrade.building] || 0) + 1;
-    else if (upgrade.kind === 'global') effects.global *= upgrade.value;
+    else if (upgrade.kind === 'global' || upgrade.kind === 'discovery') effects.global *= upgrade.value;
     else if (upgrade.kind === 'archive') effects.archivists++;
     else if (upgrade.kind === 'clickDouble') effects.clickDoublers++;
     else if (upgrade.kind === 'clickShare') effects.clickShares++;
@@ -139,7 +139,7 @@ export function getGlobalMultiplier(state) {
 }
 
 export function getBuildingMultiplier(state, buildingId) {
-  return 2 ** (upgradeEffects(state.upgrades).tiers[buildingId] || 0);
+  return tierBonus(BUILDING_BY_ID[buildingId]) ** (upgradeEffects(state.upgrades).tiers[buildingId] || 0);
 }
 
 function buffMultiplier(buffs, key) {
@@ -255,7 +255,9 @@ export function buyUpgrade(state, upgradeId) {
   if (!isUpgradeUnlocked(state, upgradeId)) return state;
   const cost = getUpgradeCost(state, upgradeId);
   if (cost > state.salvage) return state;
-  return refresh({ ...state, salvage: state.salvage - cost, upgrades: { ...state.upgrades, [upgradeId]: true } });
+  const next = { ...state, salvage: state.salvage - cost, upgrades: { ...state.upgrades, [upgradeId]: true } };
+  // Discoveries are story beats as well as upgrades.
+  return refresh(UPGRADE_BY_ID[upgradeId].kind === 'discovery' ? addLog(next, { kind: 'discovery', id: upgradeId }) : next);
 }
 
 // --- Earning ---------------------------------------------------------------

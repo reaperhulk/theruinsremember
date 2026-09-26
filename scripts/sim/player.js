@@ -92,6 +92,19 @@ export function simulate(persona, { seed = 1, horizon = persona.horizon, onCycle
   let state = createState(0);
   const counters = { actions: 0, clicks: 0, purchases: 0, echoes: 0, cycles: 0, sessions: 0, active: 0, longestWait: 0 };
   let lastPurchaseActive = 0;
+  // Attention spent in the first 8 hours without buying anything, or without
+  // anything new appearing (a building, an era's building or an upgrade).
+  const WINDOW = 8 * 3600;
+  const gaps = { purchase: 0, novelty: 0 };
+  let seen = new Set();
+  let lastBuyAt = 0;
+  let lastNewAt = 0;
+  const noticeNew = () => {
+    let fresh = false;
+    for (const building of BUILDINGS) if (isBuildingRevealed(state, building.id) && !seen.has(building.id)) { seen.add(building.id); fresh = true; }
+    for (const upgrade of getAvailableUpgrades(state)) if (!seen.has(upgrade.id)) { seen.add(upgrade.id); fresh = true; }
+    return fresh;
+  };
   const eraTimes = { 1: 0 };
   const cycleTimes = [];
   // How long each new run takes to recover what the previous run ended with,
@@ -128,12 +141,23 @@ export function simulate(persona, { seed = 1, horizon = persona.horizon, onCycle
         const bought = counters.purchases;
         state = decide(state, persona, counters);
         if (counters.purchases > bought) lastPurchaseActive = counters.active;
+        if (time < WINDOW) {
+          if (counters.purchases > bought) lastBuyAt = counters.active;
+          if (noticeNew()) lastNewAt = counters.active;
+          gaps.purchase = Math.max(gaps.purchase, counters.active - lastBuyAt);
+          if (counters.active - lastNewAt > gaps.novelty) {
+            gaps.novelty = counters.active - lastNewAt;
+            gaps.noveltyAt = { time, era: state.era, runTime: state.runTime, cycle: counters.cycles };
+          }
+        }
         // Longest stretch of attention spent with nothing worth buying.
         counters.longestWait = Math.max(counters.longestWait, counters.active - lastPurchaseActive);
         if (shouldTurnCycle(state)) {
           onCycle?.({ time, state });
           chase = { target: state.runEarned, length: time - (cycleTimes.at(-1) ?? 0), start: time };
           state = spendMemories(turnCycle(state), counters);
+          // A new run brings its opening content back into view.
+          seen = new Set();
           cycleTimes.push(time);
           counters.cycles++;
           counters.actions++;
@@ -161,6 +185,7 @@ export function simulate(persona, { seed = 1, horizon = persona.horizon, onCycle
     eraTimes,
     cycleTimes,
     recoveries,
+    gaps,
     finalEra: state.era,
     highestEra: state.highestEra,
     memories: getTotalMemories(state),

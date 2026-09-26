@@ -276,7 +276,7 @@ button.danger { border-color: var(--danger); color: var(--danger); }
 .toast { padding: 0.5em 0.8em; border-radius: 8px; opacity: 0.96; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); animation: toast-in 200ms ease-out; }
 .toast strong { color: var(--chapter); }
 .toast-echo { border-color: #f4c95d; }
-.toast-era { border-color: var(--chapter); }
+.toast-era, .toast-discovery { border-color: var(--chapter); }
 @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: grid; place-items: center; padding: 1rem; z-index: 30; }

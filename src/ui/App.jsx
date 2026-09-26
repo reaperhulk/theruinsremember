@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_NAMES } from '../game/data.js';
+import { ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_NAMES, UPGRADE_BY_ID } from '../game/data.js';
 import {
   buyBuilding, buyMemoryUpgrade, buyUpgrade, canLeaveMessage, catchEcho, click, getClickValue, getSps, leaveMessage, turnCycle,
 } from '../game/engine.js';
@@ -7,7 +7,7 @@ import { exportSave } from '../game/save.js';
 import { CHAPTERS, DISCOVERIES, MESSAGES, STORY, pickDiscovery } from '../game/lore.js';
 import { SCORE } from './score.js';
 import {
-  getMusicStatus, playAchievement, playClick, playEraTransition, playGemFound, playPrestige, playUpgrade,
+  getMusicStatus, playAchievement, playDiscovery, playClick, playEraTransition, playGemFound, playPrestige, playUpgrade,
   setMusicEnabled, setMusicEra, setVolumes, startAmbient, subscribeMusic, syncAudioVisibility, unlockAudio,
 } from './AudioManager.js';
 import { RuinsCanvas } from './RuinsCanvas.jsx';
@@ -126,7 +126,7 @@ export function App() {
   const toast = useCallback((kind, title, text) => {
     const id = ++toastId.current;
     setToasts(list => [...list.slice(-3), { id, kind, title, text }]);
-    setTimeout(() => setToasts(list => list.filter(t => t.id !== id)), kind === 'era' ? 9000 : kind === 'achievement' ? 3500 : 5000);
+    setTimeout(() => setToasts(list => list.filter(t => t.id !== id)), kind === 'era' || kind === 'discovery' ? 9000 : kind === 'achievement' ? 3500 : 5000);
   }, []);
 
   // Announce whatever the engine logged since the last render.
@@ -140,6 +140,10 @@ export function App() {
         const chapter = CHAPTERS[entry.era];
         toast('era', `Era ${entry.era}: ${ERA_NAMES[entry.era]}`, `${chapter.title}. ${chapter.discovery}`);
         playEraTransition();
+      } else if (entry.kind === 'discovery') {
+        const discovery = UPGRADE_BY_ID[entry.id];
+        toast('discovery', `Discovery: ${discovery.name}`, discovery.text);
+        playDiscovery();
       } else if (entry.kind === 'cycle' && entry.cycle === 1) {
         setStory('firstCycle');
       } else if (entry.kind === 'achievement') {
