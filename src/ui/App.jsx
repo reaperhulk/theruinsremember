@@ -51,7 +51,7 @@ function Buffs({ buffs }) {
     <div className="buffs">
       {buffs.map(buff => (
         <span key={buff.id} className={`buff buff-${buff.id}`}>
-          {ECHO_EFFECTS[buff.id].name} · {buff.production ? `production ×${buff.production}` : `clicks ×${buff.click}`} · {Math.ceil(buff.remaining)}s
+          {ECHO_EFFECTS[buff.id].name} · {buff.production ? `production ×${buff.production}` : `+${buff.clickSeconds}s of production per dig`} · {Math.ceil(buff.remaining)}s
         </span>
       ))}
     </div>

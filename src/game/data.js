@@ -173,7 +173,10 @@ export const UPGRADE_BY_ID = Object.fromEntries(UPGRADES.map(u => [u.id, u]));
 export const ECHO_EFFECTS = {
   cache: { name: 'Recovered Cache', weight: 45, description: 'A sealed cache of salvage.' },
   remembrance: { name: 'Remembrance', weight: 45, duration: 77, production: 7, description: 'Production ×7 for 77 seconds.' },
-  ancientHands: { name: 'Ancient Hands', weight: 10, duration: 13, click: 777, description: 'Clicks ×777 for 13 seconds.' },
+  // Each dig during Ancient Hands also recovers this many seconds of base
+  // production. Bounded by how fast anyone can click, and unaffected by other
+  // buffs, so it can't eclipse the rest of the economy.
+  ancientHands: { name: 'Ancient Hands', weight: 10, duration: 13, clickSeconds: 10, description: 'For 13 seconds, every dig also recovers 10 seconds of production.' },
 };
 export const ECHO_SPAWN_MIN = 300;
 export const ECHO_SPAWN_MAX = 900;

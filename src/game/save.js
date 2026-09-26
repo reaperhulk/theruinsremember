@@ -53,7 +53,7 @@ export function parseSave(text) {
   state.highestEra = Math.max(state.era, Number.isInteger(saved.highestEra) ? Math.min(10, saved.highestEra) : 1);
   state.buffs = Array.isArray(saved.buffs)
     ? saved.buffs.filter(b => isObject(b) && ECHO_EFFECTS[b.id] && amount(b.remaining))
-      .map(b => ({ id: b.id, remaining: b.remaining, ...(ECHO_EFFECTS[b.id].production ? { production: ECHO_EFFECTS[b.id].production } : {}), ...(ECHO_EFFECTS[b.id].click ? { click: ECHO_EFFECTS[b.id].click } : {}) }))
+      .map(b => ({ id: b.id, remaining: b.remaining, ...(ECHO_EFFECTS[b.id].production ? { production: ECHO_EFFECTS[b.id].production } : {}), ...(ECHO_EFFECTS[b.id].clickSeconds ? { clickSeconds: ECHO_EFFECTS[b.id].clickSeconds } : {}) }))
     : [];
   const timer = saved.echo?.timer;
   state.echo = { timer: amount(timer) ? timer : fresh.echo.timer, active: null };

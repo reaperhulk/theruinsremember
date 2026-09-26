@@ -170,7 +170,8 @@ export function getClickValue(state) {
   const { clickDoublers, clickShares } = upgradeEffects(state.upgrades);
   const hands = state.memoryUpgrades.rememberedHands;
   const base = 2 ** clickDoublers * (hands ? 2 : 1);
-  return (base + getSps(state) * 0.01 * (clickShares + (hands ? 1 : 0))) * buffMultiplier(state.buffs, 'click');
+  const handsBonus = state.buffs.reduce((sum, buff) => sum + (buff.clickSeconds || 0), 0) * getBaseSps(state);
+  return base + getSps(state) * 0.01 * (clickShares + (hands ? 1 : 0)) + handsBonus;
 }
 
 export function getStats(state) {
@@ -350,7 +351,7 @@ export function catchEcho(state, rng = Math.random) {
   } else {
     const buff = { id: effectId, remaining: getBuffDuration(state, effect.duration) };
     if (effect.production) buff.production = effect.production;
-    if (effect.click) buff.click = effect.click;
+    if (effect.clickSeconds) buff.clickSeconds = effect.clickSeconds;
     next = { ...next, buffs: [...next.buffs.filter(b => b.id !== effectId), buff] };
   }
   next = addLog(next, { kind: 'echo', effect: effectId, amount });

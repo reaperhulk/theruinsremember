@@ -146,6 +146,19 @@ describe('echoes', () => {
     expect(after.buffs).toEqual([]);
   });
 
+  it('Ancient Hands adds a bounded amount of production to every dig', () => {
+    let state = buyBuilding(rich({ ...createState(0), era: 3 }, 1e6), 'camp', 10);
+    state = { ...state, echo: { timer: 0, active: { x: 0.5, y: 0.5, remaining: 5 } } };
+    const plain = getClickValue(state);
+    const { state: hands, effect } = catchEcho(state, rng(0.99));
+    expect(effect.id).toBe('ancientHands');
+    // Each dig recovers ten seconds of base production, however it is buffed.
+    expect(getClickValue(hands) - plain).toBeCloseTo(10 * getBaseSps(hands));
+    const both = { ...hands, buffs: [...hands.buffs, { id: 'remembrance', production: 7, remaining: 50 }] };
+    expect(getClickValue(both) - getClickValue({ ...both, buffs: both.buffs.filter(b => b.id !== 'ancientHands') })).toBeCloseTo(10 * getBaseSps(hands));
+    expect(tick(hands, 30, () => 0.5).buffs).toEqual([]);
+  });
+
   it('never grant Ancient Hands before the Digital Age', () => {
     const state = { ...createState(0), echo: { timer: 0, active: { x: 0.5, y: 0.5, remaining: 5 } } };
     expect(catchEcho(state, rng(0.99)).effect.id).not.toBe('ancientHands');
