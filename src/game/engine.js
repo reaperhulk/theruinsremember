@@ -9,6 +9,11 @@ import { MESSAGES } from './lore.js';
 
 export const SAVE_VERSION = 1;
 
+// What the message left at the ending does for every later cycle.
+const MESSAGE_MEMORY_STRENGTH = 1.25; // warn: memories multiply production 25% more
+const MESSAGE_CLICK_SHARE = 0.05; // welcome: each dig adds 5% of a second's production
+const MESSAGE_INHERITANCE = 0.01; // guide: each cycle starts with 1% of the last one's salvage
+
 export function createState(now = Date.now()) {
   return {
     version: SAVE_VERSION,
@@ -111,7 +116,7 @@ function upgradeEffects(upgrades) {
 // later cycles run away.
 export function getMemoryStrength(state) {
   const m = state.memoryUpgrades;
-  return m.deeperMemory ? 1 : m.deepMemory ? 0.75 : 0.5;
+  return (m.deeperMemory ? 1 : m.deepMemory ? 0.75 : 0.5) * (state.message === 'warn' ? MESSAGE_MEMORY_STRENGTH : 1);
 }
 
 export function getMemoryMultiplier(state, memories = getTotalMemories(state)) {
@@ -121,7 +126,7 @@ export function getMemoryMultiplier(state, memories = getTotalMemories(state)) {
 // Share of the last cycle's recovered salvage a new cycle starts with.
 export function getInheritanceRate(state) {
   const m = state.memoryUpgrades;
-  return m.inheritance ? 0.01 : m.headStart ? 0.001 : 0;
+  return (m.inheritance ? 0.01 : m.headStart ? 0.001 : 0) + (state.message === 'guide' ? MESSAGE_INHERITANCE : 0);
 }
 
 export function getAchievementBonus(state) {
@@ -171,7 +176,8 @@ export function getClickValue(state) {
   const hands = state.memoryUpgrades.rememberedHands;
   const base = 2 ** clickDoublers * (hands ? 2 : 1);
   const handsBonus = state.buffs.reduce((sum, buff) => sum + (buff.clickSeconds || 0), 0) * getBaseSps(state);
-  return base + getSps(state) * 0.01 * (clickShares + (hands ? 1 : 0)) + handsBonus;
+  const welcome = state.message === 'welcome' ? MESSAGE_CLICK_SHARE : 0;
+  return base + getSps(state) * (0.01 * (clickShares + (hands ? 1 : 0)) + welcome) + handsBonus;
 }
 
 export function getStats(state) {
@@ -454,12 +460,15 @@ export function buyMemoryUpgrade(state, id) {
 // --- The ending ------------------------------------------------------------
 
 // Owning an Echo of Yourself lets you choose (or rewrite) the message the
-// ruins will carry into every later cycle.
+// ruins will carry into every later cycle. The message shapes those cycles:
+// a warning makes memories stronger, a welcome makes every dig count, and a
+// guide leaves each new cycle some of the last one's salvage (see the MESSAGE_ constants).
+
 export function canLeaveMessage(state) {
   return (state.buildings.echo || 0) > 0;
 }
 
 export function leaveMessage(state, id) {
   if (!MESSAGES[id] || !canLeaveMessage(state) || state.message === id) return state;
-  return addLog({ ...state, message: id }, { kind: 'message', id });
+  return refresh(addLog({ ...state, message: id }, { kind: 'message', id }));
 }

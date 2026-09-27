@@ -276,6 +276,7 @@ function buildAchievements() {
   for (const [count, name] of [[1, 'The Cycle Turns'], [5, 'Again'], [10, 'And Again'], [25, 'The Loop']]) {
     list.push({ id: `cycles:${count}`, name, description: `Let the cycle turn ${count} time${count === 1 ? '' : 's'}.`, test: s => s.cycles >= count });
   }
+  list.push({ id: 'message', name: 'The Ruins Remember', description: 'Leave a message for the next civilization.', test: s => !!s.message });
   return list;
 }
 

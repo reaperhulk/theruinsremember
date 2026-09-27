@@ -518,9 +518,33 @@ export const CYCLE_DISCOVERIES = {
 
 // The message the first Echo of Yourself lets you leave for the next arrivals.
 export const MESSAGES = {
-  warn: { label: 'Warn them', text: 'Do not build what we built. It ends the same way.', description: 'Tell the next civilization where this road leads.' },
-  welcome: { label: 'Welcome them', text: 'You are not the first. You are not alone. Keep digging.', description: 'Tell them someone was here, and someone cared.' },
-  guide: { label: 'Guide them', text: 'Everything you need is already buried here. We left it for you.', description: 'Tell them the ruins are a gift, not a warning.' },
+  warn: {
+    label: 'Warn them', text: 'Do not build what we built. It ends the same way.', description: 'Tell the next civilization where this road leads.',
+    effect: 'Every later civilization heeds the warning: memories multiply production 25% more.',
+    epilogue: [
+      'The next survivors find your warning on the first day, before they have even buried their dead. They argue over it for a generation.',
+      'They build anyway. Everyone does. But they build carefully, and they write down everything they learn, and when the end comes they are not surprised by it.',
+      'They remember more of it than you did.',
+    ],
+  },
+  welcome: {
+    label: 'Welcome them', text: 'You are not the first. You are not alone. Keep digging.', description: 'Tell them someone was here, and someone cared.',
+    effect: 'Every later civilization digs with your encouragement: each dig also recovers 5% of a second’s production.',
+    epilogue: [
+      'A child finds your words scratched into a stone near the crash site and reads them aloud to anyone who will listen.',
+      'The survivors are frightened, and hungry, and very far from home. But someone was here. Someone cared enough to leave a note. They pick up their shovels.',
+      'Every dig, somewhere, someone is saying it again: keep digging.',
+    ],
+  },
+  guide: {
+    label: 'Guide them', text: 'Everything you need is already buried here. We left it for you.', description: 'Tell them the ruins are a gift, not a warning.',
+    effect: 'Every later civilization knows where to look: each cycle begins with 1% of the salvage the last one recovered.',
+    epilogue: [
+      'The next survivors stop treating the ruins as a mystery and start treating them as a map.',
+      'They dig where you dug. They find your caches exactly where you left them: tools, alloys, blueprints wrapped against the damp. What took you a lifetime takes them a season.',
+      'The ruins were never a warning. They were an inheritance, and now everyone knows it.',
+    ],
+  },
 };
 
 // Where later civilizations find your message. {message} is replaced.
@@ -547,6 +571,14 @@ export const STORY = {
       'You build the Echo of Yourself, and it turns to look at you. It has your face, your hands, your handwriting. It has been here the whole time: in the foundations, in the maintenance notes, on the empty berth.',
       'The ruins were never someone else\u2019s. They were yours, left for you, by you. Every civilization reaches this point, and every civilization leaves a message for the next.',
       'This time, you can choose what it says.',
+    ],
+  },
+  // Shown after the message is chosen. The chosen message's epilogue comes first.
+  epilogue: {
+    title: 'What the ruins will say',
+    paragraphs: [
+      'Your civilization has done what every civilization does. It rose from the ruins, it reached the edge of everything, and it found itself waiting there.',
+      'The cycle will turn, as it always has. The difference is that now it turns on purpose.',
     ],
   },
 };

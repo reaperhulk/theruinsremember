@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_NAMES, UPGRADE_BY_ID } from '../game/data.js';
+import { ACHIEVEMENTS, ACHIEVEMENT_BY_ID, ECHO_EFFECTS, ERA_NAMES, UPGRADE_BY_ID } from '../game/data.js';
 import {
-  buyBuilding, buyMemoryUpgrade, buyUpgrade, canLeaveMessage, catchEcho, click, getClickValue, getSps, leaveMessage, turnCycle,
+  buyBuilding, buyMemoryUpgrade, buyUpgrade, canLeaveMessage, catchEcho, click, getClickValue, getPendingMemories, getSps, leaveMessage, turnCycle,
 } from '../game/engine.js';
 import { exportSave } from '../game/save.js';
 import { CHAPTERS, DISCOVERIES, MESSAGES, STORY, pickDiscovery } from '../game/lore.js';
@@ -73,9 +73,9 @@ function Toasts({ toasts }) {
 }
 
 // A chapter of the story: the first cycle, and the ending with its choice.
-function StoryModal({ story, children, onClose, action }) {
+function StoryModal({ story, children, onClose, action, secondary }) {
   return (
-    <Modal title={story.title} onClose={onClose} action={action} className="story">
+    <Modal title={story.title} onClose={onClose} action={action} secondary={secondary} className="story">
       {story.paragraphs.map(text => <p key={text}>{text}</p>)}
       {children}
     </Modal>
@@ -90,21 +90,51 @@ function EndingChoice({ current, onChoose }) {
           <strong>{message.label}</strong>
           <span>“{message.text}”</span>
           <small>{message.description}</small>
+          <small className="message-effect">{message.effect}</small>
         </button>
       ))}
     </div>
   );
 }
 
-function Modal({ title, children, onClose, action = 'Continue', className = '' }) {
+// The close of the story: what the chosen message becomes, and a look back
+// at the whole journey before the cycle turns on purpose.
+function Epilogue({ state }) {
+  const message = MESSAGES[state.message];
+  const rows = [
+    ['Time in the ruins', formatTime(state.totalTime)],
+    ['Cycles turned', state.cycles.toLocaleString('en-US')],
+    ['Salvage recovered', formatAmount(state.totalEarned)],
+    ['Dug by hand', `${state.clicks.toLocaleString('en-US')} times`],
+    ['Glimmers caught', state.echoesCaught.toLocaleString('en-US')],
+    ['Achievements', `${Object.keys(state.achievements).length} of ${ACHIEVEMENTS.length}`],
+  ];
+  return (
+    <>
+      <blockquote className="epilogue-message">“{message.text}”</blockquote>
+      {message.epilogue.map(text => <p key={text}>{text}</p>)}
+      {STORY.epilogue.paragraphs.map(text => <p key={text}>{text}</p>)}
+      <dl className="stat-list epilogue-stats">{rows.map(([k, v]) => <div key={k} className="stat-row"><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+      <p className="muted">{message.effect} You can rewrite the message whenever you own an Echo of Yourself.</p>
+    </>
+  );
+}
+
+function Modal({ title, children, onClose, action = 'Continue', secondary, className = '' }) {
   const ref = useRef(null);
-  useEffect(() => { ref.current?.focus(); }, []);
+  useEffect(() => { ref.current?.focus({ preventScroll: true }); }, []);
+  const primary = <button ref={ref} type="button" className="primary" onClick={onClose}>{action}</button>;
   return (
     <div className="modal-backdrop" role="presentation">
       <div className={`modal ${className}`} role="dialog" aria-modal="true" aria-label={title}>
         <h2>{title}</h2>
         {children}
-        <button ref={ref} type="button" className="primary" onClick={onClose}>{action}</button>
+        {secondary ? (
+          <div className="modal-actions">
+            <button type="button" onClick={secondary.onClick}>{secondary.label}</button>
+            {primary}
+          </div>
+        ) : primary}
       </div>
     </div>
   );
@@ -245,10 +275,22 @@ export function App() {
           onClose={() => { setStory(null); setEndingDeferred(true); }}>
           <EndingChoice current={state.message} onChoose={id => {
             update(s => leaveMessage(s, id));
-            setStory(null);
-            toast('era', 'Your message', `“${MESSAGES[id].text}” The next civilization will find it in the ruins.`);
+            setStory('epilogue');
           }} />
         </StoryModal>
+      )}
+      {story === 'epilogue' && state.message && (
+        getPendingMemories(state) > 0 ? (
+          <StoryModal story={STORY.epilogue} action={`Let the cycle turn (+${formatAmount(getPendingMemories(state))} memories)`}
+            onClose={() => { setStory(null); onTurn(); toast('era', 'The cycle turns', 'Your message waits in the ruins for whoever comes next.'); }}
+            secondary={{ label: 'Stay a while', onClick: () => setStory(null) }}>
+            <Epilogue state={state} />
+          </StoryModal>
+        ) : (
+          <StoryModal story={STORY.epilogue} action="Stay a while" onClose={() => setStory(null)}>
+            <Epilogue state={state} />
+          </StoryModal>
+        )
       )}
     </div>
   );

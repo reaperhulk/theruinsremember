@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CHAPTERS, CYCLE_DISCOVERIES, DISCOVERIES, MESSAGES, MESSAGE_DISCOVERIES, pickDiscovery } from '../lore.js';
-import { buyBuilding, createState, leaveMessage, turnCycle } from '../engine.js';
+import { buyBuilding, createState, getClickValue, getInheritanceRate, getMemoryMultiplier, getSps, leaveMessage, turnCycle } from '../engine.js';
 import { parseSave, serializeSave } from '../save.js';
 
 const sequence = (...values) => { let i = 0; return () => values[i++ % values.length]; };
@@ -38,7 +38,7 @@ describe('the ending', () => {
     expect(leaveMessage(state, 'nonsense')).toBe(state);
     state = leaveMessage(state, 'warn');
     expect(state.message).toBe('warn');
-    expect(state.log.at(-1)).toMatchObject({ kind: 'message', id: 'warn' });
+    expect(state.log.slice(-2)).toMatchObject([{ kind: 'message', id: 'warn' }, { kind: 'achievement', id: 'message' }]);
     expect(leaveMessage(state, 'warn')).toBe(state);
     const next = turnCycle(state);
     expect(next.message).toBe('warn');
@@ -46,6 +46,23 @@ describe('the ending', () => {
     // It can be rewritten once another Echo of Yourself is built.
     expect(leaveMessage(next, 'welcome')).toBe(next);
     expect(leaveMessage(withEcho(), 'welcome').message).toBe('welcome');
+  });
+
+  it('gives every message a lasting, different effect on later cycles', () => {
+    const base = { ...withEcho(), memories: 100 };
+    const [warn, welcome, guide] = ['warn', 'welcome', 'guide'].map(id => turnCycle(leaveMessage(base, id)));
+    const none = turnCycle(base);
+    for (const id of Object.keys(MESSAGES)) expect(MESSAGES[id].effect && MESSAGES[id].epilogue.length).toBeTruthy();
+    // A warning makes memories stronger.
+    expect(getMemoryMultiplier(warn) - 1).toBeCloseTo((getMemoryMultiplier(none) - 1) * 1.25);
+    expect(getMemoryMultiplier(welcome)).toBe(getMemoryMultiplier(none));
+    // A welcome makes each dig worth 5% of a second's production.
+    const producing = s => ({ ...s, buildings: { scavenger: 50 } });
+    expect(getClickValue(producing(welcome)) - getClickValue(producing(none))).toBeCloseTo(getSps(producing(welcome)) * 0.05);
+    // A guide hands each new cycle 1% of the last one's salvage.
+    expect(getInheritanceRate(guide)).toBe(0.01);
+    expect(guide.runEarned).toBe(Math.floor(base.runEarned * 0.01));
+    expect(none.runEarned).toBe(0);
   });
 
   it('is saved, and an unknown message is dropped', () => {

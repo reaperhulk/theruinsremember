@@ -182,7 +182,16 @@ async function story() {
   await s.shot('ending');
   await (await byText('div[@class="message-choices"]/button', 'Guide them')).click();
   check((await s.state()).message === 'guide', 'story: choosing a message did not record it');
-  check(!(await page.$('.modal')), 'story: the ending stayed open after choosing');
+  // The epilogue follows: the message's ending, a look back, and the last turn.
+  await page.waitForSelector('.epilogue-message');
+  const epilogue = await page.$eval('.modal.story', el => el.textContent);
+  check(/What the ruins will say/.test(epilogue) && /Time in the ruins/.test(epilogue), `story: epilogue showed "${epilogue.slice(0, 80)}"`);
+  await s.shot('epilogue');
+  const cycles = (await s.state()).cycles;
+  await (await byText('div[@class="modal-actions"]/button', 'Let the cycle turn')).click();
+  const after = await s.state();
+  check(after.cycles === cycles + 1 && after.message === 'guide' && !after.buildings.echo, 'story: the epilogue did not turn the cycle with the message');
+  check(!(await page.$('.modal')), 'story: the epilogue stayed open after turning');
   await (await byText('button[@role="tab"]', 'Chronicle')).click();
   const card = await page.$eval('.message-card', el => el.textContent);
   check(/Everything you need is already buried here/.test(card), `story: chronicle shows "${card}"`);

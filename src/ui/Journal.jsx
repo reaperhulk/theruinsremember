@@ -52,6 +52,7 @@ function Chronicle({ state, onRewriteMessage }) {
         <article className="message-card">
           <p className="eyebrow">Your message to the next civilization</p>
           <p>“{MESSAGES[state.message].text}”</p>
+          <small className="muted">{MESSAGES[state.message].effect}</small>
           {canLeaveMessage(state) && <button type="button" onClick={onRewriteMessage}>Rewrite it</button>}
         </article>
       )}
